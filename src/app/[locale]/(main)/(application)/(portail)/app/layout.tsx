@@ -1,6 +1,7 @@
 import { AppProvider } from "@/components/provider/AppProvider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { roleEntrepriseCodes } from "@/constants/codeTables";
+import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import { bootstrapUser } from "@/server/queries/bootstrap.query";
 import { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
@@ -12,8 +13,7 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getSession();
   const user = session?.user;
   if (!user) {
-    //TODO : rediriger vers page de login
-    return <div>Not authenticated</div>;
+    redirect({ href: "/auth/login", locale: "fr" });
   }
 
   const cookieStore = await cookies();
@@ -25,26 +25,25 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
       ? (cookieValue as RoleEntrepriseType)
       : undefined;
 
-  const bootstrap = await bootstrapUser(user.id, postureActive);
+  const bootstrap = await bootstrapUser(user!.id, postureActive);
   if (!bootstrap) {
-    //TODO : rediriger vers page d'adhesion
-    return <div>No entreprise adhesion found</div>;
+    redirect({ href: "/auth/unauthorized", locale: "fr" });
   }
 
   const payload = {
     user: {
-      id: user.id,
-      prenom: user.prenom ?? "",
-      nom: user.nom ?? "",
-      email: user.email,
-      avatarId: user.avatarId ?? null,
+      id: user!.id,
+      prenom: user!.prenom ?? "",
+      nom: user!.nom ?? "",
+      email: user!.email,
+      avatarId: user!.avatarId ?? null,
     },
-    entreprise: bootstrap.entreprise,
-    roleClientAdhesion: bootstrap.roleClientAdhesion,
-    rolePrestataireAdhesion: bootstrap.rolePrestataireAdhesion,
-    rolesEntreprise: bootstrap.rolesEntreprise,
-    postureActive: bootstrap.postureActive,
-    rolePlateformeAdhesion: bootstrap.rolePlateformeAdhesion,
+    entreprise: bootstrap!.entreprise,
+    roleClientAdhesion: bootstrap!.roleClientAdhesion,
+    rolePrestataireAdhesion: bootstrap!.rolePrestataireAdhesion,
+    rolesEntreprise: bootstrap!.rolesEntreprise,
+    postureActive: bootstrap!.postureActive,
+    rolePlateformeAdhesion: bootstrap!.rolePlateformeAdhesion,
   };
 
   return (

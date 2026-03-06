@@ -15,7 +15,7 @@ import { SelectItem } from "@/components/ui/select";
 import { getServicesAction } from "@/server/actions/servicesActions";
 import { insertTacheListeTemplateAction } from "@/server/actions/tacheListesTemplatesActions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClipboardList, Loader2 } from "lucide-react";
+import { ListChecks, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -105,7 +105,7 @@ export function NewChecklistDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <ClipboardList className="text-primary h-5 w-5" />
+            <ListChecks className="text-primary h-5 w-5" />
             {isSystem ? "Nouvelle checklist système" : "Nouvelle checklist"}
           </DialogTitle>
         </DialogHeader>

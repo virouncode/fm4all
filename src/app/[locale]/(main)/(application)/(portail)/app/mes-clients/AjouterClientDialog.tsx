@@ -20,7 +20,13 @@ import {
   findEntrepriseBySiretAction,
 } from "@/server/actions/clientServiceExecutionsActions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, RotateCcw, Search, XCircle } from "lucide-react";
+import {
+  Building2,
+  CheckCircle2,
+  RotateCcw,
+  Search,
+  XCircle,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -160,7 +166,12 @@ export function AjouterClientDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] max-w-lg flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
-          <DialogTitle>Ajouter un client</DialogTitle>
+          <DialogTitle>
+            <div className="flex items-center gap-2">
+              <Building2 className="text-primary" />
+              Ajouter un client
+            </div>
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -314,7 +325,9 @@ export function AjouterClientDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={!siretResolved || siretBlocked || isSubmitting || creating}
+                disabled={
+                  !siretResolved || siretBlocked || isSubmitting || creating
+                }
               >
                 {(isSubmitting || creating) && <Spinner />}
                 Confirmer

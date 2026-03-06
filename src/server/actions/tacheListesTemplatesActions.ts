@@ -17,7 +17,8 @@ import {
   getTacheListesTemplatesByProprietaire,
   getTacheListesWithServiceNames,
 } from "@/server/queries/tacheListesTemplates.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
 import {
   deleteTacheListeItemSchema,
   deleteTacheListeTemplateSchema,
@@ -39,32 +40,6 @@ import { flattenValidationErrors } from "next-safe-action";
 
 // ==================== HELPERS ====================
 
-/** Vérifie que l'utilisateur a accès à l'entreprise (adhésion client ou prestataire, ou rôle plateforme) */
-async function hasAccessToEntreprise(
-  userId: string,
-  entrepriseId: string,
-): Promise<boolean> {
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (platformRole?.role) return true;
-
-  const [clientAdhesion, prestataireAdhesion] = await Promise.all([
-    db.query.userClientAdhesions.findFirst({
-      where: and(
-        eq(userClientAdhesions.userId, userId),
-        eq(userClientAdhesions.entrepriseId, entrepriseId),
-      ),
-    }),
-    db.query.userPrestataireAdhesions.findFirst({
-      where: and(
-        eq(userPrestataireAdhesions.userId, userId),
-        eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
-      ),
-    }),
-  ]);
-
-  return !!(clientAdhesion ?? prestataireAdhesion);
-}
-
 /**
  * Vérifie que l'utilisateur peut écrire des checklists pour cette entreprise.
  * Requiert au minimum le rôle "manager" (client ou prestataire) ou rôle plateforme.
@@ -75,7 +50,7 @@ async function canManageChecklists(
 ): Promise<boolean> {
   if (!entrepriseId) return false;
 
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
   const [clientAdhesion, prestataireAdhesion] = await Promise.all([
@@ -83,12 +58,14 @@ async function canManageChecklists(
       where: and(
         eq(userClientAdhesions.userId, userId),
         eq(userClientAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
       ),
     }),
     db.query.userPrestataireAdhesions.findFirst({
       where: and(
         eq(userPrestataireAdhesions.userId, userId),
         eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
       ),
     }),
   ]);
@@ -106,7 +83,7 @@ async function canManageChecklists(
 
 /** Vérifie que l'utilisateur a le rôle plateforme */
 async function isPlatformUser(userId: string): Promise<boolean> {
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  const platformRole = await getEffectivePlateformeRole(userId);
   return !!platformRole?.role;
 }
 
@@ -286,7 +263,7 @@ export const updateTacheListeTemplateAction = actionClient
     const { id, entrepriseId, nom, actif } = parsedInput;
 
     // Vérifier que le pack appartient à cette entreprise (ou rôle plateforme pour pack système)
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
       if (!hasSufficientRole) {
@@ -349,7 +326,7 @@ export const deleteTacheListeTemplateAction = actionClient
     const { id, entrepriseId } = parsedInput;
 
     // Vérifier propriété du pack (ou rôle plateforme)
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
       if (!hasSufficientRole) {
@@ -410,7 +387,7 @@ export const insertTacheListeItemAction = actionClient
       normalized;
 
     // Vérifier que le pack appartient à cette entreprise
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
       if (!hasSufficientRole) {
@@ -487,7 +464,7 @@ export const updateTacheListeItemAction = actionClient
       normalized;
 
     // Vérifier propriété via le pack
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
       if (!hasSufficientRole) {
@@ -558,7 +535,7 @@ export const deleteTacheListeItemAction = actionClient
     const { id, entrepriseId } = parsedInput;
 
     // Vérifier propriété via le pack
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
       if (!hasSufficientRole) {
@@ -638,7 +615,7 @@ export const reorderTacheListeItemsAction = actionClient
     const { listeTemplateId, entrepriseId, orderedIds } = parsedInput;
 
     // Vérifier propriété du pack
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
       if (!hasSufficientRole) {

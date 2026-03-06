@@ -2,13 +2,13 @@
 
 import { db } from "@/db";
 import {
+  clientServiceExecutionPrix,
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServicePerimetre,
   clientServices,
-  tacheListesTemplates,
 } from "@/db/schema/services";
-import { userClientAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -16,10 +16,12 @@ import {
   getAllPrestations,
   getPrestationById,
   getPrestationsByEntreprise,
+  getPrestationsByPrestataire,
   getPrestationWithJoinsById,
   prestationBelongsToEntreprise,
 } from "@/server/queries/clientServices.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getResponsableSiteIdsByPrestataire } from "@/server/queries/userPrestataireSiteAttributions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
@@ -27,11 +29,11 @@ import {
   getPrestationsQuerySchema,
   insertClientServiceToDbSchema,
   insertPrestationActionSchema,
+  insertPrestationWithExecutionActionSchema,
   perimetreEntrySchema,
   prestationByIdSchema,
   selectClientServiceSchema,
   updateClientServiceToDbSchema,
-  updateClientServiceTacheListeSchema,
   updatePrestationActionSchema,
   updatePrestationStatutSchema,
 } from "@/zod-schemas/clientServices.schema";
@@ -52,7 +54,7 @@ async function canManagePrestation(
   entrepriseId: string,
   siteId: string,
 ): Promise<{ allowed: boolean; isPlateforme: boolean }> {
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return { allowed: true, isPlateforme: true };
 
   const siteRole = await resolveUserEffectiveRoleOnSite({
@@ -70,7 +72,7 @@ async function hasAccessToEntreprise(
   userId: string,
   entrepriseId: string,
 ): Promise<boolean> {
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
   const adhesion = await db.query.userClientAdhesions.findFirst({
@@ -133,6 +135,7 @@ export const getPrestationsAction = actionClient
 
     const {
       entrepriseId,
+      prestataireEntrepriseId,
       statut,
       serviceId,
       siteId,
@@ -141,9 +144,30 @@ export const getPrestationsAction = actionClient
       orderDir,
     } = parsedInput;
 
+    // Branche prestataire : filtre via executions → serviceEntreprises
+    if (prestataireEntrepriseId) {
+      const adhesion = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, prestataireEntrepriseId),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
+      const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+      if (!adhesion && !plateformeRole?.role) {
+        throw errors.forbidden("Vous n'avez pas accès à ce prestataire.");
+      }
+
+      const prestations = await getPrestationsByPrestataire(
+        prestataireEntrepriseId,
+        { clientEntrepriseId: entrepriseId, statut, serviceId, siteId, modeCommercial, orderBy, orderDir },
+      );
+      return { prestations };
+    }
+
     if (!entrepriseId) {
       // Vue cross-clients : réservée à la plateforme
-      const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+      const platformRole = await getEffectivePlateformeRole(currentUser.id);
       if (!platformRole?.role) {
         throw errors.forbidden(
           "Seule la plateforme peut accéder à la vue cross-clients.",
@@ -160,7 +184,7 @@ export const getPrestationsAction = actionClient
       return { prestations };
     }
 
-    // Vue standard : vérifier l'accès à l'entreprise
+    // Vue standard : vérifier l'accès à l'entreprise (posture client)
     const hasAccess = await hasAccessToEntreprise(currentUser.id, entrepriseId);
     if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
@@ -554,16 +578,23 @@ export const updatePrestationStatutAction = actionClient
       );
     }
 
-    // Guard : activation planifiée sans checklist interdite
-    if (
-      newStatut === "actif" &&
-      current.modePlanning === "planifie" &&
-      !current.tacheListeTemplateId
-    ) {
-      throw errors.conflict(
-        "Impossible d'activer une prestation planifiée sans checklist. " +
-          "Sélectionnez une checklist par défaut dans l'onglet Paramètres.",
-      );
+    // Guard : activation sans exécution active interdite
+    if (newStatut === "actif") {
+      const [execRow] = await db
+        .select({ total: count() })
+        .from(clientServiceExecutions)
+        .where(
+          and(
+            eq(clientServiceExecutions.clientServiceId, prestationId),
+            eq(clientServiceExecutions.actif, true),
+          ),
+        );
+      if (!execRow || execRow.total === 0) {
+        throw errors.conflict(
+          "Impossible d'activer une prestation sans exécution active. " +
+            "Ajoutez au moins une exécution (prestataire + tarifs) dans l'onglet Exécution & Tarifs.",
+        );
+      }
     }
 
     // Effectuer la mise à jour
@@ -684,73 +715,152 @@ export const deletePrestationAction = actionClient
     };
   });
 
-// ==================== UPDATE CHECKLIST PAR DÉFAUT ====================
+// ==================== INSERT PRESTATION + EXECUTION (posture prestataire) ====================
 
-export const updateClientServiceTacheListeAction = actionClient
-  .metadata({ actionName: "updateClientServiceTacheListeAction" })
-  .inputSchema(updateClientServiceTacheListeSchema, {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+/**
+ * Crée une prestation ET son exécution dans une seule transaction.
+ * Réservé à la posture prestataire : le prestataire est automatiquement résolu
+ * depuis le serviceEntrepriseId fourni ; modeCommercial est toujours "direct".
+ */
+export const insertPrestationWithExecutionAction = actionClient
+  .metadata({ actionName: "insertPrestationWithExecutionAction" })
+  .inputSchema(insertPrestationWithExecutionActionSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { prestationId, entrepriseId, tacheListeTemplateId } = parsedInput;
+    const { entrepriseId, siteId } = parsedInput;
 
-    // Vérifier que la prestation appartient à l'entreprise
-    const prestation = await getPrestationById(prestationId);
-    if (!prestation || prestation.entrepriseId !== entrepriseId) {
-      throw errors.notFound("Prestation");
-    }
+    // Permission : plateforme OU responsable_site prestataire sur le site client
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!platformRole) {
+      // Vérifier adhésion prestataire active
+      const prestataireAdhesion =
+        await db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        });
+      if (!prestataireAdhesion) {
+        throw errors.forbidden(
+          "Vous devez être un prestataire actif pour créer une prestation.",
+        );
+      }
 
-    // Vérifier les permissions
-    const canManage = await canManagePrestation(
-      currentUser.id,
-      entrepriseId,
-      prestation.siteId,
-    );
-    if (!canManage) {
-      throw errors.forbidden(
-        "Vous devez être responsable de ce site pour modifier la checklist.",
-      );
-    }
-
-    // Si un pack est fourni, vérifier qu'il existe et appartient au bon service
-    if (tacheListeTemplateId) {
-      const [pack] = await db
-        .select({ serviceId: tacheListesTemplates.serviceId })
-        .from(tacheListesTemplates)
-        .where(eq(tacheListesTemplates.id, tacheListeTemplateId))
-        .limit(1);
-
-      if (!pack) throw errors.notFound("Pack de tâches");
-      if (pack.serviceId !== prestation.serviceId) {
-        throw errors.conflict(
-          "Ce pack de tâches n'est pas compatible avec le service de cette prestation.",
+      // Vérifier responsable_site sur le site client
+      const responsableSiteIds = await getResponsableSiteIdsByPrestataire({
+        userId: currentUser.id,
+        clientEntrepriseId: entrepriseId,
+      });
+      if (!responsableSiteIds.includes(siteId)) {
+        throw errors.forbidden(
+          "Vous devez être responsable de ce site chez ce client pour créer une prestation.",
         );
       }
     }
 
-    const [updated] = await db
-      .update(clientServices)
-      .set({
-        tacheListeTemplateId,
-        updatedById: currentUser.id,
-        updatedAt: new Date(),
-      })
-      .where(eq(clientServices.id, prestationId))
-      .returning();
-
-    if (!updated) throw errors.internal("Échec de la mise à jour.");
-
-    // Resync les occurrences futures (les tâches snapshotées seront remplacées)
-    await onClientServiceChanged({
-      clientServiceId: prestationId,
-      now: new Date(),
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalNumbers: [
+        "frequenceParPeriode",
+        "intervalleJours",
+        "dureeEstimeeMinutes",
+      ] as const,
+      optionalDates: ["dateDebut", "dateFin", "dateFinValidite"] as const,
+      requiredDates: ["dateDebutValidite"] as const,
+      requiredNumbers: ["priorite"] as const,
+      optionalStrings: ["heureDebutPreference", "notes"] as const,
     });
 
-    return { prestation: updated };
+    const payload = insertClientServiceToDbSchema.parse({
+      entrepriseId: normalized.entrepriseId,
+      siteId: normalized.siteId,
+      serviceId: normalized.serviceId,
+      frequence: normalized.frequence,
+      frequenceParPeriode: normalized.frequenceParPeriode,
+      intervalleJours: normalized.intervalleJours,
+      dateDebut: normalized.dateDebut,
+      dateFin: normalized.dateFin,
+      joursPreference: normalized.joursPreference ?? null,
+      heureDebutPreference: normalized.heureDebutPreference,
+      dureeEstimeeMinutes: normalized.dureeEstimeeMinutes,
+      statut: "brouillon",
+      modePlanning: normalized.modePlanning ?? "planifie",
+      modeCommercial: "direct", // Toujours direct en posture prestataire
+      notes: normalized.notes,
+      createdById: currentUser.id,
+      updatedById: currentUser.id,
+    });
+
+    const parsedPrestation = await db.transaction(async (tx) => {
+      // 1. Créer la prestation
+      const [inserted] = await tx
+        .insert(clientServices)
+        .values(payload)
+        .returning();
+
+      if (!inserted) throw errors.internal("Échec de la création de la prestation.");
+
+      // 2. Insérer les entrées de périmètre
+      await tx.insert(clientServicePerimetre).values(
+        parsedInput.perimetre.map((entry, idx) => ({
+          clientServiceId: inserted.id,
+          siteId: entry.siteId,
+          mode: entry.mode,
+          scope: entry.scope,
+          ordreAffichage: idx,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })),
+      );
+
+      // 3. Créer l'exécution
+      const [execution] = await tx
+        .insert(clientServiceExecutions)
+        .values({
+          clientServiceId: inserted.id,
+          siteId,
+          serviceEntrepriseId: parsedInput.serviceEntrepriseId,
+          dateDebutValidite: normalized.dateDebutValidite,
+          dateFinValidite: normalized.dateFinValidite,
+          priorite: normalized.priorite,
+          modePilotage: parsedInput.modePilotage,
+          actif: true,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
+        .returning();
+
+      if (!execution) throw errors.internal("Échec de la création de l'exécution.");
+
+      // 4. Insérer les lignes de prix
+      await tx.insert(clientServiceExecutionPrix).values(
+        parsedInput.prix.map((p) => ({
+          executionId: execution.id,
+          typePrix: p.typePrix,
+          montantHt: Math.round(Number(p.montantHt) * 100),
+          coutPrestataireHt: null,
+          margePourcent: null,
+          periodeFacturation: p.periodeFacturation ?? null,
+          nbOccurrencesIncluses:
+            p.nbOccurrencesIncluses && p.nbOccurrencesIncluses !== ""
+              ? Number(p.nbOccurrencesIncluses)
+              : null,
+          actif: true,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })),
+      );
+
+      return selectClientServiceSchema.parse(inserted);
+    });
+
+    return {
+      message: "Prestation et exécution créées avec succès.",
+      prestation: parsedPrestation,
+    };
   });

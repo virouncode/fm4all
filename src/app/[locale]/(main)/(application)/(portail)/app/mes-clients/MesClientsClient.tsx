@@ -38,10 +38,10 @@ function toEntrepriseCard(c: ClientAvecDetails): EntrepriseWithDetails {
 export function MesClientsClient() {
   const entreprise = useAppStore((s) => s.entreprise);
   const posture = useAppStore((s) => s.postureActive);
-  const roleClientAdhesion = useAppStore((s) => s.roleClientAdhesion);
+  const rolePrestataireAdhesion = useAppStore((s) => s.rolePrestataireAdhesion);
 
   const canManage =
-    roleClientAdhesion === "admin" || roleClientAdhesion === "manager";
+    rolePrestataireAdhesion === "admin" || rolePrestataireAdhesion === "manager";
 
   const [clients, setClients] = useState<ClientAvecDetails[]>([]);
   const [loading, setLoading] = useState(false);

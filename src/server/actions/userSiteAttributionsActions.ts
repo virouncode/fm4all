@@ -1,11 +1,11 @@
 "use server";
 
 import { db } from "@/db";
-import { userClientSiteAttributions } from "@/db/schema/users";
+import { userClientAdhesions, userClientSiteAttributions, userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import {
   getAvailableSitesForAttribution,
   getUserClientSiteAttributions,
@@ -33,17 +33,20 @@ async function getUserRoleLevel(
   userId: string,
   entrepriseId: string,
 ): Promise<number> {
-  // Check platform role first (level 4)
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (platformRole?.role === "super_admin_plateforme") {
+  // Check platform role first (level 4) — tout rôle plateforme = niveau 4
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     return 4;
   }
 
-  // Check enterprise role
-  const { getUserClientAdhesion } = await import(
-    "@/server/queries/userAdhesions.query"
-  );
-  const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
+  // Check enterprise client role avec statut actif
+  const adhesion = await db.query.userClientAdhesions.findFirst({
+    where: and(
+      eq(userClientAdhesions.userId, userId),
+      eq(userClientAdhesions.entrepriseId, entrepriseId),
+      eq(userClientAdhesions.statut, "actif"),
+    ),
+  });
 
   if (!adhesion) return 0;
 
@@ -768,6 +771,32 @@ export const getUserClientSiteAttributionsAction = actionClient
     const session = await getSession();
     if (!session?.user) {
       throw errors.unauthorized("Vous n'êtes pas authentifié");
+    }
+    const currentUser = session.user;
+
+    // Vérifier que currentUser a accès à cette entreprise
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!platformRole?.role) {
+      const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+        db.query.userClientAdhesions.findFirst({
+          where: and(
+            eq(userClientAdhesions.userId, currentUser.id),
+            eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+            eq(userClientAdhesions.statut, "actif"),
+          ),
+        }),
+        db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        }),
+      ]);
+
+      if (!clientAdhesion && !prestataireAdhesion) {
+        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      }
     }
 
     const { attributions, allSites } = await getUserClientSiteAttributions({

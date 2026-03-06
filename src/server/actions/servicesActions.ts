@@ -2,19 +2,24 @@
 
 import { db } from "@/db";
 import { services } from "@/db/schema/services";
+import { userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
-import { getServicesWithStats } from "@/server/queries/services.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import {
+  getAllServices,
+  getServicesByPrestataire,
+  getServicesWithStats,
+} from "@/server/queries/services.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   insertServiceFormSchema,
   serviceSelectSchema,
   updateServiceFormSchema,
 } from "@/zod-schemas/service.schema";
-import { eq } from "drizzle-orm";
-import { getAllServices } from "@/server/queries/services.query";
+import { and, eq } from "drizzle-orm";
+import { z } from "zod";
 
 /**
  * Récupère la liste de tous les services du catalogue
@@ -35,6 +40,41 @@ export const getServicesAction = actionClient
   });
 
 /**
+ * Returns services offered by the current prestataire enterprise.
+ * Used to filter the service select in PrestationFormDialog (prestataire posture).
+ * Returns serviceEntrepriseId alongside service info for direct use when creating executions.
+ */
+export const getServicesByPrestataireAction = actionClient
+  .metadata({ actionName: "getServicesByPrestataireAction" })
+  .inputSchema(z.object({ prestataireEntrepriseId: z.uuid("ID invalide") }))
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    // Vérifier que l'utilisateur appartient à cette entreprise prestataire
+    const plateformeRole = await getEffectivePlateformeRole(session.user.id);
+    if (!plateformeRole) {
+      const adhesion = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, session.user.id),
+          eq(
+            userPrestataireAdhesions.entrepriseId,
+            parsedInput.prestataireEntrepriseId,
+          ),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
+      if (!adhesion)
+        throw errors.forbidden("Vous n'avez pas accès à ce prestataire.");
+    }
+
+    const servicesList = await getServicesByPrestataire(
+      parsedInput.prestataireEntrepriseId,
+    );
+    return { services: servicesList };
+  });
+
+/**
  * Get all services with client/prestataire stats — plateforme only
  */
 export const getServicesWithStatsAction = actionClient
@@ -43,7 +83,7 @@ export const getServicesWithStatsAction = actionClient
     const session = await getSession();
     if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(session.user.id);
+    const plateformeRole = await getEffectivePlateformeRole(session.user.id);
     if (!plateformeRole)
       throw errors.forbidden("Réservé aux membres de la plateforme FM4ALL.");
 
@@ -61,7 +101,7 @@ export const insertServiceAction = actionClient
     const session = await getSession();
     if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(session.user.id);
+    const plateformeRole = await getEffectivePlateformeRole(session.user.id);
     if (!plateformeRole)
       throw errors.forbidden("Réservé aux membres de la plateforme FM4ALL.");
 
@@ -93,7 +133,7 @@ export const updateServiceAction = actionClient
     const session = await getSession();
     if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(session.user.id);
+    const plateformeRole = await getEffectivePlateformeRole(session.user.id);
     if (!plateformeRole)
       throw errors.forbidden("Réservé aux membres de la plateforme FM4ALL.");
 

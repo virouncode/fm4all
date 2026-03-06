@@ -3,10 +3,12 @@
 import { db } from "@/db";
 import {
   clientPrestataireRelations,
+  entrepriseInvitations,
   entrepriseRoles,
   entreprises,
   serviceEntreprises,
 } from "@/db/schema/entreprises";
+import { user as userTable } from "@/db/schema/auth";
 import {
   clientServiceExecutionPrix,
   clientServiceExecutions,
@@ -32,8 +34,12 @@ import {
 } from "@/server/queries/clientServiceExecutions.query";
 import { getPrestationById } from "@/server/queries/clientServices.query";
 import { getAllServices } from "@/server/queries/services.query";
-import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { sendEmailDirect } from "@/server/email/mailgunDirect";
+import {
+  getUserClientAdhesion,
+  hasAccessToEntreprise,
+} from "@/server/queries/userAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
@@ -55,7 +61,7 @@ import {
   updateExecutionModePilotageSchema,
   updateExecutionTacheListeSchema,
 } from "@/zod-schemas/clientServiceExecutions.schema";
-import { and, count, eq, gt, lt, ne } from "drizzle-orm";
+import { and, count, eq, gt, isNull, lt, ne } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
@@ -70,7 +76,7 @@ async function canManagePrestation(
   entrepriseId: string,
   siteId: string,
 ): Promise<{ allowed: boolean; isPlateforme: boolean }> {
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return { allowed: true, isPlateforme: true };
 
   const siteRole = await resolveUserEffectiveRoleOnSite({
@@ -82,23 +88,36 @@ async function canManagePrestation(
 }
 
 /**
- * Vérifie que l'utilisateur a accès à l'entreprise (adhésion ou plateforme).
+ * Vérifie si l'utilisateur peut changer le mode de pilotage d'une exécution.
+ * Règles : plateforme ✅ | client admin ✅ | client collaborateur responsable_site ✅ | manager ❌
  */
-async function hasAccessToEntreprise(
+async function canChangeModePilotageCheck(
   userId: string,
-  entrepriseId: string,
+  clientEntrepriseId: string,
+  siteId: string,
 ): Promise<boolean> {
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
   const adhesion = await db.query.userClientAdhesions.findFirst({
     where: and(
       eq(userClientAdhesions.userId, userId),
-      eq(userClientAdhesions.entrepriseId, entrepriseId),
+      eq(userClientAdhesions.entrepriseId, clientEntrepriseId),
     ),
   });
-  return !!adhesion;
+  if (!adhesion) return false;
+  if (adhesion.role === "admin") return true;
+  if (adhesion.role === "manager") return false;
+
+  // collaborateur : vérifier responsable_site sur le site
+  const siteRole = await resolveUserEffectiveRoleOnSite({
+    userId,
+    siteId,
+    entrepriseId: clientEntrepriseId,
+  });
+  return siteRole === "responsable_site";
 }
+
 
 // ==================== GET PRESTATAIRES FOR SERVICE ====================
 
@@ -114,7 +133,7 @@ export const getPrestatairesForServiceAction = actionClient
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     // Vérifier l'accès à l'entreprise (un seul appel pour plateforme + adhesion)
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     const isPlateforme = !!platformRole?.role;
 
     if (!isPlateforme) {
@@ -250,7 +269,7 @@ export const createOrLinkPrestataireAction = actionClient
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     // Vérifier que l'utilisateur a accès à l'entreprise cliente avec au moins rôle manager
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
@@ -1097,29 +1116,15 @@ export const updateExecutionModePilotageAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    const { allowed: canManage, isPlateforme } = await canManagePrestation(
+    const allowed = await canChangeModePilotageCheck(
       currentUser.id,
       entrepriseId,
       prestation.siteId,
     );
-    if (!canManage) {
+    if (!allowed) {
       throw errors.forbidden(
-        "Vous devez être responsable de ce site pour modifier cette exécution.",
+        "Seuls la plateforme, un admin client ou un responsable de site peuvent modifier le mode de pilotage.",
       );
-    }
-
-    // Règle : un prestataire ne peut pas s'octroyer le pilotage exclusif
-    if (!isPlateforme && modePilotage === "prestataire") {
-      // Vérifier si l'utilisateur est côté prestataire (pas côté client)
-      const clientAdhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId,
-      });
-      if (!clientAdhesion) {
-        throw errors.forbidden(
-          "Un prestataire ne peut pas s'octroyer le pilotage exclusif.",
-        );
-      }
     }
 
     const [execution] = await db
@@ -1197,6 +1202,7 @@ export const getMesClientsAction = actionClient
       where: and(
         eq(userPrestataireAdhesions.userId, currentUser.id),
         eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
       ),
     });
     if (!adhesion) {
@@ -1489,6 +1495,10 @@ export const inviterPrestataireAdminAction = actionClient
 
 // ==================== INVITER ADMIN CLIENT (Posture Prestataire) ====================
 
+/**
+ * Enregistre une invitation administrateur pour un client (posture prestataire).
+ * Ne crée PAS de compte utilisateur — envoie uniquement un email avec un lien d'onboarding.
+ */
 export const inviterClientAdminAction = actionClient
   .metadata({ actionName: "inviterClientAdminAction" })
   .inputSchema(
@@ -1503,11 +1513,12 @@ export const inviterClientAdminAction = actionClient
     if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
     const currentUser = session.user;
 
-    // 1. Vérifier que l'utilisateur est prestataire avec au moins rôle manager
+    // 1. Vérifier que l'utilisateur est prestataire actif avec au moins rôle manager
     const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
       where: and(
         eq(userPrestataireAdhesions.userId, currentUser.id),
         eq(userPrestataireAdhesions.entrepriseId, parsedInput.prestataireEntrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
       ),
     });
     if (!prestataireAdhesion) {
@@ -1542,45 +1553,66 @@ export const inviterClientAdminAction = actionClient
       throw errors.conflict("Ce client a déjà un administrateur actif.");
     }
 
-    // 4. Créer le compte utilisateur avec mot de passe temporaire
-    const tempPassword = crypto.randomUUID();
-    let newUserId: string;
-    try {
-      const authResult = await auth.api.signUpEmail({
-        body: {
-          email: parsedInput.email,
-          password: tempPassword,
-          name: parsedInput.email,
-          prenom: "",
-          nom: "",
-        },
-      });
-      newUserId = authResult.user.id;
-    } catch {
+    // 4. Vérifier que l'email n'est pas déjà utilisé par un compte existant
+    const existingUser = await db
+      .select({ id: userTable.id })
+      .from(userTable)
+      .where(eq(userTable.email, parsedInput.email))
+      .limit(1);
+    if (existingUser.length > 0) {
       throw errors.conflict(
-        "Un compte existe déjà avec cet email. Demandez au client de se connecter directement.",
+        `Un compte existe déjà avec l'adresse "${parsedInput.email}".`,
       );
     }
 
-    // 5. Créer l'adhésion admin dans l'entreprise cliente
-    await db.insert(userClientAdhesions).values({
-      userId: newUserId,
+    // 5. Récupérer le nom de l'entreprise cliente pour l'email
+    const [clientEntreprise] = await db
+      .select({ nom: entreprises.nom })
+      .from(entreprises)
+      .where(eq(entreprises.id, parsedInput.clientEntrepriseId))
+      .limit(1);
+    if (!clientEntreprise) throw errors.notFound("Entreprise cliente introuvable.");
+
+    // 6. Annuler les invitations en attente existantes pour ce client
+    await db
+      .delete(entrepriseInvitations)
+      .where(
+        and(
+          eq(entrepriseInvitations.entrepriseId, parsedInput.clientEntrepriseId),
+          isNull(entrepriseInvitations.acceptedAt),
+        ),
+      );
+
+    // 7. Créer la nouvelle invitation
+    const token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const sentAt = new Date();
+
+    await db.insert(entrepriseInvitations).values({
       entrepriseId: parsedInput.clientEntrepriseId,
-      role: "admin",
-      statut: "actif",
+      email: parsedInput.email,
+      token,
+      expiresAt,
       createdById: currentUser.id,
       updatedById: currentUser.id,
     });
 
-    // 6. Envoyer l'email d'activation
-    const reqHeaders = await headers();
-    await auth.api.requestPasswordReset({
-      body: {
-        email: parsedInput.email,
-        redirectTo: `${process.env.APP_URL}/auth/reset-password`,
-      },
-      headers: reqHeaders,
+    // 8. Envoyer l'email d'invitation
+    const lien = `${process.env.APP_URL}/auth/inscription-admin?token=${token}`;
+    await sendEmailDirect({
+      to: parsedInput.email,
+      subject: "Invitation à rejoindre FM4ALL",
+      text: `
+        <h2>Vous avez été invité à rejoindre FM4ALL</h2>
+        <p>Vous avez été invité à créer votre compte administrateur pour l'entreprise <strong>${clientEntreprise.nom}</strong>.</p>
+        <p>Cliquez sur le lien ci-dessous pour créer votre compte :</p>
+        <p><a href="${lien}">Créer mon compte</a></p>
+        <p><small>Ce lien est valable 7 jours.</small></p>
+      `,
+      useTemplate: false,
     });
 
-    return { message: "Invitation envoyée avec succès." };
+    return {
+      pendingInvitation: { email: parsedInput.email, sentAt },
+    };
   });

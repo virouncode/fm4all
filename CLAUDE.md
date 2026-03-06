@@ -786,6 +786,46 @@ function MyComponent() {
 }
 ```
 
+#### Cookie de Posture (Serveur)
+
+Le cookie `fm4all:postureActive` (httpOnly, sameSite: lax, 180 jours) est la **source de vérité côté serveur** pour la posture active. Il est mis à jour via `setActivePostureAction` (`src/server/actions/activePostureAction.ts`).
+
+**Valeurs** : `"client"` | `"prestataire"` | `"plateforme"`
+
+**Règle** : Cookie absent ou valeur inconnue = **pas de bypass plateforme** (comportement le plus sûr par défaut).
+
+#### Distinction CRITIQUE : getEffectivePlateformeRole() vs getUserPlateformeAdhesion()
+
+Un utilisateur FM4ALL peut avoir simultanément un `rolePlateformeAdhesion` ET un `roleClientAdhesion` ou `rolePrestataireAdhesion`. Si cet utilisateur bascule en posture `"client"` ou `"prestataire"`, son rôle plateforme **ne doit PAS** override ses permissions dans cette posture.
+
+| Fonction | Où l'utiliser | Comportement |
+|----------|---------------|--------------|
+| `getUserPlateformeAdhesion(userId)` | **Guards `page.tsx`** | Vérifie uniquement si l'user A le rôle en base — indépendant de la posture active |
+| `getEffectivePlateformeRole(userId)` | **Server actions** (bypasses) | Vérifie le rôle en base **ET** que la posture cookie = `"plateforme"` |
+
+```typescript
+// ✅ Dans page.tsx — "Est-ce que cet user a le rôle plateforme ?"
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+if (!platformRole?.role) redirect({ href: "/auth/unauthorized", locale: "fr" });
+
+// ✅ Dans server actions — "Est-ce que cet user agit EN TANT QUE plateforme maintenant ?"
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+const platformRole = await getEffectivePlateformeRole(userId);
+if (platformRole?.role) return true; // bypass SEULEMENT si posture cookie = "plateforme"
+```
+
+**Fichier** : `src/server/utils/permissions.utils.ts`
+
+**Règle clé** : `if (posture !== "plateforme") return null` — PAS `if (posture && posture !== "plateforme")` :
+- Cookie absent → `posture = undefined` → `undefined !== "plateforme"` → `return null` ✅
+- Cookie = `"client"` → `return null` ✅
+- Cookie = `"plateforme"` → vérifie le rôle en base ✅
+
+#### Centralisation de hasAccessToEntreprise
+
+`hasAccessToEntreprise(userId, entrepriseId)` est définie dans `src/server/queries/userAdhesions.query.ts` et utilise `getEffectivePlateformeRole` pour le bypass. **Ne jamais créer de copies locales** dans les fichiers d'actions — importer directement depuis le fichier de queries.
+
 ### 2. Closure Table pour Hiérarchies
 
 Le projet utilise une **closure table** pour gérer les hiérarchies de sites:
@@ -2217,7 +2257,33 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 
 ---
 
-**Dernière mise à jour**: 2026-03-06
+## Changelog (2026-03-06 — session 2)
+
+**Audit sécurité — mes-clients, checklists, layout + refactoring permissions posture-aware** :
+
+- ✅ **Bug `MesClientsClient`** : `canManage` utilisait `roleClientAdhesion` au lieu de `rolePrestataireAdhesion`
+- ✅ **Bug `hasAccessToEntreprise`** : vérification `statut: "actif"` manquante + pas de check prestataire
+- ✅ **Bug `inviterClientAdminAction`** : réécriture — flow invitation (token → `entrepriseInvitations` → email → `/auth/inscription-admin?token=`) au lieu de création directe de compte
+- ✅ **Bug `canManageChecklists`** : `statut: "actif"` manquant sur les deux checks d'adhésion
+- ✅ **`app/layout.tsx`** : deux TODO placeholder remplacés par de vrais redirects (`/auth/login`, `/auth/unauthorized`)
+- ✅ **Centralisation `hasAccessToEntreprise`** : exportée depuis `userAdhesions.query.ts`, copies locales supprimées dans `clientServiceExecutionsActions.ts` et `tacheListesTemplatesActions.ts`
+- ✅ **`getEffectivePlateformeRole()`** créée dans `src/server/utils/permissions.utils.ts` — rend le bypass plateforme posture-aware (lit le cookie `fm4all:postureActive`)
+- ✅ **11 fichiers d'actions** migrés : `getUserPlateformeAdhesion` → `getEffectivePlateformeRole`
+
+**Fichiers créés** :
+- `src/server/utils/permissions.utils.ts`
+
+**Fichiers modifiés** :
+- `src/server/queries/userAdhesions.query.ts`
+- `src/server/actions/clientServiceExecutionsActions.ts`
+- `src/server/actions/tacheListesTemplatesActions.ts`
+- `src/app/[locale]/.../app/layout.tsx`
+- `src/app/[locale]/.../app/mes-clients/MesClientsClient.tsx`
+- 10 autres fichiers d'actions (sed — import + appel)
+
+---
+
+**Dernière mise à jour**: 2026-03-06 (session 2)
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 

@@ -27,7 +27,7 @@ import {
   countProspects,
 } from "@/server/queries/prospects.query";
 import { getAllServices } from "@/server/queries/services.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { insertUserArborescence } from "@/server/utils/usersArborescence.utils";
 import {
   insertEntrepriseFormSchema,
@@ -54,6 +54,9 @@ import {
 export const getEntreprisesAction = actionClient
   .metadata({ actionName: "getEntreprisesAction" })
   .action(async () => {
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
     const entreprisesData = await getAllEntreprises();
     return { entreprises: entreprisesData };
   });
@@ -73,7 +76,7 @@ export const getEntreprisesClientesAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
 
     if (!plateformeRole) {
       throw errors.forbidden(
@@ -93,6 +96,9 @@ export const getEntreprisesClientesAction = actionClient
 export const getEntreprisesPrestatairesAction = actionClient
   .metadata({ actionName: "getEntreprisesPrestatairesAction" })
   .action(async () => {
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
     const prestataires = await getEntreprisesPrestataires();
     return { prestataires };
   });
@@ -126,7 +132,7 @@ export const getEntreprisesPaginatedAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole) {
       throw errors.forbidden(
         "Seule la plateforme peut accéder à cette ressource.",
@@ -176,11 +182,40 @@ export const getMonEntrepriseDetailsAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
-    if (!adhesion) throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    // Bypass plateforme — tous les rôles plateforme ont accès
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+
+    if (!plateformeRole) {
+      // Vérifier une adhésion client OU prestataire active
+      const [clientAdhesionRows, prestataireAdhesionRows] = await Promise.all([
+        db
+          .select({ id: userClientAdhesions.id })
+          .from(userClientAdhesions)
+          .where(
+            and(
+              eq(userClientAdhesions.userId, currentUser.id),
+              eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+              eq(userClientAdhesions.statut, "actif"),
+            ),
+          )
+          .limit(1),
+        db
+          .select({ id: userPrestataireAdhesions.id })
+          .from(userPrestataireAdhesions)
+          .where(
+            and(
+              eq(userPrestataireAdhesions.userId, currentUser.id),
+              eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+              eq(userPrestataireAdhesions.statut, "actif"),
+            ),
+          )
+          .limit(1),
+      ]);
+
+      if (!clientAdhesionRows[0] && !prestataireAdhesionRows[0]) {
+        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      }
+    }
 
     const entreprise = await getEntrepriseWithDetailsById(parsedInput.entrepriseId);
     if (!entreprise) throw errors.notFound("Entreprise introuvable.");
@@ -220,7 +255,7 @@ export const getProspectsAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole) {
       throw errors.forbidden(
         "Seule la plateforme peut accéder à cette ressource.",
@@ -259,7 +294,7 @@ export const getAllServicesAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole) {
       throw errors.forbidden(
         "Seule la plateforme peut accéder à cette ressource.",
@@ -297,7 +332,7 @@ export const createEntrepriseAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole) {
       throw errors.forbidden(
         "Seule la plateforme peut créer des entreprises.",
@@ -426,7 +461,7 @@ export const updateEntrepriseInfosAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
       throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
 
@@ -472,7 +507,7 @@ export const updateEntrepriseContactAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
       throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
 
@@ -512,7 +547,7 @@ export const updateEntrepriseRolesAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
       throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
 
@@ -628,7 +663,7 @@ export const getEntrepriseServicesAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
       throw errors.forbidden("Seule la plateforme peut accéder à cette ressource.");
 
@@ -652,7 +687,7 @@ export const updateEntrepriseLogoAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
       throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
 
@@ -733,7 +768,7 @@ export const inviterEntrepriseAdminAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
       throw errors.forbidden(
         "Seule la plateforme peut inviter des administrateurs.",

@@ -22,7 +22,7 @@ import {
   getPrestationWithJoinsById,
 } from "@/server/queries/clientServices.query";
 import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { getUsersByEntrepriseId } from "@/server/queries/users.query";
 import { promoteS3Key, s3, S3_BUCKET } from "@/server/s3/s3";
 import {
@@ -72,7 +72,7 @@ async function canManagePrestation(
   entrepriseId: string,
   siteId: string,
 ): Promise<boolean> {
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
   const siteRole = await resolveUserEffectiveRoleOnSite({
@@ -89,7 +89,7 @@ async function canInteractWithPrestation(
   entrepriseId: string,
   siteId: string,
 ): Promise<boolean> {
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
   const siteRole = await resolveUserEffectiveRoleOnSite({
@@ -275,7 +275,7 @@ export const getOccurrencesPageAction = actionClient
     } = parsedInput;
 
     // Vérifier l'accès à l'entreprise (plateforme OU adhésion)
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
@@ -324,7 +324,7 @@ export const getOccurrenceTachesAction = actionClient
     const { occurrenceId, prestationId, entrepriseId } = parsedInput;
 
     // Vérifier accès à l'entreprise (plateforme OU adhésion)
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
@@ -1069,7 +1069,7 @@ export const updateTacheAssigneeAction = actionClient
     const { tacheId, occurrenceId, entrepriseId, assigneeUserId } = parsedInput;
 
     // Vérifier accès entreprise
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
@@ -1139,7 +1139,7 @@ export const updateTacheAssigneeAction = actionClient
       }
     } else {
       // Self-unassign sans prestataire → plateforme uniquement (nettoyage)
-      const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+      const platformRole = await getEffectivePlateformeRole(currentUser.id);
       if (!platformRole?.role) {
         throw errors.forbidden("Vous n'avez pas les droits pour cette action.");
       }
@@ -1197,7 +1197,7 @@ export const getAssignableUsersForOccurrenceAction = actionClient
 
     const { entrepriseId } = parsedInput;
 
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
@@ -1235,7 +1235,7 @@ export const linkTicketToOccurrenceAction = actionClient
 
     const { ticketId, occurrenceId, entrepriseId } = parsedInput;
 
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
@@ -1290,7 +1290,7 @@ export const unlinkTicketFromOccurrenceAction = actionClient
 
     const { ticketId, occurrenceId, entrepriseId } = parsedInput;
 
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
@@ -1337,7 +1337,7 @@ export const getAvailableTicketsForLinkingAction = actionClient
 
     const { occurrenceId, entrepriseId } = parsedInput;
 
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
@@ -1389,7 +1389,7 @@ export const getTicketsByOccurrenceAction = actionClient
 
     const { occurrenceId, entrepriseId } = parsedInput;
 
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
       const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,

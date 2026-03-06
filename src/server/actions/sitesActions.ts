@@ -14,7 +14,7 @@ import {
   getSitesByEntrepriseId,
   siteBelongsToEntreprise,
 } from "@/server/queries/sites.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import {
   deleteSiteArborescence,
   getDescendantsOfSite,
@@ -36,27 +36,78 @@ import {
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { and, eq, inArray } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
+import { z } from "zod";
 
 // ==================== HELPERS ====================
 
 /**
- * Vérifie si l'utilisateur est admin de l'entreprise
+ * Vérifie que l'utilisateur a accès à l'entreprise (platform OU adhésion active).
+ * Lève une erreur forbidden si non.
+ */
+async function assertCanAccessEntreprise(
+  userId: string,
+  entrepriseId: string,
+): Promise<void> {
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) return;
+
+  const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+    db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+    }),
+    db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    }),
+  ]);
+
+  if (clientAdhesion || prestataireAdhesion) return;
+
+  // 3. Accès proxy : prestataire lié à ce client via clientPrestataireRelations
+  const userPrestataireAdhesionsList =
+    await db.query.userPrestataireAdhesions.findMany({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    });
+  for (const pAdh of userPrestataireAdhesionsList) {
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: and(
+        eq(clientPrestataireRelations.clientEntrepriseId, entrepriseId),
+        eq(clientPrestataireRelations.prestataireEntrepriseId, pAdh.entrepriseId),
+      ),
+    });
+    if (relation) return;
+  }
+
+  throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+}
+
+/**
+ * Vérifie si l'utilisateur est admin de l'entreprise (statut actif requis).
+ * Plateforme (tout rôle) = admin implicite.
  */
 async function isAdmin(userId: string, entrepriseId: string): Promise<boolean> {
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) return true;
+
   const adhesion = await db.query.userClientAdhesions.findFirst({
     where: and(
       eq(userClientAdhesions.userId, userId),
       eq(userClientAdhesions.entrepriseId, entrepriseId),
+      eq(userClientAdhesions.statut, "actif"),
     ),
   });
 
-  // Check enterprise admin OR platform super admin
-  const platformRole = await getUserPlateformeAdhesion(userId);
-
-  return (
-    adhesion?.role === "admin" ||
-    platformRole?.role === "super_admin_plateforme"
-  );
+  return adhesion?.role === "admin";
 }
 
 /**
@@ -140,6 +191,8 @@ export const getSitesAction = actionClient
 
     const { entrepriseId } = parsedInput;
 
+    await assertCanAccessEntreprise(currentUser.id, entrepriseId);
+
     // Récupérer TOUS les sites (actifs ET inactifs)
     const sites = await getSitesByEntrepriseId(entrepriseId, true);
     return sites;
@@ -163,6 +216,8 @@ export const getSiteByIdAction = actionClient
     }
 
     const { siteId, entrepriseId } = parsedInput;
+
+    await assertCanAccessEntreprise(currentUser.id, entrepriseId);
 
     // Vérifier que le site appartient à l'entreprise
     const belongs = await siteBelongsToEntreprise({ siteId, entrepriseId });
@@ -195,7 +250,7 @@ export const getAllSitesForPlatformAction = actionClient
     }
 
     // Vérifier que l'utilisateur est plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
     if (!platformRole?.role) {
       throw errors.forbidden("Accès réservé à la plateforme.");
@@ -228,7 +283,7 @@ export const getAccessibleSitesAction = actionClient
     }
 
     // Vérifier si l'utilisateur est plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
     // Si plateforme : retourner TOUS les sites sans filtrage (inclure inactifs)
     if (platformRole?.role) {
@@ -256,6 +311,131 @@ export const getAccessibleSitesAction = actionClient
     });
 
     return sites;
+  });
+
+// ==================== GET SITES FOR PRESTATION ====================
+
+/**
+ * Retourne tous les sites d'un client + les IDs des sites où l'utilisateur est responsable_site.
+ * Utilisé par PrestationFormDialog pour afficher l'arborescence complète avec checkboxes sélectives.
+ *
+ * responsableSiteIds = null → tous les sites sont activés (plateforme, client admin/manager)
+ * responsableSiteIds = string[] → seuls ces sites ont la checkbox activée
+ */
+export const getSitesForPrestationAction = actionClient
+  .metadata({ actionName: "getSitesForPrestationAction" })
+  .inputSchema(
+    getSitesQuerySchema.extend({
+      posture: z.enum(["plateforme", "client", "prestataire"]).optional(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    const { entrepriseId, posture } = parsedInput;
+
+    // Charger tous les sites du client
+    const allSites = await getSitesByEntrepriseId(entrepriseId, false);
+
+    // Branche plateforme → tous les sites activés
+    // (ignoré si l'utilisateur est en posture prestataire ou client)
+    if (posture !== "prestataire" && posture !== "client") {
+      const platformRole = await getEffectivePlateformeRole(currentUser.id);
+      if (platformRole?.role) {
+        return { allSites, responsableSiteIds: null as string[] | null };
+      }
+    }
+
+    // Branche client → vérifier adhésion
+    const clientAdhesion = await db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, currentUser.id),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
+      ),
+    });
+
+    if (clientAdhesion) {
+      // Admin/manager → tous les sites activés
+      if (
+        clientAdhesion.role === "admin" ||
+        clientAdhesion.role === "manager"
+      ) {
+        return { allSites, responsableSiteIds: null as string[] | null };
+      }
+
+      // Collaborateur → calculer les sites responsable_site via attributions
+      const { getUserClientSiteAttributions } = await import(
+        "@/server/queries/userSiteAttributions.query"
+      );
+      const { attributions } = await getUserClientSiteAttributions({
+        userId: currentUser.id,
+        entrepriseId,
+      });
+
+      const responsableSiteIds = attributions
+        .filter(
+          (a) =>
+            a.role === "responsable_site" &&
+            (a.isInherited || a.mode === "inclure"),
+        )
+        .map((a) => a.siteId);
+
+      return {
+        allSites,
+        responsableSiteIds: [...new Set(responsableSiteIds)],
+      };
+    }
+
+    // Branche prestataire → vérifier adhésion prestataire + relation client
+    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst(
+      {
+        where: eq(userPrestataireAdhesions.userId, currentUser.id),
+      },
+    );
+
+    if (prestataireAdhesion) {
+      // Vérifier que le client est bien lié à ce prestataire
+      const relation = await db.query.clientPrestataireRelations.findFirst({
+        where: and(
+          eq(clientPrestataireRelations.clientEntrepriseId, entrepriseId),
+          eq(
+            clientPrestataireRelations.prestataireEntrepriseId,
+            prestataireAdhesion.entrepriseId,
+          ),
+        ),
+      });
+
+      if (!relation) {
+        throw errors.forbidden(
+          "Vous n'avez pas accès aux sites de ce client.",
+        );
+      }
+
+      // Calculer les sites responsable_site via userPrestataireSiteAttributions
+      const { getResponsableSiteIdsByPrestataire } = await import(
+        "@/server/queries/userPrestataireSiteAttributions.query"
+      );
+      const responsableSiteIds = await getResponsableSiteIdsByPrestataire({
+        userId: currentUser.id,
+        clientEntrepriseId: entrepriseId,
+      });
+
+      return {
+        allSites,
+        responsableSiteIds: [...new Set(responsableSiteIds)],
+      };
+    }
+
+    throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
   });
 
 // ==================== INSERT SITE ====================
@@ -669,7 +849,7 @@ export const permanentlyDeleteSiteAction = actionClient
     // UNIQUEMENT pour super_admin_plateforme de l'entreprise FM4ALL en posture plateforme
 
     // 1. Vérifier que l'utilisateur actuel a le rôle plateforme super_admin_plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
     if (!platformRole || platformRole.role !== "super_admin_plateforme") {
       throw errors.forbidden(
@@ -728,6 +908,8 @@ export const getSiteResponsablesAction = actionClient
     }
 
     const { siteId, entrepriseId } = parsedInput;
+
+    await assertCanAccessEntreprise(currentUser.id, entrepriseId);
 
     const belongs = await siteBelongsToEntreprise({ siteId, entrepriseId });
     if (!belongs) {

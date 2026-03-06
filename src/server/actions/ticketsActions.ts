@@ -33,7 +33,7 @@ import {
   getTicketsByPerimetre,
 } from "@/server/queries/tickets.query";
 import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 
 // Utils
 import { getDocumentsByTicketId } from "@/server/queries/documents.query";
@@ -81,7 +81,7 @@ export const getTicketsAction = actionClient
     }
 
     // Déterminer posture
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     const entreprise = await getEntrepriseById(parsedInput.entrepriseId);
 
     let posture: "client" | "prestataire" | "plateforme" = "client";
@@ -221,7 +221,7 @@ export const insertTicketAction = actionClient
     }
 
     // Déterminer posture
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     const isPlatform = !!platformRole?.role;
 
     // demandeurEntrepriseId = TOUJOURS l'entreprise courante
@@ -638,7 +638,7 @@ export const updateTicketBasicFieldsAction = actionClient
     }
 
     // Vérifier si plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
     // Si pas plateforme, vérifier accès entreprise
     if (!platformRole?.role) {
@@ -735,7 +735,7 @@ export const updateTicketAssigneEntrepriseAction = actionClient
     }
 
     // Si client, vérifier que le prestataire est dans sa liste
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     const isPlatform = !!platformRole?.role;
 
     if (!isPlatform && normalized.assigneEntrepriseId) {
@@ -854,7 +854,7 @@ export const updateTicketStatutAction = actionClient
     }
 
     // Vérifier si plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
     // Si pas plateforme, vérifier accès entreprise
     if (!platformRole?.role) {
@@ -957,7 +957,7 @@ export const updateTicketAttachmentsAction = actionClient
     }
 
     // Vérifier si plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
     // Si pas plateforme, vérifier accès entreprise
     if (!platformRole?.role) {
@@ -1117,7 +1117,7 @@ export const insertTicketMessageAction = actionClient
     }
 
     // Vérifier permissions de visibilité selon posture
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     const isPlatform = !!platformRole?.role;
     const isClient =
       !isPlatform &&

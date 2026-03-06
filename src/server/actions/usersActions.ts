@@ -14,7 +14,7 @@ import {
   getUsersByEntrepriseId,
   userBelongsToEntreprise,
 } from "@/server/queries/users.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import {
   deleteUserArborescence,
   insertUserArborescence,
@@ -44,6 +44,43 @@ import { deleteS3Object, promoteS3Key } from "../s3/s3";
 import { capitalizeWords, lower, normalizeForSubmit } from "@/zod-helpers/normalize";
 import { sendEmailDirect } from "../email/mailgunDirect";
 
+// ==================== HELPERS PARTAGÉS ====================
+
+/**
+ * Vérifie que currentUser a accès à une entreprise via :
+ * - Rôle plateforme (super_admin_plateforme ou operateur_plateforme), OU
+ * - Adhésion client active, OU
+ * - Adhésion prestataire active
+ */
+async function assertActiveEntrepriseAccess(
+  userId: string,
+  entrepriseId: string,
+): Promise<void> {
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) return;
+
+  const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+    db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+    }),
+    db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    }),
+  ]);
+
+  if (!clientAdhesion && !prestataireAdhesion) {
+    throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+  }
+}
+
 // ==================== GET USERS ====================
 
 export const getUsersAction = actionClient
@@ -64,34 +101,33 @@ export const getUsersAction = actionClient
 
     // Vérifier que currentUser a accès selon la posture
     if (posture === "plateforme") {
-      const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+      const platformRole = await getEffectivePlateformeRole(currentUser.id);
       if (!platformRole?.role) {
         throw errors.forbidden("Accès réservé aux utilisateurs de la plateforme.");
       }
     } else if (posture === "prestataire") {
-      const [row] = await db
-        .select()
-        .from(userPrestataireAdhesions)
-        .where(
-          and(
-            eq(userPrestataireAdhesions.userId, currentUser.id),
-            eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
-          ),
-        )
-        .limit(1);
-      // Fallback: allow platform admins too
+      const row = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
+      // Fallback: allow platform users too
       if (!row) {
-        const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+        const platformRole = await getEffectivePlateformeRole(currentUser.id);
         if (!platformRole?.role) {
           throw errors.forbidden("Vous n'avez pas accès à cette entreprise en posture prestataire.");
         }
       }
     } else {
       // client (default)
-      const { getUserClientAdhesion } = await import("@/server/queries/userAdhesions.query");
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId,
+      const adhesion = await db.query.userClientAdhesions.findFirst({
+        where: and(
+          eq(userClientAdhesions.userId, currentUser.id),
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+          eq(userClientAdhesions.statut, "actif"),
+        ),
       });
       if (!adhesion) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
@@ -127,17 +163,7 @@ export const getUserByIdAction = actionClient
     const { userId, entrepriseId } = parsedInput;
 
     // Vérifier que currentUser a accès à cette entreprise
-    const { getUserClientAdhesion } = await import("@/server/queries/userAdhesions.query");
-    const currentUserAdhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId,
-    });
-
-    if (!currentUserAdhesion) {
-      throw errors.forbidden(
-        "Vous n'avez pas accès à cette entreprise.",
-      );
-    }
+    await assertActiveEntrepriseAccess(currentUser.id, entrepriseId);
 
     const belongs = await userBelongsToEntreprise({ userId, entrepriseId });
     if (!belongs) {
@@ -176,17 +202,7 @@ export const getUsersByEntrepriseAction = actionClient
     const { entrepriseId } = parsedInput;
 
     // Vérifier que currentUser a accès à cette entreprise
-    const { getUserClientAdhesion } = await import("@/server/queries/userAdhesions.query");
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId,
-    });
-
-    if (!adhesion) {
-      throw errors.forbidden(
-        "Vous n'avez pas accès à cette entreprise.",
-      );
-    }
+    await assertActiveEntrepriseAccess(currentUser.id, entrepriseId);
 
     const users = await getUsersByEntrepriseId(entrepriseId);
     return users;
@@ -238,7 +254,7 @@ export const insertUserAction = actionClient
 
     // ===== VALIDATION DES PERMISSIONS =====
 
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
     // 1. Récupérer le rôle de l'utilisateur actuel (selon posture)
     let currentUserRole: "admin" | "manager" | "collaborateur" | null = null;
@@ -248,6 +264,7 @@ export const insertUserAction = actionClient
         where: and(
           eq(userPrestataireAdhesions.userId, currentUser.id),
           eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+          eq(userPrestataireAdhesions.statut, "actif"),
         ),
       });
       currentUserRole = adhesion?.role ?? null;
@@ -256,20 +273,21 @@ export const insertUserAction = actionClient
         where: and(
           eq(userClientAdhesions.userId, currentUser.id),
           eq(userClientAdhesions.entrepriseId, entrepriseId),
+          eq(userClientAdhesions.statut, "actif"),
         ),
       });
       currentUserRole = adhesion?.role ?? null;
     }
 
-    if (!currentUserRole && platformRole?.role !== "super_admin_plateforme") {
+    if (!currentUserRole && !platformRole?.role) {
       throw errors.forbidden(
-        "Vous n'avez pas d'adhésion dans cette entreprise.",
+        "Vous n'avez pas d'adhésion active dans cette entreprise.",
       );
     }
 
     // 2. Vérifier que l'utilisateur peut créer des utilisateurs
     if (
-      platformRole?.role !== "super_admin_plateforme" &&
+      !platformRole?.role &&
       currentUserRole !== "admin" &&
       currentUserRole !== "manager"
     ) {
@@ -456,7 +474,7 @@ export const insertPlateformeUserAction = actionClient
     }
 
     // Seul super_admin_plateforme peut créer des utilisateurs plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole || platformRole.role !== "super_admin_plateforme") {
       throw errors.forbidden(
         "Seul un super administrateur de la plateforme peut créer des utilisateurs plateforme.",
@@ -575,6 +593,7 @@ export const updateUserAction = actionClient
   .inputSchema(
     updateUserFormSchema.extend({
       entrepriseId: z.uuid("ID entreprise invalide"),
+      posture: z.enum(["client", "prestataire"]).default("client"),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
@@ -596,6 +615,7 @@ export const updateUserAction = actionClient
       avatar,
       roleAdhesion,
       statut,
+      posture = "client",
     } = parsedInput;
 
     // Normalisation anticipée de l'email (nécessaire avant la section changeEmail)
@@ -608,54 +628,82 @@ export const updateUserAction = actionClient
 
     // ===== VALIDATION DES PERMISSIONS =====
 
-    // 1. Récupérer le rôle de l'utilisateur actuel
-    const currentUserAdhesion = await db.query.userClientAdhesions.findFirst({
-      where: and(
-        eq(userClientAdhesions.userId, currentUser.id),
-        eq(userClientAdhesions.entrepriseId, entrepriseId),
-      ),
-    });
+    // 1. Récupérer le rôle plateforme (niveau le plus élevé, indépendant de la posture)
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
-    if (!currentUserAdhesion) {
+    // 2. Récupérer le rôle de l'utilisateur actuel (selon posture)
+    let currentUserRole: "admin" | "manager" | "collaborateur" | null = null;
+
+    if (posture === "prestataire") {
+      const adhesion = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
+      currentUserRole = adhesion?.role ?? null;
+    } else {
+      const adhesion = await db.query.userClientAdhesions.findFirst({
+        where: and(
+          eq(userClientAdhesions.userId, currentUser.id),
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+          eq(userClientAdhesions.statut, "actif"),
+        ),
+      });
+      currentUserRole = adhesion?.role ?? null;
+    }
+
+    if (!currentUserRole && !platformRole?.role) {
       throw errors.forbidden(
-        "Vous n'avez pas d'adhésion dans cette entreprise.",
+        "Vous n'avez pas d'adhésion active dans cette entreprise.",
       );
     }
 
-    const currentUserRole = currentUserAdhesion.role;
+    // 3. Récupérer le rôle et statut de l'utilisateur cible (selon posture)
+    let targetUserRole: "admin" | "manager" | "collaborateur" | null = null;
+    let targetUserStatut: string | null = null;
 
-    // 2. Récupérer le rôle de l'utilisateur cible
-    const targetUserClientAdhesion = await db.query.userClientAdhesions.findFirst({
-      where: and(
-        eq(userClientAdhesions.userId, userId),
-        eq(userClientAdhesions.entrepriseId, entrepriseId),
-      ),
-    });
+    if (posture === "prestataire") {
+      const targetAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, userId),
+          eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        ),
+      });
+      targetUserRole = targetAdhesion?.role ?? null;
+      targetUserStatut = targetAdhesion?.statut ?? null;
+    } else {
+      const targetAdhesion = await db.query.userClientAdhesions.findFirst({
+        where: and(
+          eq(userClientAdhesions.userId, userId),
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+        ),
+      });
+      targetUserRole = targetAdhesion?.role ?? null;
+      targetUserStatut = targetAdhesion?.statut ?? null;
+    }
 
-    if (!targetUserClientAdhesion) {
+    if (!targetUserRole) {
       throw errors.notFound("Adhésion de l'utilisateur cible");
     }
 
-    const targetUserRole = targetUserClientAdhesion.role;
-
-    // 3. Hiérarchie des rôles
+    // 4. Hiérarchie des rôles
     const roleHierarchy: Record<RoleClientAdhesionType, number> = {
       admin: 3,
       manager: 2,
       collaborateur: 1,
     };
 
-    // Platform role is highest (level 4) - check separately
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     const currentLevel =
-      platformRole?.role === "super_admin_plateforme"
+      platformRole?.role // Tout rôle plateforme = niveau 4
         ? 4
-        : roleHierarchy[currentUserRole];
+        : currentUserRole ? roleHierarchy[currentUserRole] : 0;
     const targetLevel = roleHierarchy[targetUserRole];
 
     const isEditingSelf = currentUser.id === userId;
 
-    // 4. Vérifier la permission de base (éditer cet utilisateur)
+    // 5. Vérifier la permission de base (éditer cet utilisateur)
     // Peut éditer: soi-même OU niveau supérieur (pas même niveau)
     const canEdit = isEditingSelf || currentLevel > targetLevel;
 
@@ -680,12 +728,11 @@ export const updateUserAction = actionClient
       }
     }
 
-    // 5. Vérifier les permissions pour modifier role/statut
-    // Vérifier si le rôle ou le statut ont réellement changé
+    // 6. Vérifier les permissions pour modifier role/statut
     const isRoleChanging =
-      roleAdhesion !== undefined && roleAdhesion !== targetUserClientAdhesion.role;
+      roleAdhesion !== undefined && roleAdhesion !== targetUserRole;
     const isStatutChanging =
-      statut !== undefined && statut !== targetUserClientAdhesion.statut;
+      statut !== undefined && statut !== targetUserStatut;
 
     if (isRoleChanging || isStatutChanging) {
       // Ne peut pas changer son propre rôle ou statut
@@ -711,7 +758,7 @@ export const updateUserAction = actionClient
           );
         }
 
-        const newRoleLevel = roleHierarchy[roleAdhesion];
+        const newRoleLevel = roleHierarchy[roleAdhesion!];
 
         // Personne ne peut attribuer un rôle supérieur ou égal au sien
         if (newRoleLevel >= currentLevel) {
@@ -897,7 +944,7 @@ export const updateUserAction = actionClient
         throw errors.internal("Échec de la mise à jour de l'utilisateur.");
       }
 
-      // 4. Update adhesion (role/statut) si fournis
+      // 4. Update adhesion (role/statut) si fournis — dans la bonne table selon posture
       if (roleAdhesion !== undefined || statut !== undefined) {
         const adhesionPayload: {
           role?: typeof roleAdhesion;
@@ -910,15 +957,27 @@ export const updateUserAction = actionClient
         if (roleAdhesion !== undefined) adhesionPayload.role = roleAdhesion;
         if (statut !== undefined) adhesionPayload.statut = statut;
 
-        await tx
-          .update(userClientAdhesions)
-          .set(adhesionPayload)
-          .where(
-            and(
-              eq(userClientAdhesions.userId, userId),
-              eq(userClientAdhesions.entrepriseId, entrepriseId),
-            ),
-          );
+        if (posture === "prestataire") {
+          await tx
+            .update(userPrestataireAdhesions)
+            .set(adhesionPayload)
+            .where(
+              and(
+                eq(userPrestataireAdhesions.userId, userId),
+                eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+              ),
+            );
+        } else {
+          await tx
+            .update(userClientAdhesions)
+            .set(adhesionPayload)
+            .where(
+              and(
+                eq(userClientAdhesions.userId, userId),
+                eq(userClientAdhesions.entrepriseId, entrepriseId),
+              ),
+            );
+        }
       }
 
       // Changement email admin : mettre à jour email + emailVerified:false dans la transaction
@@ -1005,7 +1064,7 @@ export const permanentlyDeleteUserAction = actionClient
     // UNIQUEMENT pour super_admin_plateforme de l'entreprise FM4ALL en posture plateforme
 
     // 1. Vérifier que l'utilisateur actuel a le rôle plateforme super_admin_plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
     if (!platformRole || platformRole.role !== "super_admin_plateforme") {
       throw errors.forbidden(
@@ -1079,15 +1138,16 @@ export const getUsersEligibleForAdhesionAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès (admin ou super_admin_plateforme)
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
-    if (platformRole?.role !== "super_admin_plateforme") {
-      // Vérifier que l'utilisateur est admin dans cette entreprise (peu importe la posture)
+    // Vérifier accès (admin actif ou tout rôle plateforme)
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!platformRole?.role) {
+      // Vérifier que l'utilisateur est admin actif dans cette entreprise (peu importe la posture)
       const isClientAdmin = await db.query.userClientAdhesions.findFirst({
         where: and(
           eq(userClientAdhesions.userId, currentUser.id),
           eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
           eq(userClientAdhesions.role, "admin"),
+          eq(userClientAdhesions.statut, "actif"),
         ),
       });
       const isPrestataireAdmin = await db.query.userPrestataireAdhesions.findFirst({
@@ -1095,6 +1155,7 @@ export const getUsersEligibleForAdhesionAction = actionClient
           eq(userPrestataireAdhesions.userId, currentUser.id),
           eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
           eq(userPrestataireAdhesions.role, "admin"),
+          eq(userPrestataireAdhesions.statut, "actif"),
         ),
       });
       if (!isClientAdmin && !isPrestataireAdmin) {
@@ -1124,14 +1185,15 @@ export const addAdhesionToExistingUserAction = actionClient
 
     const { targetUserId, entrepriseId, posture, role } = parsedInput;
 
-    // Vérifier que le currentUser est admin ou super_admin_plateforme
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
-    if (platformRole?.role !== "super_admin_plateforme") {
+    // Vérifier que le currentUser est admin actif ou tout rôle plateforme
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!platformRole?.role) {
       const isClientAdmin = await db.query.userClientAdhesions.findFirst({
         where: and(
           eq(userClientAdhesions.userId, currentUser.id),
           eq(userClientAdhesions.entrepriseId, entrepriseId),
           eq(userClientAdhesions.role, "admin"),
+          eq(userClientAdhesions.statut, "actif"),
         ),
       });
       const isPrestataireAdmin = await db.query.userPrestataireAdhesions.findFirst({
@@ -1139,6 +1201,7 @@ export const addAdhesionToExistingUserAction = actionClient
           eq(userPrestataireAdhesions.userId, currentUser.id),
           eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
           eq(userPrestataireAdhesions.role, "admin"),
+          eq(userPrestataireAdhesions.statut, "actif"),
         ),
       });
       if (!isClientAdmin && !isPrestataireAdmin) {
