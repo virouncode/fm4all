@@ -474,10 +474,6 @@ export const clientServicesRelations = relations(
     factures: many(factures),
     factureLigneAllocations: many(factureLigneAllocations),
     documentsLinks: many(documentsLinks),
-    tacheListeTemplate: one(tacheListesTemplates, {
-      fields: [clientServices.tacheListeTemplateId],
-      references: [tacheListesTemplates.id],
-    }),
     prixAppliques: many(clientServicePrixAppliques),
   }),
 );

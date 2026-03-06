@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { useRouter } from "@/i18n/navigation";
 import { getPrestationsAction } from "@/server/actions/clientServicesActions";
+import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
 import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
@@ -98,32 +99,71 @@ export default function PrestationsClient({
     searchParams.modeCommercial,
   ].filter(Boolean).length;
 
-  // En posture plateforme : cibler le client filtré (ou undefined = tous les clients)
-  // En posture client : toujours son propre entreprise
-  const targetEntrepriseId = useMemo(() => {
-    if (posture === "plateforme") {
-      return searchParams.clientEntrepriseId || undefined;
-    }
-    return entreprise?.id || undefined;
-  }, [posture, entreprise?.id, searchParams.clientEntrepriseId]);
-
-  // Chargement des clients (plateforme uniquement, une seule fois)
+  // Chargement des clients (plateforme ou prestataire)
   useEffect(() => {
-    if (posture !== "plateforme") return;
-
-    async function loadClients() {
-      const result = await getEntreprisesClientesAction();
-      if (result?.data?.clients) {
-        setClients(result.data.clients);
-      }
+    if (posture === "plateforme") {
+      getEntreprisesClientesAction().then((result) => {
+        if (result?.data?.clients) setClients(result.data.clients);
+      });
+    } else if (posture === "prestataire" && entreprise?.id) {
+      getMesClientsAction({ entrepriseId: entreprise.id }).then((result) => {
+        if (result?.data?.clients) {
+          setClients(result.data.clients.map((c) => ({ id: c.id, nom: c.nom })));
+        }
+      });
     }
-    loadClients();
-  }, [posture]);
+  }, [posture, entreprise?.id]);
 
   // Chargement des prestations
   const loadPrestations = useCallback(async () => {
-    // Pour posture non-plateforme, on a besoin d'un entrepriseId
-    if (posture !== "plateforme" && !targetEntrepriseId) {
+    const validOrderByValues = ["createdAt", "serviceNom", "siteNom", "statut", "frequence", "dateDebut"];
+    const orderByParam = (searchParams.orderBy && validOrderByValues.includes(searchParams.orderBy)
+      ? searchParams.orderBy
+      : undefined) as PrestationsOrderByType | undefined;
+    const orderDirParam = (searchParams.orderDir === "asc" || searchParams.orderDir === "desc"
+      ? searchParams.orderDir as "asc" | "desc"
+      : undefined);
+    const commonFilters = {
+      statut: (searchParams.statut as ClientServiceStatutType) || undefined,
+      serviceId: searchParams.serviceId || undefined,
+      siteId: searchParams.siteId || undefined,
+      modeCommercial: (searchParams.modeCommercial as ModeCommercialType) || undefined,
+      orderBy: orderByParam,
+      orderDir: orderDirParam,
+    };
+
+    // Posture prestataire : nécessite un client sélectionné
+    if (posture === "prestataire") {
+      if (!entreprise?.id) {
+        setLoading(false);
+        setPrestations([]);
+        return;
+      }
+      setLoading(true);
+      setIsError(false);
+      try {
+        const result = await getPrestationsAction({
+          prestataireEntrepriseId: entreprise.id,
+          entrepriseId: searchParams.clientEntrepriseId || undefined,
+          ...commonFilters,
+        });
+        if (result?.serverError) {
+          toast.error(result.serverError.message);
+          setIsError(true);
+        } else if (result?.data?.prestations) {
+          setPrestations(result.data.prestations);
+        }
+      } catch {
+        toast.error("Erreur lors du chargement des prestations");
+        setIsError(true);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Posture client : toujours son propre entreprise
+    if (posture === "client" && !entreprise?.id) {
       setLoading(false);
       setPrestations([]);
       return;
@@ -133,20 +173,13 @@ export default function PrestationsClient({
     setIsError(false);
 
     try {
-      const validOrderByValues = ["createdAt", "serviceNom", "siteNom", "statut", "frequence", "dateDebut"];
       const result = await getPrestationsAction({
-        entrepriseId: targetEntrepriseId, // undefined = tous les clients (plateforme only)
-        statut: (searchParams.statut as ClientServiceStatutType) || undefined,
-        serviceId: searchParams.serviceId || undefined,
-        siteId: searchParams.siteId || undefined,
-        modeCommercial:
-          (searchParams.modeCommercial as ModeCommercialType) || undefined,
-        orderBy: (searchParams.orderBy && validOrderByValues.includes(searchParams.orderBy)
-          ? searchParams.orderBy
-          : undefined) as PrestationsOrderByType | undefined,
-        orderDir: (searchParams.orderDir === "asc" || searchParams.orderDir === "desc"
-          ? searchParams.orderDir
-          : undefined),
+        // plateforme : clientEntrepriseId ou undefined (cross-clients)
+        // client : son propre entreprise
+        entrepriseId: posture === "plateforme"
+          ? (searchParams.clientEntrepriseId || undefined)
+          : (entreprise?.id || undefined),
+        ...commonFilters,
       });
 
       if (result?.serverError) {
@@ -161,7 +194,7 @@ export default function PrestationsClient({
     } finally {
       setLoading(false);
     }
-  }, [targetEntrepriseId, posture, searchParams]);
+  }, [entreprise?.id, posture, searchParams]);
 
   // Chargement initial + rechargement lors de la navigation
   // Utilise searchParams comme objet (nouvelle référence à chaque navigation) pour détecter les changements
@@ -193,7 +226,7 @@ export default function PrestationsClient({
     );
   };
 
-  // Changement de client dans le sélecteur dédié (plateforme uniquement)
+  // Changement de client dans le sélecteur dédié (plateforme et prestataire)
   const handleClientChange = (clientId: string) => {
     const params: Record<string, string> = {};
     if (searchParams.orderBy) params.orderBy = searchParams.orderBy;
@@ -230,8 +263,8 @@ export default function PrestationsClient({
 
   return (
     <div className="flex h-full flex-col gap-4">
-      {/* ==================== SÉLECTEUR CLIENT (plateforme uniquement) ==================== */}
-      {posture === "plateforme" && (
+      {/* ==================== SÉLECTEUR CLIENT (plateforme et prestataire) ==================== */}
+      {(posture === "plateforme" || posture === "prestataire") && (
         <div className="flex flex-shrink-0 items-center gap-2">
           <span className="text-muted-foreground whitespace-nowrap text-sm">
             Client :
@@ -241,7 +274,7 @@ export default function PrestationsClient({
             onValueChange={handleClientChange}
           >
             <SelectTrigger className="h-8 w-64">
-              <SelectValue placeholder="Tous les clients" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les clients</SelectItem>
@@ -361,6 +394,7 @@ export default function PrestationsClient({
         currentFilters={filters}
         onApply={handleFiltersApply}
         clientEntrepriseId={searchParams.clientEntrepriseId}
+        prestataireEntrepriseId={posture === "prestataire" ? entreprise?.id : undefined}
       />
 
       {/* Tri */}

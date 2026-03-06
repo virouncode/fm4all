@@ -31,6 +31,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { modePilotageCT } from "@/constants/codeTables";
 import { updateExecutionAction } from "@/server/actions/clientServiceExecutionsActions";
+import { useAppStore } from "@/stores/application/appStore";
 import type {
   ExecutionPrixItem,
   ExecutionWithPrix,
@@ -55,6 +56,10 @@ type ExecutionEditDialogProps = {
   entrepriseId: string;
   modeCommercial: ModeCommercialType;
   isPlateforme: boolean;
+  canChangeModePilotage: boolean;
+  clientHasActiveAdmin: boolean;
+  clientNom: string;
+  serviceNom: string;
   onSuccess: (executions: ExecutionWithPrix[]) => void;
 };
 
@@ -148,10 +153,19 @@ export function ExecutionEditDialog({
   entrepriseId,
   modeCommercial,
   isPlateforme,
+  canChangeModePilotage,
+  clientHasActiveAdmin,
+  clientNom,
+  serviceNom,
   onSuccess,
 }: ExecutionEditDialogProps) {
+  const postureActive = useAppStore((state) => state.postureActive);
   const showIntermediaire =
     isPlateforme && modeCommercial === "intermediaire_fm4all";
+
+  const availableModePilotage = clientHasActiveAdmin
+    ? modePilotageCT
+    : modePilotageCT.filter((m) => m.code === "prestataire");
 
   const activePrix = execution.prix.filter((p) => p.actif);
 
@@ -239,6 +253,11 @@ export function ExecutionEditDialog({
       <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
           <DialogTitle>Modifier l&apos;exécution</DialogTitle>
+          {postureActive === "prestataire" && (
+            <p className="text-muted-foreground text-sm">
+              {clientNom} — {serviceNom}
+            </p>
+          )}
           <p className="text-muted-foreground text-sm">
             Prestataire :{" "}
             <strong>{execution.prestataireNom ?? "Inconnu"}</strong>
@@ -262,8 +281,9 @@ export function ExecutionEditDialog({
                   requiredMark
                   description="Détermine qui pilote le workflow de cette exécution."
                   selectClassName="w-full"
+                  disabled={!canChangeModePilotage}
                 >
-                  {modePilotageCT.map((m) => (
+                  {availableModePilotage.map((m) => (
                     <SelectItem key={m.code} value={m.code}>
                       {m.name}
                     </SelectItem>

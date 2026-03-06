@@ -256,9 +256,9 @@ export const modeCommercialCodes = modeCommercialCT.map(
 ];
 
 export const modePilotageCT = [
-  { code: "client", name: "Gestion interne (client pilote)" },
-  { code: "prestataire", name: "Prestataire opérant" },
-  { code: "collaboration", name: "Collaboration bilatérale" },
+  { code: "client", name: "Géré par le client" },
+  { code: "prestataire", name: "Géré par le prestataire" },
+  { code: "collaboration", name: "Géré en commun" },
 ] as const;
 
 export const modePilotageCodes = modePilotageCT.map(

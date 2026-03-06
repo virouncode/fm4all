@@ -110,6 +110,8 @@ type PrestationDetailsClientProps = {
   prestation: PrestationListItem;
   canManage: boolean;
   isPlateforme: boolean;
+  canChangeModePilotage: boolean;
+  clientHasActiveAdmin: boolean;
   executions: ExecutionWithPrix[];
   occurrences: OccurrenceListItem[];
   totalOccurrences: number;
@@ -132,6 +134,8 @@ export function PrestationDetailsClient({
   prestation,
   canManage,
   isPlateforme,
+  canChangeModePilotage,
+  clientHasActiveAdmin,
   executions: initialExecutions,
   occurrences,
   totalOccurrences,
@@ -699,6 +703,8 @@ export function PrestationDetailsClient({
             executions={executions}
             canManage={canManage}
             isPlateforme={isPlateforme}
+            canChangeModePilotage={canChangeModePilotage}
+            clientHasActiveAdmin={clientHasActiveAdmin}
             prestation={prestation}
             onExecutionsChange={setExecutions}
           />
@@ -784,12 +790,16 @@ function ExecutionTab({
   executions,
   canManage,
   isPlateforme,
+  canChangeModePilotage,
+  clientHasActiveAdmin,
   prestation,
   onExecutionsChange,
 }: {
   executions: ExecutionWithPrix[];
   canManage: boolean;
   isPlateforme: boolean;
+  canChangeModePilotage: boolean;
+  clientHasActiveAdmin: boolean;
   prestation: PrestationListItem;
   onExecutionsChange: (executions: ExecutionWithPrix[]) => void;
 }) {
@@ -954,6 +964,8 @@ function ExecutionTab({
             execution={execution}
             canManage={canManage}
             isPlateforme={isPlateforme}
+            canChangeModePilotage={canChangeModePilotage}
+            clientHasActiveAdmin={clientHasActiveAdmin}
             prestation={prestation}
             onExecutionsChange={onExecutionsChange}
           />
@@ -970,6 +982,10 @@ function ExecutionTab({
           serviceId={prestation.serviceId}
           modeCommercial={prestation.modeCommercial}
           isPlateforme={isPlateforme}
+          canChangeModePilotage={canChangeModePilotage}
+          clientHasActiveAdmin={clientHasActiveAdmin}
+          clientNom={prestation.entrepriseNom}
+          serviceNom={prestation.serviceNom}
           onSuccess={(updated) => {
             onExecutionsChange(updated);
             setAddDialogOpen(false);
@@ -984,12 +1000,16 @@ function ExecutionCard({
   execution,
   canManage,
   isPlateforme,
+  canChangeModePilotage,
+  clientHasActiveAdmin,
   prestation,
   onExecutionsChange,
 }: {
   execution: ExecutionWithPrix;
   canManage: boolean;
   isPlateforme: boolean;
+  canChangeModePilotage: boolean;
+  clientHasActiveAdmin: boolean;
   prestation: PrestationListItem;
   onExecutionsChange: (executions: ExecutionWithPrix[]) => void;
 }) {
@@ -1314,6 +1334,10 @@ function ExecutionCard({
           entrepriseId={prestation.entrepriseId}
           modeCommercial={prestation.modeCommercial}
           isPlateforme={isPlateforme}
+          canChangeModePilotage={canChangeModePilotage}
+          clientHasActiveAdmin={clientHasActiveAdmin}
+          clientNom={prestation.entrepriseNom}
+          serviceNom={prestation.serviceNom}
           onSuccess={(updated) => {
             onExecutionsChange(updated);
             setEditOpen(false);

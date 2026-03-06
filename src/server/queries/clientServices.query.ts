@@ -1,9 +1,10 @@
 import "server-only";
 
 import { db } from "@/db";
-import { entreprises } from "@/db/schema/entreprises";
-import { clientServices, services } from "@/db/schema/services";
+import { entreprises, serviceEntreprises } from "@/db/schema/entreprises";
+import { clientServiceExecutions, clientServices, services } from "@/db/schema/services";
 import { sites } from "@/db/schema/sites";
+import { userClientAdhesions } from "@/db/schema/users";
 import {
   type ModeCommercialType,
   type PrestationListItem,
@@ -13,6 +14,19 @@ import {
   selectClientServiceSchema,
 } from "@/zod-schemas/clientServices.schema";
 import { asc, desc, and, eq } from "drizzle-orm";
+
+export async function hasClientActiveAdmin(
+  clientEntrepriseId: string,
+): Promise<boolean> {
+  const admin = await db.query.userClientAdhesions.findFirst({
+    where: and(
+      eq(userClientAdhesions.entrepriseId, clientEntrepriseId),
+      eq(userClientAdhesions.role, "admin"),
+      eq(userClientAdhesions.statut, "actif"),
+    ),
+  });
+  return !!admin;
+}
 
 // ==================== ORDER HELPER ====================
 
@@ -91,7 +105,6 @@ export async function getPrestationsByEntreprise(
       modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
-      tacheListeTemplateId: clientServices.tacheListeTemplateId,
       createdAt: clientServices.createdAt,
       updatedAt: clientServices.updatedAt,
     })
@@ -101,6 +114,86 @@ export async function getPrestationsByEntreprise(
     .innerJoin(services, eq(services.id, clientServices.serviceId))
     .where(and(...conditions))
     .orderBy(buildOrderBy(options?.orderBy, options?.orderDir));
+
+  return rows.map((row) => prestationListItemSchema.parse(row));
+}
+
+/**
+ * GET PRESTATIONS BY PRESTATAIRE
+ * Returns prestations where the prestataire has at least one execution
+ * (joins via clientServiceExecutions → serviceEntreprises)
+ */
+export async function getPrestationsByPrestataire(
+  prestataireEntrepriseId: string,
+  options?: {
+    clientEntrepriseId?: string;
+    statut?: SelectClientServiceType["statut"];
+    serviceId?: string;
+    siteId?: string;
+    modeCommercial?: ModeCommercialType;
+    orderBy?: PrestationsOrderByType;
+    orderDir?: "asc" | "desc";
+  },
+): Promise<PrestationListItem[]> {
+  const conditions = [
+    eq(serviceEntreprises.entrepriseId, prestataireEntrepriseId),
+  ];
+
+  if (options?.clientEntrepriseId) {
+    conditions.push(eq(clientServices.entrepriseId, options.clientEntrepriseId));
+  }
+
+  if (options?.statut) {
+    conditions.push(eq(clientServices.statut, options.statut));
+  }
+  if (options?.serviceId) {
+    conditions.push(eq(clientServices.serviceId, options.serviceId));
+  }
+  if (options?.siteId) {
+    conditions.push(eq(clientServices.siteId, options.siteId));
+  }
+  if (options?.modeCommercial) {
+    conditions.push(eq(clientServices.modeCommercial, options.modeCommercial));
+  }
+
+  const rows = await db
+    .selectDistinctOn([clientServices.id], {
+      id: clientServices.id,
+      entrepriseId: clientServices.entrepriseId,
+      entrepriseNom: entreprises.nom,
+      siteId: clientServices.siteId,
+      siteNom: sites.nom,
+      serviceId: clientServices.serviceId,
+      serviceNom: services.nom,
+      frequence: clientServices.frequence,
+      frequenceParPeriode: clientServices.frequenceParPeriode,
+      intervalleJours: clientServices.intervalleJours,
+      dateDebut: clientServices.dateDebut,
+      dateFin: clientServices.dateFin,
+      joursPreference: clientServices.joursPreference,
+      heureDebutPreference: clientServices.heureDebutPreference,
+      dureeEstimeeMinutes: clientServices.dureeEstimeeMinutes,
+      statut: clientServices.statut,
+      modePlanning: clientServices.modePlanning,
+      modeCommercial: clientServices.modeCommercial,
+      notes: clientServices.notes,
+      createdAt: clientServices.createdAt,
+      updatedAt: clientServices.updatedAt,
+    })
+    .from(clientServices)
+    .innerJoin(entreprises, eq(entreprises.id, clientServices.entrepriseId))
+    .innerJoin(sites, eq(sites.id, clientServices.siteId))
+    .innerJoin(services, eq(services.id, clientServices.serviceId))
+    .innerJoin(
+      clientServiceExecutions,
+      eq(clientServiceExecutions.clientServiceId, clientServices.id),
+    )
+    .innerJoin(
+      serviceEntreprises,
+      eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+    )
+    .where(and(...conditions))
+    .orderBy(clientServices.id, buildOrderBy(options?.orderBy, options?.orderDir));
 
   return rows.map((row) => prestationListItemSchema.parse(row));
 }
@@ -138,7 +231,6 @@ export async function getAllPrestations(options?: {
       modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
-      tacheListeTemplateId: clientServices.tacheListeTemplateId,
       createdAt: clientServices.createdAt,
       updatedAt: clientServices.updatedAt,
     })
@@ -209,7 +301,6 @@ export async function getPrestationWithJoinsById(
       modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
-      tacheListeTemplateId: clientServices.tacheListeTemplateId,
       createdAt: clientServices.createdAt,
       updatedAt: clientServices.updatedAt,
     })

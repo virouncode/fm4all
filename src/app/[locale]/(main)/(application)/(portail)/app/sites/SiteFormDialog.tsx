@@ -27,7 +27,7 @@ import {
   type UpdateSiteFormType,
 } from "@/zod-schemas/sites.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building, Copy } from "lucide-react";
+import { Copy, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useForm, useFormState } from "react-hook-form";
@@ -219,7 +219,7 @@ export function SiteFormDialog({
         <DialogHeader>
           <DialogTitle>
             <div className="flex items-center gap-2">
-              <Building className="text-primary size-6" />
+              <MapPin className="text-primary size-6" />
               {mode === "create" ? "Créer un site" : "Modifier le site"}
             </div>
           </DialogTitle>

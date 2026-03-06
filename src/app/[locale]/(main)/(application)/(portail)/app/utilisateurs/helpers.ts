@@ -4,7 +4,11 @@ import {
 } from "@/zod-schemas/user.schema";
 import type { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
 import type { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
-import type { RoleClientAttributionType } from "@/zod-schemas/userSiteAttribution.schema";
+import type { RolePrestataireAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import type {
+  RoleClientAttributionType,
+  RolePrestataireAttributionSiteType,
+} from "@/zod-schemas/userSiteAttribution.schema";
 import type { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 
 /**
@@ -198,12 +202,59 @@ export function getAvailableRolesByPostureAndLevel(
 }
 
 /**
+ * FILTRER RÔLES PRESTATAIRE PAR NIVEAU D'UTILISATEUR
+ * Retourne les rôles disponibles pour l'attribution de sites prestataire
+ */
+export function getAvailableRolesByPosturePrestataire(
+  roleAdhesion: RolePrestataireAdhesionType | null,
+  rolePlateformeAdhesion?: RolePlateformeAdhesionType | null,
+): RolePrestataireAttributionSiteType[] {
+  if (!roleAdhesion && !rolePlateformeAdhesion) return [];
+
+  const allPrestataireRoles: RolePrestataireAttributionSiteType[] = [
+    "responsable_site",
+    "demandeur_site",
+    "observateur_site",
+    "intervenant_site",
+  ];
+
+  // Plateforme, admin, manager → tous les rôles
+  if (
+    rolePlateformeAdhesion === "super_admin_plateforme" ||
+    roleAdhesion === "admin" ||
+    roleAdhesion === "manager"
+  ) {
+    return allPrestataireRoles;
+  }
+
+  // Collaborateur → pas de responsable_site (délégation locale uniquement)
+  if (roleAdhesion === "collaborateur") {
+    return ["demandeur_site", "observateur_site", "intervenant_site"];
+  }
+
+  return [];
+}
+
+/**
  * LABELS DES RÔLES
  */
 export const roleLabels: Record<string, string> = {
   responsable_site: "Responsable",
   demandeur_site: "Demandeur",
   observateur_site: "Observateur",
+};
+
+/**
+ * LABELS DES RÔLES PRESTATAIRE
+ */
+export const rolePrestataireLabels: Record<
+  RolePrestataireAttributionSiteType,
+  string
+> = {
+  responsable_site: "Responsable de site",
+  demandeur_site: "Demandeur de site",
+  observateur_site: "Observateur de site",
+  intervenant_site: "Intervenant de site",
 };
 
 /**

@@ -62,7 +62,7 @@ export function SiteDetails({
 
   // Permissions
   const isAdmin =
-    currentUserPlateformeRole === "super_admin_plateforme" ||
+    !!currentUserPlateformeRole ||
     currentUserRole === "admin";
   const isResponsable = responsableSiteIds.has(site.id);
 

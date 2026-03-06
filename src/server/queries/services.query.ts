@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { clientServices, services } from "@/db/schema/services";
 import { serviceEntreprises } from "@/db/schema/entreprises";
 import type { ServiceWithStatsType } from "@/zod-schemas/service.schema";
-import { asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 
 /**
  * GET ALL SERVICES (catalogue)
@@ -16,6 +16,31 @@ export async function getAllServices(): Promise<
   return await db
     .select({ id: services.id, nom: services.nom })
     .from(services)
+    .orderBy(asc(services.nom));
+}
+
+/**
+ * GET SERVICES BY PRESTATAIRE
+ * Returns services offered by a prestataire enterprise (via serviceEntreprises table)
+ * Includes serviceEntrepriseId for direct use when creating executions.
+ */
+export async function getServicesByPrestataire(
+  prestataireEntrepriseId: string,
+): Promise<Array<{ id: string; nom: string; serviceEntrepriseId: string }>> {
+  return await db
+    .select({
+      id: services.id,
+      nom: services.nom,
+      serviceEntrepriseId: serviceEntreprises.id,
+    })
+    .from(serviceEntreprises)
+    .innerJoin(services, eq(serviceEntreprises.serviceId, services.id))
+    .where(
+      and(
+        eq(serviceEntreprises.entrepriseId, prestataireEntrepriseId),
+        eq(serviceEntreprises.actif, true),
+      ),
+    )
     .orderBy(asc(services.nom));
 }
 

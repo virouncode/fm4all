@@ -97,7 +97,7 @@ function TreeNode({
 
   // Permissions
   const isAdmin =
-    currentUserPlateformeRole === "super_admin_plateforme" ||
+    !!currentUserPlateformeRole ||
     currentUserRole === "admin";
   const isResponsable = responsableSiteIds.has(node.id);
   const canCreateChild = canManageOverride || isAdmin || isResponsable;

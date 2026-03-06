@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { getServicesAction } from "@/server/actions/servicesActions";
-import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
+import { getServicesByPrestataireAction, getServicesAction } from "@/server/actions/servicesActions";
+import { getAccessibleSitesAction, getSitesForPrestationAction } from "@/server/actions/sitesActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Filter, RotateCcw } from "lucide-react";
@@ -42,9 +42,11 @@ type PrestationsFiltersDialogProps = {
   onOpenChange: (open: boolean) => void;
   currentFilters: AppliedFiltersType;
   onApply: (filters: AppliedFiltersType) => void;
-  /** Client sélectionné dans la barre principale (plateforme uniquement).
+  /** Client sélectionné dans la barre principale (plateforme et prestataire).
    *  Utilisé pour charger les sites du bon client et activer/désactiver le filtre site. */
   clientEntrepriseId?: string;
+  /** ID du prestataire (posture prestataire uniquement). Filtre les services à ceux proposés par ce prestataire. */
+  prestataireEntrepriseId?: string;
 }
 
 export function PrestationsFiltersDialog({
@@ -53,6 +55,7 @@ export function PrestationsFiltersDialog({
   currentFilters,
   onApply,
   clientEntrepriseId,
+  prestataireEntrepriseId,
 }: PrestationsFiltersDialogProps) {
   const postureActive = useAppStore((state) => state.postureActive);
   const entrepriseId = useAppStore((state) => state.entreprise?.id);
@@ -75,27 +78,62 @@ export function PrestationsFiltersDialog({
 
   const filters = useWatch({ control: form.control });
 
-  // Charger services
+  // Charger services selon la posture
   useEffect(() => {
     if (!open) return;
 
     async function loadServices() {
+      // Posture prestataire : seulement les services proposés par ce prestataire
+      if (prestataireEntrepriseId) {
+        const result = await getServicesByPrestataireAction({
+          prestataireEntrepriseId,
+        });
+        if (result?.data?.services) {
+          setServices(result.data.services.map((s) => ({ id: s.id, nom: s.nom })));
+        }
+        return;
+      }
+      // Autres postures : tous les services du catalogue
       const result = await getServicesAction();
       if (result?.data?.services) {
         setServices(result.data.services);
       }
     }
     loadServices();
-  }, [open]);
+  }, [open, prestataireEntrepriseId]);
 
-  // Charger sites selon le client sélectionné (prop, depuis la barre principale) ou l'entreprise courante
+  // Charger sites selon le client sélectionné
   useEffect(() => {
     if (!open) return;
 
+    // Posture prestataire : sites du client sélectionné (via getSitesForPrestationAction)
+    if (postureActive === "prestataire") {
+      if (!clientEntrepriseId) {
+        setSites([]);
+        return;
+      }
+      async function loadSitesPrestataire() {
+        setLoadingSites(true);
+        try {
+          const result = await getSitesForPrestationAction({
+            entrepriseId: clientEntrepriseId!,
+            posture: "prestataire",
+          });
+          if (result?.data?.allSites) {
+            setSites(result.data.allSites.map((s) => ({ id: s.id, nom: s.nom })));
+          }
+        } catch {
+          toast.error("Erreur lors du chargement des sites");
+        }
+        setLoadingSites(false);
+      }
+      loadSitesPrestataire();
+      return;
+    }
+
+    // Posture plateforme : sites du client sélectionné
     const targetId =
-      postureActive === "plateforme"
-        ? clientEntrepriseId || null
-        : entrepriseId;
+      postureActive === "plateforme" ? clientEntrepriseId || null : entrepriseId;
 
     if (!targetId) {
       setSites([]);
@@ -227,7 +265,7 @@ export function PrestationsFiltersDialog({
                 withError={false}
                 disabled={
                   loadingSites ||
-                  (postureActive === "plateforme" && !clientEntrepriseId)
+                  ((postureActive === "plateforme" || postureActive === "prestataire") && !clientEntrepriseId)
                 }
               >
                 <SelectItem value="all">

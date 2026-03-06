@@ -179,19 +179,6 @@ export type UpdateOccurrenceAssigneeType = z.infer<
   typeof updateOccurrenceAssigneeSchema
 >;
 
-// ==================== DEPLOY ASSIGNATION (BULK) ====================
-
-export const deployAssignationSchema = z.object({
-  executionId: z.uuid("ID de l'exécution invalide"),
-  prestationId: z.uuid("ID de la prestation invalide"),
-  entrepriseId: z.uuid("ID de l'entreprise invalide"),
-  assigneeUserId: z.uuid().nullable(),
-  applyToTaches: z.boolean().optional(),
-  dateFrom: z.string().optional(),
-  dateTo: z.string().optional(),
-});
-export type DeployAssignationType = z.infer<typeof deployAssignationSchema>;
-
 // ==================== INSERT OCCURRENCE ON-DEMAND ====================
 
 export const insertOccurrenceOnDemandFormSchema = z.object({

@@ -1,6 +1,12 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { SiteTreeNode } from "@/zod-schemas/sites.schema";
 import { Building, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
@@ -10,7 +16,11 @@ type AttributionSitesTreeProps = {
   selectedSiteIds: string[];
   onSiteToggle: (siteId: string, isChecked: boolean) => void;
   scope: "self" | "subtree";
+  /** Déjà attribué → checkbox auto-cochée + désactivée */
   getSiteState?: (siteId: string) => "disabled" | "available";
+  /** Si fourni, seuls ces siteIds ont leur checkbox activée.
+   *  Les autres sont désactivés avec tooltip "Vous n'êtes pas responsable de ce site". */
+  enabledSiteIds?: string[];
 };
 
 export function AttributionSitesTree({
@@ -19,24 +29,28 @@ export function AttributionSitesTree({
   onSiteToggle,
   scope,
   getSiteState,
+  enabledSiteIds,
 }: AttributionSitesTreeProps) {
   return (
-    <div className="space-y-1">
-      {tree.length === 0 && (
-        <p className="text-muted-foreground text-sm">Aucun site disponible</p>
-      )}
-      {tree.map((node) => (
-        <TreeNode
-          key={node.id}
-          node={node}
-          level={0}
-          selectedSiteIds={selectedSiteIds}
-          onSiteToggle={onSiteToggle}
-          scope={scope}
-          getSiteState={getSiteState}
-        />
-      ))}
-    </div>
+    <TooltipProvider>
+      <div className="space-y-1">
+        {tree.length === 0 && (
+          <p className="text-muted-foreground text-sm">Aucun site disponible</p>
+        )}
+        {tree.map((node) => (
+          <TreeNode
+            key={node.id}
+            node={node}
+            level={0}
+            selectedSiteIds={selectedSiteIds}
+            onSiteToggle={onSiteToggle}
+            scope={scope}
+            getSiteState={getSiteState}
+            enabledSiteIds={enabledSiteIds}
+          />
+        ))}
+      </div>
+    </TooltipProvider>
   );
 }
 
@@ -47,6 +61,7 @@ function TreeNode({
   onSiteToggle,
   scope,
   getSiteState,
+  enabledSiteIds,
 }: {
   node: SiteTreeNode;
   level: number;
@@ -54,14 +69,42 @@ function TreeNode({
   onSiteToggle: (siteId: string, isChecked: boolean) => void;
   scope: "self" | "subtree";
   getSiteState?: (siteId: string) => "disabled" | "available";
+  enabledSiteIds?: string[];
 }) {
   const [expanded, setExpanded] = useState(true);
   const hasChildren = node.children.length > 0;
   const isChecked = selectedSiteIds.includes(node.id);
 
-  // Calculer l'état du site (disabled ou available)
+  // État "déjà attribué" (auto-coché + désactivé)
   const siteState = getSiteState ? getSiteState(node.id) : "available";
-  const isDisabled = siteState === "disabled";
+  const isAlreadyAttributed = siteState === "disabled";
+
+  // État "pas responsable" (checkbox vide + désactivée + tooltip)
+  const isNotResponsible =
+    enabledSiteIds !== undefined && !enabledSiteIds.includes(node.id);
+
+  const isDisabled = isAlreadyAttributed || isNotResponsible;
+
+  const checkboxEl = (
+    <Checkbox
+      id={node.id}
+      checked={isAlreadyAttributed || isChecked}
+      disabled={isDisabled}
+      onCheckedChange={(checked) => onSiteToggle(node.id, checked === true)}
+    />
+  );
+
+  const labelEl = (
+    <label
+      htmlFor={node.id}
+      className={`flex flex-1 items-center gap-2 ${
+        isDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+      }`}
+    >
+      <Building className="text-muted-foreground h-4 w-4" />
+      <span className="text-sm">{node.nom}</span>
+    </label>
+  );
 
   return (
     <div>
@@ -87,23 +130,19 @@ function TreeNode({
         </button>
 
         {/* Checkbox */}
-        <Checkbox
-          id={node.id}
-          checked={isDisabled || isChecked} // Auto-cocher si disabled
-          disabled={isDisabled}
-          onCheckedChange={(checked) => onSiteToggle(node.id, checked === true)}
-        />
+        {checkboxEl}
 
-        {/* Site Icon + Name */}
-        <label
-          htmlFor={node.id}
-          className={`flex flex-1 items-center gap-2 ${
-            isDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-          }`}
-        >
-          <Building className="text-muted-foreground h-4 w-4" />
-          <span className="text-sm">{node.nom}</span>
-        </label>
+        {/* Label — avec tooltip si "pas responsable" */}
+        {isNotResponsible ? (
+          <Tooltip>
+            <TooltipTrigger asChild>{labelEl}</TooltipTrigger>
+            <TooltipContent>
+              Vous n&apos;êtes pas responsable de ce site
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          labelEl
+        )}
       </div>
 
       {/* Children (recursive) */}
@@ -118,6 +157,7 @@ function TreeNode({
               onSiteToggle={onSiteToggle}
               scope={scope}
               getSiteState={getSiteState}
+              enabledSiteIds={enabledSiteIds}
             />
           ))}
         </div>

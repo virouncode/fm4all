@@ -59,8 +59,7 @@ export function SitesClientsClient() {
     null,
   );
 
-  const canCreateRoot =
-    currentUserPlateformeRole === "super_admin_plateforme";
+  const canCreateRoot = !!currentUserPlateformeRole;
 
   // Load all platform clients on mount
   useEffect(() => {

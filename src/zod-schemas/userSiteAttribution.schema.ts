@@ -1,9 +1,13 @@
 import {
   attributionModeCodes,
   roleClientAttributionSiteCodes,
+  rolePrestataireAttributionSiteCodes,
   siteAttributionScopeCodes,
 } from "@/constants/codeTables";
-import { userClientSiteAttributions } from "@/db/schema/users";
+import {
+  userClientSiteAttributions,
+  userPrestataireSiteAttributions,
+} from "@/db/schema/users";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -98,6 +102,66 @@ export const bulkInsertMixedAttributionsFormSchema = z.object({
 });
 export type BulkInsertMixedAttributionsFormType = z.infer<
   typeof bulkInsertMixedAttributionsFormSchema
+>;
+
+// ============================================================
+// PRESTATAIRE SITE ATTRIBUTIONS
+// ============================================================
+
+export const rolePrestataireAttributionSchema = z.enum(
+  rolePrestataireAttributionSiteCodes,
+);
+export type RolePrestataireAttributionSiteType = z.infer<
+  typeof rolePrestataireAttributionSchema
+>;
+
+export const selectUserPrestataireSiteAttributionSchema = createSelectSchema(
+  userPrestataireSiteAttributions,
+);
+export type SelectUserPrestataireSiteAttributionType = z.infer<
+  typeof selectUserPrestataireSiteAttributionSchema
+>;
+
+export const selectUserPrestataireSiteAttributionWithSiteSchema =
+  selectUserPrestataireSiteAttributionSchema.extend({
+    site: z.object({
+      id: z.uuid(),
+      nom: z.string(),
+      parentId: z.uuid().nullable(),
+    }),
+  });
+
+export type SelectUserPrestataireSiteAttributionWithSiteType = z.infer<
+  typeof selectUserPrestataireSiteAttributionWithSiteSchema
+>;
+
+export const selectUserPrestataireSiteAttributionWithInheritanceSchema =
+  selectUserPrestataireSiteAttributionWithSiteSchema.extend({
+    isInherited: z.boolean(),
+    inheritedFromSiteId: z.uuid().nullable(),
+  });
+
+export type SelectUserPrestataireSiteAttributionWithInheritanceType = z.infer<
+  typeof selectUserPrestataireSiteAttributionWithInheritanceSchema
+>;
+
+export const bulkInsertMixedPrestataireAttributionsFormSchema = z.object({
+  userId: z.uuid("ID utilisateur invalide"),
+  clientEntrepriseId: z.uuid("ID entreprise cliente invalide"),
+  attributions: z
+    .array(
+      z.object({
+        siteId: z.uuid("ID site invalide"),
+        mode: attributionModeSchema,
+        scope: siteAttributionScopeSchema,
+        role: rolePrestataireAttributionSchema,
+      }),
+    )
+    .min(1, "Au moins une attribution doit être fournie"),
+  exclusionsToDelete: z.array(z.uuid()).optional(),
+});
+export type BulkInsertMixedPrestataireAttributionsFormType = z.infer<
+  typeof bulkInsertMixedPrestataireAttributionsFormSchema
 >;
 
 // DELETE schema

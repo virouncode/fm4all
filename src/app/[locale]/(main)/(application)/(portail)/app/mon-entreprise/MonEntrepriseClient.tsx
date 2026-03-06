@@ -12,7 +12,8 @@ type ServiceItem = { serviceId: string; nom: string };
 
 export function MonEntrepriseClient() {
   const entreprise = useAppStore((s) => s.entreprise);
-  const roleAdhesion = useAppStore((s) => s.roleClientAdhesion);
+  const roleClientAdhesion = useAppStore((s) => s.roleClientAdhesion);
+  const rolePrestataireAdhesion = useAppStore((s) => s.rolePrestataireAdhesion);
 
   const [data, setData] = useState<{
     entreprise: EntrepriseWithDetails;
@@ -71,7 +72,7 @@ export function MonEntrepriseClient() {
     loadData();
   }, [loadData]);
 
-  const canEdit = roleAdhesion === "admin";
+  const canEdit = roleClientAdhesion === "admin" || rolePrestataireAdhesion === "admin";
 
   if (loading) {
     return (

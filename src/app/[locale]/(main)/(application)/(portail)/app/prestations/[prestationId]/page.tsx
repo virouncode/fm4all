@@ -7,7 +7,10 @@ import {
   getExecutionsWithPrixByPrestationId,
   getOccurrencesByPrestationId,
 } from "@/server/queries/clientServiceExecutions.query";
-import { getPrestationWithJoinsById } from "@/server/queries/clientServices.query";
+import {
+  getPrestationWithJoinsById,
+  hasClientActiveAdmin,
+} from "@/server/queries/clientServices.query";
 import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
@@ -61,8 +64,9 @@ export default async function PrestationDetailPage({
 
   // 4. Calculer les permissions
   let canManage = isPlateforme;
-  if (!canManage) {
-    const siteRole = await resolveUserEffectiveRoleOnSite({
+  let siteRole = null;
+  if (!isPlateforme) {
+    siteRole = await resolveUserEffectiveRoleOnSite({
       userId: currentUser.id,
       siteId: prestation.siteId,
       entrepriseId: prestation.entrepriseId,
@@ -70,30 +74,35 @@ export default async function PrestationDetailPage({
     canManage = siteRole === "responsable_site";
   }
 
-  // Peut gérer les checklists : plateforme OU rôle admin/manager (niveau entreprise)
-  const canManageChecklist =
+  const isClientAdmin =
+    !isPlateforme && !!clientAdhesion && clientAdhesion.role === "admin";
+  const isClientManager =
+    !isPlateforme && !!clientAdhesion && clientAdhesion.role === "manager";
+  const canChangeModePilotage =
     isPlateforme ||
-    clientAdhesion?.role === "admin" ||
-    clientAdhesion?.role === "manager";
+    isClientAdmin ||
+    (canManage && !isPlateforme && !isClientManager);
 
   // 5. Charger les exécutions et leurs prix
   const executions = await getExecutionsWithPrixByPrestationId(prestationId);
 
-  // 6. Charger les interventions (première page) + totaux + sites disponibles
-  const [occurrences, totalOccurrences, totalNonAssigned, availableSites] =
+  // 6. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin
+  const [occurrences, totalOccurrences, totalNonAssigned, availableSites, clientHasActiveAdmin] =
     await Promise.all([
       getOccurrencesByPrestationId(prestationId, { limit: 50, sortDir: "asc" }),
       countOccurrencesByPrestationId(prestationId),
       countNonAssignedOccurrencesByPrestationId(prestationId),
       getDistinctSitesForPrestation(prestationId),
+      hasClientActiveAdmin(prestation.entrepriseId),
     ]);
 
   return (
     <PrestationDetailsClient
       prestation={prestation}
       canManage={canManage}
-      canManageChecklist={canManageChecklist}
       isPlateforme={isPlateforme}
+      canChangeModePilotage={canChangeModePilotage}
+      clientHasActiveAdmin={clientHasActiveAdmin}
       executions={executions}
       occurrences={occurrences}
       totalOccurrences={totalOccurrences}

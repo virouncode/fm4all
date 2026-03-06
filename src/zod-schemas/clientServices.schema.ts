@@ -203,6 +203,8 @@ export type PrestationsOrderByType = z.infer<typeof prestationsOrderBySchema>;
 export const getPrestationsQuerySchema = z.object({
   // Optionnel : si absent, la plateforme peut voir tous les clients (cross-client)
   entrepriseId: z.uuid("ID de l'entreprise invalide").optional(),
+  // Posture prestataire : ID du prestataire (filtre via clientServiceExecutions → serviceEntreprises)
+  prestataireEntrepriseId: z.uuid("ID du prestataire invalide").optional(),
   statut: clientServiceStatutSchema.optional(),
   serviceId: z.uuid().optional(),
   siteId: z.uuid().optional(),
@@ -239,22 +241,76 @@ export type InsertPrestationActionType = z.infer<
   typeof insertPrestationActionSchema
 >;
 
+// Action INSERT prestation + exécution en une transaction (posture prestataire)
+// modeCommercial est toujours "direct" et n'est pas exposé dans ce schéma.
+export const insertPrestationWithExecutionActionSchema =
+  insertPrestationActionSchema.extend({
+    // serviceEntrepriseId résolu automatiquement côté client (depuis serviceEntreprises)
+    serviceEntrepriseId: z.uuid("Prestataire invalide"),
+    dateDebutValidite: z
+      .string()
+      .min(1, "Date de début de validité obligatoire"),
+    dateFinValidite: z.string().optional(),
+    priorite: z
+      .string()
+      .refine(
+        (v) =>
+          !isNaN(Number(v)) &&
+          Number(v) >= 0 &&
+          Number(v) <= 100 &&
+          Number.isInteger(Number(v)),
+        "La priorité doit être un entier entre 0 et 100",
+      ),
+    modePilotage: z.enum(["client", "prestataire", "collaboration"]),
+    prix: z
+      .array(
+        z
+          .object({
+            typePrix: z.enum([
+              "abonnement",
+              "par_occurrence",
+              "installation",
+              "frais_livraison",
+            ]),
+            montantHt: z
+              .string()
+              .refine(
+                (v) => !isNaN(Number(v)) && Number(v) >= 0,
+                "Le montant doit être un nombre positif",
+              ),
+            coutPrestataireHt: z.string().optional(),
+            margePourcent: z.string().optional(),
+            periodeFacturation: z
+              .enum(["semaine", "mois", "annee"])
+              .optional(),
+            nbOccurrencesIncluses: z.string().optional(),
+          })
+          .superRefine((data, ctx) => {
+            if (
+              data.typePrix === "abonnement" &&
+              !data.periodeFacturation
+            ) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["periodeFacturation"],
+                message:
+                  "Période de facturation obligatoire pour un abonnement",
+              });
+            }
+          }),
+      )
+      .min(1, "Au moins une ligne de tarif est requise"),
+  });
+export type InsertPrestationWithExecutionActionType = z.infer<
+  typeof insertPrestationWithExecutionActionSchema
+>;
+
 // Action UPDATE prestation (form + entrepriseId)
 export const updatePrestationActionSchema = updatePrestationFormSchema.extend({
   entrepriseId: z.uuid("ID de l'entreprise invalide"),
 });
 export type UpdatePrestationActionType = z.infer<
   typeof updatePrestationActionSchema
->;
-
-// Mise à jour de la checklist par défaut d'une prestation
-export const updateClientServiceTacheListeSchema = z.object({
-  prestationId: z.uuid("ID de la prestation invalide"),
-  entrepriseId: z.uuid("ID de l'entreprise invalide"),
-  tacheListeTemplateId: z.uuid().nullable(),
-});
-export type UpdateClientServiceTacheListeType = z.infer<
-  typeof updateClientServiceTacheListeSchema
 >;
 
 // ==================== JOINED TYPE (pour la liste) ====================
@@ -279,7 +335,6 @@ export type PrestationListItem = {
   modePlanning: ClientServiceModePlanningType;
   modeCommercial: ModeCommercialType;
   notes: string | null;
-  tacheListeTemplateId: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -305,7 +360,6 @@ export const prestationListItemSchema: z.ZodType<PrestationListItem> = z.object(
     modePlanning: clientServiceModePlanningSchema,
     modeCommercial: modeCommercialSchema,
     notes: z.string().nullable(),
-    tacheListeTemplateId: z.string().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
   },

@@ -11,7 +11,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { updateExecutionTacheListeAction } from "@/server/actions/clientServiceExecutionsActions";
-import { updateClientServiceTacheListeAction } from "@/server/actions/clientServicesActions";
 import { getAvailableTacheListesTemplatesAction } from "@/server/actions/tacheListesTemplatesActions";
 import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
 import {
@@ -28,11 +27,9 @@ import { toast } from "sonner";
 type TacheListePickerDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** "client_service" → modifie la prestation ; "execution" → modifie l'exécution */
-  context: "client_service" | "execution";
-  /** ID de la prestation (client_service) ou de l'exécution */
-  entityId: string;
-  /** ID de la prestation (toujours requis pour les permissions) */
+  /** ID de l'exécution */
+  executionId: string;
+  /** ID de la prestation (pour les permissions) */
   prestationId: string;
   /** ID du service (pour filtrer les packs compatibles) */
   serviceId: string;
@@ -40,24 +37,20 @@ type TacheListePickerDialogProps = {
   serviceNom?: string;
   /** ID de l'entreprise cliente */
   entrepriseId: string;
-  /** ID de l'exécution (si context="execution") — pour charger les packs prestataire */
-  executionId?: string;
   /** Pack actuellement assigné */
   currentPackId?: string | null;
-  /** Callback déclenché après une sélection réussie */
-  onSuccess: () => void;
+  /** Callback déclenché après une sélection réussie — reçoit le pack sélectionné ou null */
+  onSuccess: (pack: TacheListeTemplateWithItems | null) => void;
 }
 
 export function TacheListePickerDialog({
   open,
   onOpenChange,
-  context,
-  entityId,
+  executionId,
   prestationId,
   serviceId,
   serviceNom,
   entrepriseId,
-  executionId,
   currentPackId,
   onSuccess,
 }: TacheListePickerDialogProps) {
@@ -95,21 +88,12 @@ export function TacheListePickerDialog({
   const handleSave = async () => {
     setSaving(true);
 
-    let result;
-    if (context === "client_service") {
-      result = await updateClientServiceTacheListeAction({
-        prestationId: entityId,
-        entrepriseId,
-        tacheListeTemplateId: selectedPackId,
-      });
-    } else {
-      result = await updateExecutionTacheListeAction({
-        executionId: entityId,
-        prestationId,
-        entrepriseId,
-        tacheListeTemplateId: selectedPackId,
-      });
-    }
+    const result = await updateExecutionTacheListeAction({
+      executionId,
+      prestationId,
+      entrepriseId,
+      tacheListeTemplateId: selectedPackId,
+    });
 
     setSaving(false);
 
@@ -123,8 +107,11 @@ export function TacheListePickerDialog({
         ? "Checklist assignée avec succès."
         : "Checklist désassignée.",
     );
+    const selectedPack = selectedPackId
+      ? (packs.find((p) => p.id === selectedPackId) ?? null)
+      : null;
     onOpenChange(false);
-    onSuccess();
+    onSuccess(selectedPack);
   };
 
   const isDirty = selectedPackId !== (currentPackId ?? null);
@@ -171,10 +158,7 @@ export function TacheListePickerDialog({
                   }`}
                   onClick={() => setSelectedPackId(null)}
                 >
-                  <div className="flex items-center gap-2">
-                    {selectedPackId === null && (
-                      <CheckCircle2 className="text-primary h-4 w-4 flex-shrink-0" />
-                    )}
+                  <div className="flex items-center justify-between gap-2">
                     <span
                       className={
                         selectedPackId === null
@@ -184,6 +168,9 @@ export function TacheListePickerDialog({
                     >
                       Aucune checklist
                     </span>
+                    {selectedPackId === null && (
+                      <CheckCircle2 className="text-primary h-4 w-4 flex-shrink-0" />
+                    )}
                   </div>
                 </button>
 
@@ -191,26 +178,36 @@ export function TacheListePickerDialog({
                 {packs.map((pack) => (
                   <div
                     key={pack.id}
-                    className="overflow-hidden rounded-lg border"
+                    className={`overflow-hidden rounded-lg border transition-colors ${
+                      selectedPackId === pack.id ? "border-primary" : ""
+                    }`}
                   >
-                    {/* Header du pack — chevron gauche, check droit */}
+                    {/* Header du pack — clic partout pour sélectionner, chevron pour déplier */}
                     <div
-                      className={`flex w-full items-center gap-2 p-3 text-sm transition-colors ${
+                      role="button"
+                      tabIndex={0}
+                      className={`flex w-full cursor-pointer items-center gap-2 p-3 text-sm transition-colors ${
                         selectedPackId === pack.id
-                          ? "border-primary bg-primary/5"
+                          ? "bg-primary/5"
                           : "hover:bg-muted/50"
                       }`}
+                      onClick={() => setSelectedPackId(pack.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ")
+                          setSelectedPackId(pack.id);
+                      }}
                     >
-                      {/* Chevron toggle (gauche) */}
+                      {/* Chevron toggle (gauche) — stoppe la propagation */}
                       {pack.items.length > 0 ? (
                         <button
                           type="button"
                           className="text-muted-foreground hover:text-foreground flex-shrink-0"
-                          onClick={() =>
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setExpandedPackId(
                               expandedPackId === pack.id ? null : pack.id,
-                            )
-                          }
+                            );
+                          }}
                           aria-label={
                             expandedPackId === pack.id ? "Réduire" : "Développer"
                           }
@@ -225,12 +222,8 @@ export function TacheListePickerDialog({
                         <span className="h-4 w-4 flex-shrink-0" />
                       )}
 
-                      {/* Sélectionner le pack */}
-                      <button
-                        type="button"
-                        className="flex min-w-0 flex-1 items-center gap-2 text-left"
-                        onClick={() => setSelectedPackId(pack.id)}
-                      >
+                      {/* Nom + badges */}
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
                         <span className="truncate font-medium">{pack.nom}</span>
                         {pack.proprietaireEntrepriseId === null ? (
                           <span className="flex-shrink-0 rounded border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-xs font-medium text-violet-700 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300">
@@ -252,7 +245,7 @@ export function TacheListePickerDialog({
                           {pack.items.length} tâche
                           {pack.items.length !== 1 ? "s" : ""}
                         </Badge>
-                      </button>
+                      </div>
 
                       {/* Check circle (droite) */}
                       {selectedPackId === pack.id && (

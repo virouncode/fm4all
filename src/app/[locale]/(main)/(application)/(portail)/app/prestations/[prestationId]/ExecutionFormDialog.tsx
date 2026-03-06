@@ -56,6 +56,10 @@ type ExecutionFormDialogProps = {
   serviceId: string;
   modeCommercial: ModeCommercialType;
   isPlateforme: boolean;
+  canChangeModePilotage: boolean;
+  clientHasActiveAdmin: boolean;
+  clientNom: string;
+  serviceNom: string;
   onSuccess: (executions: ExecutionWithPrix[]) => void;
 };
 
@@ -138,6 +142,10 @@ export function ExecutionFormDialog({
   serviceId,
   modeCommercial,
   isPlateforme,
+  canChangeModePilotage,
+  clientHasActiveAdmin,
+  clientNom,
+  serviceNom,
   onSuccess,
 }: ExecutionFormDialogProps) {
   const [prestataires, setPrestataires] = useState<PrestatairItem[]>([]);
@@ -246,11 +254,20 @@ export function ExecutionFormDialog({
     });
   }
 
+  const availableModePilotage = clientHasActiveAdmin
+    ? modePilotageCT
+    : modePilotageCT.filter((m) => m.code === "prestataire");
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
           <DialogTitle>Ajouter une exécution</DialogTitle>
+          {postureActive === "prestataire" && (
+            <p className="text-muted-foreground text-sm">
+              {clientNom} — {serviceNom}
+            </p>
+          )}
         </DialogHeader>
 
         <Form {...form}>
@@ -297,8 +314,9 @@ export function ExecutionFormDialog({
                   placeholder="Sélectionnez un mode"
                   description="Détermine qui pilote le workflow de cette exécution."
                   selectClassName="w-full"
+                  disabled={!canChangeModePilotage}
                 >
-                  {modePilotageCT.map((m) => (
+                  {availableModePilotage.map((m) => (
                     <SelectItem key={m.code} value={m.code}>
                       {m.name}
                     </SelectItem>

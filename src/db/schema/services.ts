@@ -99,11 +99,6 @@ export const clientServices = pgTable(
       .notNull()
       .default("direct"),
     notes: text("notes"),
-    tacheListeTemplateId: uuid("tache_liste_template_id").references(
-      () => tacheListesTemplates.id,
-      { onDelete: "set null" },
-    ),
-    // checklist par défaut pour les occurrences de cette prestation
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),
@@ -192,11 +187,6 @@ export const clientServiceExecutions = pgTable(
       { onDelete: "set null" },
     ),
     // checklist override du prestataire (prioritaire sur celle de la prestation)
-    assigneeUserIdDefault: uuid("assignee_user_id_default").references(
-      () => user.id,
-      { onDelete: "set null" },
-    ),
-    // intervenant par défaut propagé aux occurrences futures (non rétroactif)
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdById: createdById(() => user),

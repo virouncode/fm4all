@@ -57,35 +57,73 @@ export async function bootstrapUser(
     }),
   ]);
 
-  // 3. Si pas de client adhesion → fallback pour utilisateurs purement plateforme
+  // 3. Si pas de client adhesion → fallbacks alternatifs
   if (!bootstrapData || !bootstrapData.entreprise) {
-    if (!platformAdhesion) return null;
+    // Cas A : utilisateur plateforme (avec ou sans prestataire)
+    if (platformAdhesion) {
+      // Trouver l'entreprise FM4ALL (celle avec le rôle "plateforme")
+      const [platformEntrepriseRole] = await db
+        .select({ entrepriseId: entrepriseRoles.entrepriseId })
+        .from(entrepriseRoles)
+        .where(eq(entrepriseRoles.role, "plateforme"))
+        .limit(1);
 
-    // Trouver l'entreprise FM4ALL (celle avec le rôle "plateforme")
-    const [platformEntrepriseRole] = await db
-      .select({ entrepriseId: entrepriseRoles.entrepriseId })
-      .from(entrepriseRoles)
-      .where(eq(entrepriseRoles.role, "plateforme"))
-      .limit(1);
+      if (!platformEntrepriseRole) return null;
 
-    if (!platformEntrepriseRole) return null;
+      const [fm4allEntreprise] = await db
+        .select()
+        .from(entreprises)
+        .where(eq(entreprises.id, platformEntrepriseRole.entrepriseId))
+        .limit(1);
 
-    const [fm4allEntreprise] = await db
-      .select()
-      .from(entreprises)
-      .where(eq(entreprises.id, platformEntrepriseRole.entrepriseId))
-      .limit(1);
+      if (!fm4allEntreprise) return null;
 
-    if (!fm4allEntreprise) return null;
+      const rolesPlateforme: RoleEntrepriseType[] = ["plateforme"];
+      if (prestataireAdhesion) rolesPlateforme.push("prestataire");
 
-    return {
-      entreprise: fm4allEntreprise,
-      roleClientAdhesion: null,
-      rolePrestataireAdhesion: null,
-      rolesEntreprise: ["plateforme"] as RoleEntrepriseType[],
-      postureActive: "plateforme" as RoleEntrepriseType,
-      rolePlateformeAdhesion: platformAdhesion.role as RolePlateformeAdhesionType,
-    };
+      const posturePlateforme =
+        activePosture && rolesPlateforme.includes(activePosture)
+          ? activePosture
+          : pickDefaultPosture(rolesPlateforme);
+
+      return {
+        entreprise: fm4allEntreprise,
+        roleClientAdhesion: null,
+        rolePrestataireAdhesion: prestataireAdhesion
+          ? (prestataireAdhesion.role as RolePrestataireAdhesionType)
+          : null,
+        rolesEntreprise: rolesPlateforme,
+        postureActive: posturePlateforme,
+        rolePlateformeAdhesion: platformAdhesion.role as RolePlateformeAdhesionType,
+      };
+    }
+
+    // Cas B : utilisateur purement prestataire (sans client ni plateforme)
+    if (prestataireAdhesion) {
+      const [prestataireEntreprise] = await db
+        .select()
+        .from(entreprises)
+        .where(eq(entreprises.id, prestataireAdhesion.entrepriseId))
+        .limit(1);
+
+      if (!prestataireEntreprise) return null;
+
+      const posturePrestataire =
+        activePosture && activePosture === "prestataire"
+          ? activePosture
+          : ("prestataire" as RoleEntrepriseType);
+
+      return {
+        entreprise: prestataireEntreprise,
+        roleClientAdhesion: null,
+        rolePrestataireAdhesion: prestataireAdhesion.role as RolePrestataireAdhesionType,
+        rolesEntreprise: ["prestataire"] as RoleEntrepriseType[],
+        postureActive: posturePrestataire,
+        rolePlateformeAdhesion: null,
+      };
+    }
+
+    return null;
   }
 
   // 4. Chemin standard — récupérer les rôles entreprise
