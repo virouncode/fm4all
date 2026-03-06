@@ -6,6 +6,7 @@ import {
   clientServiceStatutCodes,
   contratDealModeCodes,
   modeCommercialCodes,
+  modePilotageCodes,
   contratStatutCodes,
   contratTypeCodes,
   devisLigneUniteCodes,
@@ -210,3 +211,5 @@ export const modeCommercialEnum = pgEnum(
   "mode_commercial",
   modeCommercialCodes,
 );
+
+export const modePilotageEnum = pgEnum("mode_pilotage", modePilotageCodes);

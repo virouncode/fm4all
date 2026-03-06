@@ -4,7 +4,7 @@ import {
   EntrepriseSelectType,
   RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
-import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import { RoleClientAdhesionType, RolePrestataireAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { create } from "zustand";
 
@@ -20,6 +20,7 @@ export type BootstrapPayload = {
   user: AppUser;
   entreprise: EntrepriseSelectType;
   roleClientAdhesion: RoleClientAdhesionType | null;
+  rolePrestataireAdhesion: RolePrestataireAdhesionType | null;
   rolesEntreprise: RoleEntrepriseType[];
   postureActive: RoleEntrepriseType;
   rolePlateformeAdhesion: RolePlateformeAdhesionType | null;
@@ -30,6 +31,7 @@ type AppStore = {
   user: AppUser | null;
   entreprise: EntrepriseSelectType | null;
   roleClientAdhesion: RoleClientAdhesionType | null;
+  rolePrestataireAdhesion: RolePrestataireAdhesionType | null;
   rolesEntreprise: RoleEntrepriseType[];
   postureActive: RoleEntrepriseType | null;
   rolePlateformeAdhesion: RolePlateformeAdhesionType | null;
@@ -45,6 +47,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   user: null,
   entreprise: null,
   roleClientAdhesion: null,
+  rolePrestataireAdhesion: null,
   rolesEntreprise: [],
   postureActive: null,
   rolePlateformeAdhesion: null,
@@ -54,6 +57,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       user: payload.user,
       entreprise: payload.entreprise,
       roleClientAdhesion: payload.roleClientAdhesion,
+      rolePrestataireAdhesion: payload.rolePrestataireAdhesion,
       rolesEntreprise: payload.rolesEntreprise,
       postureActive: payload.postureActive,
       rolePlateformeAdhesion: payload.rolePlateformeAdhesion,
@@ -72,6 +76,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       user: null,
       entreprise: null,
       roleClientAdhesion: null,
+      rolePrestataireAdhesion: null,
       rolesEntreprise: [],
       postureActive: null,
       rolePlateformeAdhesion: null,

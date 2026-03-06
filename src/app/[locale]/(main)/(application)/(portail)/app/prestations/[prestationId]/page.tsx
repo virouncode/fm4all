@@ -48,12 +48,13 @@ export default async function PrestationDetailPage({
   const platformRole = await getUserPlateformeAdhesion(currentUser.id);
   const isPlateforme = !!platformRole?.role;
 
+  let clientAdhesion = null;
   if (!isPlateforme) {
-    const adhesion = await getUserClientAdhesion({
+    clientAdhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: prestation.entrepriseId,
     });
-    if (!adhesion) {
+    if (!clientAdhesion) {
       notFound();
     }
   }
@@ -68,6 +69,12 @@ export default async function PrestationDetailPage({
     });
     canManage = siteRole === "responsable_site";
   }
+
+  // Peut gérer les checklists : plateforme OU rôle admin/manager (niveau entreprise)
+  const canManageChecklist =
+    isPlateforme ||
+    clientAdhesion?.role === "admin" ||
+    clientAdhesion?.role === "manager";
 
   // 5. Charger les exécutions et leurs prix
   const executions = await getExecutionsWithPrixByPrestationId(prestationId);
@@ -85,6 +92,7 @@ export default async function PrestationDetailPage({
     <PrestationDetailsClient
       prestation={prestation}
       canManage={canManage}
+      canManageChecklist={canManageChecklist}
       isPlateforme={isPlateforme}
       executions={executions}
       occurrences={occurrences}

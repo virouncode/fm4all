@@ -227,7 +227,9 @@ export function UserSiteAttributionsList({
                 >
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-medium">{attribution.site.nom}</p>
+                      <p className="text-sm font-medium">
+                        {attribution.site.nom}
+                      </p>
                       <Badge
                         variant="secondary"
                         className={roleColors[attribution.role]}

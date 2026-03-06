@@ -14,7 +14,14 @@ import { updateExecutionTacheListeAction } from "@/server/actions/clientServiceE
 import { updateClientServiceTacheListeAction } from "@/server/actions/clientServicesActions";
 import { getAvailableTacheListesTemplatesAction } from "@/server/actions/tacheListesTemplatesActions";
 import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
-import { CheckCircle2, ClipboardList, Clock, Loader2 } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  ClipboardList,
+  Clock,
+  Loader2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -29,6 +36,8 @@ type TacheListePickerDialogProps = {
   prestationId: string;
   /** ID du service (pour filtrer les packs compatibles) */
   serviceId: string;
+  /** Nom du service (pour l'affichage dans le titre) */
+  serviceNom?: string;
   /** ID de l'entreprise cliente */
   entrepriseId: string;
   /** ID de l'exécution (si context="execution") — pour charger les packs prestataire */
@@ -46,6 +55,7 @@ export function TacheListePickerDialog({
   entityId,
   prestationId,
   serviceId,
+  serviceNom,
   entrepriseId,
   executionId,
   currentPackId,
@@ -126,6 +136,11 @@ export function TacheListePickerDialog({
           <DialogTitle className="flex items-center gap-2">
             <ClipboardList className="text-primary h-5 w-5" />
             Choisir une checklist
+            {serviceNom && (
+              <span className="text-muted-foreground text-sm font-normal">
+                — {serviceNom}
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -178,24 +193,58 @@ export function TacheListePickerDialog({
                     key={pack.id}
                     className="overflow-hidden rounded-lg border"
                   >
-                    {/* Header du pack — deux boutons côte à côte (pas imbriqués) */}
+                    {/* Header du pack — chevron gauche, check droit */}
                     <div
-                      className={`flex w-full items-center justify-between gap-2 p-3 text-sm transition-colors ${
+                      className={`flex w-full items-center gap-2 p-3 text-sm transition-colors ${
                         selectedPackId === pack.id
                           ? "border-primary bg-primary/5"
                           : "hover:bg-muted/50"
                       }`}
                     >
+                      {/* Chevron toggle (gauche) */}
+                      {pack.items.length > 0 ? (
+                        <button
+                          type="button"
+                          className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                          onClick={() =>
+                            setExpandedPackId(
+                              expandedPackId === pack.id ? null : pack.id,
+                            )
+                          }
+                          aria-label={
+                            expandedPackId === pack.id ? "Réduire" : "Développer"
+                          }
+                        >
+                          {expandedPackId === pack.id ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </button>
+                      ) : (
+                        <span className="h-4 w-4 flex-shrink-0" />
+                      )}
+
                       {/* Sélectionner le pack */}
                       <button
                         type="button"
                         className="flex min-w-0 flex-1 items-center gap-2 text-left"
                         onClick={() => setSelectedPackId(pack.id)}
                       >
-                        {selectedPackId === pack.id && (
-                          <CheckCircle2 className="text-primary h-4 w-4 flex-shrink-0" />
-                        )}
                         <span className="truncate font-medium">{pack.nom}</span>
+                        {pack.proprietaireEntrepriseId === null ? (
+                          <span className="flex-shrink-0 rounded border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-xs font-medium text-violet-700 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300">
+                            Système
+                          </span>
+                        ) : pack.proprietaireEntrepriseId === entrepriseId ? (
+                          <span className="flex-shrink-0 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300">
+                            Client
+                          </span>
+                        ) : (
+                          <span className="flex-shrink-0 rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                            Prestataire
+                          </span>
+                        )}
                         <Badge
                           variant="outline"
                           className="flex-shrink-0 text-xs"
@@ -205,18 +254,10 @@ export function TacheListePickerDialog({
                         </Badge>
                       </button>
 
-                      {/* Toggle aperçu */}
-                      <button
-                        type="button"
-                        className="text-muted-foreground hover:text-foreground flex-shrink-0 text-xs underline"
-                        onClick={() =>
-                          setExpandedPackId(
-                            expandedPackId === pack.id ? null : pack.id,
-                          )
-                        }
-                      >
-                        {expandedPackId === pack.id ? "Masquer" : "Aperçu"}
-                      </button>
+                      {/* Check circle (droite) */}
+                      {selectedPackId === pack.id && (
+                        <CheckCircle2 className="text-primary h-4 w-4 flex-shrink-0" />
+                      )}
                     </div>
 
                     {/* Aperçu des items */}

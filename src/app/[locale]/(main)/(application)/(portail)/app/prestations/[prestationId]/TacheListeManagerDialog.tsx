@@ -52,69 +52,105 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-type TacheListeManagerDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+// ==================== CONTENT (réutilisable inline ou dans un dialog) ====================
+
+export type TacheListeManagerContentProps = {
   serviceId: string;
-  /** null = afficher les templates système (posture plateforme) */
+  /** null = packs système (posture plateforme) */
   proprietaireEntrepriseId: string | null;
   /** Fourni en posture plateforme : permet de choisir entre système et client */
   clientEntrepriseId?: string;
   clientEntrepriseNom?: string;
-}
+  /** Rôle des packs non-système dans ce contexte */
+  nonSystemBadgeRole?: "client" | "prestataire";
+  /** Masque le bouton "Nouvelle checklist" (ex: ChecklistsClient gère la création globalement) */
+  hideCreateButton?: boolean;
+  /** Si false, masque tous les boutons CRUD (collaborateur) — défaut true */
+  canManage?: boolean;
+  /** Classe CSS sur le wrapper */
+  className?: string;
+  /** Appelé après création/suppression d'un pack */
+  onPacksChanged?: () => void;
+};
 
-export function TacheListeManagerDialog({
-  open,
-  onOpenChange,
+export function TacheListeManagerContent({
   serviceId,
   proprietaireEntrepriseId,
   clientEntrepriseId,
   clientEntrepriseNom,
-}: TacheListeManagerDialogProps) {
+  nonSystemBadgeRole,
+  hideCreateButton = false,
+  canManage = true,
+  className,
+  onPacksChanged,
+}: TacheListeManagerContentProps) {
   const [packs, setPacks] = useState<TacheListeTemplateWithItems[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedPackId, setExpandedPackId] = useState<string | null>(null);
   const [newPackName, setNewPackName] = useState("");
   const [isCreatingPack, setIsCreatingPack] = useState(false);
   const [creatingPack, setCreatingPack] = useState(false);
-  // En posture plateforme : choix du propriétaire du nouveau pack
-  const isPlatformMode = proprietaireEntrepriseId === null && !!clientEntrepriseId;
-  const [newPackOwner, setNewPackOwner] = useState<"system" | "client">("system");
+
+  const isPlatformMode =
+    proprietaireEntrepriseId === null && !!clientEntrepriseId;
+  const [newPackOwner, setNewPackOwner] = useState<"system" | "client">(
+    "system",
+  );
 
   const loadPacks = useCallback(async () => {
-    setLoading(true);
-    const result = await getTacheListesTemplatesAction({
-      proprietaireEntrepriseId,
-      serviceId,
-    });
-    if (result?.data?.packs) {
-      setPacks(result.data.packs);
-    } else if (result?.serverError) {
-      toast.error("Impossible de charger les checklists.");
+    if (proprietaireEntrepriseId === null && clientEntrepriseId) {
+      // Mode plateforme : charger les packs système ET ceux du client
+      const [systemResult, clientResult] = await Promise.all([
+        getTacheListesTemplatesAction({
+          proprietaireEntrepriseId: null,
+          serviceId,
+        }),
+        getTacheListesTemplatesAction({
+          proprietaireEntrepriseId: clientEntrepriseId,
+          serviceId,
+        }),
+      ]);
+      if (systemResult?.serverError) {
+        toast.error("Impossible de charger les checklists.");
+      } else {
+        setPacks([
+          ...(systemResult?.data?.packs ?? []),
+          ...(clientResult?.data?.packs ?? []),
+        ]);
+      }
+    } else {
+      const result = await getTacheListesTemplatesAction({
+        proprietaireEntrepriseId,
+        serviceId,
+      });
+      if (result?.data?.packs) {
+        setPacks(result.data.packs);
+      } else if (result?.serverError) {
+        toast.error("Impossible de charger les checklists.");
+      }
     }
     setLoading(false);
-  }, [proprietaireEntrepriseId, serviceId]);
+  }, [proprietaireEntrepriseId, serviceId, clientEntrepriseId]);
 
   useEffect(() => {
-    if (open) {
-      loadPacks();
-      setIsCreatingPack(false);
-      setNewPackName("");
-      setNewPackOwner("system");
-      setExpandedPackId(null);
-    }
-  }, [open, loadPacks]);
+    // Spinner uniquement au changement de contexte (service/propriétaire)
+    // — pas lors des refreshes silencieux suite à une mutation
+    setLoading(true);
+    void loadPacks();
+    setIsCreatingPack(false);
+    setNewPackName("");
+    setNewPackOwner("system");
+    setExpandedPackId(null);
+  }, [loadPacks]);
 
   const handleCreatePack = async () => {
     if (!newPackName.trim()) return;
 
-    // Résoudre le propriétaire selon le choix
-    const resolvedProprietaireId: string | null =
-      isPlatformMode
-        ? newPackOwner === "system"
-          ? null
-          : (clientEntrepriseId ?? null)
-        : proprietaireEntrepriseId;
+    const resolvedProprietaireId: string | null = isPlatformMode
+      ? newPackOwner === "system"
+        ? null
+        : (clientEntrepriseId ?? null)
+      : proprietaireEntrepriseId;
 
     setCreatingPack(true);
     const result = await insertTacheListeTemplateAction({
@@ -130,9 +166,174 @@ export function TacheListeManagerDialog({
     setNewPackName("");
     setIsCreatingPack(false);
     await loadPacks();
+    onPacksChanged?.();
     toast.success("Checklist créée.");
   };
 
+  return (
+    <div className={className}>
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {/* Bouton créer */}
+          {!hideCreateButton && canManage && !isCreatingPack ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsCreatingPack(true)}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4" />
+              Nouvelle checklist
+            </Button>
+          ) : !hideCreateButton && canManage && isCreatingPack ? (
+            <div className="space-y-3 rounded-lg border p-3">
+              {isPlatformMode && (
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-medium">Propriétaire</Label>
+                  <RadioGroup
+                    value={newPackOwner}
+                    onValueChange={(v) =>
+                      setNewPackOwner(v as "system" | "client")
+                    }
+                    className="space-y-1"
+                  >
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="system" id="owner-system" />
+                      <Label
+                        htmlFor="owner-system"
+                        className="cursor-pointer text-sm font-normal"
+                      >
+                        Système{" "}
+                        <span className="text-muted-foreground text-xs">
+                          (disponible pour tous les clients)
+                        </span>
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="client" id="owner-client" />
+                      <Label
+                        htmlFor="owner-client"
+                        className="cursor-pointer text-sm font-normal"
+                      >
+                        Pour ce client{" "}
+                        {clientEntrepriseNom && (
+                          <span className="text-muted-foreground text-xs">
+                            : {clientEntrepriseNom}
+                          </span>
+                        )}
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
+
+              <div>
+                <Label className="mb-1.5 block text-sm font-medium">
+                  Nom de la checklist
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newPackName}
+                    onChange={(e) => setNewPackName(e.target.value)}
+                    placeholder="Ex : Protocole nettoyage standard"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") void handleCreatePack();
+                      if (e.key === "Escape") {
+                        setIsCreatingPack(false);
+                        setNewPackName("");
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleCreatePack}
+                    disabled={creatingPack || !newPackName.trim()}
+                  >
+                    {creatingPack ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Créer"
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setIsCreatingPack(false);
+                      setNewPackName("");
+                    }}
+                  >
+                    Annuler
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {packs.length === 0 && !isCreatingPack && (
+            <div className="py-6 text-center">
+              <ClipboardList className="text-muted-foreground/30 mx-auto mb-3 h-10 w-10" />
+              <p className="text-muted-foreground text-sm">
+                Aucune checklist créée pour ce service.
+              </p>
+            </div>
+          )}
+
+          {packs.map((pack) => (
+            <PackEditor
+              key={pack.id}
+              pack={pack}
+              expanded={expandedPackId === pack.id}
+              onToggleExpand={() =>
+                setExpandedPackId(
+                  expandedPackId === pack.id ? null : pack.id,
+                )
+              }
+              entrepriseId={pack.proprietaireEntrepriseId}
+              clientEntrepriseId={clientEntrepriseId}
+              nonSystemBadgeRole={nonSystemBadgeRole}
+              canManage={canManage}
+              onRefresh={loadPacks}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==================== DIALOG WRAPPER ====================
+
+type TacheListeManagerDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  serviceId: string;
+  /** Nom du service (pour l'affichage dans le titre) */
+  serviceNom?: string;
+  /** null = afficher les templates système (posture plateforme) */
+  proprietaireEntrepriseId: string | null;
+  /** Fourni en posture plateforme : permet de choisir entre système et client */
+  clientEntrepriseId?: string;
+  clientEntrepriseNom?: string;
+};
+
+export function TacheListeManagerDialog({
+  open,
+  onOpenChange,
+  serviceId,
+  serviceNom,
+  proprietaireEntrepriseId,
+  clientEntrepriseId,
+  clientEntrepriseNom,
+}: TacheListeManagerDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col gap-0 p-0">
@@ -140,136 +341,27 @@ export function TacheListeManagerDialog({
           <DialogTitle className="flex items-center gap-2">
             <ClipboardList className="text-primary h-5 w-5" />
             Gérer mes checklists
+            {serviceNom && (
+              <span className="text-muted-foreground text-sm font-normal">
+                — {serviceNom}
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
 
         <Separator />
 
-        <div className="flex-1 overflow-hidden">
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
-            </div>
-          ) : (
-            <ScrollArea className="h-[60vh] px-6 py-4">
-              <div className="space-y-3">
-                {/* Bouton créer un pack */}
-                {!isCreatingPack ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsCreatingPack(true)}
-                    className="w-full"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Nouvelle checklist
-                  </Button>
-                ) : (
-                  <div className="rounded-lg border p-3 space-y-3">
-                    {/* Choix du propriétaire (posture plateforme uniquement) */}
-                    {isPlatformMode && (
-                      <div className="space-y-1.5">
-                        <Label className="text-sm font-medium">Propriétaire</Label>
-                        <RadioGroup
-                          value={newPackOwner}
-                          onValueChange={(v) => setNewPackOwner(v as "system" | "client")}
-                          className="space-y-1"
-                        >
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem value="system" id="owner-system" />
-                            <Label htmlFor="owner-system" className="text-sm font-normal cursor-pointer">
-                              Système{" "}
-                              <span className="text-muted-foreground text-xs">(disponible pour tous les clients)</span>
-                            </Label>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem value="client" id="owner-client" />
-                            <Label htmlFor="owner-client" className="text-sm font-normal cursor-pointer">
-                              Pour ce client{" "}
-                              {clientEntrepriseNom && (
-                                <span className="text-muted-foreground text-xs">: {clientEntrepriseNom}</span>
-                              )}
-                            </Label>
-                          </div>
-                        </RadioGroup>
-                      </div>
-                    )}
-
-                    <div>
-                      <Label className="mb-1.5 block text-sm font-medium">
-                        Nom de la checklist
-                      </Label>
-                      <div className="flex gap-2">
-                        <Input
-                          value={newPackName}
-                          onChange={(e) => setNewPackName(e.target.value)}
-                          placeholder="Ex : Protocole nettoyage standard"
-                          autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") void handleCreatePack();
-                            if (e.key === "Escape") {
-                              setIsCreatingPack(false);
-                              setNewPackName("");
-                            }
-                          }}
-                        />
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={handleCreatePack}
-                          disabled={creatingPack || !newPackName.trim()}
-                        >
-                          {creatingPack ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            "Créer"
-                          )}
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setIsCreatingPack(false);
-                            setNewPackName("");
-                          }}
-                        >
-                          Annuler
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {packs.length === 0 && !isCreatingPack && (
-                  <div className="py-8 text-center">
-                    <ClipboardList className="text-muted-foreground/30 mx-auto mb-3 h-10 w-10" />
-                    <p className="text-muted-foreground text-sm">
-                      Aucune checklist créée pour ce service.
-                    </p>
-                  </div>
-                )}
-
-                {/* Liste des packs */}
-                {packs.map((pack) => (
-                  <PackEditor
-                    key={pack.id}
-                    pack={pack}
-                    expanded={expandedPackId === pack.id}
-                    onToggleExpand={() =>
-                      setExpandedPackId(
-                        expandedPackId === pack.id ? null : pack.id,
-                      )
-                    }
-                    entrepriseId={pack.proprietaireEntrepriseId}
-                    onRefresh={loadPacks}
-                  />
-                ))}
-              </div>
-            </ScrollArea>
+        <ScrollArea className="h-[60vh]">
+          {open && (
+            <TacheListeManagerContent
+              serviceId={serviceId}
+              proprietaireEntrepriseId={proprietaireEntrepriseId}
+              clientEntrepriseId={clientEntrepriseId}
+              clientEntrepriseNom={clientEntrepriseNom}
+              className="px-6 py-4"
+            />
           )}
-        </div>
+        </ScrollArea>
 
         <Separator />
 
@@ -294,14 +386,28 @@ function PackEditor({
   expanded,
   onToggleExpand,
   entrepriseId,
+  clientEntrepriseId,
+  nonSystemBadgeRole,
+  canManage = true,
   onRefresh,
 }: {
   pack: TacheListeTemplateWithItems;
   expanded: boolean;
   onToggleExpand: () => void;
   entrepriseId: string | null;
+  clientEntrepriseId?: string;
+  nonSystemBadgeRole?: "client" | "prestataire";
+  canManage?: boolean;
   onRefresh: () => Promise<void>;
 }) {
+  const badgeRole: "systeme" | "client" | "prestataire" | undefined =
+    pack.proprietaireEntrepriseId === null
+      ? "systeme"
+      : clientEntrepriseId !== undefined
+        ? pack.proprietaireEntrepriseId === clientEntrepriseId
+          ? "client"
+          : "prestataire"
+        : nonSystemBadgeRole;
   const [localItems, setLocalItems] = useState<TacheListeItemRow[]>(pack.items);
   const latestOrderRef = useRef<TacheListeItemRow[]>(pack.items);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -311,7 +417,6 @@ function PackEditor({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isAddingItem, setIsAddingItem] = useState(false);
 
-  // Sync local items when pack refreshes from parent
   useEffect(() => {
     setLocalItems(pack.items);
     latestOrderRef.current = pack.items;
@@ -331,7 +436,6 @@ function PackEditor({
     });
     if (result?.serverError) {
       toast.error(result.serverError.message);
-      // Revert to server state
       setLocalItems(pack.items);
       latestOrderRef.current = pack.items;
     }
@@ -341,13 +445,14 @@ function PackEditor({
     setLocalItems((prev) => [...prev, newItem]);
     latestOrderRef.current = [...latestOrderRef.current, newItem];
     setIsAddingItem(false);
-    // Background sync
     void onRefresh();
   };
 
   const handleItemDeleted = (itemId: string) => {
     setLocalItems((prev) => prev.filter((i) => i.id !== itemId));
-    latestOrderRef.current = latestOrderRef.current.filter((i) => i.id !== itemId);
+    latestOrderRef.current = latestOrderRef.current.filter(
+      (i) => i.id !== itemId,
+    );
     void onRefresh();
   };
 
@@ -415,7 +520,6 @@ function PackEditor({
     <div className="overflow-hidden rounded-lg border">
       {/* Header pack */}
       <div className="flex items-center gap-2 p-3">
-        {/* Toggle expand */}
         <button
           type="button"
           onClick={onToggleExpand}
@@ -429,7 +533,6 @@ function PackEditor({
           )}
         </button>
 
-        {/* Nom (éditable) */}
         {isEditingName ? (
           <div className="flex flex-1 gap-2">
             <Input
@@ -474,9 +577,19 @@ function PackEditor({
         ) : (
           <>
             <span className="flex-1 text-sm font-medium">{pack.nom}</span>
-            {pack.proprietaireEntrepriseId === null && (
-              <span className="bg-primary/10 text-primary rounded px-1.5 py-0.5 text-xs font-medium">
+            {badgeRole === "systeme" && (
+              <span className="rounded border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-xs font-medium text-violet-700 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300">
                 Système
+              </span>
+            )}
+            {badgeRole === "client" && (
+              <span className="rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300">
+                Client
+              </span>
+            )}
+            {badgeRole === "prestataire" && (
+              <span className="rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                Prestataire
               </span>
             )}
             <span className="text-muted-foreground text-xs">
@@ -485,16 +598,14 @@ function PackEditor({
           </>
         )}
 
-        {!isEditingName && (
+        {!isEditingName && canManage && (
           <div className="flex flex-shrink-0 items-center gap-1">
-            {/* Toggle actif */}
             <Switch
               checked={pack.actif}
               onCheckedChange={handleToggleActif}
               aria-label={pack.actif ? "Désactiver" : "Activer"}
               className="scale-75"
             />
-            {/* Renommer */}
             <Button
               type="button"
               size="icon"
@@ -505,7 +616,6 @@ function PackEditor({
             >
               <Pencil className="h-3 w-3" />
             </Button>
-            {/* Supprimer */}
             <Button
               type="button"
               size="icon"
@@ -525,7 +635,6 @@ function PackEditor({
         )}
       </div>
 
-      {/* Confirmation suppression */}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -548,7 +657,6 @@ function PackEditor({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Items (si expanded) */}
       {expanded && (
         <div className="bg-muted/20 border-t">
           {localItems.length === 0 && !isAddingItem && (
@@ -570,6 +678,7 @@ function PackEditor({
                 item={item}
                 packId={pack.id}
                 entrepriseId={entrepriseId}
+                canManage={canManage}
                 onDragEnd={handleSaveOrder}
                 onDeleted={() => handleItemDeleted(item.id)}
                 onUpdated={handleItemUpdated}
@@ -577,15 +686,14 @@ function PackEditor({
             ))}
           </Reorder.Group>
 
-          {/* Ajouter un item */}
-          {isAddingItem ? (
+          {canManage && isAddingItem ? (
             <AddItemForm
               packId={pack.id}
               entrepriseId={entrepriseId}
               onSuccess={handleItemAdded}
               onCancel={() => setIsAddingItem(false)}
             />
-          ) : (
+          ) : canManage ? (
             <div className="px-3 py-2">
               <Button
                 type="button"
@@ -598,7 +706,7 @@ function PackEditor({
                 Ajouter une tâche
               </Button>
             </div>
-          )}
+          ) : null}
         </div>
       )}
     </div>
@@ -611,6 +719,7 @@ function DraggableItemRow({
   item,
   packId: _packId,
   entrepriseId,
+  canManage = true,
   onDragEnd,
   onDeleted,
   onUpdated,
@@ -618,6 +727,7 @@ function DraggableItemRow({
   item: TacheListeItemRow;
   packId: string;
   entrepriseId: string | null;
+  canManage?: boolean;
   onDragEnd: () => Promise<void>;
   onDeleted: () => void;
   onUpdated: (item: TacheListeItemRow) => void;
@@ -673,7 +783,9 @@ function DraggableItemRow({
       value={item}
       dragListener={false}
       dragControls={controls}
-      onDragEnd={() => { void onDragEnd(); }}
+      onDragEnd={() => {
+        void onDragEnd();
+      }}
       className="outline-none"
       as="div"
     >
@@ -701,7 +813,9 @@ function DraggableItemRow({
                 onClick={handleSave}
                 disabled={isSaving || !editTitre.trim()}
               >
-                {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                {isSaving ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : null}
                 Enregistrer
               </Button>
               <Button
@@ -720,17 +834,17 @@ function DraggableItemRow({
           </div>
         ) : (
           <div className="flex items-start gap-2 px-4 py-2">
-            {/* Drag handle */}
-            <button
-              type="button"
-              onPointerDown={(e) => controls.start(e)}
-              className="text-muted-foreground hover:text-foreground mt-0.5 cursor-grab touch-none active:cursor-grabbing"
-              aria-label="Déplacer"
-            >
-              <GripVertical className="h-4 w-4" />
-            </button>
+            {canManage && (
+              <button
+                type="button"
+                onPointerDown={(e) => controls.start(e)}
+                className="text-muted-foreground hover:text-foreground mt-0.5 cursor-grab touch-none active:cursor-grabbing"
+                aria-label="Déplacer"
+              >
+                <GripVertical className="h-4 w-4" />
+              </button>
+            )}
 
-            {/* Contenu */}
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium">{item.titre}</p>
               {item.description && (
@@ -740,34 +854,35 @@ function DraggableItemRow({
               )}
             </div>
 
-            {/* Actions */}
-            <div className="flex flex-shrink-0 items-center gap-0.5">
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="h-6 w-6"
-                onClick={() => setIsEditing(true)}
-                aria-label="Modifier"
-              >
-                <Pencil className="h-3 w-3" />
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="text-destructive h-6 w-6"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                aria-label="Supprimer"
-              >
-                {isDeleting ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Trash2 className="h-3 w-3" />
-                )}
-              </Button>
-            </div>
+            {canManage && (
+              <div className="flex flex-shrink-0 items-center gap-0.5">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="h-6 w-6"
+                  onClick={() => setIsEditing(true)}
+                  aria-label="Modifier"
+                >
+                  <Pencil className="h-3 w-3" />
+                </Button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="text-destructive h-6 w-6"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  aria-label="Supprimer"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" />
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>

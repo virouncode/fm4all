@@ -487,7 +487,38 @@ Tâche (assignation spécifique à une tâche)
 
 > ⚠️ **Règle de non-rétroactivité** : modifier les intervenants assignés à une exécution **ne modifie pas** les passages déjà créés ou déjà assignés individuellement. Seuls les futurs passages non encore assignés sont impactés.
 
-### 5.10 Tableau des droits sur les prestations
+### 5.10 Modèles de checklists (templates)
+
+Les tâches affichées lors de chaque passage sont issues d'un **modèle de checklist** (pack) défini au niveau de la prestation. Ces packs peuvent être gérés depuis le module **Checklists** de la plateforme.
+
+#### Deux niveaux de permission distincts
+
+| Permission | Qui l'a | Ce qu'elle permet |
+|-----------|---------|-----------------|
+| **Assigner une checklist** | Responsable de site | Associer un pack existant à une prestation, réorganiser les items |
+| **Gérer les templates** | Administrateur ou Manager | Créer, modifier, supprimer des packs et leurs items |
+
+> ⚠️ **Règle importante** : un Responsable de site peut **utiliser** les modèles de checklists, mais ne peut pas **en créer de nouveaux** ni **modifier les items** existants. Cette distinction est intentionnelle — les templates sont des ressources partagées entre prestations ; leur gestion est réservée aux responsables de l'entreprise (admin/manager).
+
+#### Types de packs
+
+| Type | Description | Accès |
+|------|-------------|-------|
+| **Pack système** | Templates fournis par FM4ALL, disponibles pour toutes les entreprises | Lecture pour tous les utilisateurs authentifiés |
+| **Pack entreprise** | Templates créés par l'entreprise, pour ses propres prestations | Réservé aux utilisateurs de cette entreprise |
+
+#### Qui peut faire quoi
+
+| Action | Admin | Manager | Responsable de site | Collaborateur |
+|--------|:-:|:-:|:-:|:-:|
+| Consulter les modèles disponibles | ✅ | ✅ | ✅ | ✅ |
+| Assigner un modèle à une prestation | ✅ | ✅ | ✅ | ❌ |
+| Créer / modifier un pack d'entreprise | ✅ | ✅ | ❌ | ❌ |
+| Supprimer un pack d'entreprise | ✅ | ✅ | ❌ | ❌ |
+| Modifier les items d'un pack | ✅ | ✅ | ❌ | ❌ |
+| Gérer les packs système | FM4ALL uniquement | ❌ | ❌ | ❌ |
+
+### 5.11 Tableau des droits sur les prestations
 
 | Action | Responsable de site | FM4ALL |
 |--------|:-:|:-:|
@@ -777,4 +808,4 @@ Les pages partagées entre postures (`/app/sites`, `/app/utilisateurs`, `/app/ti
 
 ---
 
-*Document mis à jour le 2026-03-05 (v2) — FM4ALL*
+*Document mis à jour le 2026-03-06 (v3) — FM4ALL*

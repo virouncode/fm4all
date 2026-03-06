@@ -34,8 +34,8 @@ export function LogoAvatar({
     size === "sm" ? "text-sm font-semibold" : "text-base font-bold";
 
   return (
-    <Avatar className={`${sizeClass} flex-shrink-0`}>
-      {logoUrl && <AvatarImage src={logoUrl} alt={`Logo ${nom}`} />}
+    <Avatar className={`${sizeClass} flex-shrink-0 ring-1 ring-border`}>
+      {logoUrl && <AvatarImage src={logoUrl} alt={`Logo ${nom}`} className="object-contain" />}
       <AvatarFallback className={`${textClass} bg-primary/10 text-primary`}>
         {initial}
       </AvatarFallback>

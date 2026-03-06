@@ -173,13 +173,10 @@ export const userClientAdhesions = pgTable(
     updatedById: updatedById(() => user),
   },
   (table) => [
-    index("user_client_adhesions_user_id_idx").on(table.userId),
     index("user_client_adhesions_entreprise_id_idx").on(table.entrepriseId),
     index("user_client_adhesions_statut_idx").on(table.statut),
-    uniqueIndex("user_client_adhesions_user_entreprise_udx").on(
-      table.userId,
-      table.entrepriseId,
-    ),
+    // 1 user = 1 entreprise cliente (contrainte métier forte)
+    uniqueIndex("user_client_adhesions_user_udx").on(table.userId),
   ],
 );
 
@@ -205,15 +202,10 @@ export const userPrestataireAdhesions = pgTable(
     updatedById: updatedById(() => user),
   },
   (table) => [
-    index("user_prestataire_adhesions_user_id_idx").on(table.userId),
-    index("user_prestataire_adhesions_entreprise_id_idx").on(
-      table.entrepriseId,
-    ),
+    index("user_prestataire_adhesions_entreprise_id_idx").on(table.entrepriseId),
     index("user_prestataire_adhesions_statut_idx").on(table.statut),
-    uniqueIndex("user_prestataire_adhesions_user_entreprise_udx").on(
-      table.userId,
-      table.entrepriseId,
-    ),
+    // 1 user = 1 entreprise prestataire (contrainte métier forte)
+    uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
   ],
 );
 

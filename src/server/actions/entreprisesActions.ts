@@ -1,12 +1,13 @@
 "use server";
 
 import { db } from "@/db";
-import { entreprises, entrepriseRoles, serviceEntreprises } from "@/db/schema/entreprises";
+import { entreprises, entrepriseRoles, serviceEntreprises, entrepriseInvitations } from "@/db/schema/entreprises";
 import { clientServices, clientServiceExecutions } from "@/db/schema/services";
 import { documents } from "@/db/schema/documents";
-import { count, ilike, eq, ne, and, inArray } from "drizzle-orm";
+import { count, ilike, eq, ne, and, inArray, isNull, gt } from "drizzle-orm";
 import { promoteS3Key, deleteS3Object as deleteS3ObjectFromServer } from "@/server/s3/s3";
-import { userClientAdhesions } from "@/db/schema/users";
+import { user as userTable } from "@/db/schema/auth";
+import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { auth } from "@/server/auth/auth";
@@ -39,7 +40,12 @@ import {
 import { flattenValidationErrors } from "next-safe-action";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { capitalizeWords, lower, normalizeForSubmit } from "@/zod-helpers/normalize";
+import { capitalizeWords, lower, normalizeForSubmit, upper } from "@/zod-helpers/normalize";
+import { sendEmailDirect } from "@/server/email/mailgunDirect";
+import {
+  accepterInvitationAdminSchema,
+  inviterEntrepriseAdminSchema,
+} from "@/zod-schemas/inscriptionAdmin.schema";
 
 /**
  * Récupère la liste de toutes les entreprises
@@ -307,19 +313,15 @@ export const createEntrepriseAction = actionClient
       phoneContact,
       roles,
       serviceIds,
-      adminPrenom,
-      adminNom,
-      adminEmail,
-      adminPhone,
     } = parsedInput;
 
     // Normaliser les champs optionnels: "" → null + appliquer la casse
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalStrings: ["prenomContact", "nomContact", "emailContact", "phoneContact", "adminPhone"] as const,
+      optionalStrings: ["prenomContact", "nomContact", "emailContact", "phoneContact"] as const,
     });
 
     // Nettoyer le nom (capitalisation) et le SIRET (supprimer espaces éventuels)
-    const nomClean = capitalizeWords(nom);
+    const nomClean = upper(nom);
     const siretClean = siret.trim().replace(/\s/g, "");
 
     // Vérifier l'unicité du nom
@@ -402,84 +404,9 @@ export const createEntrepriseAction = actionClient
       );
     }
 
-    // ===== ÉTAPE 2: Créer l'utilisateur admin via better-auth =====
-    const tempPassword = crypto.randomUUID();
-
-    let newUser: { id: string; email: string };
-
-    try {
-      const authResult = await auth.api.signUpEmail({
-        body: {
-          email: adminEmail,
-          password: tempPassword,
-          name: `${adminPrenom} ${adminNom}`,
-          prenom: adminPrenom,
-          nom: adminNom,
-          phone: normalized.adminPhone ?? null,
-          avatarId: null,
-          createdById: currentUser.id,
-          updatedById: currentUser.id,
-        },
-      });
-
-      if (!authResult?.user) {
-        throw new Error("Échec de la création de l'utilisateur.");
-      }
-
-      newUser = { id: authResult.user.id, email: authResult.user.email };
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-
-      if (
-        errorMessage.toLowerCase().includes("already exists") ||
-        errorMessage.toLowerCase().includes("user already exists")
-      ) {
-        throw errors.conflict(
-          `Un utilisateur avec l'email "${adminEmail}" existe déjà.`,
-        );
-      }
-
-      throw errors.internal(
-        `Erreur lors de la création de l'administrateur: ${errorMessage}`,
-      );
-    }
-
-    // ===== ÉTAPE 3: Créer l'adhésion admin + arborescence =====
-    await db.transaction(async (tx) => {
-      await tx.insert(userClientAdhesions).values({
-        userId: newUser.id,
-        entrepriseId: newEntreprise.id,
-        role: "admin",
-        statut: "actif",
-        createdById: currentUser.id,
-        updatedById: currentUser.id,
-      });
-
-      // Arborescence sans parent (premier admin de l'entreprise)
-      await insertUserArborescence({
-        entrepriseId: newEntreprise.id,
-        userId: newUser.id,
-        parentId: null,
-        createdById: currentUser.id,
-        tx,
-      });
-    });
-
-    // ===== ÉTAPE 4: Envoyer l'email d'activation =====
-    // better-auth détecte emailVerified=false et envoie l'email d'activation
-    const reqHeaders = await headers();
-    await auth.api.requestPasswordReset({
-      body: {
-        email: adminEmail,
-        redirectTo: `${process.env.APP_URL}/auth/reset-password`,
-      },
-      headers: reqHeaders,
-    });
-
     return {
       entreprise: newEntreprise,
-      message: `Entreprise "${nomClean}" créée avec succès. Un email d'activation a été envoyé à ${adminEmail}.`,
+      message: `Entreprise "${nomClean}" créée avec succès.`,
     };
   });
 
@@ -504,7 +431,7 @@ export const updateEntrepriseInfosAction = actionClient
       throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
 
     const { entrepriseId, nom, siret } = parsedInput;
-    const nomClean = capitalizeWords(nom);
+    const nomClean = upper(nom);
     const siretClean = siret.trim().replace(/\s/g, "");
 
     // Unicité nom (hors l'entreprise elle-même)
@@ -792,4 +719,268 @@ export const updateEntrepriseLogoAction = actionClient
     }
 
     return { success: true };
+  });
+
+/**
+ * Enregistre une invitation administrateur pour une entreprise (posture plateforme).
+ * Ne crée PAS de compte utilisateur — envoie uniquement un email avec un lien d'onboarding.
+ */
+export const inviterEntrepriseAdminAction = actionClient
+  .metadata({ actionName: "inviterEntrepriseAdminAction" })
+  .inputSchema(inviterEntrepriseAdminSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (!plateformeRole)
+      throw errors.forbidden(
+        "Seule la plateforme peut inviter des administrateurs.",
+      );
+
+    // 1. Vérifier qu'il n'y a pas déjà un admin actif
+    const existingClientAdmin = await db
+      .select({ id: userClientAdhesions.id })
+      .from(userClientAdhesions)
+      .where(
+        and(
+          eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+          eq(userClientAdhesions.role, "admin"),
+          eq(userClientAdhesions.statut, "actif"),
+        ),
+      )
+      .limit(1);
+
+    const existingPrestataireAdmin = await db
+      .select({ id: userPrestataireAdhesions.id })
+      .from(userPrestataireAdhesions)
+      .where(
+        and(
+          eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+          eq(userPrestataireAdhesions.role, "admin"),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      )
+      .limit(1);
+
+    if (existingClientAdmin.length > 0 || existingPrestataireAdmin.length > 0) {
+      throw errors.conflict(
+        "Cette entreprise possède déjà un administrateur actif.",
+      );
+    }
+
+    // 2. Vérifier que l'email n'est pas déjà utilisé par un compte existant
+    const existingUser = await db
+      .select({ id: userTable.id })
+      .from(userTable)
+      .where(eq(userTable.email, parsedInput.email))
+      .limit(1);
+
+    if (existingUser.length > 0) {
+      throw errors.conflict(
+        `Un compte existe déjà avec l'adresse "${parsedInput.email}".`,
+      );
+    }
+
+    // 3. Récupérer le nom de l'entreprise pour l'email
+    const [entreprise] = await db
+      .select({ nom: entreprises.nom })
+      .from(entreprises)
+      .where(eq(entreprises.id, parsedInput.entrepriseId))
+      .limit(1);
+
+    if (!entreprise) throw errors.notFound("Entreprise introuvable.");
+
+    // 3. Annuler les invitations en attente existantes
+    await db
+      .delete(entrepriseInvitations)
+      .where(
+        and(
+          eq(entrepriseInvitations.entrepriseId, parsedInput.entrepriseId),
+          isNull(entrepriseInvitations.acceptedAt),
+        ),
+      );
+
+    // 4. Créer la nouvelle invitation
+    const token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const sentAt = new Date();
+
+    await db.insert(entrepriseInvitations).values({
+      entrepriseId: parsedInput.entrepriseId,
+      email: parsedInput.email,
+      token,
+      expiresAt,
+      createdById: currentUser.id,
+      updatedById: currentUser.id,
+    });
+
+    // 5. Envoyer l'email d'invitation
+    const lien = `${process.env.APP_URL}/auth/inscription-admin?token=${token}`;
+    await sendEmailDirect({
+      to: parsedInput.email,
+      subject: "Invitation à rejoindre FM4ALL",
+      text: `
+        <h2>Vous avez été invité à rejoindre FM4ALL</h2>
+        <p>Vous avez été invité à créer votre compte administrateur pour l'entreprise <strong>${entreprise.nom}</strong>.</p>
+        <p>Cliquez sur le lien ci-dessous pour créer votre compte :</p>
+        <p><a href="${lien}">Créer mon compte</a></p>
+        <p><small>Ce lien est valable 7 jours.</small></p>
+      `,
+      useTemplate: false,
+    });
+
+    return {
+      pendingInvitation: { email: parsedInput.email, sentAt },
+    };
+  });
+
+/**
+ * Accepte une invitation administrateur : crée le compte + les adhésions.
+ * Appelé depuis la page publique /auth/inscription-admin.
+ */
+export const accepterInvitationAdminAction = actionClient
+  .metadata({ actionName: "accepterInvitationAdminAction" })
+  .inputSchema(accepterInvitationAdminSchema)
+  .action(async ({ parsedInput }) => {
+    // 1. Valider le token
+    const [invitation] = await db
+      .select({
+        id: entrepriseInvitations.id,
+        entrepriseId: entrepriseInvitations.entrepriseId,
+        email: entrepriseInvitations.email,
+        createdById: entrepriseInvitations.createdById,
+      })
+      .from(entrepriseInvitations)
+      .where(
+        and(
+          eq(entrepriseInvitations.token, parsedInput.token),
+          isNull(entrepriseInvitations.acceptedAt),
+          gt(entrepriseInvitations.expiresAt, new Date()),
+        ),
+      )
+      .limit(1);
+
+    if (!invitation)
+      throw errors.notFound("Lien d'invitation invalide ou expiré.");
+
+    // 2. Récupérer les rôles de l'entreprise
+    const companyRoles = await db
+      .select({ role: entrepriseRoles.role })
+      .from(entrepriseRoles)
+      .where(eq(entrepriseRoles.entrepriseId, invitation.entrepriseId));
+
+    const roles = companyRoles.map((r) => r.role);
+
+    // 3. Normaliser les données
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["phone"] as const,
+    });
+
+    // 4. Créer le compte utilisateur
+    let authResult;
+    try {
+      authResult = await auth.api.signUpEmail({
+        body: {
+          email: invitation.email,
+          password: crypto.randomUUID(),
+          name: `${normalized.prenom} ${normalized.nom}`,
+          prenom: normalized.prenom,
+          nom: normalized.nom,
+          phone: normalized.phone ?? null,
+          avatarId: null,
+          createdById: invitation.createdById ?? undefined,
+          updatedById: invitation.createdById ?? undefined,
+        },
+      });
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (msg.toLowerCase().includes("already exists")) {
+        throw errors.conflict(
+          `Un compte avec l'email "${invitation.email}" existe déjà.`,
+        );
+      }
+      throw errors.internal(`Erreur lors de la création du compte : ${msg}`);
+    }
+
+    if (!authResult?.user) throw errors.internal("Échec de la création du compte.");
+    const newUserId = authResult.user.id;
+
+    // 6. Transaction : adhésions + marquer invitation acceptée
+    // Si la transaction échoue, supprimer l'utilisateur Better Auth pour éviter un compte orphelin
+    try {
+      await db.transaction(async (tx) => {
+        if (roles.includes("client")) {
+          await tx
+            .insert(userClientAdhesions)
+            .values({
+              userId: newUserId,
+              entrepriseId: invitation.entrepriseId,
+              role: "admin",
+              statut: "actif",
+              createdById: invitation.createdById,
+              updatedById: invitation.createdById,
+            })
+            .onConflictDoNothing();
+        }
+
+        if (roles.includes("prestataire")) {
+          await tx
+            .insert(userPrestataireAdhesions)
+            .values({
+              userId: newUserId,
+              entrepriseId: invitation.entrepriseId,
+              role: "admin",
+              statut: "actif",
+              createdById: invitation.createdById,
+              updatedById: invitation.createdById,
+            })
+            .onConflictDoNothing();
+        }
+
+        await tx
+          .update(entrepriseInvitations)
+          .set({ acceptedAt: new Date(), updatedById: newUserId })
+          .where(eq(entrepriseInvitations.id, invitation.id));
+
+        // Entrée closure table (racine — admin sans parent hiérarchique)
+        await insertUserArborescence({
+          entrepriseId: invitation.entrepriseId,
+          userId: newUserId,
+          parentId: null,
+          createdById: invitation.createdById ?? newUserId,
+          tx,
+        });
+      });
+    } catch (txError) {
+      // Rollback via le contexte interne de Better Auth (cascades sessions/accounts)
+      try {
+        const betterAuthCtx = await auth.$context;
+        await betterAuthCtx.internalAdapter.deleteUser(newUserId);
+      } catch {
+        // Ignorer l'erreur de cleanup — log suffisant côté serveur
+      }
+      throw txError;
+    }
+
+    // 7. Envoyer email pour définir le mot de passe
+    // Ne pas faire échouer l'action si l'email échoue : le compte est déjà créé.
+    // L'utilisateur peut demander un nouveau lien depuis la page de login.
+    try {
+      await auth.api.requestPasswordReset({
+        body: {
+          email: invitation.email,
+          redirectTo: `${process.env.APP_URL}/auth/reset-password?type=activation`,
+        },
+        headers: await headers(),
+      });
+    } catch {
+      // Email non bloquant — le compte est créé, l'utilisateur peut réinitialiser son mdp
+    }
+
+    return {
+      message:
+        "Votre compte a été créé. Un email vous a été envoyé pour définir votre mot de passe.",
+    };
   });

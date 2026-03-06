@@ -24,13 +24,13 @@ const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
   } = authClient.useSession();
 
   const handleSignOut = async () => {
-    if (!session) router.push("/auth/signin");
+    if (!session) router.push("/auth/login");
     else {
       try {
         await authClient.signOut({
           fetchOptions: {
             onSuccess: () => {
-              router.push("/auth/signin");
+              router.push("/auth/login");
               toast({
                 title: t("deconnexion-reussie"),
                 description: t("vous-avez-ete-deconnecte-avec-succes"),

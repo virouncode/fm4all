@@ -27,6 +27,20 @@ export type GetTacheListeTemplateType = z.infer<
   typeof getTacheListeTemplateSchema
 >;
 
+export const getChecklistsForPageSchema = z.object({
+  /** Posture de l'utilisateur */
+  posture: z.enum(["client", "prestataire", "plateforme"]),
+  /** entrepriseId de l'utilisateur (client ou prestataire) — obligatoire sauf plateforme */
+  entrepriseId: z.uuid().optional(),
+  /** Filtre optionnel par service */
+  serviceId: z.uuid().optional(),
+  /** Filtre plateforme : null = système, uuid = entreprise spécifique */
+  proprietaireFilter: z.uuid().nullable().optional(),
+});
+export type GetChecklistsForPageType = z.infer<
+  typeof getChecklistsForPageSchema
+>;
+
 // ==================== TEMPLATE CRUD ====================
 
 export const insertTacheListeTemplateSchema = z.object({

@@ -99,6 +99,7 @@ import { TacheListePickerDialog } from "./TacheListePickerDialog";
 type PrestationDetailsClientProps = {
   prestation: PrestationListItem;
   canManage: boolean;
+  canManageChecklist: boolean;
   isPlateforme: boolean;
   executions: ExecutionWithPrix[];
   occurrences: OccurrenceListItem[];
@@ -138,6 +139,7 @@ const STATUT_LABELS: Record<ClientServiceStatutType, string> = {
 export function PrestationDetailsClient({
   prestation,
   canManage,
+  canManageChecklist,
   isPlateforme,
   executions: initialExecutions,
   occurrences,
@@ -315,7 +317,7 @@ export function PrestationDetailsClient({
           {/* Checklist par défaut */}
           <ChecklistDefaultCard
             prestation={prestation}
-            canManage={canManage}
+            canManage={canManageChecklist}
             isPlateforme={isPlateforme}
           />
 
@@ -704,7 +706,7 @@ function ExecutionTab({
         <div className="flex justify-end">
           <Button onClick={() => setAddDialogOpen(true)}>
             <Zap className="h-4 w-4" />
-            Ajouter un prestataire
+            Ajouter une exécution
           </Button>
         </div>
       )}
@@ -970,7 +972,7 @@ function ExecutionCard({
             {canManage && (
               <div className="flex items-center gap-2">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   className="h-7 text-xs"
                   onClick={() => setChecklistPickerOpen(true)}
@@ -980,7 +982,7 @@ function ExecutionCard({
                 </Button>
                 {execution.prestataireEntrepriseId && (
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     className="h-7 text-xs"
                     onClick={() => setChecklistManagerOpen(true)}
@@ -1003,6 +1005,7 @@ function ExecutionCard({
             entityId={execution.id}
             prestationId={prestation.id}
             serviceId={prestation.serviceId}
+            serviceNom={prestation.serviceNom}
             entrepriseId={prestation.entrepriseId}
             executionId={execution.id}
             currentPackId={execution.tacheListeTemplateId}
@@ -1016,6 +1019,7 @@ function ExecutionCard({
               open={checklistManagerOpen}
               onOpenChange={setChecklistManagerOpen}
               serviceId={prestation.serviceId}
+              serviceNom={prestation.serviceNom}
               proprietaireEntrepriseId={execution.prestataireEntrepriseId}
             />
           )}
@@ -1668,6 +1672,20 @@ function ChecklistDefaultCard({
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />
                   <span className="font-medium">{packDetails.nom}</span>
+                  {/* Badge type checklist */}
+                  {packDetails.proprietaireEntrepriseId === null ? (
+                    <span className="flex-shrink-0 rounded border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-xs font-medium text-violet-700 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300">
+                      Système
+                    </span>
+                  ) : packDetails.proprietaireEntrepriseId === prestation.entrepriseId ? (
+                    <span className="flex-shrink-0 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300">
+                      Client
+                    </span>
+                  ) : (
+                    <span className="flex-shrink-0 rounded border border-orange-200 bg-orange-50 px-1.5 py-0.5 text-xs font-medium text-orange-700 dark:border-orange-800 dark:bg-orange-950/60 dark:text-orange-300">
+                      Prestataire
+                    </span>
+                  )}
                   <Badge variant="outline" className="text-xs">
                     {packDetails.items.length} tâche
                     {packDetails.items.length !== 1 ? "s" : ""}
@@ -1725,6 +1743,7 @@ function ChecklistDefaultCard({
             entityId={prestation.id}
             prestationId={prestation.id}
             serviceId={prestation.serviceId}
+            serviceNom={prestation.serviceNom}
             entrepriseId={prestation.entrepriseId}
             currentPackId={prestation.tacheListeTemplateId}
             onSuccess={() => {
@@ -1741,6 +1760,7 @@ function ChecklistDefaultCard({
               if (!open) router.refresh();
             }}
             serviceId={prestation.serviceId}
+            serviceNom={prestation.serviceNom}
             proprietaireEntrepriseId={
               isPlateforme ? null : prestation.entrepriseId
             }

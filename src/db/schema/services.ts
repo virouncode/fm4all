@@ -30,6 +30,7 @@ import {
   executionTypePrixEnum,
   frequenceEnum,
   modeCommercialEnum,
+  modePilotageEnum,
   occurrenceStatutEnum,
   occurrenceTacheStatutEnum,
   perimetreModeEnum,
@@ -185,6 +186,7 @@ export const clientServiceExecutions = pgTable(
     priorite: smallint("priorite").notNull(),
     // plus grand = gagne ; convention : 0=global, 10=bâtiment, 20=zone
     actif: boolean("actif").notNull().default(true),
+    modePilotage: modePilotageEnum("mode_pilotage").notNull().default("client"),
     tacheListeTemplateId: uuid("tache_liste_template_id").references(
       () => tacheListesTemplates.id,
       { onDelete: "set null" },

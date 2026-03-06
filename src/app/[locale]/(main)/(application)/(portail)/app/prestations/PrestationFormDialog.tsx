@@ -30,9 +30,11 @@ import {
   insertPrestationAction,
   updatePrestationAction,
 } from "@/server/actions/clientServicesActions";
+import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
 import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
 import { getServicesAction } from "@/server/actions/servicesActions";
 import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
+import { upper } from "@/zod-helpers/normalize";
 import { useAppStore } from "@/stores/application/appStore";
 import {
   clientServiceModePlanningSchema,
@@ -181,7 +183,7 @@ export function PrestationFormDialog({
   const [selectedClientId, setSelectedClientId] = useState<string>(
     isEdit
       ? prestation.entrepriseId
-      : posture === "plateforme"
+      : posture === "plateforme" || posture === "prestataire"
         ? ""
         : (entreprise?.id ?? ""),
   );
@@ -216,7 +218,7 @@ export function PrestationFormDialog({
           notes: prestation.notes ?? "",
         }
       : {
-          entrepriseId: posture === "plateforme" ? "" : (entreprise?.id ?? ""),
+          entrepriseId: posture === "plateforme" || posture === "prestataire" ? "" : (entreprise?.id ?? ""),
           serviceId: "",
           frequence: "hebdomadaire",
           frequenceParPeriode: "",
@@ -271,15 +273,25 @@ export function PrestationFormDialog({
     );
   }, [selectedSiteIds, sites]);
 
-  // Charger les clients (posture plateforme, mode création)
+  // Charger les clients (posture plateforme ou prestataire, mode création)
   useEffect(() => {
-    if (isEdit || posture !== "plateforme" || !open) return;
-    async function loadClients() {
-      const result = await getEntreprisesClientesAction();
-      if (result?.data?.clients) setClients(result.data.clients);
+    if (isEdit || !open) return;
+    if (posture === "plateforme") {
+      async function loadClientsPlateforme() {
+        const result = await getEntreprisesClientesAction();
+        if (result?.data?.clients) setClients(result.data.clients);
+      }
+      loadClientsPlateforme();
+    } else if (posture === "prestataire" && entreprise?.id) {
+      async function loadClientsPrestataire() {
+        const result = await getMesClientsAction({
+          entrepriseId: entreprise!.id,
+        });
+        if (result?.data?.clients) setClients(result.data.clients);
+      }
+      loadClientsPrestataire();
     }
-    loadClients();
-  }, [isEdit, posture, open]);
+  }, [isEdit, posture, open, entreprise?.id]);
 
   // Charger les services (mode création)
   useEffect(() => {
@@ -335,7 +347,9 @@ export function PrestationFormDialog({
       });
     } else {
       const defaultClientId =
-        posture === "plateforme" ? "" : (entreprise?.id ?? "");
+        posture === "plateforme" || posture === "prestataire"
+          ? ""
+          : (entreprise?.id ?? "");
       form.reset({
         entrepriseId: defaultClientId,
         serviceId: "",
@@ -597,21 +611,26 @@ export function PrestationFormDialog({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {posture === "plateforme" && (
-                    <RhfControlledSelect<PrestationFormValues>
-                      name="entrepriseId"
-                      label="Client"
-                      requiredMark
-                      placeholder="Sélectionnez un client"
-                      onChange={(value) => handleClientChange(value as string)}
-                      selectClassName="w-full"
-                    >
-                      {clients.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.nom}
-                        </SelectItem>
-                      ))}
-                    </RhfControlledSelect>
+                  {(posture === "plateforme" || posture === "prestataire") && (
+                    <div className="space-y-3">
+                      <Label>
+                        Client <span className="text-destructive">*</span>
+                      </Label>
+
+                      <RhfControlledSelect<PrestationFormValues>
+                        name="entrepriseId"
+                        label=""
+                        placeholder="Sélectionnez un client"
+                        onChange={(value) => handleClientChange(value as string)}
+                        selectClassName="w-full"
+                      >
+                        {clients.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.nom}
+                          </SelectItem>
+                        ))}
+                      </RhfControlledSelect>
+                    </div>
                   )}
 
                   {/* Arbre de sélection des sites — même pattern que l'attribution */}
@@ -638,7 +657,7 @@ export function PrestationFormDialog({
                         </p>
                       ) : sites.length === 0 ? (
                         <p className="text-muted-foreground text-sm">
-                          {posture === "plateforme"
+                          {posture === "plateforme" || posture === "prestataire"
                             ? "Sélectionnez d'abord un client"
                             : "Aucun site disponible"}
                         </p>

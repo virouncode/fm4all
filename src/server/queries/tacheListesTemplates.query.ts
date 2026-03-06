@@ -1,7 +1,8 @@
 import "server-only";
 
 import { db } from "@/db";
-import { tacheListeItems, tacheListesTemplates } from "@/db/schema/services";
+import { entreprises } from "@/db/schema/entreprises";
+import { services, tacheListeItems, tacheListesTemplates } from "@/db/schema/services";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 
 export type TacheListeItemRow = {
@@ -19,6 +20,13 @@ export type TacheListeTemplateRow = {
   proprietaireEntrepriseId: string | null;
   nom: string;
   actif: boolean;
+};
+
+export type TacheListeTemplateWithServiceNom = TacheListeTemplateRow & {
+  serviceNom: string;
+  /** Nom de l'entreprise propriétaire — null pour les packs système */
+  proprietaireEntrepriseNom: string | null;
+  items: TacheListeItemRow[];
 };
 
 export type TacheListeTemplateWithItems = TacheListeTemplateRow & {
@@ -112,6 +120,107 @@ export async function getAvailableTacheListesTemplates({
 
   return packs.map((pack) => ({
     ...pack,
+    items: itemsByPack.get(pack.id) ?? [],
+  }));
+}
+
+/**
+ * GET PACKS WITH SERVICE NAMES — pour la page /app/checklists
+ *
+ * Retourne les packs d'un propriétaire avec le nom du service (JOIN services).
+ * - activeOnly=true : retourne seulement les packs actifs (ex: packs système en posture client)
+ * - activeOnly=false (défaut) : retourne tous les packs (pour la gestion)
+ */
+export async function getTacheListesWithServiceNames({
+  proprietaireEntrepriseId,
+  serviceId,
+  serviceIds,
+  activeOnly = false,
+}: {
+  /** null = système, string = entreprise, undefined = tous */
+  proprietaireEntrepriseId: string | null | undefined;
+  serviceId?: string;
+  /** Filtre sur une liste de serviceIds (ex: services proposés par un prestataire) */
+  serviceIds?: string[];
+  activeOnly?: boolean;
+}): Promise<TacheListeTemplateWithServiceNom[]> {
+  const conditions = [];
+
+  if (proprietaireEntrepriseId !== undefined) {
+    const ownerCondition =
+      proprietaireEntrepriseId === null
+        ? isNull(tacheListesTemplates.proprietaireEntrepriseId)
+        : eq(
+            tacheListesTemplates.proprietaireEntrepriseId,
+            proprietaireEntrepriseId,
+          );
+    conditions.push(ownerCondition);
+  }
+
+  if (serviceId) conditions.push(eq(tacheListesTemplates.serviceId, serviceId));
+  if (serviceIds?.length)
+    conditions.push(inArray(tacheListesTemplates.serviceId, serviceIds));
+  if (activeOnly) conditions.push(eq(tacheListesTemplates.actif, true));
+
+  const packs = await db
+    .select({
+      id: tacheListesTemplates.id,
+      serviceId: tacheListesTemplates.serviceId,
+      serviceNom: services.nom,
+      proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId,
+      proprietaireEntrepriseNom: entreprises.nom,
+      nom: tacheListesTemplates.nom,
+      actif: tacheListesTemplates.actif,
+    })
+    .from(tacheListesTemplates)
+    .innerJoin(services, eq(services.id, tacheListesTemplates.serviceId))
+    .leftJoin(
+      entreprises,
+      eq(entreprises.id, tacheListesTemplates.proprietaireEntrepriseId),
+    )
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(asc(services.nom), asc(tacheListesTemplates.nom));
+
+  if (packs.length === 0) return [];
+
+  const packIds = packs.map((p) => p.id);
+
+  const allItems = await db
+    .select({
+      id: tacheListeItems.id,
+      listeTemplateId: tacheListeItems.listeTemplateId,
+      ordre: tacheListeItems.ordre,
+      titre: tacheListeItems.titre,
+      description: tacheListeItems.description,
+      actif: tacheListeItems.actif,
+      dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+    })
+    .from(tacheListeItems)
+    .where(inArray(tacheListeItems.listeTemplateId, packIds))
+    .orderBy(asc(tacheListeItems.ordre));
+
+  const itemsByPack = new Map<string, TacheListeItemRow[]>();
+  for (const item of allItems) {
+    const existing = itemsByPack.get(item.listeTemplateId) ?? [];
+    existing.push({
+      id: item.id,
+      ordre: item.ordre,
+      titre: item.titre,
+      description: item.description,
+      actif: item.actif,
+      dureeEstimeeMinutes: item.dureeEstimeeMinutes,
+    });
+    itemsByPack.set(item.listeTemplateId, existing);
+  }
+
+  return packs.map((pack) => ({
+    id: pack.id,
+    serviceId: pack.serviceId,
+    serviceNom: pack.serviceNom,
+    proprietaireEntrepriseId: pack.proprietaireEntrepriseId,
+    proprietaireEntrepriseNom: pack.proprietaireEntrepriseNom,
+    nom: pack.nom,
+    actif: pack.actif,
     items: itemsByPack.get(pack.id) ?? [],
   }));
 }

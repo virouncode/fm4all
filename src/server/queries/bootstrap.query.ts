@@ -5,8 +5,10 @@ import {
   entreprises,
   userClientAdhesions,
   userPlateformeAdhesions,
+  userPrestataireAdhesions,
 } from "@/db/schema";
 import { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
+import { RolePrestataireAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { and, eq, getTableColumns } from "drizzle-orm";
 
@@ -39,13 +41,21 @@ export async function bootstrapUser(
     )
     .limit(1);
 
-  // 2. Toujours récupérer l'adhésion plateforme
-  const platformAdhesion = await db.query.userPlateformeAdhesions.findFirst({
-    where: and(
-      eq(userPlateformeAdhesions.userId, userId),
-      eq(userPlateformeAdhesions.statut, "actif"),
-    ),
-  });
+  // 2. Toujours récupérer l'adhésion plateforme et prestataire
+  const [platformAdhesion, prestataireAdhesion] = await Promise.all([
+    db.query.userPlateformeAdhesions.findFirst({
+      where: and(
+        eq(userPlateformeAdhesions.userId, userId),
+        eq(userPlateformeAdhesions.statut, "actif"),
+      ),
+    }),
+    db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    }),
+  ]);
 
   // 3. Si pas de client adhesion → fallback pour utilisateurs purement plateforme
   if (!bootstrapData || !bootstrapData.entreprise) {
@@ -71,6 +81,7 @@ export async function bootstrapUser(
     return {
       entreprise: fm4allEntreprise,
       roleClientAdhesion: null,
+      rolePrestataireAdhesion: null,
       rolesEntreprise: ["plateforme"] as RoleEntrepriseType[],
       postureActive: "plateforme" as RoleEntrepriseType,
       rolePlateformeAdhesion: platformAdhesion.role as RolePlateformeAdhesionType,
@@ -93,6 +104,8 @@ export async function bootstrapUser(
   return {
     entreprise: bootstrapData.entreprise,
     roleClientAdhesion: bootstrapData.roleClientAdhesion,
+    rolePrestataireAdhesion:
+      (prestataireAdhesion?.role as RolePrestataireAdhesionType) ?? null,
     rolesEntreprise: roles,
     postureActive,
     rolePlateformeAdhesion:

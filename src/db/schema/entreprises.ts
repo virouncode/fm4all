@@ -4,6 +4,7 @@ import {
   index,
   pgTable,
   text,
+  timestamp,
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
@@ -73,6 +74,53 @@ export const entrepriseRoles = pgTable(
       table.entrepriseId,
       table.role,
     ),
+  ],
+);
+
+export const clientPrestataireRelations = pgTable(
+  "client_prestataire_relations",
+  {
+    id: id(),
+    clientEntrepriseId: uuid("client_entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, { onDelete: "cascade" }),
+    prestataireEntrepriseId: uuid("prestataire_entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, { onDelete: "cascade" }),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    index("cpr_client_id_idx").on(table.clientEntrepriseId),
+    index("cpr_prestataire_id_idx").on(table.prestataireEntrepriseId),
+    uniqueIndex("cpr_client_prestataire_udx").on(
+      table.clientEntrepriseId,
+      table.prestataireEntrepriseId,
+    ),
+  ],
+);
+
+export const entrepriseInvitations = pgTable(
+  "entreprise_invitations",
+  {
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    token: text("token").notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    index("ei_entreprise_id_idx").on(table.entrepriseId),
+    index("ei_token_idx").on(table.token),
   ],
 );
 

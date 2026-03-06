@@ -1,6 +1,7 @@
 import { roleEntrepriseCodes } from "@/constants/codeTables";
 import { isValidSIRET } from "@/lib/utils/isValidSIRET";
 import { capitalizeWords, lower } from "@/zod-helpers/normalize";
+import { phoneNumberSchemaEmpty } from "@/zod-schemas/phone.schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { entrepriseRoles, entreprises } from "../db/schema";
@@ -35,7 +36,7 @@ export const insertEntrepriseStep1Schema = z.object({
     .email("Email de contact invalide")
     .or(z.literal(""))
     .optional(),
-  phoneContact: z.string().optional(),
+  phoneContact: phoneNumberSchemaEmpty("Numéro de téléphone invalide"),
   roles: z
     .array(roleEntrepriseSchema)
     .min(1, "Au moins un rôle est obligatoire"),
@@ -57,35 +58,7 @@ export type InsertEntrepriseStep1Type = z.infer<
   typeof insertEntrepriseStep1Schema
 >;
 
-/**
- * Step 2 — Administrateur principal
- */
-export const insertEntrepriseStep2Schema = z.object({
-  adminPrenom: z
-    .string()
-    .min(1, "Prénom de l'administrateur obligatoire")
-    .transform((v) => capitalizeWords(v)),
-  adminNom: z
-    .string()
-    .min(1, "Nom de l'administrateur obligatoire")
-    .transform((v) => capitalizeWords(v)),
-  adminEmail: z
-    .string()
-    .email("Email de l'administrateur invalide")
-    .transform((v) => lower(v)),
-  adminPhone: z.string().or(z.literal("")).optional(),
-});
-
-export type InsertEntrepriseStep2Type = z.infer<
-  typeof insertEntrepriseStep2Schema
->;
-
-/**
- * Schema complet pour la soumission finale (Step1 + Step2)
- */
-export const insertEntrepriseFormSchema = insertEntrepriseStep1Schema.and(
-  insertEntrepriseStep2Schema,
-);
+export const insertEntrepriseFormSchema = insertEntrepriseStep1Schema;
 
 export type InsertEntrepriseFormType = z.infer<
   typeof insertEntrepriseFormSchema
@@ -114,7 +87,7 @@ export const updateEntrepriseContactSchema = z.object({
     .email("Email de contact invalide")
     .or(z.literal(""))
     .optional(),
-  phoneContact: z.string().optional(),
+  phoneContact: phoneNumberSchemaEmpty("Numéro de téléphone invalide").optional(),
 });
 export type UpdateEntrepriseContactType = z.infer<
   typeof updateEntrepriseContactSchema
@@ -177,6 +150,9 @@ export type EntrepriseWithDetails = {
   createdAt: Date;
   roles: RoleEntrepriseType[];
   nbSites: number;
+  hasActiveAdmin: boolean;
+  services: Array<{ id: string; nom: string }>;
+  pendingInvitation: { email: string; sentAt: Date } | null;
 };
 
 // ==================== PROSPECT SCHEMA ====================

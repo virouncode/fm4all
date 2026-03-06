@@ -30,7 +30,7 @@ type ObfuscatedLinkProps = {
         pathname: "/fournisseur/[fournisseurId]";
         params: { fournisseurId: string };
       }
-    | "/auth/signin"
+    | "/auth/login"
     | {
         pathname: "/services/[slug]";
         params: { slug: string };

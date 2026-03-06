@@ -118,7 +118,7 @@ export function MesPrestatairesClient() {
         </div>
       ) : prestataires.length === 0 ? (
         <div className="flex flex-1 items-center justify-center">
-          <p className="text-muted-foreground">Aucun prestataire enregistré</p>
+          <p className="text-muted-foreground text-sm">Aucun prestataire enregistré.</p>
         </div>
       ) : (
         <div className="flex-1 overflow-auto">

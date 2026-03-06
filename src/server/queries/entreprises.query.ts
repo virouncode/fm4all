@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/db";
-import { entreprises, entrepriseRoles, serviceEntreprises } from "@/db/schema/entreprises";
+import { entreprises, entrepriseRoles, serviceEntreprises, entrepriseInvitations } from "@/db/schema/entreprises";
 import { documents } from "@/db/schema/documents";
 import { services } from "@/db/schema/services";
 import { sites } from "@/db/schema/sites";
@@ -179,6 +179,32 @@ export async function getEntreprisesPaginated({
       createdAt: entreprises.createdAt,
       roles: sql<string[] | null>`array_agg(DISTINCT ${entrepriseRoles.role}::text) FILTER (WHERE ${entrepriseRoles.role} IS NOT NULL)`,
       nbSites: sql<number>`COUNT(DISTINCT ${sites.id})::integer`,
+      hasActiveAdmin: sql<boolean>`EXISTS (
+        SELECT 1 FROM user_client_adhesions uca
+        WHERE uca.entreprise_id = ${entreprises.id}
+        AND uca.role = 'admin'
+        AND uca.statut = 'actif'
+        UNION ALL
+        SELECT 1 FROM user_prestataire_adhesions upa
+        WHERE upa.entreprise_id = ${entreprises.id}
+        AND upa.role = 'admin'
+        AND upa.statut = 'actif'
+      )`,
+      services: sql<Array<{ id: string; nom: string }> | null>`(
+        SELECT json_agg(json_build_object('id', s.id::text, 'nom', s.nom))
+        FROM service_entreprises se
+        INNER JOIN services s ON s.id = se.service_id
+        WHERE se.entreprise_id = ${entreprises.id}
+      )`,
+      pendingInvitation: sql<{ email: string; sentAt: Date } | null>`(
+        SELECT json_build_object('email', ei.email, 'sentAt', ei.created_at)
+        FROM ${entrepriseInvitations} ei
+        WHERE ei.entreprise_id = ${entreprises.id}
+          AND ei.accepted_at IS NULL
+          AND ei.expires_at > NOW()
+        ORDER BY ei.created_at DESC
+        LIMIT 1
+      )`,
     })
     .from(entreprises)
     .leftJoin(entrepriseRoles, eq(entreprises.id, entrepriseRoles.entrepriseId))
@@ -195,6 +221,9 @@ export async function getEntreprisesPaginated({
     roles: (r.roles ?? []) as RoleEntrepriseType[],
     nbSites: Number(r.nbSites) || 0,
     logoStorageKey: r.logoStorageKey ?? null,
+    hasActiveAdmin: Boolean(r.hasActiveAdmin),
+    services: (r.services ?? []) as Array<{ id: string; nom: string }>,
+    pendingInvitation: r.pendingInvitation ?? null,
   }));
 }
 
@@ -255,6 +284,32 @@ export async function getEntrepriseWithDetailsById(
       createdAt: entreprises.createdAt,
       roles: sql<string[] | null>`array_agg(DISTINCT ${entrepriseRoles.role}::text) FILTER (WHERE ${entrepriseRoles.role} IS NOT NULL)`,
       nbSites: sql<number>`COUNT(DISTINCT ${sites.id})::integer`,
+      hasActiveAdmin: sql<boolean>`EXISTS (
+        SELECT 1 FROM user_client_adhesions uca
+        WHERE uca.entreprise_id = ${entreprises.id}
+        AND uca.role = 'admin'
+        AND uca.statut = 'actif'
+        UNION ALL
+        SELECT 1 FROM user_prestataire_adhesions upa
+        WHERE upa.entreprise_id = ${entreprises.id}
+        AND upa.role = 'admin'
+        AND upa.statut = 'actif'
+      )`,
+      services: sql<Array<{ id: string; nom: string }> | null>`(
+        SELECT json_agg(json_build_object('id', s.id::text, 'nom', s.nom))
+        FROM service_entreprises se
+        INNER JOIN services s ON s.id = se.service_id
+        WHERE se.entreprise_id = ${entreprises.id}
+      )`,
+      pendingInvitation: sql<{ email: string; sentAt: Date } | null>`(
+        SELECT json_build_object('email', ei.email, 'sentAt', ei.created_at)
+        FROM ${entrepriseInvitations} ei
+        WHERE ei.entreprise_id = ${entreprises.id}
+          AND ei.accepted_at IS NULL
+          AND ei.expires_at > NOW()
+        ORDER BY ei.created_at DESC
+        LIMIT 1
+      )`,
     })
     .from(entreprises)
     .leftJoin(entrepriseRoles, eq(entreprises.id, entrepriseRoles.entrepriseId))
@@ -272,6 +327,9 @@ export async function getEntrepriseWithDetailsById(
     roles: (result.roles ?? []) as RoleEntrepriseType[],
     nbSites: Number(result.nbSites) || 0,
     logoStorageKey: result.logoStorageKey ?? null,
+    hasActiveAdmin: Boolean(result.hasActiveAdmin),
+    services: (result.services ?? []) as Array<{ id: string; nom: string }>,
+    pendingInvitation: result.pendingInvitation ?? null,
   };
 }
 

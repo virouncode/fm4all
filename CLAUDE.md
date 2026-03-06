@@ -2176,7 +2176,48 @@ Ne PAS essayer `const table = condition ? tableA : tableB` — le typage Drizzle
 
 ---
 
-**Dernière mise à jour**: 2026-03-05
+## Changelog (2026-03-06)
+
+**Audit module Checklists + Schema hardening + Relations.ts complet** :
+
+- ✅ **Bug 1 corrigé** : `DraggableItemRow` — boutons Pencil/Trash/GripVertical conditionnels sur `canManage` prop (étaient toujours visibles même sans droits)
+- ✅ **Schema hardening** — `userClientAdhesions` et `userPrestataireAdhesions` : unique index sur `userId` seul (règle "1 user = 1 enterprise") — migration `0026_petite_callisto.sql`
+- ✅ **`canManageChecklists(userId, entrepriseId: string | null)`** : signature corrigée pour accepter `null` (retourne `false` immédiatement) — corrige 6 erreurs TS pre-existantes
+- ✅ **`getTacheListeTemplateAction`** : contrôle d'accès ajouté pour les packs enterprise (les packs système `proprietaireEntrepriseId === null` restent accessibles à tous les utilisateurs authentifiés)
+- ✅ **`NewChecklistDialog.onSuccess`** : type corrigé de `(serviceId, serviceNom) => void` à `() => void`
+- ✅ **`relations.ts`** : toutes les relations manquantes ajoutées (voir section dédiée dans MEMORY.md)
+
+**Distinction CRITIQUE : `canManage` vs `canManageChecklists`** :
+
+```typescript
+// canManage (de responsable_site) = opérationnel
+// → Assigner une checklist existante à une prestation
+// → Contrôle DraggableItemRow buttons (Pencil, Trash, GripVertical)
+
+// canManageChecklists (de admin/manager entreprise) = stratégique
+// → CRUD des packs et items de checklist (templates)
+// → getTacheListeTemplateAction : system packs = accessibles à tous, enterprise packs = check accès
+```
+
+**Règle schema unique — 1 user = 1 enterprise** :
+
+```typescript
+// ✅ CORRECT — unique sur userId seul (pas sur la paire userId+entrepriseId)
+uniqueIndex("user_client_adhesions_user_udx").on(table.userId),
+uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
+// Raison : un utilisateur appartient à UNE seule entreprise en tant que client/prestataire
+// Multi-posture = changer d'entreprise (nouveau compte), pas appartenir à deux entreprises
+```
+
+**`relations.ts` — Points d'attention** :
+- Mettre à jour `relations.ts` ne génère **jamais** de migration (abstraction TypeScript uniquement)
+- Quand deux relations existent entre les mêmes tables → `relationName` requis sur les DEUX côtés
+- Conflits de noms : importer une table avec alias (`as clientPrestataireRelationsTable`)
+- `clientServicePrixAppliques` : table anti-double-facturation, complètement absente de relations.ts avant ce fix
+
+---
+
+**Dernière mise à jour**: 2026-03-06
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 

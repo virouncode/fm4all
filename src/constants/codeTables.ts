@@ -255,6 +255,19 @@ export const modeCommercialCodes = modeCommercialCT.map(
   ...(typeof modeCommercialCT)[number]["code"][],
 ];
 
+export const modePilotageCT = [
+  { code: "client", name: "Gestion interne (client pilote)" },
+  { code: "prestataire", name: "Prestataire opérant" },
+  { code: "collaboration", name: "Collaboration bilatérale" },
+] as const;
+
+export const modePilotageCodes = modePilotageCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof modePilotageCT)[number]["code"],
+  ...(typeof modePilotageCT)[number]["code"][],
+];
+
 export const perimetreModeCT = [
   { code: "inclure", name: "Inclure" },
   { code: "exclure", name: "Exclure" },

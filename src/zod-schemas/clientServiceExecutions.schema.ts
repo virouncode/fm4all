@@ -5,6 +5,13 @@ import { z } from "zod";
 
 // ==================== ENUMS ====================
 
+export const modePilotageSchema = z.enum([
+  "client",
+  "prestataire",
+  "collaboration",
+]);
+export type ModePilotageType = z.infer<typeof modePilotageSchema>;
+
 export const executionTypePrixSchema = z.enum([
   "abonnement",
   "par_occurrence",
@@ -99,6 +106,7 @@ export const insertExecutionFormSchema = z
           Number.isInteger(Number(v)),
         "La priorité doit être un entier entre 0 et 100",
       ),
+    modePilotage: modePilotageSchema,
     assigneeUserIdDefault: z.uuid().or(z.literal("")).optional(),
     prix: z
       .array(insertExecutionPrixFormSchema)
@@ -152,6 +160,7 @@ export const updateExecutionFormSchema = z
           Number.isInteger(Number(v)),
         "La priorité doit être un entier entre 0 et 100",
       ),
+    modePilotage: modePilotageSchema,
     assigneeUserIdDefault: z.uuid().or(z.literal("")).optional(),
     prix: z
       .array(insertExecutionPrixFormSchema)
@@ -187,7 +196,7 @@ export type UpdateExecutionFormType = z.infer<typeof updateExecutionFormSchema>;
 export const createOrLinkPrestataireSchema = z.object({
   siret: siretSchema("Le SIRET est invalide"),
   nom: z.string().min(1, "Nom de l'entreprise requis").transform((v) => upper(v)),
-  serviceId: z.uuid("ID du service invalide"),
+  serviceIds: z.array(z.uuid()),
   entrepriseId: z.uuid("ID de l'entreprise invalide"),
   prenomContact: z.string().optional(),
   nomContact: z.string().optional(),
@@ -212,6 +221,7 @@ export type GetPrestatairesForServiceType = z.infer<
 
 export const findEntrepriseBySiretSchema = z.object({
   siret: siretSchema("Le SIRET est invalide"),
+  clientEntrepriseId: z.uuid().optional(),
 });
 export type FindEntrepriseBySiretType = z.infer<
   typeof findEntrepriseBySiretSchema
@@ -275,4 +285,52 @@ export const updateExecutionAssigneeDefaultSchema = z.object({
 });
 export type UpdateExecutionAssigneeDefaultType = z.infer<
   typeof updateExecutionAssigneeDefaultSchema
+>;
+
+export const getMesClientsSchema = z.object({
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+});
+export type GetMesClientsType = z.infer<typeof getMesClientsSchema>;
+
+export const getMesPrestatairesSchema = z.object({
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+});
+export type GetMesPrestatairesType = z.infer<typeof getMesPrestatairesSchema>;
+
+export const updateExecutionModePilotageSchema = z.object({
+  executionId: z.uuid("ID de l'exécution invalide"),
+  prestationId: z.uuid("ID de la prestation invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  modePilotage: modePilotageSchema,
+});
+export type UpdateExecutionModePilotageType = z.infer<
+  typeof updateExecutionModePilotageSchema
+>;
+
+// ==================== CREATE OR LINK CLIENT (Posture Prestataire) ====================
+
+export const createOrLinkClientSchema = z.object({
+  siret: siretSchema("Le SIRET est invalide"),
+  nom: z.string().min(1, "Nom de l'entreprise requis").transform((v) => upper(v)),
+  prestataireEntrepriseId: z.uuid("ID du prestataire invalide"),
+  prenomContact: z.string().optional(),
+  nomContact: z.string().optional(),
+  emailContact: z.email("Email invalide").optional().or(z.literal("")),
+  phoneContact: z.string().optional(),
+});
+export type CreateOrLinkClientType = z.infer<typeof createOrLinkClientSchema>;
+
+// ==================== CREATE OR LINK PRESTATAIRE SIMPLE (Posture Client, sans service) ====================
+
+export const createOrLinkPrestataireSimpleSchema = z.object({
+  siret: siretSchema("Le SIRET est invalide"),
+  nom: z.string().min(1, "Nom de l'entreprise requis").transform((v) => upper(v)),
+  clientEntrepriseId: z.uuid("ID de l'entreprise cliente invalide"),
+  prenomContact: z.string().optional(),
+  nomContact: z.string().optional(),
+  emailContact: z.email("Email invalide").optional().or(z.literal("")),
+  phoneContact: z.string().optional(),
+});
+export type CreateOrLinkPrestataireSimpleType = z.infer<
+  typeof createOrLinkPrestataireSimpleSchema
 >;

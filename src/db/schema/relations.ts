@@ -20,6 +20,8 @@ import { devis, devisDemandes, devisLignes, devisTemporaires } from "./devis";
 import { documents, documentsLinks } from "./documents";
 // ENTREPRISES TABLES
 import {
+  clientPrestataireRelations as clientPrestataireRelationsTable,
+  entrepriseInvitations,
   entrepriseRoles,
   entreprises,
   serviceEntreprises,
@@ -77,6 +79,7 @@ import {
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServicePerimetre,
+  clientServicePrixAppliques,
   clientServices,
   occurrenceTaches,
   services,
@@ -92,6 +95,7 @@ import { ticketMessages, tickets } from "./tickets";
 import {
   userClientAdhesions,
   userClientSiteAttributions,
+  userPlateformeAdhesions,
   userPrestataireAdhesions,
   userPrestataireSiteAttributions,
   usersArborescence,
@@ -136,6 +140,10 @@ export const userRelations = relations(user, ({ one, many }) => ({
   }),
   tachesAssigned: many(occurrenceTaches, { relationName: "tacheAssignee" }),
   tachesCompletees: many(occurrenceTaches, { relationName: "tacheCompletee" }),
+  plateformeAdhesion: one(userPlateformeAdhesions, {
+    fields: [user.id],
+    references: [userPlateformeAdhesions.userId],
+  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -206,7 +214,22 @@ export const entreprisesRelations = relations(entreprises, ({ one, many }) => ({
   ticketsDemandeur: many(tickets, { relationName: "ticketDemandeur" }),
   ticketsAssigne: many(tickets, { relationName: "ticketAssigneEntreprise" }),
   // Documents relations
-  documentsProprietaire: many(documents),
+  logo: one(documents, {
+    fields: [entreprises.logoId],
+    references: [documents.id],
+    relationName: "entrepriseLogo",
+  }),
+  documentsProprietaire: many(documents, {
+    relationName: "documentsProprietaireEntreprise",
+  }),
+  // Client/prestataire relations
+  clientPrestataireAsClient: many(clientPrestataireRelationsTable, {
+    relationName: "cpRelationClient",
+  }),
+  clientPrestataireAsPrestataire: many(clientPrestataireRelationsTable, {
+    relationName: "cpRelationPrestataire",
+  }),
+  invitations: many(entrepriseInvitations),
   // Client services
   clientServices: many(clientServices),
   // Tarifs relations
@@ -268,6 +291,32 @@ export const serviceEntreprisesRelations = relations(
   }),
 );
 
+export const clientPrestataireRelationsRelations = relations(
+  clientPrestataireRelationsTable,
+  ({ one }) => ({
+    clientEntreprise: one(entreprises, {
+      fields: [clientPrestataireRelationsTable.clientEntrepriseId],
+      references: [entreprises.id],
+      relationName: "cpRelationClient",
+    }),
+    prestataireEntreprise: one(entreprises, {
+      fields: [clientPrestataireRelationsTable.prestataireEntrepriseId],
+      references: [entreprises.id],
+      relationName: "cpRelationPrestataire",
+    }),
+  }),
+);
+
+export const entrepriseInvitationsRelations = relations(
+  entrepriseInvitations,
+  ({ one }) => ({
+    entreprise: one(entreprises, {
+      fields: [entrepriseInvitations.entrepriseId],
+      references: [entreprises.id],
+    }),
+  }),
+);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SITES RELATIONS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -324,11 +373,14 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
   proprietaireEntreprise: one(entreprises, {
     fields: [documents.proprietaireEntrepriseId],
     references: [entreprises.id],
+    relationName: "documentsProprietaireEntreprise",
   }),
   links: many(documentsLinks),
   // Tables qui référencent documents.imageId
   cafeMachines: many(cafeMachines),
   fontaines: many(fontaines),
+  // Tables qui référencent documents.id comme logo/avatar
+  entreprisesLogo: many(entreprises, { relationName: "entrepriseLogo" }),
 }));
 
 export const documentsLinksRelations = relations(documentsLinks, ({ one }) => ({
@@ -352,6 +404,10 @@ export const documentsLinksRelations = relations(documentsLinks, ({ one }) => ({
   ticket: one(tickets, {
     fields: [documentsLinks.ticketId],
     references: [tickets.id],
+  }),
+  ticketMessage: one(ticketMessages, {
+    fields: [documentsLinks.ticketMessageId],
+    references: [ticketMessages.id],
   }),
   occurrence: one(clientServiceOccurrences, {
     fields: [documentsLinks.occurrenceId],
@@ -422,6 +478,7 @@ export const clientServicesRelations = relations(
       fields: [clientServices.tacheListeTemplateId],
       references: [tacheListesTemplates.id],
     }),
+    prixAppliques: many(clientServicePrixAppliques),
   }),
 );
 
@@ -454,6 +511,7 @@ export const clientServiceOccurrencesRelations = relations(
     tickets: many(tickets),
     factureLigneAllocations: many(factureLigneAllocations),
     documentsLinks: many(documentsLinks),
+    prixAppliques: many(clientServicePrixAppliques),
   }),
 );
 
@@ -479,16 +537,18 @@ export const clientServiceExecutionsRelations = relations(
       fields: [clientServiceExecutions.tacheListeTemplateId],
       references: [tacheListesTemplates.id],
     }),
+    prixAppliques: many(clientServicePrixAppliques),
   }),
 );
 
 export const clientServiceExecutionPrixRelations = relations(
   clientServiceExecutionPrix,
-  ({ one }) => ({
+  ({ one, many }) => ({
     execution: one(clientServiceExecutions, {
       fields: [clientServiceExecutionPrix.executionId],
       references: [clientServiceExecutions.id],
     }),
+    prixAppliques: many(clientServicePrixAppliques),
   }),
 );
 
@@ -502,6 +562,28 @@ export const clientServicePerimetreRelations = relations(
     site: one(sites, {
       fields: [clientServicePerimetre.siteId],
       references: [sites.id],
+    }),
+  }),
+);
+
+export const clientServicePrixAppliquesRelations = relations(
+  clientServicePrixAppliques,
+  ({ one }) => ({
+    executionPrix: one(clientServiceExecutionPrix, {
+      fields: [clientServicePrixAppliques.executionPrixId],
+      references: [clientServiceExecutionPrix.id],
+    }),
+    clientService: one(clientServices, {
+      fields: [clientServicePrixAppliques.clientServiceId],
+      references: [clientServices.id],
+    }),
+    execution: one(clientServiceExecutions, {
+      fields: [clientServicePrixAppliques.executionId],
+      references: [clientServiceExecutions.id],
+    }),
+    occurrence: one(clientServiceOccurrences, {
+      fields: [clientServicePrixAppliques.occurrenceId],
+      references: [clientServiceOccurrences.id],
     }),
   }),
 );
@@ -615,16 +697,20 @@ export const ticketsRelations = relations(tickets, ({ one, many }) => ({
   documentsLinks: many(documentsLinks),
 }));
 
-export const ticketMessagesRelations = relations(ticketMessages, ({ one }) => ({
-  ticket: one(tickets, {
-    fields: [ticketMessages.ticketId],
-    references: [tickets.id],
+export const ticketMessagesRelations = relations(
+  ticketMessages,
+  ({ one, many }) => ({
+    ticket: one(tickets, {
+      fields: [ticketMessages.ticketId],
+      references: [tickets.id],
+    }),
+    auteurUser: one(user, {
+      fields: [ticketMessages.auteurUserId],
+      references: [user.id],
+    }),
+    documentsLinks: many(documentsLinks),
   }),
-  auteurUser: one(user, {
-    fields: [ticketMessages.auteurUserId],
-    references: [user.id],
-  }),
-}));
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DEVIS RELATIONS
@@ -989,6 +1075,16 @@ export const userPrestataireAdhesionsRelations = relations(
     entreprise: one(entreprises, {
       fields: [userPrestataireAdhesions.entrepriseId],
       references: [entreprises.id],
+    }),
+  }),
+);
+
+export const userPlateformeAdhesionsRelations = relations(
+  userPlateformeAdhesions,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userPlateformeAdhesions.userId],
+      references: [user.id],
     }),
   }),
 );

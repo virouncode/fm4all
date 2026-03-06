@@ -2,6 +2,7 @@
 
 import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
 import { RhfInput } from "@/components/rhf/RhfInput";
+import { modePilotageCT } from "@/constants/codeTables";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -162,6 +163,7 @@ export function ExecutionEditDialog({
         ? format(new Date(execution.dateFinValidite), "yyyy-MM-dd")
         : "",
       priorite: String(execution.priorite),
+      modePilotage: execution.modePilotage,
       prix: activePrix.length > 0 ? activePrix.map(prixItemToForm) : [emptyPrixItem()],
     },
   });
@@ -185,6 +187,7 @@ export function ExecutionEditDialog({
         ? format(new Date(execution.dateFinValidite), "yyyy-MM-dd")
         : "",
       priorite: String(execution.priorite),
+      modePilotage: execution.modePilotage,
       prix: activePrixForReset.length > 0
         ? activePrixForReset.map(prixItemToForm)
         : [emptyPrixItem()],
@@ -237,6 +240,38 @@ export function ExecutionEditDialog({
           >
             <div className="min-h-0 flex-1 overflow-y-auto px-6">
               <div className="space-y-5 py-2 pb-4">
+                {/* Mode de pilotage */}
+                <FormField
+                  control={form.control}
+                  name="modePilotage"
+                  render={({ field: f }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Mode de pilotage{" "}
+                        <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <Select value={f.value} onValueChange={f.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionnez un mode" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {modePilotageCT.map((m) => (
+                            <SelectItem key={m.code} value={m.code}>
+                              {m.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-muted-foreground text-xs">
+                        Détermine qui pilote le workflow de cette exécution.
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {/* Dates de validité */}
                 <div className="grid grid-cols-2 gap-4">
                   <RhfDatePicker<UpdateExecutionFormType>

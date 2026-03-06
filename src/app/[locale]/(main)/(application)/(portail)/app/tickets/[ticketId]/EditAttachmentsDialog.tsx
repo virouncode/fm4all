@@ -11,8 +11,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
-import { updateTicketAttachmentsAction } from "@/server/actions/ticketsActions";
 import { getPresignedReadUrlAction } from "@/server/actions/s3Actions";
+import { updateTicketAttachmentsAction } from "@/server/actions/ticketsActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Paperclip, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -28,7 +28,7 @@ const editAttachmentsFormSchema = z.object({
       mimeType: z.string(),
       sizeBytes: z.number(),
       previewUrl: z.string().optional(),
-    })
+    }),
   ),
 });
 
@@ -151,7 +151,7 @@ export function EditAttachmentsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2">
           <Pencil className="h-4 w-4" />
           Modifier
         </Button>
@@ -225,7 +225,10 @@ export function EditAttachmentsDialog({
               >
                 Annuler
               </Button>
-              <Button type="submit" disabled={isSubmitting || !isDirty || loadingUrls}>
+              <Button
+                type="submit"
+                disabled={isSubmitting || !isDirty || loadingUrls}
+              >
                 {isSubmitting ? "Enregistrement..." : "Enregistrer"}
               </Button>
             </DialogFooter>

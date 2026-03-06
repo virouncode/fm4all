@@ -36,10 +36,9 @@ async function resolveSession(req: NextRequest) {
   }
 
   try {
-    const response = await fetch(
-      `${req.nextUrl.origin}/api/auth/get-session`,
-      { headers: { cookie: req.headers.get("cookie") || "" } },
-    );
+    const response = await fetch(`${req.nextUrl.origin}/api/auth/get-session`, {
+      headers: { cookie: req.headers.get("cookie") || "" },
+    });
 
     if (!response.ok) return null;
 
@@ -120,7 +119,7 @@ export async function middleware(req: NextRequest) {
   const sessionData = await resolveSession(req);
 
   if (!sessionData) {
-    return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url));
+    return NextResponse.redirect(new URL(`/${locale}/auth/login`, req.url));
   }
 
   // Session OK → next-intl rend la page

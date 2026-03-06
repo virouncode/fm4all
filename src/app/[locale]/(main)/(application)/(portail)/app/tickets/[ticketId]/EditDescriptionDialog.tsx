@@ -66,7 +66,7 @@ export function EditDescriptionDialog({
   return (
     <>
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         onClick={handleOpen}
         className="h-7 gap-2"

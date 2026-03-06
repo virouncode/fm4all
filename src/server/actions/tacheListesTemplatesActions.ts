@@ -7,7 +7,7 @@ import {
   tacheListeItems,
   tacheListesTemplates,
 } from "@/db/schema/services";
-import { userClientAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -15,12 +15,14 @@ import {
   getAvailableTacheListesTemplates,
   getTacheListeTemplateWithItems,
   getTacheListesTemplatesByProprietaire,
+  getTacheListesWithServiceNames,
 } from "@/server/queries/tacheListesTemplates.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import {
   deleteTacheListeItemSchema,
   deleteTacheListeTemplateSchema,
   getAvailableTacheListesTemplatesSchema,
+  getChecklistsForPageSchema,
   getTacheListeTemplateSchema,
   getTacheListesTemplatesSchema,
   insertTacheListeItemSchema,
@@ -30,12 +32,14 @@ import {
   updateTacheListeTemplateSchema,
 } from "@/zod-schemas/tacheListesTemplates.schema";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
+import { getServicesByEntrepriseId } from "@/server/queries/entreprises.query";
+import { getAllServices } from "@/server/queries/services.query";
 import { and, asc, eq, max } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 
 // ==================== HELPERS ====================
 
-/** Vérifie que l'utilisateur a accès à l'entreprise (adhésion ou rôle plateforme) */
+/** Vérifie que l'utilisateur a accès à l'entreprise (adhésion client ou prestataire, ou rôle plateforme) */
 async function hasAccessToEntreprise(
   userId: string,
   entrepriseId: string,
@@ -43,14 +47,61 @@ async function hasAccessToEntreprise(
   const platformRole = await getUserPlateformeAdhesion(userId);
   if (platformRole?.role) return true;
 
-  const adhesion = await db.query.userClientAdhesions.findFirst({
-    where: and(
-      eq(userClientAdhesions.userId, userId),
-      eq(userClientAdhesions.entrepriseId, entrepriseId),
-    ),
-  });
+  const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+    db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
+      ),
+    }),
+    db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+      ),
+    }),
+  ]);
 
-  return !!adhesion;
+  return !!(clientAdhesion ?? prestataireAdhesion);
+}
+
+/**
+ * Vérifie que l'utilisateur peut écrire des checklists pour cette entreprise.
+ * Requiert au minimum le rôle "manager" (client ou prestataire) ou rôle plateforme.
+ */
+async function canManageChecklists(
+  userId: string,
+  entrepriseId: string | null,
+): Promise<boolean> {
+  if (!entrepriseId) return false;
+
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  if (platformRole?.role) return true;
+
+  const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+    db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
+      ),
+    }),
+    db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+      ),
+    }),
+  ]);
+
+  const clientRole = clientAdhesion?.role;
+  const prestataireRole = prestataireAdhesion?.role;
+
+  return (
+    clientRole === "admin" ||
+    clientRole === "manager" ||
+    prestataireRole === "admin" ||
+    prestataireRole === "manager"
+  );
 }
 
 /** Vérifie que l'utilisateur a le rôle plateforme */
@@ -193,13 +244,13 @@ export const insertTacheListeTemplateAction = actionClient
         );
       }
     } else {
-      const hasAccess = await hasAccessToEntreprise(
+      const canManage = await canManageChecklists(
         currentUser.id,
         proprietaireEntrepriseId,
       );
-      if (!hasAccess) {
+      if (!canManage) {
         throw errors.forbidden(
-          "Vous n'avez pas accès à cette entreprise pour créer un pack.",
+          "Vous devez être au moins manager pour créer une checklist.",
         );
       }
     }
@@ -237,6 +288,13 @@ export const updateTacheListeTemplateAction = actionClient
     // Vérifier que le pack appartient à cette entreprise (ou rôle plateforme pour pack système)
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
+      const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
+      if (!hasSufficientRole) {
+        throw errors.forbidden(
+          "Vous devez être au moins manager pour modifier une checklist.",
+        );
+      }
+
       const [packRow] = await db
         .select({
           proprietaireEntrepriseId:
@@ -293,6 +351,13 @@ export const deleteTacheListeTemplateAction = actionClient
     // Vérifier propriété du pack (ou rôle plateforme)
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
+      const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
+      if (!hasSufficientRole) {
+        throw errors.forbidden(
+          "Vous devez être au moins manager pour supprimer une checklist.",
+        );
+      }
+
       const [packRow] = await db
         .select({
           proprietaireEntrepriseId:
@@ -347,6 +412,13 @@ export const insertTacheListeItemAction = actionClient
     // Vérifier que le pack appartient à cette entreprise
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
+      const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
+      if (!hasSufficientRole) {
+        throw errors.forbidden(
+          "Vous devez être au moins manager pour modifier une checklist.",
+        );
+      }
+
       const [packRow] = await db
         .select({
           proprietaireEntrepriseId:
@@ -417,6 +489,13 @@ export const updateTacheListeItemAction = actionClient
     // Vérifier propriété via le pack
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
+      const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
+      if (!hasSufficientRole) {
+        throw errors.forbidden(
+          "Vous devez être au moins manager pour modifier une checklist.",
+        );
+      }
+
       const [itemRow] = await db
         .select({
           proprietaireEntrepriseId:
@@ -481,6 +560,13 @@ export const deleteTacheListeItemAction = actionClient
     // Vérifier propriété via le pack
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
+      const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
+      if (!hasSufficientRole) {
+        throw errors.forbidden(
+          "Vous devez être au moins manager pour supprimer une tâche.",
+        );
+      }
+
       const [itemRow] = await db
         .select({
           proprietaireEntrepriseId:
@@ -554,6 +640,13 @@ export const reorderTacheListeItemsAction = actionClient
     // Vérifier propriété du pack
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
+      const hasSufficientRole = await canManageChecklists(currentUser.id, entrepriseId);
+      if (!hasSufficientRole) {
+        throw errors.forbidden(
+          "Vous devez être au moins manager pour réordonner les tâches.",
+        );
+      }
+
       const [packRow] = await db
         .select({
           proprietaireEntrepriseId:
@@ -613,7 +706,8 @@ export const reorderTacheListeItemsAction = actionClient
 
 /**
  * Retourne un pack avec ses items (actifs + inactifs) — pour preview.
- * Accessible à tout utilisateur authentifié (pas de check entreprise).
+ * Accessible si : pack système (proprietaireEntrepriseId = null)
+ *              OU utilisateur a accès à l'entreprise propriétaire.
  */
 export const getTacheListeTemplateAction = actionClient
   .metadata({ actionName: "getTacheListeTemplateAction" })
@@ -629,5 +723,108 @@ export const getTacheListeTemplateAction = actionClient
     const pack = await getTacheListeTemplateWithItems(parsedInput.id);
     if (!pack) throw errors.notFound("Pack introuvable.");
 
+    // Packs système : accessibles à tous les utilisateurs authentifiés
+    if (pack.proprietaireEntrepriseId !== null) {
+      const hasAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        pack.proprietaireEntrepriseId,
+      );
+      if (!hasAccess) {
+        throw errors.forbidden("Vous n'avez pas accès à cette checklist.");
+      }
+    }
+
     return { pack };
+  });
+
+// ==================== GET CHECKLISTS FOR PAGE ====================
+
+/**
+ * Action pour la page /app/checklists.
+ *
+ * Postures client/prestataire :
+ *   - Packs système (actifs uniquement, read-only)
+ *   - Packs de l'entreprise (tous, éditables)
+ *
+ * Posture plateforme :
+ *   - proprietaireFilter = undefined → tous les packs (système + tous clients)
+ *   - proprietaireFilter = null      → seulement les packs système
+ *   - proprietaireFilter = uuid      → seulement les packs de cette entreprise
+ */
+export const getChecklistsForPageAction = actionClient
+  .metadata({ actionName: "getChecklistsForPageAction" })
+  .inputSchema(getChecklistsForPageSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { posture, entrepriseId, serviceId, proprietaireFilter } = parsedInput;
+
+    if (posture === "plateforme") {
+      const isPlatform = await isPlatformUser(currentUser.id);
+      if (!isPlatform) {
+        throw errors.forbidden("Accès réservé aux utilisateurs plateforme.");
+      }
+
+      // proprietaireFilter: undefined → tous, null → système, uuid → entreprise spécifique
+      const packs = await getTacheListesWithServiceNames({
+        proprietaireEntrepriseId: proprietaireFilter,
+        serviceId,
+        activeOnly: false,
+      });
+
+      return { systemPacks: [], ownPacks: packs };
+    }
+
+    // Posture client ou prestataire
+    if (!entrepriseId) {
+      throw errors.forbidden("entrepriseId obligatoire.");
+    }
+
+    const hasAccess = await hasAccessToEntreprise(currentUser.id, entrepriseId);
+    if (!hasAccess) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Pour un prestataire, limiter aux services qu'il propose
+    // Pour un client, retourner tous les services (pour le filtre)
+    const [prestataireServices, allServices] = await Promise.all([
+      posture === "prestataire"
+        ? getServicesByEntrepriseId(entrepriseId).then((rows) =>
+            rows.map((s) => ({ id: s.serviceId, nom: s.nom })),
+          )
+        : Promise.resolve(undefined),
+      posture === "client"
+        ? getAllServices().then((rows) =>
+            rows.map((s) => ({ id: s.id, nom: s.nom })),
+          )
+        : Promise.resolve(undefined),
+    ]);
+    const prestataireServiceIds = prestataireServices?.map((s) => s.id);
+
+    const [systemPacks, ownPacks] = await Promise.all([
+      getTacheListesWithServiceNames({
+        proprietaireEntrepriseId: null,
+        serviceId,
+        serviceIds: prestataireServiceIds,
+        activeOnly: true,
+      }),
+      getTacheListesWithServiceNames({
+        proprietaireEntrepriseId: entrepriseId,
+        serviceId,
+        serviceIds: prestataireServiceIds,
+        activeOnly: false,
+      }),
+    ]);
+
+    return {
+      systemPacks,
+      ownPacks,
+      prestataireServices: prestataireServices ?? null,
+      clientServices: allServices ?? null,
+    };
   });
