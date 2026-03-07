@@ -217,6 +217,7 @@ export async function getTicketsByPerimetre({
       type: tickets.type,
       priorite: tickets.priorite,
       statut: tickets.statut,
+      priseEnChargeAt: tickets.priseEnChargeAt,
       lastActivityAt: tickets.lastActivityAt,
       resolvedAt: tickets.resolvedAt,
       closedAt: tickets.closedAt,

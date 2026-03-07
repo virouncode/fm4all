@@ -99,10 +99,12 @@ export async function canUserAccessTicket({
   const posture = cookieStore.get("fm4all:postureActive")?.value;
 
   if (posture === "prestataire") {
-    // Prestataire: ticket assigné à son entreprise ou à lui directement
+    // Prestataire: ticket assigné à son entreprise, à lui directement,
+    // ou dont il est le demandeur (cas où le prestataire a créé le ticket)
     return (
       ticket.assigneEntrepriseId === entrepriseId ||
-      ticket.assigneUserId === userId
+      ticket.assigneUserId === userId ||
+      ticket.demandeurEntrepriseId === entrepriseId
     );
   }
 

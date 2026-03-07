@@ -1,7 +1,10 @@
 "use server";
 
 import { db } from "@/db";
+import { clientPrestataireRelations, entreprises } from "@/db/schema/entreprises";
+import { userPrestataireAdhesions } from "@/db/schema/users";
 import { documents, documentsLinks } from "@/db/schema/documents";
+import { sites } from "@/db/schema/sites";
 import { ticketMessages, tickets } from "@/db/schema/tickets";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
@@ -20,7 +23,7 @@ import {
   updateTicketFormSchema,
   updateTicketStatutSchema,
 } from "@/zod-schemas/ticket.schema";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
@@ -46,6 +49,7 @@ import {
   canUserEditAssigneUserId,
   canUserEditStatut,
   canUserEditTicketBasicFields,
+  canUserEditTypeAndPriorite,
   canUserUpdateTicket,
   getAvailableStatutsForUser,
 } from "@/server/utils/ticketsPermissions.utils";
@@ -212,15 +216,53 @@ export const insertTicketAction = actionClient
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     const isPlatform = !!platformRole?.role;
 
-    // demandeurEntrepriseId = TOUJOURS l'entreprise courante
+    const cookieStore = await cookies();
+    const posture = cookieStore.get("fm4all:postureActive")?.value;
+
+    // demandeurEntrepriseId = TOUJOURS l'entreprise courante (qui crée)
     const demandeurEntrepriseId = parsedInput.entrepriseId;
 
     // proprietaireEntrepriseId selon posture:
     // - Client: auto = entreprise courante
     // - Plateforme: choisi dans le Select
-    const proprietaireEntrepriseId = isPlatform
-      ? parsedInput.proprietaireEntrepriseId || parsedInput.entrepriseId
-      : parsedInput.entrepriseId;
+    // - Prestataire: client propriétaire du site (récupéré depuis la table sites)
+    let proprietaireEntrepriseId: string;
+
+    if (isPlatform) {
+      proprietaireEntrepriseId =
+        parsedInput.proprietaireEntrepriseId || parsedInput.entrepriseId;
+    } else if (posture === "prestataire") {
+      // Récupérer le client propriétaire du site
+      const site = await db.query.sites.findFirst({
+        where: eq(sites.id, parsedInput.siteId),
+        columns: { entrepriseId: true },
+      });
+      if (!site) {
+        throw errors.notFound("Site introuvable.");
+      }
+      // Vérifier que la relation client-prestataire existe
+      const relation = await db.query.clientPrestataireRelations.findFirst({
+        where: and(
+          eq(
+            clientPrestataireRelations.clientEntrepriseId,
+            site.entrepriseId,
+          ),
+          eq(
+            clientPrestataireRelations.prestataireEntrepriseId,
+            parsedInput.entrepriseId,
+          ),
+        ),
+        columns: { id: true },
+      });
+      if (!relation) {
+        throw errors.forbidden(
+          "Vous n'avez pas de relation avec le client propriétaire de ce site.",
+        );
+      }
+      proprietaireEntrepriseId = site.entrepriseId;
+    } else {
+      proprietaireEntrepriseId = parsedInput.entrepriseId;
+    }
 
     // Normaliser les données avant insertion (transforme "" → null)
     const normalized = normalizeForSubmit(parsedInput, {
@@ -436,6 +478,15 @@ export const changeTicketStatusAction = actionClient
       updatedById: currentUser.id,
     };
 
+    // priseEnChargeAt : setté une seule fois lors du passage à pris_en_charge
+    if (
+      parsedInput.newStatut === "pris_en_charge" &&
+      ticket.statut === "nouveau" &&
+      !ticket.priseEnChargeAt
+    ) {
+      updates.priseEnChargeAt = now;
+    }
+
     if (parsedInput.newStatut === "a_valider") {
       updates.resolvedAt = now;
     }
@@ -445,6 +496,13 @@ export const changeTicketStatusAction = actionClient
       if (!ticket.resolvedAt) {
         updates.resolvedAt = now;
       }
+    }
+
+    if (
+      parsedInput.newStatut === "annule" ||
+      parsedInput.newStatut === "rejete"
+    ) {
+      updates.closedAt = now;
     }
 
     // UPDATE
@@ -625,17 +683,37 @@ export const updateTicketBasicFieldsAction = actionClient
       }
     }
 
-    // Vérifier permission
-    const canEdit = await canUserEditTicketBasicFields({
-      userId: currentUser.id,
-      ticketId: parsedInput.ticketId,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    // Vérifier permission sur titre/description (niveau ≥ 2 — demandeur_site)
+    const hasBasicFields =
+      parsedInput.titre !== undefined || parsedInput.description !== undefined;
+    const hasTypeOrPriorite =
+      parsedInput.type !== undefined || parsedInput.priorite !== undefined;
 
-    if (!canEdit) {
-      throw errors.forbidden(
-        "Vous n'avez pas la permission de modifier ces champs. Seuls les clients avec rôle demandeur_site ou supérieur peuvent modifier le titre, description, type et priorité.",
-      );
+    if (hasBasicFields) {
+      const canEdit = await canUserEditTicketBasicFields({
+        userId: currentUser.id,
+        ticketId: parsedInput.ticketId,
+        entrepriseId: parsedInput.entrepriseId,
+      });
+      if (!canEdit) {
+        throw errors.forbidden(
+          "Vous n'avez pas la permission de modifier le titre ou la description. Rôle requis : demandeur_site ou supérieur.",
+        );
+      }
+    }
+
+    // Vérifier permission sur type/priorité (niveau ≥ 3 — responsable_site uniquement)
+    if (hasTypeOrPriorite) {
+      const canEditTypeOrPriorite = await canUserEditTypeAndPriorite({
+        userId: currentUser.id,
+        ticketId: parsedInput.ticketId,
+        entrepriseId: parsedInput.entrepriseId,
+      });
+      if (!canEditTypeOrPriorite) {
+        throw errors.forbidden(
+          "Vous n'avez pas la permission de modifier le type ou la priorité. Rôle requis : responsable_site.",
+        );
+      }
     }
 
     // Préparer les updates
@@ -854,7 +932,7 @@ export const updateTicketStatutAction = actionClient
       );
     }
 
-    // Vérifier que le statut demandé est autorisé pour cet utilisateur
+    // Vérifier que le statut demandé est dans le superset autorisé
     const availableStatuts = await getAvailableStatutsForUser({
       userId: currentUser.id,
       ticketId: parsedInput.ticketId,
@@ -867,6 +945,27 @@ export const updateTicketStatutAction = actionClient
       );
     }
 
+    // Récupérer ticket pour vérifier le statut courant et les timestamps
+    const ticket = await getTicketById(parsedInput.ticketId);
+    if (!ticket) {
+      throw errors.notFound("Ticket");
+    }
+
+    // Vérifier la transition via la machine d'état
+    const isAllowed = await isStatusTransitionAllowed({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+      currentStatut: ticket.statut,
+      newStatut: parsedInput.statut,
+    });
+
+    if (!isAllowed) {
+      throw errors.forbidden(
+        `Transition ${ticket.statut} → ${parsedInput.statut} non autorisée pour votre rôle.`,
+      );
+    }
+
     // Calculer timestamps
     const now = new Date();
     const updates: Record<string, unknown> = {
@@ -875,10 +974,13 @@ export const updateTicketStatutAction = actionClient
       updatedById: currentUser.id,
     };
 
-    // Récupérer ticket pour vérifier resolvedAt
-    const ticket = await getTicketById(parsedInput.ticketId);
-    if (!ticket) {
-      throw errors.notFound("Ticket");
+    // priseEnChargeAt : setté une seule fois lors du passage à pris_en_charge
+    if (
+      parsedInput.statut === "pris_en_charge" &&
+      ticket.statut === "nouveau" &&
+      !ticket.priseEnChargeAt
+    ) {
+      updates.priseEnChargeAt = now;
     }
 
     if (parsedInput.statut === "a_valider" && !ticket.resolvedAt) {
@@ -1085,22 +1187,44 @@ export const insertTicketMessageAction = actionClient
       throw errors.notFound("Ticket");
     }
 
-    // Vérifier que l'utilisateur est lié à ce ticket (client, prestataire assigné ou plateforme)
+    // Vérifier que l'utilisateur est lié à ce ticket (client, prestataire ou plateforme)
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     const isPlatform = !!platformRole?.role;
+
+    // Client : propriétaire ou demandeur (prestataire peut être demandeur)
     const isClient =
       !isPlatform &&
-      ticket.proprietaireEntrepriseId === parsedInput.entrepriseId;
+      (ticket.proprietaireEntrepriseId === parsedInput.entrepriseId ||
+        (ticket.demandeurEntrepriseId === parsedInput.entrepriseId &&
+          ticket.assigneEntrepriseId !== parsedInput.entrepriseId));
+
+    // Prestataire : assigné ou demandeur (quand prestataire a créé le ticket)
     const isPrestataire =
-      !isPlatform && ticket.assigneEntrepriseId === parsedInput.entrepriseId;
+      !isPlatform &&
+      !isClient &&
+      (ticket.assigneEntrepriseId === parsedInput.entrepriseId ||
+        ticket.demandeurEntrepriseId === parsedInput.entrepriseId);
 
     if (!isPlatform && !isClient && !isPrestataire) {
       throw errors.forbidden("Vous n'avez pas accès à ce ticket.");
     }
 
-    // Vérifier permissions de visibilité selon posture
+    // Vérifier rôle ≥ demandeur_site pour poster un message (niveau ≥ 2)
+    // Les observateurs et intervenants ne peuvent pas commenter
+    if (!isPlatform) {
+      const canPost = await canUserEditTicketBasicFields({
+        userId: currentUser.id,
+        ticketId: parsedInput.ticketId,
+        entrepriseId: parsedInput.entrepriseId,
+      });
+      if (!canPost) {
+        throw errors.forbidden(
+          "Vous n'avez pas la permission de poster un message. Rôle requis : demandeur_site ou supérieur.",
+        );
+      }
+    }
 
-    // Plateforme peut tout poster
+    // Vérifier permissions de visibilité selon posture
     if (!isPlatform) {
       // Client peut poster "public" ou "client_only"
       if (
@@ -1191,4 +1315,53 @@ export const insertTicketMessageAction = actionClient
     const parsedMessage = selectTicketMessageSchema.parse(insertedMessage);
 
     return { message: parsedMessage };
+  });
+
+// ═══════════════════════════════════════════════════════════════
+// GET PRESTATAIRE CLIENTS (pour création ticket, sans restriction de rôle)
+// ═══════════════════════════════════════════════════════════════
+
+export const getPrestataireMesClientsForTicketAction = actionClient
+  .metadata({ actionName: "getPrestataireMesClientsForTicketAction" })
+  .inputSchema(z.object({ prestataireEntrepriseId: z.uuid() }), {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    // Vérifier adhésion prestataire active (tout rôle)
+    const adhesion = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, currentUser.id),
+        eq(userPrestataireAdhesions.entrepriseId, parsedInput.prestataireEntrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Récupérer les IDs clients via clientPrestataireRelations
+    const clientIds = await db
+      .select({ id: clientPrestataireRelations.clientEntrepriseId })
+      .from(clientPrestataireRelations)
+      .where(
+        eq(
+          clientPrestataireRelations.prestataireEntrepriseId,
+          parsedInput.prestataireEntrepriseId,
+        ),
+      );
+
+    if (!clientIds.length) return { clients: [] };
+
+    const clients = await db
+      .select({ id: entreprises.id, nom: entreprises.nom })
+      .from(entreprises)
+      .where(inArray(entreprises.id, clientIds.map((c) => c.id)));
+
+    return { clients };
   });

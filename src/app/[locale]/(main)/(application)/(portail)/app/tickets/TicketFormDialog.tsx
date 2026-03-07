@@ -15,8 +15,8 @@ import {
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { getEntreprisesClientesAction, getEntreprisesPrestatairesAction } from "@/server/actions/entreprisesActions";
-import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
-import { insertTicketAction } from "@/server/actions/ticketsActions";
+import { getAccessibleSitesAction, getPrestataireSitesForClientAction } from "@/server/actions/sitesActions";
+import { getPrestataireMesClientsForTicketAction, insertTicketAction } from "@/server/actions/ticketsActions";
 import { getClientPrestatairesAction } from "@/server/actions/clientServiceExecutionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -47,8 +47,10 @@ export function TicketFormDialog({
   const [clients, setClients] = useState<Array<{ id: string; nom: string }>>(
     [],
   );
+  // Pour posture prestataire : selectedClientId = l'id du CLIENT choisi (pas du prestataire)
+  // Pour posture plateforme/client : selectedClientId = l'id de l'entreprise cliente
   const [selectedClientId, setSelectedClientId] = useState<string>(
-    entreprise?.id || "",
+    posture === "prestataire" || posture === "plateforme" ? "" : (entreprise?.id || ""),
   );
   const [loadingSites, setLoadingSites] = useState(false);
   const [prestataires, setPrestataires] = useState<Array<{ id: string; nom: string }>>([]);
@@ -63,7 +65,10 @@ export function TicketFormDialog({
       type: "demande",
       priorite: "normale",
       siteId: "",
-      proprietaireEntrepriseId: posture === "plateforme" ? "" : (entreprise?.id || ""),
+      proprietaireEntrepriseId:
+        posture === "plateforme" || posture === "prestataire"
+          ? ""
+          : (entreprise?.id || ""),
       assigneEntrepriseId: "",
       attachments: [],
     },
@@ -82,15 +87,24 @@ export function TicketFormDialog({
     (att) => !att || !att.storageKey,
   );
 
-  // Charger clients si posture plateforme
+  // Charger clients si posture plateforme ou prestataire
   useEffect(() => {
-    if (posture !== "plateforme" || !open) return;
+    if ((posture !== "plateforme" && posture !== "prestataire") || !open) return;
 
     async function loadClients() {
       try {
-        const result = await getEntreprisesClientesAction();
-        if (result?.data?.clients) {
-          setClients(result.data.clients);
+        if (posture === "plateforme") {
+          const result = await getEntreprisesClientesAction();
+          if (result?.data?.clients) {
+            setClients(result.data.clients);
+          }
+        } else if (posture === "prestataire" && entreprise?.id) {
+          const result = await getPrestataireMesClientsForTicketAction({
+            prestataireEntrepriseId: entreprise.id,
+          });
+          if (result?.data?.clients) {
+            setClients(result.data.clients);
+          }
         }
       } catch {
         toast.error("Erreur lors du chargement des clients");
@@ -98,7 +112,7 @@ export function TicketFormDialog({
     }
 
     loadClients();
-  }, [posture, open]);
+  }, [posture, open, entreprise?.id]);
 
   // Charger sites quand le client change OU au montage
   useEffect(() => {
@@ -107,16 +121,23 @@ export function TicketFormDialog({
     async function loadSites() {
       setLoadingSites(true);
       try {
-        // getAccessibleSitesAction gère la posture en interne:
-        // - Plateforme: retourne TOUS les sites du client
-        // - Client: retourne seulement les sites accessibles selon attributions
-        const result = await getAccessibleSitesAction({
-          entrepriseId: selectedClientId,
-        });
-
-        if (result?.data) {
-          const sitesData = Array.isArray(result.data) ? result.data : [];
-          setSites(sitesData.map((s) => ({ id: s.id, nom: s.nom })));
+        if (posture === "prestataire") {
+          // Prestataire : sites du client où le prestataire a des attributions
+          const result = await getPrestataireSitesForClientAction({
+            clientEntrepriseId: selectedClientId,
+          });
+          if (result?.data?.sites) {
+            setSites(result.data.sites);
+          }
+        } else {
+          // Plateforme / Client : getAccessibleSitesAction gère la posture en interne
+          const result = await getAccessibleSitesAction({
+            entrepriseId: selectedClientId,
+          });
+          if (result?.data) {
+            const sitesData = Array.isArray(result.data) ? result.data : [];
+            setSites(sitesData.map((s) => ({ id: s.id, nom: s.nom })));
+          }
         }
       } catch {
         toast.error("Erreur lors du chargement des sites");
@@ -125,11 +146,11 @@ export function TicketFormDialog({
     }
 
     loadSites();
-  }, [selectedClientId, open]);
+  }, [selectedClientId, open, posture]);
 
-  // Charger prestataires selon posture
+  // Charger prestataires selon posture (seulement pour plateforme et client)
   useEffect(() => {
-    if (!selectedClientId || !open) return;
+    if (!selectedClientId || !open || posture === "prestataire") return;
 
     async function loadPrestataires() {
       setLoadingPrestataires(true);
@@ -162,7 +183,10 @@ export function TicketFormDialog({
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      const defaultProprietaireId = posture === "plateforme" ? "" : (entreprise?.id || "");
+      const defaultProprietaireId =
+        posture === "plateforme" || posture === "prestataire"
+          ? ""
+          : (entreprise?.id || "");
       form.reset({
         titre: "",
         description: "",
@@ -173,7 +197,12 @@ export function TicketFormDialog({
         assigneEntrepriseId: "",
         attachments: [],
       });
-      setSelectedClientId(posture === "plateforme" ? "" : (entreprise?.id || ""));
+      setSites([]);
+      setSelectedClientId(
+        posture === "plateforme" || posture === "prestataire"
+          ? ""
+          : (entreprise?.id || ""),
+      );
     }
   }, [open, form, entreprise?.id, posture]);
 
@@ -203,8 +232,12 @@ export function TicketFormDialog({
 
     if (posture === "plateforme") {
       proprietaireId = data.proprietaireEntrepriseId || entreprise.id;
+    } else if (posture === "prestataire") {
+      // Prestataire : le propriétaire est le CLIENT sélectionné
+      // (le serveur re-vérifie via site.entrepriseId)
+      proprietaireId = selectedClientId;
     } else {
-      // Posture client : proprietaire = demandeur = current entreprise
+      // Posture client : proprietaire = entreprise courante
       proprietaireId = entreprise.id;
     }
 
@@ -251,8 +284,8 @@ export function TicketFormDialog({
           >
             {/* Contenu scrollable */}
             <div className="flex-1 space-y-4 overflow-y-auto p-6">
-              {/* Si posture plateforme : Select Client */}
-              {posture === "plateforme" && (
+              {/* Si posture plateforme ou prestataire : Select Client */}
+              {(posture === "plateforme" || posture === "prestataire") && (
                 <RhfControlledSelect<InsertTicketFormType>
                   name="proprietaireEntrepriseId"
                   label="Client"

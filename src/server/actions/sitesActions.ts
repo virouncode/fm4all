@@ -14,6 +14,7 @@ import {
   getSitesByEntrepriseId,
   siteBelongsToEntreprise,
 } from "@/server/queries/sites.query";
+import { getUserPrestataireSiteAttributions } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import {
   deleteSiteArborescence,
@@ -918,4 +919,65 @@ export const getSiteResponsablesAction = actionClient
 
     const responsables = await getSiteResponsables(siteId);
     return { responsables };
+  });
+
+// ==================== GET PRESTATAIRE SITES FOR CLIENT (création ticket) ====================
+
+export const getPrestataireSitesForClientAction = actionClient
+  .metadata({ actionName: "getPrestataireSitesForClientAction" })
+  .inputSchema(z.object({ clientEntrepriseId: z.uuid("Client obligatoire") }), {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier adhésion prestataire active
+    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, currentUser.id),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    });
+
+    if (!prestataireAdhesion) {
+      throw errors.forbidden("Vous n'avez pas d'accès prestataire.");
+    }
+
+    // Vérifier relation client-prestataire
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: and(
+        eq(clientPrestataireRelations.clientEntrepriseId, parsedInput.clientEntrepriseId),
+        eq(
+          clientPrestataireRelations.prestataireEntrepriseId,
+          prestataireAdhesion.entrepriseId,
+        ),
+      ),
+    });
+
+    if (!relation) {
+      throw errors.forbidden("Vous n'avez pas de relation avec ce client.");
+    }
+
+    // Récupérer les sites accessibles via attributions prestataire
+    const { attributions } = await getUserPrestataireSiteAttributions({
+      userId: currentUser.id,
+      clientEntrepriseId: parsedInput.clientEntrepriseId,
+    });
+
+    const sitesAccessibles = attributions
+      .filter((a) => a.mode === "inclure")
+      .map((a) => ({ id: a.siteId, nom: a.site.nom }));
+
+    // Dédupliquer
+    const unique = [
+      ...new Map(sitesAccessibles.map((s) => [s.id, s])).values(),
+    ];
+
+    return { sites: unique };
   });

@@ -1,8 +1,13 @@
 import "server-only";
 
 import { db } from "@/db";
+import { clientPrestataireRelations } from "@/db/schema/entreprises";
+import { sites } from "@/db/schema/sites";
+import { getUserPrestataireSiteRole } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
+import { and, eq } from "drizzle-orm";
+import { cookies } from "next/headers";
 
 type DbOrTransaction =
   | typeof db
@@ -20,17 +25,15 @@ const ROLE_HIERARCHY = {
  * Vérifie si un utilisateur peut créer un ticket sur un site
  *
  * Règle métier:
- * - Plateforme (operateur/super_admin): ✅ OUI
- * - responsable_site: ✅ OUI (niveau 3)
- * - demandeur_site: ✅ OUI (niveau 2, client uniquement)
- * - observateur_site: ❌ NON (niveau 1)
- * - intervenant_site: ❌ NON (niveau 0)
+ * - Plateforme: ✅ OUI
+ * - Client (responsable_site, demandeur_site ≥ 2): ✅ OUI
+ * - Prestataire: ✅ OUI si relation client-prestataire + rôle site ≥ demandeur_site
+ * - observateur_site / intervenant_site: ❌ NON
  *
  * @param userId - ID de l'utilisateur
  * @param siteId - ID du site
- * @param entrepriseId - ID de l'entreprise (client propriétaire du site)
+ * @param entrepriseId - ID de l'entreprise courante (client ou prestataire selon posture)
  * @param tx - Transaction optionnelle
- * @returns true si l'utilisateur peut créer un ticket
  */
 export async function canUserCreateTicket({
   userId,
@@ -43,14 +46,52 @@ export async function canUserCreateTicket({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme (posture-aware)
+  // Plateforme → accès total
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) {
-    return true;
+  if (platformRole?.role) return true;
+
+  const cookieStore = await cookies();
+  const posture = cookieStore.get("fm4all:postureActive")?.value;
+
+  // Branche prestataire
+  if (posture === "prestataire") {
+    const dbClient = tx || db;
+
+    // Récupérer le site pour avoir le client propriétaire
+    const site = await dbClient.query.sites.findFirst({
+      where: eq(sites.id, siteId),
+      columns: { entrepriseId: true },
+    });
+    if (!site) return false;
+
+    const clientEntrepriseId = site.entrepriseId;
+
+    // Vérifier relation client-prestataire
+    const relation = await dbClient.query.clientPrestataireRelations.findFirst({
+      where: and(
+        eq(clientPrestataireRelations.clientEntrepriseId, clientEntrepriseId),
+        eq(
+          clientPrestataireRelations.prestataireEntrepriseId,
+          entrepriseId, // entrepriseId = prestataire ici
+        ),
+      ),
+      columns: { id: true },
+    });
+    if (!relation) return false;
+
+    // Vérifier rôle prestataire sur le site ≥ demandeur_site
+    const siteRole = await getUserPrestataireSiteRole({
+      userId,
+      siteId,
+      clientEntrepriseId,
+    });
+    if (!siteRole) return false;
+
+    const userLevel = ROLE_HIERARCHY[siteRole as keyof typeof ROLE_HIERARCHY];
+    return userLevel >= 2;
   }
 
-  // Récupérer rôle effectif sur le site (posture-aware)
-  // entrepriseId = entreprise cliente propriétaire du site
+  // Branche client (défaut)
   const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId,
@@ -59,28 +100,17 @@ export async function canUserCreateTicket({
 
   if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return false;
 
-  // Peut créer si rôle ≥ demandeur_site (niveau 2)
   const userLevel =
     ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
   return userLevel >= 2;
 }
 
 /**
- * Vérifie si un utilisateur peut mettre à jour un ticket
+ * Vérifie si un utilisateur peut mettre à jour un ticket (champs de base)
  *
- * Règle métier:
- * - Plateforme: ✅ OUI (tout)
- * - Champs généraux (titre, description, type, priorite):
- *   - demandeur_site ou + (niveau ≥ 2)
- * - Assignation (assigneEntrepriseId, assigneUserId):
- *   - responsable_site ou plateforme (niveau ≥ 3)
- *
- * @param userId - ID de l'utilisateur
- * @param ticketId - ID du ticket
- * @param entrepriseId - ID de l'entreprise courante
- * @param updateData - Données à mettre à jour
- * @param tx - Transaction optionnelle
- * @returns true si l'utilisateur peut mettre à jour
+ * - Plateforme: ✅ (tout)
+ * - Champs assignation: responsable_site (niveau ≥ 3)
+ * - Autres champs: demandeur_site ou + (niveau ≥ 2)
  */
 export async function canUserUpdateTicket({
   userId,
@@ -92,22 +122,16 @@ export async function canUserUpdateTicket({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  updateData: any;
+  updateData: Record<string, unknown>;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme (posture-aware)
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) {
-    return true; // Plateforme peut tout modifier
-  }
+  if (platformRole?.role) return true;
 
-  // Récupérer le ticket
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Récupérer rôle effectif sur le site du ticket (posture-aware)
-  // Toujours utiliser ticket.proprietaireEntrepriseId pour la lookup de site
   const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
@@ -119,79 +143,20 @@ export async function canUserUpdateTicket({
   const userLevel =
     ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
 
-  // Vérifier selon les champs modifiés
   const hasAssignFields =
     "assigneEntrepriseId" in updateData || "assigneUserId" in updateData;
 
-  if (hasAssignFields) {
-    // Assignation requiert responsable_site (niveau 3) ou plateforme
-    return userLevel >= 3;
-  }
-
-  // Champs généraux: demandeur_site ou + (niveau 2)
+  if (hasAssignFields) return userLevel >= 3;
   return userLevel >= 2;
 }
 
 /**
- * Vérifie si un utilisateur peut assigner un ticket
+ * Vérifie si l'utilisateur peut éditer le titre et la description du ticket
+ * (niveau ≥ 2 — demandeur_site ou supérieur, des deux côtés)
  *
- * Règle métier:
- * - Plateforme (operateur/super_admin): ✅ OUI
- * - responsable_site: ✅ OUI
- * - Autres: ❌ NON
- *
- * @param userId - ID de l'utilisateur
- * @param ticketId - ID du ticket
- * @param entrepriseId - ID de l'entreprise courante
- * @param tx - Transaction optionnelle
- * @returns true si l'utilisateur peut assigner
- */
-export async function canUserAssignTicket({
-  userId,
-  ticketId,
-  entrepriseId,
-  tx,
-}: {
-  userId: string;
-  ticketId: string;
-  entrepriseId: string;
-  tx?: DbOrTransaction;
-}): Promise<boolean> {
-  // Vérifier si plateforme (posture-aware)
-  const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) {
-    return true;
-  }
-
-  // Récupérer le ticket
-  const { getTicketById } = await import("@/server/queries/tickets.query");
-  const ticket = await getTicketById(ticketId);
-  if (!ticket) return false;
-
-  // Récupérer rôle effectif sur le site du ticket (posture-aware)
-  const effectiveRoleStr = await resolvePostureAwareSiteRole({
-    userId,
-    siteId: ticket.siteId,
-    entrepriseId: ticket.proprietaireEntrepriseId,
-  });
-
-  // Peut assigner si responsable_site
-  return effectiveRoleStr === "responsable_site";
-}
-
-/**
- * NOUVELLES PERMISSIONS - Ticket Details Page
- * Basées sur la matrice de permissions 2026-02-24
- */
-
-/**
- * Vérifie si l'utilisateur peut éditer les champs de base du ticket
- * (titre, description, type, priorite)
- *
- * Règles:
- * - Plateforme: ✅ OUI
- * - Client (demandeur_site ou responsable_site): ✅ OUI
- * - Prestataire: ❌ NON
+ * - Plateforme: ✅
+ * - responsable_site / demandeur_site (client ou prestataire): ✅
+ * - observateur_site / intervenant_site: ❌
  */
 export async function canUserEditTicketBasicFields({
   userId,
@@ -204,27 +169,20 @@ export async function canUserEditTicketBasicFields({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme (posture-aware)
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) {
-    return true;
-  }
+  if (platformRole?.role) return true;
 
-  // Récupérer le ticket
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Vérifier que c'est un client (pas un prestataire)
-  // Si l'entreprise courante est le proprietaire ou demandeur = client
-  if (
-    ticket.proprietaireEntrepriseId !== entrepriseId &&
-    ticket.demandeurEntrepriseId !== entrepriseId
-  ) {
-    return false; // Pas un client de ce ticket (prestataire → NON)
-  }
+  const isInvolved =
+    ticket.proprietaireEntrepriseId === entrepriseId ||
+    ticket.demandeurEntrepriseId === entrepriseId ||
+    ticket.assigneEntrepriseId === entrepriseId;
 
-  // Récupérer rôle effectif sur le site (posture-aware)
+  if (!isInvolved) return false;
+
   const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
@@ -235,16 +193,61 @@ export async function canUserEditTicketBasicFields({
 
   const userLevel =
     ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
-  return userLevel >= 2; // demandeur_site (2) ou responsable_site (3)
+  return userLevel >= 2;
+}
+
+/**
+ * Vérifie si l'utilisateur peut éditer le type et la priorité du ticket
+ * (niveau ≥ 3 — responsable_site uniquement)
+ *
+ * - Plateforme: ✅
+ * - responsable_site: ✅
+ * - demandeur_site et inférieurs: ❌
+ */
+export async function canUserEditTypeAndPriorite({
+  userId,
+  ticketId,
+  entrepriseId,
+  tx,
+}: {
+  userId: string;
+  ticketId: string;
+  entrepriseId: string;
+  tx?: DbOrTransaction;
+}): Promise<boolean> {
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) return true;
+
+  const { getTicketById } = await import("@/server/queries/tickets.query");
+  const ticket = await getTicketById(ticketId);
+  if (!ticket) return false;
+
+  const isInvolved =
+    ticket.proprietaireEntrepriseId === entrepriseId ||
+    ticket.demandeurEntrepriseId === entrepriseId ||
+    ticket.assigneEntrepriseId === entrepriseId;
+
+  if (!isInvolved) return false;
+
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
+    userId,
+    siteId: ticket.siteId,
+    entrepriseId: ticket.proprietaireEntrepriseId,
+  });
+
+  if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return false;
+
+  const userLevel =
+    ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
+  return userLevel >= 3;
 }
 
 /**
  * Vérifie si l'utilisateur peut modifier assigneEntrepriseId
  *
- * Règles:
- * - Plateforme: ✅ OUI (tous les prestataires)
- * - Client (demandeur_site ou responsable_site): ✅ OUI (leurs prestataires uniquement)
- * - Prestataire: ❌ NON
+ * - Plateforme: ✅ (tous les prestataires)
+ * - Client responsable_site (niveau ≥ 3): ✅ (leurs prestataires uniquement)
+ * - Prestataire: ❌
  */
 export async function canUserEditAssigneEntrepriseId({
   userId,
@@ -257,18 +260,14 @@ export async function canUserEditAssigneEntrepriseId({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme (posture-aware)
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) {
-    return true;
-  }
+  if (platformRole?.role) return true;
 
-  // Récupérer le ticket
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Vérifier que c'est un client
+  // Seul le côté client peut changer le prestataire assigné
   if (
     ticket.proprietaireEntrepriseId !== entrepriseId &&
     ticket.demandeurEntrepriseId !== entrepriseId
@@ -276,7 +275,6 @@ export async function canUserEditAssigneEntrepriseId({
     return false;
   }
 
-  // Récupérer rôle effectif sur le site (posture-aware)
   const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
@@ -287,16 +285,14 @@ export async function canUserEditAssigneEntrepriseId({
 
   const userLevel =
     ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
-  return userLevel >= 2; // demandeur_site ou responsable_site
+  return userLevel >= 3;
 }
 
 /**
  * Vérifie si l'utilisateur peut modifier assigneUserId
  *
- * Règles:
- * - Plateforme (super_admin_plateforme, operateur_plateforme): ✅ OUI
- * - Client (proprietaire ou demandeur) avec role >= demandeur_site: ✅ OUI
- * - Prestataire / autres: ❌ NON
+ * - Plateforme: ✅
+ * - responsable_site (client ou prestataire assigné): ✅
  */
 export async function canUserEditAssigneUserId({
   userId,
@@ -309,26 +305,20 @@ export async function canUserEditAssigneUserId({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme (posture-aware)
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) {
-    return true;
-  }
+  if (platformRole?.role) return true;
 
-  // Récupérer le ticket
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Vérifier que l'entreprise courante est bien le propriétaire ou le demandeur (côté client)
-  if (
-    ticket.proprietaireEntrepriseId !== entrepriseId &&
-    ticket.demandeurEntrepriseId !== entrepriseId
-  ) {
-    return false;
-  }
+  const isInvolved =
+    ticket.proprietaireEntrepriseId === entrepriseId ||
+    ticket.demandeurEntrepriseId === entrepriseId ||
+    ticket.assigneEntrepriseId === entrepriseId;
 
-  // Récupérer le rôle effectif sur le site du ticket (posture-aware)
+  if (!isInvolved) return false;
+
   const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
@@ -339,17 +329,15 @@ export async function canUserEditAssigneUserId({
 
   const userLevel =
     ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
-  // Requiert au minimum demandeur_site (niveau 2) ou responsable_site (niveau 3)
-  return userLevel >= 2;
+  return userLevel >= 3;
 }
 
 /**
  * Vérifie si l'utilisateur peut modifier le statut du ticket
  *
- * Règles:
- * - Plateforme: ✅ OUI (tous les statuts)
- * - Client: ✅ OUI (tous les statuts, pour autonomie)
- * - Prestataire: ✅ OUI (sous-ensemble: pris_en_charge, en_attente_client, a_valider, rejete)
+ * - Plateforme: ✅
+ * - responsable_site (niveau ≥ 3) des deux côtés: ✅
+ * - demandeur_site et inférieurs: ❌
  */
 export async function canUserEditStatut({
   userId,
@@ -362,53 +350,38 @@ export async function canUserEditStatut({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme (posture-aware)
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) {
-    return true;
-  }
+  if (platformRole?.role) return true;
 
-  // Récupérer le ticket
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Client (proprietaire ou demandeur)
-  if (
+  const isInvolved =
     ticket.proprietaireEntrepriseId === entrepriseId ||
-    ticket.demandeurEntrepriseId === entrepriseId
-  ) {
-    // Vérifier rôle sur le site (posture-aware)
-    const effectiveRoleStr = await resolvePostureAwareSiteRole({
-      userId,
-      siteId: ticket.siteId,
-      entrepriseId: ticket.proprietaireEntrepriseId,
-    });
+    ticket.demandeurEntrepriseId === entrepriseId ||
+    ticket.assigneEntrepriseId === entrepriseId;
 
-    if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY))
-      return false;
+  if (!isInvolved) return false;
 
-    const userLevel =
-      ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
-    return userLevel >= 2; // Client peut si demandeur_site ou +
-  }
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
+    userId,
+    siteId: ticket.siteId,
+    entrepriseId: ticket.proprietaireEntrepriseId,
+  });
 
-  // Prestataire (assigné à ce ticket)
-  if (ticket.assigneEntrepriseId === entrepriseId) {
-    // Le prestataire assigné peut modifier le statut (sous-ensemble dans getAvailableStatutsForUser)
-    return true;
-  }
+  if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return false;
 
-  return false;
+  const userLevel =
+    ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
+  return userLevel >= 3;
 }
 
 /**
- * Retourne les statuts disponibles pour un utilisateur sur un ticket
+ * Retourne les statuts disponibles pour un utilisateur sur un ticket.
  *
- * @param userId - ID de l'utilisateur
- * @param ticketId - ID du ticket
- * @param entrepriseId - ID de l'entreprise courante
- * @returns Array des statuts possibles
+ * Retourne le superset des statuts accessibles (niveau permission).
+ * La machine d'état dans isStatusTransitionAllowed valide la transition exacte.
  */
 export async function getAvailableStatutsForUser({
   userId,
@@ -421,10 +394,8 @@ export async function getAvailableStatutsForUser({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<string[]> {
-  // Vérifier si plateforme (posture-aware)
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) {
-    // Plateforme: tous les statuts
     return [
       "nouveau",
       "pris_en_charge",
@@ -437,46 +408,63 @@ export async function getAvailableStatutsForUser({
     ];
   }
 
-  // Récupérer le ticket
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
   if (!ticket) return [];
 
-  // Client
-  if (
+  const isInvolved =
     ticket.proprietaireEntrepriseId === entrepriseId ||
-    ticket.demandeurEntrepriseId === entrepriseId
-  ) {
-    const effectiveRoleStr = await resolvePostureAwareSiteRole({
-      userId,
-      siteId: ticket.siteId,
-      entrepriseId: ticket.proprietaireEntrepriseId,
-    });
+    ticket.demandeurEntrepriseId === entrepriseId ||
+    ticket.assigneEntrepriseId === entrepriseId;
 
-    if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return [];
+  if (!isInvolved) return [];
 
-    const userLevel =
-      ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
-    if (userLevel >= 2) {
-      // Client: tous les statuts (pour autonomie)
-      return [
-        "nouveau",
-        "pris_en_charge",
-        "en_attente_prestataire",
-        "en_attente_client",
-        "a_valider",
-        "clos",
-        "annule",
-        "rejete",
-      ];
-    }
-  }
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
+    userId,
+    siteId: ticket.siteId,
+    entrepriseId: ticket.proprietaireEntrepriseId,
+  });
 
-  // Prestataire (assigné)
-  if (ticket.assigneEntrepriseId === entrepriseId) {
-    // Prestataire: sous-ensemble
-    return ["pris_en_charge", "en_attente_client", "a_valider", "rejete"];
+  if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return [];
+
+  const userLevel =
+    ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
+
+  if (userLevel >= 3) {
+    return [
+      "nouveau",
+      "pris_en_charge",
+      "en_attente_prestataire",
+      "en_attente_client",
+      "a_valider",
+      "clos",
+      "annule",
+      "rejete",
+    ];
   }
 
   return [];
+}
+
+/**
+ * Vérifie si l'utilisateur peut assigner un ticket
+ * Alias de canUserEditAssigneEntrepriseId
+ */
+export async function canUserAssignTicket({
+  userId,
+  ticketId,
+  entrepriseId,
+  tx,
+}: {
+  userId: string;
+  ticketId: string;
+  entrepriseId: string;
+  tx?: DbOrTransaction;
+}): Promise<boolean> {
+  return canUserEditAssigneEntrepriseId({
+    userId,
+    ticketId,
+    entrepriseId,
+    tx,
+  });
 }

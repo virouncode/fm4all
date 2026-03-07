@@ -95,6 +95,7 @@ type TicketDetailsClientProps = {
   posture: "client" | "prestataire" | "plateforme";
   permissions: {
     canEditBasicFields: boolean;
+    canEditTypeAndPriorite: boolean;
     canEditAssigneEntreprise: boolean;
     canEditAssigneUser: boolean;
     canEditStatut: boolean;
@@ -287,8 +288,8 @@ export function TicketDetailsClient({
 
         {/* Badges Type, Priorité, Statut */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Badge Type - Éditable si permissions */}
-          {permissions.canEditBasicFields ? (
+          {/* Badge Type - Éditable si responsable_site */}
+          {permissions.canEditTypeAndPriorite ? (
             <EditableTypeBadge
               ticketId={ticket.id}
               entrepriseId={entrepriseId}
@@ -302,8 +303,8 @@ export function TicketDetailsClient({
             </Badge>
           )}
 
-          {/* Badge Priorité - Éditable si permissions */}
-          {permissions.canEditBasicFields ? (
+          {/* Badge Priorité - Éditable si responsable_site */}
+          {permissions.canEditTypeAndPriorite ? (
             <EditablePrioriteBadge
               ticketId={ticket.id}
               entrepriseId={entrepriseId}

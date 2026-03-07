@@ -62,6 +62,7 @@ export const tickets = pgTable(
     priorite: ticketPrioriteEnum("priorite").notNull().default("normale"),
     statut: ticketStatutEnum("statut").notNull().default("nouveau"),
     lastActivityAt: timestamptz("last_activity_at").notNull().defaultNow(),
+    priseEnChargeAt: timestamptz("prise_en_charge_at"),
     resolvedAt: timestamptz("resolved_at"),
     closedAt: timestamptz("closed_at"),
     createdById: createdById(() => user),

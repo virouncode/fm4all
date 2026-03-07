@@ -11,8 +11,9 @@ import {
   getTicketById,
   getTicketMessagesWithAttachments,
 } from "@/server/queries/tickets.query";
-import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion, getUserPrestataireAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { cookies } from "next/headers";
 import { getUsersByEntrepriseId } from "@/server/queries/users.query";
 import { canUserAccessTicket } from "@/server/utils/ticketsPerimetre.utils";
 import {
@@ -20,6 +21,7 @@ import {
   canUserEditAssigneUserId,
   canUserEditStatut,
   canUserEditTicketBasicFields,
+  canUserEditTypeAndPriorite,
   getAvailableStatutsForUser,
 } from "@/server/utils/ticketsPermissions.utils";
 import { notFound } from "next/navigation";
@@ -48,18 +50,33 @@ export default async function TicketDetailsPage({
     notFound();
   }
 
-  // 3. Déterminer l'entreprise courante et la posture
-  // On vérifie dans l'ordre: proprietaire, demandeur, assigné
+  // 3. Déterminer l'entreprise courante et la posture via le cookie
   let entrepriseId: string | null = null;
   let posture: "client" | "prestataire" | "plateforme" = "client";
 
-  // Check si plateforme
+  const cookieStore = await cookies();
+  const postureCookie = cookieStore.get("fm4all:postureActive")?.value;
+
+  // Branche plateforme
   const platformRole = await getUserPlateformeAdhesion(currentUser.id);
-  if (platformRole?.role) {
+  if (platformRole?.role && postureCookie === "plateforme") {
     posture = "plateforme";
     entrepriseId = ticket.proprietaireEntrepriseId;
+  } else if (postureCookie === "prestataire") {
+    // Branche prestataire : vérifier adhésion prestataire, puis matching ticket
+    const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+    if (prestataireAdhesion) {
+      const prestId = prestataireAdhesion.entrepriseId;
+      if (
+        ticket.assigneEntrepriseId === prestId ||
+        ticket.demandeurEntrepriseId === prestId
+      ) {
+        entrepriseId = prestId;
+        posture = "prestataire";
+      }
+    }
   } else {
-    // Vérifier adhesion proprietaire
+    // Branche client (défaut) : vérifier adhesion client
     const proprietaireAdhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: ticket.proprietaireEntrepriseId,
@@ -69,7 +86,7 @@ export default async function TicketDetailsPage({
       entrepriseId = ticket.proprietaireEntrepriseId;
       posture = "client";
     } else if (ticket.demandeurEntrepriseId) {
-      // Vérifier adhesion demandeur
+      // Cas où un autre client est le demandeur
       const demandeurAdhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId: ticket.demandeurEntrepriseId,
@@ -78,17 +95,6 @@ export default async function TicketDetailsPage({
       if (demandeurAdhesion) {
         entrepriseId = ticket.demandeurEntrepriseId;
         posture = "client";
-      } else if (ticket.assigneEntrepriseId) {
-        // Vérifier adhesion prestataire
-        const prestataireAdhesion = await getUserClientAdhesion({
-          userId: currentUser.id,
-          entrepriseId: ticket.assigneEntrepriseId,
-        });
-
-        if (prestataireAdhesion) {
-          entrepriseId = ticket.assigneEntrepriseId;
-          posture = "prestataire";
-        }
       }
     }
   }
@@ -110,6 +116,12 @@ export default async function TicketDetailsPage({
 
   // 5. Calculer les permissions field-level
   const canEditBasicFields = await canUserEditTicketBasicFields({
+    userId: currentUser.id,
+    ticketId,
+    entrepriseId,
+  });
+
+  const canEditTypeAndPriorite = await canUserEditTypeAndPriorite({
     userId: currentUser.id,
     ticketId,
     entrepriseId,
@@ -194,6 +206,7 @@ export default async function TicketDetailsPage({
       posture={posture}
       permissions={{
         canEditBasicFields,
+        canEditTypeAndPriorite,
         canEditAssigneEntreprise,
         canEditAssigneUser,
         canEditStatut,

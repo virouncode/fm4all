@@ -3,25 +3,34 @@ import "server-only";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { TicketStatutType } from "@/zod-schemas/enums";
+import { cookies } from "next/headers";
 
 /**
- * Matrix des transitions de statut autorisées
+ * Machine d'état des transitions de statut pour les tickets
  *
- * Règles métier:
- * - nouveau → pris_en_charge: responsable/plateforme
- * - pris_en_charge → en_attente_prestataire: responsable/plateforme
- * - en_attente_prestataire → en_attente_client: intervenant assigné/plateforme
- * - en_attente_prestataire → a_valider: intervenant assigné/plateforme
- * - a_valider → clos: responsable/plateforme
- * - nouveau → annule: demandeur (créateur)/responsable/plateforme
- * - nouveau → rejete: responsable/plateforme
+ * Principes métier:
+ * - Plateforme: bypass total
+ * - responsable_site requis pour piloter le workflow (niveau ≥ 3)
+ * - Transitions côté CLIENT vs côté PRESTATAIRE
+ * - États finaux (clos, annule, rejete) verrouillés sauf plateforme
  *
- * @param userId - ID de l'utilisateur
- * @param ticketId - ID du ticket
- * @param entrepriseId - ID de l'entreprise courante
- * @param currentStatut - Statut actuel du ticket
- * @param newStatut - Nouveau statut souhaité
- * @returns true si la transition est autorisée
+ * Transitions autorisées:
+ * - nouveau → pris_en_charge               : assigneEntrepriseId's responsable + plateforme
+ * - nouveau → annule                       : responsable (les deux côtés) + plateforme
+ * - nouveau → rejete                       : responsable (les deux côtés) + plateforme
+ * - pris_en_charge → en_attente_prestataire: CLIENT responsable + plateforme
+ * - pris_en_charge → en_attente_client     : PRESTATAIRE responsable + plateforme
+ * - pris_en_charge → a_valider             : PRESTATAIRE responsable + plateforme
+ * - pris_en_charge → annule                : responsable (les deux côtés) + plateforme
+ * - en_attente_prestataire → en_attente_client : PRESTATAIRE responsable + plateforme
+ * - en_attente_prestataire → a_valider         : PRESTATAIRE responsable + plateforme
+ * - en_attente_prestataire → annule            : responsable + plateforme
+ * - en_attente_client → en_attente_prestataire : CLIENT responsable + plateforme
+ * - en_attente_client → a_valider              : PRESTATAIRE responsable + plateforme
+ * - en_attente_client → annule                 : responsable + plateforme
+ * - a_valider → clos                       : CLIENT responsable + plateforme
+ * - a_valider → annule                     : responsable + plateforme
+ * - clos / annule / rejete → *             : plateforme uniquement
  */
 export async function isStatusTransitionAllowed({
   userId,
@@ -36,68 +45,119 @@ export async function isStatusTransitionAllowed({
   currentStatut: TicketStatutType;
   newStatut: TicketStatutType;
 }): Promise<boolean> {
-  // Récupérer le ticket
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Vérifier si plateforme (posture-aware)
+  // Plateforme → bypass total
   const platformRole = await getEffectivePlateformeRole(userId);
-  const isPlateforme = !!platformRole?.role;
+  if (platformRole?.role) return true;
 
-  // Récupérer rôle effectif sur le site du ticket (posture-aware)
-  // Toujours utiliser ticket.proprietaireEntrepriseId pour la lookup de site
+  // Lire la posture active depuis le cookie
+  const cookieStore = await cookies();
+  const posture = cookieStore.get("fm4all:postureActive")?.value;
+
+  // Déterminer le côté de l'utilisateur
+  const isClientSide =
+    posture === "client" || ticket.proprietaireEntrepriseId === entrepriseId;
+  const isPrestataireSide =
+    posture === "prestataire" ||
+    ticket.assigneEntrepriseId === entrepriseId ||
+    ticket.demandeurEntrepriseId === entrepriseId;
+
+  // Rôle effectif sur le site (posture-aware)
+  // Toujours utiliser ticket.proprietaireEntrepriseId pour la lookup
   const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
     entrepriseId: ticket.proprietaireEntrepriseId,
   });
 
-  // Flags de permissions
   const isResponsable = effectiveRoleStr === "responsable_site";
-  const isDemandeur = effectiveRoleStr === "demandeur_site";
-  const isIntervenant = effectiveRoleStr === "intervenant_site";
-  const isCreator = ticket.createdById === userId;
-  const isAssignedUser = ticket.assigneUserId === userId;
 
-  // Vérifier transitions selon matrix métier
-  switch (currentStatut) {
-    case "nouveau":
-      if (newStatut === "pris_en_charge") {
-        return isPlateforme || isResponsable;
-      }
-      if (newStatut === "annule") {
-        return isPlateforme || isResponsable || (isDemandeur && isCreator);
-      }
-      if (newStatut === "rejete") {
-        return isPlateforme || isResponsable;
-      }
-      break;
-
-    case "pris_en_charge":
-      if (newStatut === "en_attente_prestataire") {
-        return isPlateforme || isResponsable;
-      }
-      break;
-
-    case "en_attente_prestataire":
-      if (newStatut === "en_attente_client") {
-        return isPlateforme || (isIntervenant && isAssignedUser);
-      }
-      if (newStatut === "a_valider") {
-        return isPlateforme || (isIntervenant && isAssignedUser);
-      }
-      break;
-
-    case "a_valider":
-      if (newStatut === "clos") {
-        return isPlateforme || isResponsable;
-      }
-      break;
-
-    default:
-      break;
+  // ── ÉTATS FINAUX ── verrouillés (plateforme déjà géré ci-dessus)
+  if (
+    currentStatut === "clos" ||
+    currentStatut === "annule" ||
+    currentStatut === "rejete"
+  ) {
+    return false;
   }
 
-  return false;
+  // ── MACHINE D'ÉTAT ──
+  switch (currentStatut) {
+    case "nouveau": {
+      if (newStatut === "pris_en_charge") {
+        // Prise en charge : l'entreprise assignée en priorité, sinon tout responsable
+        if (ticket.assigneEntrepriseId) {
+          return ticket.assigneEntrepriseId === entrepriseId && isResponsable;
+        }
+        return isResponsable;
+      }
+      if (newStatut === "annule" || newStatut === "rejete") {
+        return isResponsable;
+      }
+      return false;
+    }
+
+    case "pris_en_charge": {
+      if (newStatut === "en_attente_prestataire") {
+        // Client met la balle chez le prestataire
+        return isClientSide && isResponsable;
+      }
+      if (newStatut === "en_attente_client") {
+        // Prestataire met la balle chez le client
+        return isPrestataireSide && isResponsable;
+      }
+      if (newStatut === "a_valider") {
+        // Prestataire déclare le travail terminé
+        return isPrestataireSide && isResponsable;
+      }
+      if (newStatut === "annule") {
+        return isResponsable;
+      }
+      return false;
+    }
+
+    case "en_attente_prestataire": {
+      if (newStatut === "en_attente_client") {
+        return isPrestataireSide && isResponsable;
+      }
+      if (newStatut === "a_valider") {
+        return isPrestataireSide && isResponsable;
+      }
+      if (newStatut === "annule") {
+        return isResponsable;
+      }
+      return false;
+    }
+
+    case "en_attente_client": {
+      if (newStatut === "en_attente_prestataire") {
+        // Client répond, balle retourne chez prestataire
+        return isClientSide && isResponsable;
+      }
+      if (newStatut === "a_valider") {
+        return isPrestataireSide && isResponsable;
+      }
+      if (newStatut === "annule") {
+        return isResponsable;
+      }
+      return false;
+    }
+
+    case "a_valider": {
+      if (newStatut === "clos") {
+        // Seul le client valide et clôt
+        return isClientSide && isResponsable;
+      }
+      if (newStatut === "annule") {
+        return isResponsable;
+      }
+      return false;
+    }
+
+    default:
+      return false;
+  }
 }
