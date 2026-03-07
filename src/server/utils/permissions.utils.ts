@@ -6,6 +6,14 @@ import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAtt
 import { cookies } from "next/headers";
 
 /**
+ * Retourne la posture active depuis le cookie (client | prestataire | plateforme | undefined).
+ */
+export async function getActivePosture(): Promise<string | undefined> {
+  const cookieStore = await cookies();
+  return cookieStore.get("fm4all:postureActive")?.value;
+}
+
+/**
  * Retourne le rôle plateforme uniquement si la posture active est "plateforme".
  *
  * À utiliser dans les server actions pour les bypasses de permissions.

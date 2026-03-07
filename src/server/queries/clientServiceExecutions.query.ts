@@ -240,7 +240,7 @@ export async function getClientPrestatairesAvecDetails(
 export async function getPrestatairesForService(params: {
   serviceId: string;
   clientEntrepriseId?: string;
-}): Promise<Array<{ serviceEntrepriseId: string; entrepriseId: string; nom: string }>> {
+}): Promise<Array<{ serviceEntrepriseId: string; entrepriseId: string; nom: string; hasActiveAdmin: boolean }>> {
   const { serviceId, clientEntrepriseId } = params;
 
   const baseConditions = and(
@@ -268,7 +268,7 @@ export async function getPrestatairesForService(params: {
       )
     : baseConditions;
 
-  return await db
+  const rows = await db
     .select({
       serviceEntrepriseId: serviceEntreprises.id,
       entrepriseId: entreprises.id,
@@ -278,6 +278,23 @@ export async function getPrestatairesForService(params: {
     .innerJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
     .where(conditions)
     .orderBy(entreprises.nom);
+
+  if (rows.length === 0) return [];
+
+  const entrepriseIds = rows.map((r) => r.entrepriseId);
+  const adminRows = await db
+    .select({ entrepriseId: userPrestataireAdhesions.entrepriseId })
+    .from(userPrestataireAdhesions)
+    .where(
+      and(
+        inArray(userPrestataireAdhesions.entrepriseId, entrepriseIds),
+        eq(userPrestataireAdhesions.role, "admin"),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    );
+  const hasAdminSet = new Set(adminRows.map((r) => r.entrepriseId));
+
+  return rows.map((r) => ({ ...r, hasActiveAdmin: hasAdminSet.has(r.entrepriseId) }));
 }
 
 /**
@@ -321,6 +338,7 @@ export type ExecutionWithPrix = {
   serviceEntrepriseId: string | null;
   prestataireEntrepriseId: string | null;
   prestataireNom: string | null;
+  prestataireHasActiveAdmin: boolean;
   dateDebutValidite: Date;
   dateFinValidite: Date | null;
   priorite: number;
@@ -392,7 +410,32 @@ export async function getExecutionsWithPrixByPrestationId(
 
   if (executionRows.length === 0) return [];
 
-  // 2. Récupérer les items des checklists assignées
+  // 2. Vérifier si les prestataires ont un admin actif (ghost check)
+  const prestataireEntrepriseIds = [
+    ...new Set(
+      executionRows
+        .map((e) => e.prestataireEntrepriseId)
+        .filter((id): id is string => id !== null),
+    ),
+  ];
+  const prestataireAdminSet = new Set<string>();
+  if (prestataireEntrepriseIds.length > 0) {
+    const prestataireAdminRows = await db
+      .select({ entrepriseId: userPrestataireAdhesions.entrepriseId })
+      .from(userPrestataireAdhesions)
+      .where(
+        and(
+          inArray(userPrestataireAdhesions.entrepriseId, prestataireEntrepriseIds),
+          eq(userPrestataireAdhesions.role, "admin"),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      );
+    for (const r of prestataireAdminRows) {
+      prestataireAdminSet.add(r.entrepriseId);
+    }
+  }
+
+  // 4. Récupérer les items des checklists assignées
   const templateIds = [
     ...new Set(
       executionRows
@@ -429,7 +472,7 @@ export async function getExecutionsWithPrixByPrestationId(
     }
   }
 
-  // 3. Récupérer tous les prix pour ces exécutions
+  // 5. Récupérer tous les prix pour ces exécutions
   const executionIds = executionRows.map((e) => e.id);
   const prixRows = await db
     .select()
@@ -448,7 +491,7 @@ export async function getExecutionsWithPrixByPrestationId(
     )
     .orderBy(asc(clientServiceExecutionPrix.typePrix));
 
-  // 3. Grouper les prix par executionId
+  // 6. Grouper les prix par executionId
   const prixByExecution = new Map<string, ExecutionPrixItem[]>();
   for (const prix of prixRows) {
     const list = prixByExecution.get(prix.executionId) ?? [];
@@ -469,6 +512,9 @@ export async function getExecutionsWithPrixByPrestationId(
   return executionRows.map((e) => ({
     ...e,
     prestataireNom: e.prestataireNom ?? null,
+    prestataireHasActiveAdmin: e.prestataireEntrepriseId
+      ? prestataireAdminSet.has(e.prestataireEntrepriseId)
+      : false,
     tacheListeTemplateName: e.tacheListeTemplateName ?? null,
     tacheListeItems: e.tacheListeTemplateId
       ? (itemsByTemplate.get(e.tacheListeTemplateId) ?? [])
@@ -635,6 +681,7 @@ export type OccurrenceDetail = {
   siteId: string;
   siteNom: string | null;
   executionId: string | null;
+  modePilotage: ModePilotageType | null;
   prestataireNom: string | null;
   prestataireEntrepriseId: string | null;
   dateDebutPrevue: Date | null;
@@ -692,6 +739,7 @@ export async function getOccurrenceWithDetailsById(
       siteId: clientServiceOccurrences.siteId,
       siteNom: sites.nom,
       executionId: clientServiceOccurrences.executionId,
+      modePilotage: clientServiceExecutions.modePilotage,
       prestataireNom: entreprises.nom,
       prestataireEntrepriseId: serviceEntreprises.entrepriseId,
       dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,

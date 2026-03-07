@@ -454,6 +454,8 @@ Un **passage** est une intervention planifiée sur un site, à une date précise
 
 Chaque passage peut contenir une **liste de tâches** à réaliser (checklist). Ces tâches sont issues d'un modèle de checklist défini au niveau de la prestation, et sont copiées sur chaque passage lors de sa génération.
 
+Il est également possible d'ajouter des **tâches ad-hoc** (non issues du modèle) directement sur un passage en cours ou planifié, pour des besoins ponctuels.
+
 #### Statuts d'une tâche
 
 | Statut | Signification |
@@ -465,7 +467,35 @@ Chaque passage peut contenir une **liste de tâches** à réaliser (checklist). 
 | **Annulée** | Tâche supprimée pour ce passage |
 | **Non applicable** | Tâche hors périmètre pour ce passage spécifique |
 
-Les tâches peuvent nécessiter des **preuves documentaires** (photos, rapports) selon leur paramétrage.
+#### Droits sur les tâches
+
+Les actions sur les tâches sont régies par deux niveaux de permission distincts :
+
+- **canExecute** (exécution terrain) : Admin, Responsable de site, et selon la posture — Demandeur de site (client) ou Intervenant de site (prestataire)
+- **canManage** (supervision) : Admin et Responsable de site uniquement
+
+| Action | canExecute | canManage |
+|--------|:-:|:-:|
+| Démarrer une tâche (→ En cours) | ✅ | ✅ |
+| Marquer Non applicable | ✅ | ✅ |
+| Marquer Non honorée | ✅ | ✅ |
+| Terminer une tâche (→ Terminée) | ✅ si assigné | ✅ |
+| Annuler une tâche | ❌ | ✅ |
+| Créer une tâche ad-hoc | ❌ | ✅ |
+| Modifier une tâche ad-hoc | ❌ | ✅ |
+| Supprimer une tâche ad-hoc | ❌ | ✅ |
+| Ajouter une photo-preuve | ✅ (tâche en cours) | ✅ |
+| Corriger le temps passé | ❌ | ✅ |
+
+> **Règle "Terminer"** : un intervenant (canExecute) ne peut terminer une tâche que s'il en est l'assigné. Un responsable ou administrateur (canManage) peut terminer n'importe quelle tâche.
+
+#### Photos-preuves (pièces jointes de tâche)
+
+Lors de la réalisation d'une tâche (statut **En cours**), les intervenants peuvent joindre jusqu'à **2 photos** comme preuve d'exécution. Ces photos restent consultables en lecture seule une fois la tâche terminée.
+
+#### Temps passé
+
+La durée entre le démarrage et la clôture d'une tâche est **enregistrée automatiquement**. En cas d'erreur (oubli de pointer, interruption), un Responsable de site ou Administrateur peut **corriger manuellement** la durée depuis le détail du passage, tant que la tâche est à l'état Terminée.
 
 ### 5.9 Assignation des intervenants
 
@@ -808,4 +838,4 @@ Les pages partagées entre postures (`/app/sites`, `/app/utilisateurs`, `/app/ti
 
 ---
 
-*Document mis à jour le 2026-03-06 (v3) — FM4ALL*
+*Document mis à jour le 2026-03-07 (v4) — FM4ALL*

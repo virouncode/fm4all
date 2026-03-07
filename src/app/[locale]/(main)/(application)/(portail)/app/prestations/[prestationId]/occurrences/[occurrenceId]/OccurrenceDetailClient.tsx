@@ -47,6 +47,7 @@ import {
   updateOccurrenceStatutAction,
   updateOccurrenceTacheStatutAction,
   updateTacheAssigneeAction,
+  updateTacheTempsPasseAction,
 } from "@/server/actions/clientServiceOccurrencesActions";
 import type {
   OccurrenceDetail,
@@ -93,9 +94,9 @@ type OccurrenceDetailClientProps = {
   occurrence: OccurrenceDetail;
   prestation: PrestationListItem;
   taches: OccurrenceTacheDetail[];
-  canManage: boolean; // contrôle total : annuler, non honorée, assigner autrui
-  canInteract: boolean; // travail terrain : démarrer, terminer, tâches, auto-assign
-  canAssignOccurrence: boolean; // peut assigner/modifier l'intervenant de l'occurrence
+  canManage: boolean; // contrôle total : annuler, non honorée, modifier dates, supprimer tâches ad-hoc
+  canExecute: boolean; // travail terrain : démarrer, terminer, tâches, auto-assign
+  canAssignOccurrence: boolean; // assigner/modifier l'intervenant prestataire de l'occurrence
   suiviMode: "interne" | "prestataire";
   currentUserId: string;
   currentUserPrenom: string | null;
@@ -159,7 +160,7 @@ export function OccurrenceDetailClient({
   prestation,
   taches: initialTaches,
   canManage,
-  canInteract,
+  canExecute,
   canAssignOccurrence,
   suiviMode,
   currentUserId,
@@ -424,7 +425,7 @@ export function OccurrenceDetailClient({
     (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours");
 
   const canAddAdHoc =
-    canInteract &&
+    canManage &&
     (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours");
 
   // Une occurrence peut être clôturée si aucune tâche n'est encore ouverte (a_faire ou en_cours)
@@ -563,7 +564,7 @@ export function OccurrenceDetailClient({
             {occurrenceBadge.label}
           </Badge>
 
-          {canInteract && occurrenceStatut === "en_cours" && (
+          {canExecute && occurrenceStatut === "en_cours" && (
             <Button
               size="sm"
               variant="outline"
@@ -586,7 +587,7 @@ export function OccurrenceDetailClient({
               <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
             )}
 
-            {canInteract && occurrenceStatut === "planifiee" && (
+            {canExecute && occurrenceStatut === "planifiee" && (
               <Button
                 size="sm"
                 variant="outline"
@@ -799,8 +800,9 @@ export function OccurrenceDetailClient({
               <TacheRow
                 key={tache.id}
                 tache={tache}
-                canInteract={canInteract}
+                canExecute={canExecute}
                 canManage={canManage}
+                canAssignOccurrence={canAssignOccurrence}
                 currentUserId={currentUserId}
                 currentUserPrenom={currentUserPrenom}
                 currentUserNom={currentUserNom}
@@ -922,8 +924,9 @@ function formatTemps(seconds: number): string {
 
 function TacheRow({
   tache,
-  canInteract,
+  canExecute,
   canManage,
+  canAssignOccurrence,
   currentUserId,
   currentUserPrenom,
   currentUserNom,
@@ -942,8 +945,9 @@ function TacheRow({
   onAssigneeChanged,
 }: {
   tache: OccurrenceTacheDetail;
-  canInteract: boolean;
+  canExecute: boolean;
   canManage: boolean;
+  canAssignOccurrence: boolean;
   currentUserId: string;
   currentUserPrenom: string | null;
   currentUserNom: string | null;
@@ -975,6 +979,9 @@ function TacheRow({
   const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
   const [isAssigning, setIsAssigning] = useState(false);
+  const [localTempsPasseSecondes, setLocalTempsPasseSecondes] = useState<number | null>(tache.tempsPasseSecondes ?? null);
+  const [isEditingTempsPasse, setIsEditingTempsPasse] = useState(false);
+  const [tempsPasseInputMinutes, setTempsPasseInputMinutes] = useState("");
   const badge = TACHE_STATUT[tache.statut];
   const isAdHoc = tache.listeItemId === null;
 
@@ -1047,7 +1054,7 @@ function TacheRow({
 
   // Boutons visibles quand planifiée ou en cours ; disabled si planifiée SANS prestataire assigné
   const showButtons =
-    canInteract &&
+    canExecute &&
     (occurrenceStatut === "en_cours" || occurrenceStatut === "planifiee");
   const buttonsDisabled =
     isUpdating || (occurrenceStatut === "planifiee" && !executionId);
@@ -1057,7 +1064,7 @@ function TacheRow({
       : undefined;
 
   const showPjZone =
-    canInteract &&
+    canExecute &&
     occurrenceStatut === "en_cours" &&
     tache.statut === "en_cours";
 
@@ -1094,7 +1101,7 @@ function TacheRow({
                   {tache.titre}
                 </span>
                 {isAdHoc &&
-                  canInteract &&
+                  canManage &&
                   tache.statut !== "terminee" &&
                   (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
                     <Button
@@ -1133,13 +1140,75 @@ function TacheRow({
             <p className="text-muted-foreground ml-7 flex items-center gap-1 text-xs">
               <Clock className="h-3 w-3" />
               {formatDateTime(tache.doneAt)}
-              {tache.tempsPasseSecondes !== null && tache.tempsPasseSecondes !== undefined && (
+              {localTempsPasseSecondes !== null && localTempsPasseSecondes !== undefined && (
                 <span className="ml-1 flex items-center gap-0.5">
                   <Timer className="h-3 w-3" />
-                  {formatTemps(tache.tempsPasseSecondes)}
+                  {formatTemps(localTempsPasseSecondes)}
+                  {canManage && !isEditingTempsPasse && (
+                    <button
+                      type="button"
+                      className="text-muted-foreground hover:text-foreground ml-0.5 rounded p-0.5"
+                      title="Corriger le temps passé"
+                      onClick={() => {
+                        setTempsPasseInputMinutes(String(Math.round(localTempsPasseSecondes / 60)));
+                        setIsEditingTempsPasse(true);
+                      }}
+                    >
+                      <Pencil className="h-2.5 w-2.5" />
+                    </button>
+                  )}
                 </span>
               )}
             </p>
+          )}
+          {isEditingTempsPasse && canManage && tache.statut === "terminee" && (
+            <div className="ml-7 flex items-center gap-1.5 pt-0.5">
+              <input
+                type="number"
+                min={0}
+                max={10080}
+                value={tempsPasseInputMinutes}
+                onChange={(e) => setTempsPasseInputMinutes(e.target.value)}
+                className="border-input focus-visible:ring-ring h-6 w-20 rounded border px-2 text-xs focus-visible:outline-none focus-visible:ring-1"
+                placeholder="min"
+              />
+              <span className="text-muted-foreground text-xs">min</span>
+              <Button
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={async () => {
+                  const minutes = parseInt(tempsPasseInputMinutes, 10);
+                  if (isNaN(minutes) || minutes < 0 || minutes > 10080) {
+                    toast.error("Durée invalide (0–10080 min)");
+                    return;
+                  }
+                  const result = await updateTacheTempsPasseAction({
+                    tacheId: tache.id,
+                    occurrenceId,
+                    prestationId,
+                    entrepriseId,
+                    tempsPasseSecondes: minutes * 60,
+                  });
+                  if (result?.serverError) {
+                    toast.error(result.serverError.message);
+                    return;
+                  }
+                  setLocalTempsPasseSecondes(minutes * 60);
+                  setIsEditingTempsPasse(false);
+                  toast.success("Temps passé mis à jour");
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-6 px-2 text-xs"
+                onClick={() => setIsEditingTempsPasse(false)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
           )}
         </div>
 
@@ -1147,8 +1216,8 @@ function TacheRow({
           <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
 
           {/* Assignee — visible quand l'occurrence est active */}
-          {canInteract && (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
-            canManage && prestataireEntrepriseId ? (
+          {canExecute && (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
+            canAssignOccurrence && prestataireEntrepriseId ? (
               // Responsable / plateforme : popover complet — uniquement si un prestataire est assigné
               <Popover open={assigneePopoverOpen} onOpenChange={handleOpenAssigneePopover}>
                 <PopoverTrigger asChild>
@@ -1200,7 +1269,7 @@ function TacheRow({
                   )}
                 </PopoverContent>
               </Popover>
-            ) : !canManage ? (
+            ) : !canAssignOccurrence ? (
               // Intervenant — UI selon état d'assignation
               tache.assigneeUserId === null ? (
                 // Tâche non assignée → "Je prends"
@@ -1242,11 +1311,11 @@ function TacheRow({
                   {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
                 </span>
               )
-            ) : null /* canManage sans prestataire assigné : pas d'UI d'assignation */
+            ) : null /* canAssignOccurrence sans prestataire assigné : pas d'UI d'assignation */
           )}
 
           {/* Assignee lecture seule (non-interactif) */}
-          {!canInteract && tache.assigneeUserId && (
+          {!canExecute && tache.assigneeUserId && (
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700" title={`${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`}>
               {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
             </span>
@@ -1286,16 +1355,18 @@ function TacheRow({
               )}
               {tache.statut === "en_cours" && (
                 <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-6 px-2 text-xs"
-                    onClick={() => handleTransition("terminee")}
-                    disabled={buttonsDisabled}
-                    title={disabledTitle}
-                  >
-                    Terminer
-                  </Button>
+                  {(tache.assigneeUserId === currentUserId || canManage) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => handleTransition("terminee")}
+                      disabled={buttonsDisabled}
+                      title={disabledTitle}
+                    >
+                      Terminer
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="outline"

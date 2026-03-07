@@ -7,11 +7,17 @@ import {
   getOccurrenceTaches,
   getOccurrenceWithDetailsById,
 } from "@/server/queries/clientServiceExecutions.query";
-import { getPrestationWithJoinsById } from "@/server/queries/clientServices.query";
-import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
+import { getPrestationWithJoinsById, prestataireHasExecutionOnPrestation } from "@/server/queries/clientServices.query";
+import {
+  getUserClientAdhesion,
+  getUserPrestataireAdhesion,
+} from "@/server/queries/userAdhesions.query";
+import {
+  getEffectivePlateformeRole,
+  resolvePostureAwareSiteRole,
+} from "@/server/utils/permissions.utils";
 import { and, eq, inArray } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { OccurrenceDetailClient } from "./OccurrenceDetailClient";
@@ -75,47 +81,101 @@ export default async function OccurrenceDetailPage({
   const prestation = await getPrestationWithJoinsById(prestationId);
   if (!prestation) notFound();
 
-  // 3. Vérifier l'accès à l'entreprise (plateforme OU adhésion)
-  const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+  // 3. Lire la posture active
+  const cookieStore = await cookies();
+  const posture = cookieStore.get("fm4all:postureActive")?.value;
+
+  // 4. Vérifier l'accès (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(currentUser.id);
   const isPlateforme = !!platformRole?.role;
 
+  let clientAdhesionRole: string | null = null;
+  let prestataireAdhesionRole: string | null = null;
+  let prestataireEntrepriseId: string | null = null;
+
   if (!isPlateforme) {
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: prestation.entrepriseId,
-    });
-    if (!adhesion) notFound();
+    if (posture === "prestataire") {
+      const pAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+      if (!pAdhesion) notFound();
+      prestataireEntrepriseId = pAdhesion.entrepriseId;
+      prestataireAdhesionRole = pAdhesion.role;
+
+      const canAccess = await prestataireHasExecutionOnPrestation({
+        prestationId,
+        prestataireEntrepriseId,
+      });
+      if (!canAccess) notFound();
+    } else {
+      // client ou posture par défaut
+      const cAdhesion = await getUserClientAdhesion({
+        userId: currentUser.id,
+        entrepriseId: prestation.entrepriseId,
+      });
+      if (!cAdhesion) notFound();
+      clientAdhesionRole = cAdhesion.role;
+    }
   }
 
-  // 4. Charger l'occurrence
+  // 5. Charger l'occurrence
   const occurrence = await getOccurrenceWithDetailsById(occurrenceId);
   if (!occurrence || occurrence.clientServiceId !== prestationId) notFound();
 
-  // 5. Calculer les permissions
-  let canManage = isPlateforme;   // contrôle total (annulation, non-honorée)
-  let canInteract = isPlateforme; // travail terrain (démarrer, terminer, tâches)
+  // 6. Calculer les permissions (modePilotage-aware)
+  const modePilotage = occurrence.modePilotage ?? "client";
+
+  let canManage = isPlateforme;
+  let canExecute = isPlateforme;
+
   if (!isPlateforme) {
-    const siteRole = await resolveUserEffectiveRoleOnSite({
-      userId: currentUser.id,
-      siteId: prestation.siteId,
-      entrepriseId: prestation.entrepriseId,
-    });
-    canManage = siteRole === "responsable_site";
-    canInteract = siteRole === "responsable_site";
+    if (posture === "prestataire") {
+      // Prestataire actif seulement si modePilotage = prestataire ou collaboration
+      const isActiveMode =
+        modePilotage === "prestataire" || modePilotage === "collaboration";
+      if (isActiveMode) {
+        if (prestataireAdhesionRole === "admin") {
+          canManage = true;
+          canExecute = true;
+        } else {
+          const siteRole = await resolvePostureAwareSiteRole({
+            userId: currentUser.id,
+            siteId: prestation.siteId,
+            entrepriseId: prestation.entrepriseId,
+          });
+          canManage = siteRole === "responsable_site";
+          canExecute =
+            siteRole === "responsable_site" || siteRole === "intervenant_site";
+        }
+      }
+      // modePilotage=client → prestataire n'a que Voir (canManage=false, canExecute=false)
+    } else {
+      // Client (posture par défaut)
+      // Client actif seulement si modePilotage = client ou collaboration
+      const isActiveMode =
+        modePilotage === "client" || modePilotage === "collaboration";
+      if (isActiveMode) {
+        if (clientAdhesionRole === "admin") {
+          canManage = true;
+          canExecute = true;
+        } else {
+          const siteRole = await resolvePostureAwareSiteRole({
+            userId: currentUser.id,
+            siteId: prestation.siteId,
+            entrepriseId: prestation.entrepriseId,
+          });
+          canManage = siteRole === "responsable_site";
+          canExecute =
+            siteRole === "responsable_site" || siteRole === "demandeur_site";
+        }
+      }
+      // modePilotage=prestataire → client n'a que Voir (canManage=false, canExecute=false)
+    }
   }
 
-  // Permission d'assigner l'intervenant de l'occurrence (côté prestataire)
-  let canAssignOccurrence = isPlateforme;
-  if (!isPlateforme && occurrence.prestataireEntrepriseId) {
-    const prestataireRole = await resolveUserEffectiveRoleOnSite({
-      userId: currentUser.id,
-      siteId: prestation.siteId,
-      entrepriseId: occurrence.prestataireEntrepriseId,
-    });
-    canAssignOccurrence = prestataireRole === "responsable_site";
-  }
+  // 7. canAssignOccurrence : assigner les intervenants prestataires (posture prestataire ou plateforme seulement)
+  // Un client peut gérer l'occurrence (annuler, reprogrammer) mais ne choisit pas les employés prestataires.
+  const canAssignOccurrence = isPlateforme || (posture === "prestataire" && canManage);
 
-  // 6. Déterminer le mode de suivi (interne vs prestataire)
+  // 8. Déterminer le mode de suivi (interne vs prestataire)
   let suiviMode: "interne" | "prestataire" = "interne";
   if (occurrence.prestataireEntrepriseId) {
     const hasPrestataireUsers = await hasPrestataireUsersOnSite(
@@ -125,7 +185,7 @@ export default async function OccurrenceDetailPage({
     if (hasPrestataireUsers) suiviMode = "prestataire";
   }
 
-  // 7. Charger les tâches
+  // 8. Charger les tâches
   const taches = await getOccurrenceTaches(occurrenceId);
 
   return (
@@ -134,7 +194,7 @@ export default async function OccurrenceDetailPage({
       prestation={prestation}
       taches={taches}
       canManage={canManage}
-      canInteract={canInteract}
+      canExecute={canExecute}
       canAssignOccurrence={canAssignOccurrence}
       suiviMode={suiviMode}
       currentUserId={currentUser.id}

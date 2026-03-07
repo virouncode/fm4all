@@ -163,9 +163,13 @@ export function ExecutionEditDialog({
   const showIntermediaire =
     isPlateforme && modeCommercial === "intermediaire_fm4all";
 
-  const availableModePilotage = clientHasActiveAdmin
-    ? modePilotageCT
-    : modePilotageCT.filter((m) => m.code === "prestataire");
+  const clientGhost = !clientHasActiveAdmin;
+  const prestataireGhost = !execution.prestataireHasActiveAdmin;
+  const availableModePilotage = clientGhost
+    ? modePilotageCT.filter((m) => m.code === "prestataire")
+    : prestataireGhost
+      ? modePilotageCT.filter((m) => m.code === "client")
+      : modePilotageCT;
 
   const activePrix = execution.prix.filter((p) => p.actif);
 

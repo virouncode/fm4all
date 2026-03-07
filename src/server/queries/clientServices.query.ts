@@ -13,7 +13,7 @@ import {
   type SelectClientServiceType,
   selectClientServiceSchema,
 } from "@/zod-schemas/clientServices.schema";
-import { asc, desc, and, eq, isNotNull } from "drizzle-orm";
+import { asc, desc, and, eq, inArray, isNotNull } from "drizzle-orm";
 
 /**
  * Vérifie si une entreprise prestataire a au moins une exécution active sur une prestation.
@@ -163,6 +163,8 @@ export async function getPrestationsByPrestataire(
     modeCommercial?: ModeCommercialType;
     orderBy?: PrestationsOrderByType;
     orderDir?: "asc" | "desc";
+    /** Gate N2 : si fourni, restreint aux prestations dont le site est dans cette liste */
+    attributedSiteIds?: string[];
   },
 ): Promise<PrestationListItem[]> {
   const conditions = [
@@ -184,6 +186,10 @@ export async function getPrestationsByPrestataire(
   }
   if (options?.modeCommercial) {
     conditions.push(eq(clientServices.modeCommercial, options.modeCommercial));
+  }
+  // Gate N2 : filtre par sites attribués (posture prestataire non-admin)
+  if (options?.attributedSiteIds && options.attributedSiteIds.length > 0) {
+    conditions.push(inArray(clientServices.siteId, options.attributedSiteIds));
   }
 
   const rows = await db

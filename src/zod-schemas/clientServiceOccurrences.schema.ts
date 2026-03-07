@@ -151,6 +151,20 @@ export type GetAssignableUsersForOccurrenceType = z.infer<
   typeof getAssignableUsersForOccurrenceSchema
 >;
 
+// ==================== UPDATE TACHE TEMPS PASSE ====================
+
+export const updateTacheTempsPasseSchema = z.object({
+  tacheId: z.uuid("ID de la tâche invalide"),
+  occurrenceId: z.uuid("ID de l'occurrence invalide"),
+  prestationId: z.uuid("ID de la prestation invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  // Secondes entières, max 7 jours
+  tempsPasseSecondes: z.number().int().min(0).max(604800),
+});
+export type UpdateTacheTempsPasseType = z.infer<
+  typeof updateTacheTempsPasseSchema
+>;
+
 // ==================== TICKET ↔ OCCURRENCE LINK ====================
 
 export const ticketOccurrenceLinkSchema = z.object({

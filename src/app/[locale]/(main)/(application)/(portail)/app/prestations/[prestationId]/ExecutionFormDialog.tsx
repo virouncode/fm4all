@@ -67,6 +67,7 @@ type PrestatairItem = {
   serviceEntrepriseId: string;
   entrepriseId: string;
   nom: string;
+  hasActiveAdmin: boolean;
 };
 
 const TYPE_PRIX_OPTIONS = [
@@ -150,14 +151,20 @@ export function ExecutionFormDialog({
 }: ExecutionFormDialogProps) {
   const [prestataires, setPrestataires] = useState<PrestatairItem[]>([]);
   const [loadingPrestataires, setLoadingPrestataires] = useState(false);
+  const [prestataireHasActiveAdmin, setPrestataireHasActiveAdmin] = useState(true);
 
   // Mode intermédiaire : uniquement plateforme + modeCommercial=intermediaire_fm4all
   const showIntermediaire =
     isPlateforme && modeCommercial === "intermediaire_fm4all";
 
   const postureActive = useAppStore((state) => state.postureActive);
+  // Client ghost → only "prestataire" mode; prestataire posture → "prestataire" mode
   const defaultModePilotage =
-    isPlateforme || postureActive !== "prestataire" ? "client" : "prestataire";
+    postureActive === "prestataire"
+      ? "prestataire"
+      : !clientHasActiveAdmin
+        ? "prestataire"
+        : "client";
 
   const form = useForm<InsertExecutionFormType>({
     resolver: zodResolver(insertExecutionFormSchema),
@@ -208,8 +215,10 @@ export function ExecutionFormDialog({
         const list = result.data.prestataires;
         setPrestataires(list);
         // En posture prestataire, auto-sélectionner le seul prestataire disponible
+        // et marquer comme non-ghost (l'utilisateur connecté est admin de son entreprise)
         if (postureActive === "prestataire" && list.length === 1) {
           form.setValue("serviceEntrepriseId", list[0]!.serviceEntrepriseId);
+          setPrestataireHasActiveAdmin(true);
         }
       }
       setLoadingPrestataires(false);
@@ -244,6 +253,31 @@ export function ExecutionFormDialog({
   };
 
   const watchedPrix = useWatch({ control: form.control, name: "prix" });
+  const selectedServiceEntrepriseId = useWatch({
+    control: form.control,
+    name: "serviceEntrepriseId",
+  });
+  const currentModePilotage = useWatch({
+    control: form.control,
+    name: "modePilotage",
+  });
+
+  // Mettre à jour le statut ghost du prestataire sélectionné
+  useEffect(() => {
+    if (postureActive === "prestataire") {
+      // L'utilisateur connecté est admin de son entreprise → jamais ghost
+      setPrestataireHasActiveAdmin(true);
+      return;
+    }
+    if (!selectedServiceEntrepriseId) {
+      setPrestataireHasActiveAdmin(true);
+      return;
+    }
+    const selected = prestataires.find(
+      (p) => p.serviceEntrepriseId === selectedServiceEntrepriseId,
+    );
+    setPrestataireHasActiveAdmin(selected?.hasActiveAdmin ?? true);
+  }, [selectedServiceEntrepriseId, prestataires, postureActive]);
 
   function recalculateMontant(index: number, cout: string, marge: string) {
     const coutNum = Number(cout) || 0;
@@ -254,9 +288,25 @@ export function ExecutionFormDialog({
     });
   }
 
-  const availableModePilotage = clientHasActiveAdmin
-    ? modePilotageCT
-    : modePilotageCT.filter((m) => m.code === "prestataire");
+  const clientGhost = !clientHasActiveAdmin;
+  const prestataireGhost = !prestataireHasActiveAdmin;
+  const availableModePilotage = clientGhost
+    ? modePilotageCT.filter((m) => m.code === "prestataire")
+    : prestataireGhost
+      ? modePilotageCT.filter((m) => m.code === "client")
+      : modePilotageCT;
+
+  // Auto-corriger modePilotage si la valeur actuelle n'est plus disponible
+  useEffect(() => {
+    if (
+      currentModePilotage &&
+      !availableModePilotage.find((m) => m.code === currentModePilotage)
+    ) {
+      form.setValue("modePilotage", availableModePilotage[0]!.code, {
+        shouldValidate: true,
+      });
+    }
+  }, [availableModePilotage, currentModePilotage, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

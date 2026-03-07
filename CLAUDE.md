@@ -2283,7 +2283,52 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 
 ---
 
-**Dernière mise à jour**: 2026-03-06 (session 2)
+## Changelog (2026-03-07)
+
+**Module Tâches d'occurrence — Permissions métier complètes** :
+
+- ✅ Matrice de permissions révisée selon spec métier (voir tableau ci-dessous)
+- ✅ `updateOccurrenceTacheStatutAction` restructuré : fetch tâche AVANT le check de permission (nécessaire pour isAssignée)
+  - `terminee` → `isAssignée || canManage` (était : canExecute — trop permissif)
+  - `non_honoree` → `canExecute` (était : canManage — trop restrictif)
+  - `annulee` → `canManage` uniquement (inchangé)
+  - `en_cours`, `non_applicable` → `canExecute` (inchangé)
+- ✅ `insertAdHocTacheAction` / `updateAdHocTacheAction` : restreints à `canManageOccurrence` (était `canExecuteOccurrence`)
+- ✅ Nouveau `updateTacheTempsPasseAction` : correction manuelle du temps passé (canManage, tâche `terminee` uniquement)
+- ✅ `updateTacheTempsPasseSchema` ajouté dans `clientServiceOccurrences.schema.ts` (0–604800 s, max 7 jours)
+- ✅ `OccurrenceDetailClient.tsx` — frontend synchronisé :
+  - `canAddAdHoc` → `canManage` (était `canExecute`)
+  - Bouton edit ad-hoc → `canManage` (était `canExecute`)
+  - Bouton "Terminer" → `canExecute && (isAssignée || canManage)` (était : `canExecute` seul)
+  - Champ "Corriger temps passé" : icône crayon inline, input en minutes, visible si `canManage && statut === "terminee"`
+- ✅ Pièces jointes preuves (déjà implémentées) : `PjUploadZone` + `PjThumb`, max 2 PJ/tâche, visible si `canExecute && tâche en cours`
+
+**Matrice de permissions tâches (référence)** :
+
+| Action | canExecute | canManage | isAssignée |
+|---|---|---|---|
+| Voir | ✅ | ✅ | — |
+| Créer tâche ad-hoc | ❌ | ✅ | — |
+| Modifier tâche ad-hoc | ❌ | ✅ | — |
+| Supprimer tâche ad-hoc | ❌ | ✅ | — |
+| Démarrer (→ en_cours) | ✅ | ✅ | — |
+| Terminer (→ terminee) | si assignée | ✅ | ✅ |
+| Non applicable | ✅ | ✅ | — |
+| Non honorée | ✅ | ✅ | — |
+| Annuler (→ annulee) | ❌ | ✅ | — |
+| Ajouter PJ (tâche en cours) | ✅ | ✅ | — |
+| Corriger tempsPasseSecondes | ❌ | ✅ | — |
+
+**Rappel** : `canExecute` = admin + responsable_site + demandeur_site (client) / intervenant_site (prestataire) ; `canManage` = admin + responsable_site uniquement.
+
+**Fichiers modifiés** :
+- `src/zod-schemas/clientServiceOccurrences.schema.ts` — `updateTacheTempsPasseSchema` ajouté
+- `src/server/actions/clientServiceOccurrencesActions.ts` — 3 actions modifiées + 1 nouvelle
+- `src/app/[locale]/.../occurrences/[occurrenceId]/OccurrenceDetailClient.tsx` — boutons + temps passé
+
+---
+
+**Dernière mise à jour**: 2026-03-07
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 

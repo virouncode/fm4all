@@ -20,9 +20,20 @@ import {
   getPrestationWithJoinsById,
   prestationBelongsToEntreprise,
 } from "@/server/queries/clientServices.query";
-import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
-import { getResponsableSiteIdsByPrestataire } from "@/server/queries/userPrestataireSiteAttributions.query";
-import { getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
+import {
+  getUserClientAdhesion,
+  getUserPrestataireAdhesion,
+  hasAccessToEntreprise,
+} from "@/server/queries/userAdhesions.query";
+import {
+  getAllPrestataireSiteIds,
+  getResponsableSiteIdsByPrestataire,
+} from "@/server/queries/userPrestataireSiteAttributions.query";
+import {
+  getActivePosture,
+  getEffectivePlateformeRole,
+  resolvePostureAwareSiteRole,
+} from "@/server/utils/permissions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
@@ -43,22 +54,66 @@ import { flattenValidationErrors } from "next-safe-action";
 // ==================== HELPERS ====================
 
 /**
- * Vérifie si l'utilisateur peut gérer une prestation sur un site donné.
- * Règle : rôle plateforme (any) OU responsable_site sur le site.
- * L'admin d'entreprise sert à configurer les utilisateurs, pas à gérer les prestations.
+ * Vérifie si l'utilisateur peut créer ou modifier une prestation.
+ * - Posture plateforme → toujours autorisé
+ * - Posture client : client_admin OU responsable_site sur le site
+ * - Posture prestataire : prestataire_admin OU responsable_site sur le site client
  *
- * Retourne { allowed, isPlateforme } pour éviter un second appel getUserPlateformeAdhesion.
+ * Retourne { allowed, isPlateforme, isAdmin } pour affiner les contrôles downstream.
  */
 async function canManagePrestation(
   userId: string,
   entrepriseId: string,
   siteId: string,
-): Promise<{ allowed: boolean; isPlateforme: boolean }> {
+): Promise<{ allowed: boolean; isPlateforme: boolean; isAdmin: boolean }> {
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) return { allowed: true, isPlateforme: true };
+  if (platformRole?.role) return { allowed: true, isPlateforme: true, isAdmin: false };
+
+  const posture = await getActivePosture();
+
+  if (posture === "client") {
+    const clientAdhesion = await getUserClientAdhesion({ userId, entrepriseId });
+    if (clientAdhesion?.role === "admin") {
+      return { allowed: true, isPlateforme: false, isAdmin: true };
+    }
+  } else if (posture === "prestataire") {
+    const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
+    if (prestataireAdhesion?.role === "admin") {
+      return { allowed: true, isPlateforme: false, isAdmin: true };
+    }
+  }
 
   const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
-  return { allowed: siteRole === "responsable_site", isPlateforme: false };
+  return { allowed: siteRole === "responsable_site", isPlateforme: false, isAdmin: false };
+}
+
+/**
+ * Vérifie si l'utilisateur peut archiver ou supprimer une prestation.
+ * Plus restrictif que canManagePrestation : responsable_site n'a pas ce droit.
+ * - Posture plateforme → toujours autorisé
+ * - Posture client : client_admin uniquement
+ * - Posture prestataire : prestataire_admin uniquement
+ */
+async function canArchiveDeletePrestation(
+  userId: string,
+  entrepriseId: string,
+): Promise<boolean> {
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) return true;
+
+  const posture = await getActivePosture();
+
+  if (posture === "client") {
+    const clientAdhesion = await getUserClientAdhesion({ userId, entrepriseId });
+    return clientAdhesion?.role === "admin";
+  }
+
+  if (posture === "prestataire") {
+    const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
+    return prestataireAdhesion?.role === "admin";
+  }
+
+  return false;
 }
 
 /**
@@ -134,9 +189,20 @@ export const getPrestationsAction = actionClient
         throw errors.forbidden("Vous n'avez pas accès à ce prestataire.");
       }
 
+      // Gate N2 : non-admin → restreindre aux sites attribués via userPrestataireSiteAttributions
+      let attributedSiteIds: string[] | undefined;
+      if (!plateformeRole?.role && adhesion?.role !== "admin") {
+        const siteIds = await getAllPrestataireSiteIds({
+          userId: currentUser.id,
+          clientEntrepriseId: entrepriseId,
+        });
+        if (siteIds.length === 0) return { prestations: [] };
+        attributedSiteIds = siteIds;
+      }
+
       const prestations = await getPrestationsByPrestataire(
         prestataireEntrepriseId,
-        { clientEntrepriseId: entrepriseId, statut, serviceId, siteId, modeCommercial, orderBy, orderDir },
+        { clientEntrepriseId: entrepriseId, statut, serviceId, siteId, modeCommercial, orderBy, orderDir, attributedSiteIds },
       );
       return { prestations };
     }
@@ -554,6 +620,16 @@ export const updatePrestationStatutAction = actionClient
       );
     }
 
+    // "termine" est un acte fort réservé aux admins (client ou prestataire) et à la plateforme
+    if (newStatut === "termine") {
+      const canArchive = await canArchiveDeletePrestation(currentUser.id, entrepriseId);
+      if (!canArchive) {
+        throw errors.forbidden(
+          "Seul l'administrateur de l'entreprise peut terminer une prestation.",
+        );
+      }
+    }
+
     // Guard : activation sans exécution active interdite
     if (newStatut === "actif") {
       const [execRow] = await db
@@ -664,15 +740,11 @@ export const deletePrestationAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    // Vérifier les permissions : plateforme OU responsable_site sur le site
-    const canDelete = await canManagePrestation(
-      currentUser.id,
-      entrepriseId,
-      current.siteId,
-    );
+    // Vérifier les permissions : plateforme OU admin (client ou prestataire) uniquement
+    const canDelete = await canArchiveDeletePrestation(currentUser.id, entrepriseId);
     if (!canDelete) {
       throw errors.forbidden(
-        "Vous devez être responsable de ce site pour supprimer une prestation.",
+        "Seul l'administrateur de l'entreprise peut supprimer une prestation.",
       );
     }
 

@@ -19,7 +19,7 @@ import {
 } from "@/db/schema/services";
 import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { auth } from "@/server/auth/auth";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -37,9 +37,10 @@ import { getAllServices } from "@/server/queries/services.query";
 import { sendEmailDirect } from "@/server/email/mailgunDirect";
 import {
   getUserClientAdhesion,
+  getUserPrestataireAdhesion,
   hasAccessToEntreprise,
 } from "@/server/queries/userAdhesions.query";
-import { getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
+import { getActivePosture, getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
@@ -67,64 +68,123 @@ import { z } from "zod";
 // ==================== HELPERS ====================
 
 /**
- * Vérifie si l'utilisateur peut gérer une prestation sur un site donné.
- * Retourne { allowed, isPlateforme } pour éviter un second appel getUserPlateformeAdhesion.
+ * Vérifie si l'utilisateur peut créer ou modifier une exécution.
+ * Règles : plateforme ✅ | client admin ✅ | prestataire admin ✅ | responsable_site ✅
+ * Retourne { allowed, isPlateforme, isAdmin } pour éviter des appels supplémentaires.
  */
-async function canManagePrestation(
+async function canManageExecution(
   userId: string,
   entrepriseId: string,
   siteId: string,
-): Promise<{ allowed: boolean; isPlateforme: boolean }> {
+): Promise<{ allowed: boolean; isPlateforme: boolean; isAdmin: boolean }> {
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) return { allowed: true, isPlateforme: true };
+  if (platformRole?.role) return { allowed: true, isPlateforme: true, isAdmin: false };
+
+  const posture = await getActivePosture();
+
+  if (posture === "client") {
+    const clientAdhesion = await getUserClientAdhesion({ userId, entrepriseId });
+    if (clientAdhesion?.role === "admin") {
+      return { allowed: true, isPlateforme: false, isAdmin: true };
+    }
+  } else if (posture === "prestataire") {
+    const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
+    if (prestataireAdhesion?.role === "admin") {
+      return { allowed: true, isPlateforme: false, isAdmin: true };
+    }
+  }
 
   const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
-  return { allowed: siteRole === "responsable_site", isPlateforme: false };
+  return { allowed: siteRole === "responsable_site", isPlateforme: false, isAdmin: false };
 }
 
 /**
- * Vérifie si l'utilisateur peut changer le mode de pilotage d'une exécution.
- * Règles : plateforme ✅ | client admin ✅ | client collaborateur responsable_site ✅ | manager ❌
+ * Vérifie si l'utilisateur peut activer/désactiver ou supprimer une exécution.
+ * Règles : plateforme ✅ | client admin ✅ | prestataire admin ✅
+ * (responsable_site ne suffit PAS pour ces opérations)
  */
-async function canChangeModePilotageCheck(
+async function canDisableOrDeleteExecution(
   userId: string,
-  clientEntrepriseId: string,
-  siteId: string,
+  entrepriseId: string,
 ): Promise<boolean> {
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
-  const cookieStore = await cookies();
-  const posture = cookieStore.get("fm4all:postureActive")?.value;
+  const posture = await getActivePosture();
 
-  if (posture === "prestataire") {
-    // Un prestataire responsable_site peut changer le mode de pilotage
-    const siteRole = await resolvePostureAwareSiteRole({
-      userId,
-      siteId,
-      entrepriseId: clientEntrepriseId,
-    });
-    return siteRole === "responsable_site";
+  if (posture === "client") {
+    const clientAdhesion = await getUserClientAdhesion({ userId, entrepriseId });
+    return clientAdhesion?.role === "admin";
   }
 
-  // client (défaut)
-  const adhesion = await db.query.userClientAdhesions.findFirst({
+  if (posture === "prestataire") {
+    const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
+    return prestataireAdhesion?.role === "admin";
+  }
+
+  return false;
+}
+
+/**
+ * Valide que le modePilotage choisi est compatible avec le statut "fantôme" des entreprises.
+ * Une entreprise est fantôme si elle n'a pas d'admin actif sur la plateforme.
+ *
+ * Règles :
+ * - client fantôme → seul "prestataire" est autorisé (personne côté client pour piloter)
+ * - prestataire fantôme → seul "client" est autorisé
+ * - les deux actifs → tous les modes sont possibles
+ */
+async function validateModePilotage(
+  modePilotage: string,
+  clientEntrepriseId: string,
+  prestataireEntrepriseId: string | null,
+): Promise<void> {
+  // Vérifier si le client a un admin actif
+  const clientAdminRows = await db.query.userClientAdhesions.findFirst({
     where: and(
-      eq(userClientAdhesions.userId, userId),
       eq(userClientAdhesions.entrepriseId, clientEntrepriseId),
+      eq(userClientAdhesions.role, "admin"),
+      eq(userClientAdhesions.statut, "actif"),
     ),
   });
-  if (!adhesion) return false;
-  if (adhesion.role === "admin") return true;
-  if (adhesion.role === "manager") return false;
+  const clientGhost = !clientAdminRows;
 
-  // collaborateur : vérifier responsable_site sur le site
-  const siteRole = await resolvePostureAwareSiteRole({
-    userId,
-    siteId,
-    entrepriseId: clientEntrepriseId,
-  });
-  return siteRole === "responsable_site";
+  // Vérifier si le prestataire a un admin actif (si l'entreprise est sur la plateforme)
+  let prestataireGhost = false;
+  if (prestataireEntrepriseId) {
+    const seRow = await db
+      .select({ entrepriseId: serviceEntreprises.entrepriseId })
+      .from(serviceEntreprises)
+      .where(eq(serviceEntreprises.id, prestataireEntrepriseId))
+      .limit(1);
+    const seEntrepriseId = seRow[0]?.entrepriseId;
+
+    if (seEntrepriseId) {
+      const prestataireAdminRows = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.entrepriseId, seEntrepriseId),
+          eq(userPrestataireAdhesions.role, "admin"),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
+      prestataireGhost = !prestataireAdminRows;
+    }
+  } else {
+    // Pas de serviceEntrepriseId = prestataire non défini ou externe = fantôme
+    prestataireGhost = true;
+  }
+
+  if (clientGhost && modePilotage !== "prestataire") {
+    throw errors.conflict(
+      "Le client n'a pas de compte actif sur la plateforme : seul le mode 'prestataire' est possible.",
+    );
+  }
+
+  if (prestataireGhost && modePilotage !== "client") {
+    throw errors.conflict(
+      "Le prestataire n'a pas de compte actif sur la plateforme : seul le mode 'client' est possible.",
+    );
+  }
 }
 
 
@@ -449,7 +509,7 @@ export const insertExecutionWithPrixAction = actionClient
     const { prestationId, entrepriseId, siteId } = normalized;
 
     // Vérifier les permissions (retourne aussi isPlateforme pour éviter un second appel)
-    const { allowed: canManage, isPlateforme } = await canManagePrestation(
+    const { allowed: canManage, isPlateforme } = await canManageExecution(
       currentUser.id,
       entrepriseId,
       siteId,
@@ -465,6 +525,33 @@ export const insertExecutionWithPrixAction = actionClient
     if (!prestation || prestation.entrepriseId !== entrepriseId) {
       throw errors.notFound("Prestation");
     }
+
+    // Prestataire : vérifier que serviceEntrepriseId appartient à leur entreprise
+    if (!isPlateforme) {
+      const activePosture = await getActivePosture();
+      if (activePosture === "prestataire") {
+        const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+        if (prestataireAdhesion) {
+          const [se] = await db
+            .select({ entrepriseId: serviceEntreprises.entrepriseId })
+            .from(serviceEntreprises)
+            .where(eq(serviceEntreprises.id, normalized.serviceEntrepriseId))
+            .limit(1);
+          if (!se || se.entrepriseId !== prestataireAdhesion.entrepriseId) {
+            throw errors.forbidden(
+              "Vous ne pouvez ajouter que les prestataires de votre entreprise.",
+            );
+          }
+        }
+      }
+    }
+
+    // Valider modePilotage selon le statut fantôme des entreprises
+    await validateModePilotage(
+      parsedInput.modePilotage,
+      entrepriseId,
+      normalized.serviceEntrepriseId,
+    );
 
     // Guard : en mode intermédiaire, seul un utilisateur plateforme peut créer une exécution
     if (prestation.modeCommercial === "intermediaire_fm4all" && !isPlateforme) {
@@ -589,21 +676,23 @@ export const toggleExecutionActifAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    // Vérifier les permissions
-    const canManage = await canManagePrestation(
+    // Vérifier les permissions (admin uniquement pour activer/désactiver)
+    const canDisable = await canDisableOrDeleteExecution(
       currentUser.id,
       entrepriseId,
-      prestation.siteId,
     );
-    if (!canManage) {
+    if (!canDisable) {
       throw errors.forbidden(
-        "Vous devez être responsable de ce site pour gérer les prestataires.",
+        "Seul un administrateur peut activer ou désactiver une exécution.",
       );
     }
 
     // Vérifier que l'exécution appartient à la prestation
     const [execution] = await db
-      .select({ id: clientServiceExecutions.id })
+      .select({
+        id: clientServiceExecutions.id,
+        serviceEntrepriseId: clientServiceExecutions.serviceEntrepriseId,
+      })
       .from(clientServiceExecutions)
       .where(
         and(
@@ -615,6 +704,24 @@ export const toggleExecutionActifAction = actionClient
 
     if (!execution) {
       throw errors.notFound("Exécution");
+    }
+
+    // Prestataire : vérifier que cette exécution appartient à leur entreprise
+    const activePostureToggle = await getActivePosture();
+    if (activePostureToggle === "prestataire" && execution.serviceEntrepriseId) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+      if (prestataireAdhesion) {
+        const [se] = await db
+          .select({ entrepriseId: serviceEntreprises.entrepriseId })
+          .from(serviceEntreprises)
+          .where(eq(serviceEntreprises.id, execution.serviceEntrepriseId))
+          .limit(1);
+        if (!se || se.entrepriseId !== prestataireAdhesion.entrepriseId) {
+          throw errors.forbidden(
+            "Vous ne pouvez modifier que les exécutions de votre entreprise.",
+          );
+        }
+      }
     }
 
     // Compter les occurrences futures planifiées avant de désactiver (pour warning UX)
@@ -684,21 +791,23 @@ export const deleteExecutionAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    // Vérifier les permissions
-    const canManage = await canManagePrestation(
+    // Vérifier les permissions (admin uniquement pour supprimer)
+    const canDelete = await canDisableOrDeleteExecution(
       currentUser.id,
       entrepriseId,
-      prestation.siteId,
     );
-    if (!canManage) {
+    if (!canDelete) {
       throw errors.forbidden(
-        "Vous devez être responsable de ce site pour gérer les prestataires.",
+        "Seul un administrateur peut supprimer une exécution.",
       );
     }
 
     // Vérifier que l'exécution appartient à la prestation
     const [execution] = await db
-      .select({ id: clientServiceExecutions.id })
+      .select({
+        id: clientServiceExecutions.id,
+        serviceEntrepriseId: clientServiceExecutions.serviceEntrepriseId,
+      })
       .from(clientServiceExecutions)
       .where(
         and(
@@ -710,6 +819,24 @@ export const deleteExecutionAction = actionClient
 
     if (!execution) {
       throw errors.notFound("Exécution");
+    }
+
+    // Prestataire : vérifier que cette exécution appartient à leur entreprise
+    const activePostureDelete = await getActivePosture();
+    if (activePostureDelete === "prestataire" && execution.serviceEntrepriseId) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+      if (prestataireAdhesion) {
+        const [se] = await db
+          .select({ entrepriseId: serviceEntreprises.entrepriseId })
+          .from(serviceEntreprises)
+          .where(eq(serviceEntreprises.id, execution.serviceEntrepriseId))
+          .limit(1);
+        if (!se || se.entrepriseId !== prestataireAdhesion.entrepriseId) {
+          throw errors.forbidden(
+            "Vous ne pouvez supprimer que les exécutions de votre entreprise.",
+          );
+        }
+      }
     }
 
     // Supprimer (cascade sur les prix via FK)
@@ -771,12 +898,12 @@ export const updateExecutionTacheListeAction = actionClient
     }
 
     // Vérifier permissions
-    const canManage = await canManagePrestation(
+    const { allowed: canManageChecklist } = await canManageExecution(
       currentUser.id,
       entrepriseId,
       prestation.siteId,
     );
-    if (!canManage) {
+    if (!canManageChecklist) {
       throw errors.forbidden(
         "Vous devez être responsable de ce site pour modifier la checklist.",
       );
@@ -784,7 +911,10 @@ export const updateExecutionTacheListeAction = actionClient
 
     // Vérifier que l'exécution appartient à la prestation
     const [execution] = await db
-      .select({ id: clientServiceExecutions.id })
+      .select({
+        id: clientServiceExecutions.id,
+        serviceEntrepriseId: clientServiceExecutions.serviceEntrepriseId,
+      })
       .from(clientServiceExecutions)
       .where(
         and(
@@ -795,6 +925,24 @@ export const updateExecutionTacheListeAction = actionClient
       .limit(1);
 
     if (!execution) throw errors.notFound("Exécution");
+
+    // Prestataire : vérifier que cette exécution appartient à leur entreprise
+    const activePostureChecklist = await getActivePosture();
+    if (activePostureChecklist === "prestataire" && execution.serviceEntrepriseId) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+      if (prestataireAdhesion) {
+        const [se] = await db
+          .select({ entrepriseId: serviceEntreprises.entrepriseId })
+          .from(serviceEntreprises)
+          .where(eq(serviceEntreprises.id, execution.serviceEntrepriseId))
+          .limit(1);
+        if (!se || se.entrepriseId !== prestataireAdhesion.entrepriseId) {
+          throw errors.forbidden(
+            "Vous ne pouvez modifier que les exécutions de votre entreprise.",
+          );
+        }
+      }
+    }
 
     // Si un pack est fourni, vérifier qu'il existe et est compatible avec le service
     if (tacheListeTemplateId) {
@@ -855,7 +1003,7 @@ export const updateExecutionAction = actionClient
     }
 
     // Vérifier les permissions
-    const canManage = await canManagePrestation(
+    const canManage = await canManageExecution(
       currentUser.id,
       entrepriseId,
       prestation.siteId,
@@ -868,7 +1016,10 @@ export const updateExecutionAction = actionClient
 
     // Vérifier que l'exécution appartient à la prestation
     const [existingExecution] = await db
-      .select({ id: clientServiceExecutions.id })
+      .select({
+        id: clientServiceExecutions.id,
+        serviceEntrepriseId: clientServiceExecutions.serviceEntrepriseId,
+      })
       .from(clientServiceExecutions)
       .where(
         and(
@@ -881,6 +1032,31 @@ export const updateExecutionAction = actionClient
     if (!existingExecution) {
       throw errors.notFound("Exécution");
     }
+
+    // Prestataire : vérifier que cette exécution appartient à leur entreprise
+    const activePostureUpdate = await getActivePosture();
+    if (activePostureUpdate === "prestataire" && !canManage.isPlateforme && existingExecution.serviceEntrepriseId) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+      if (prestataireAdhesion) {
+        const [se] = await db
+          .select({ entrepriseId: serviceEntreprises.entrepriseId })
+          .from(serviceEntreprises)
+          .where(eq(serviceEntreprises.id, existingExecution.serviceEntrepriseId))
+          .limit(1);
+        if (!se || se.entrepriseId !== prestataireAdhesion.entrepriseId) {
+          throw errors.forbidden(
+            "Vous ne pouvez modifier que les exécutions de votre entreprise.",
+          );
+        }
+      }
+    }
+
+    // Valider modePilotage selon le statut fantôme des entreprises
+    await validateModePilotage(
+      parsedInput.modePilotage,
+      entrepriseId,
+      existingExecution.serviceEntrepriseId,
+    );
 
     // Guard dateDebutValidite : vérifier qu'aucune occurrence non-annulée n'existe avant la nouvelle date
     const newDateDebut = new Date(parsedInput.dateDebutValidite);
@@ -1125,19 +1301,22 @@ export const updateExecutionModePilotageAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    const allowed = await canChangeModePilotageCheck(
+    const { allowed } = await canManageExecution(
       currentUser.id,
       entrepriseId,
       prestation.siteId,
     );
     if (!allowed) {
       throw errors.forbidden(
-        "Seuls la plateforme, un admin client ou un responsable de site peuvent modifier le mode de pilotage.",
+        "Seuls la plateforme, un admin ou un responsable de site peuvent modifier le mode de pilotage.",
       );
     }
 
     const [execution] = await db
-      .select({ id: clientServiceExecutions.id })
+      .select({
+        id: clientServiceExecutions.id,
+        serviceEntrepriseId: clientServiceExecutions.serviceEntrepriseId,
+      })
       .from(clientServiceExecutions)
       .where(
         and(
@@ -1148,6 +1327,27 @@ export const updateExecutionModePilotageAction = actionClient
       .limit(1);
 
     if (!execution) throw errors.notFound("Exécution");
+
+    // Prestataire : vérifier que cette exécution appartient à leur entreprise
+    const activePostureModePilotage = await getActivePosture();
+    if (activePostureModePilotage === "prestataire" && execution.serviceEntrepriseId) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+      if (prestataireAdhesion) {
+        const [se] = await db
+          .select({ entrepriseId: serviceEntreprises.entrepriseId })
+          .from(serviceEntreprises)
+          .where(eq(serviceEntreprises.id, execution.serviceEntrepriseId))
+          .limit(1);
+        if (!se || se.entrepriseId !== prestataireAdhesion.entrepriseId) {
+          throw errors.forbidden(
+            "Vous ne pouvez modifier que les exécutions de votre entreprise.",
+          );
+        }
+      }
+    }
+
+    // Valider modePilotage selon le statut fantôme des entreprises
+    await validateModePilotage(modePilotage, entrepriseId, execution.serviceEntrepriseId);
 
     const [updated] = await db
       .update(clientServiceExecutions)
