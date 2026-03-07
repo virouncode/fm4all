@@ -33,11 +33,12 @@ export function SitesClient() {
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
+  const posture = useAppStore((state) => state.postureActive);
   const searchParams = useSearchParams();
 
   // Seuls les platform super admins et admins peuvent créer des sites racines
   const canCreateRoot =
-    currentUserPlateformeRole === "super_admin_plateforme" ||
+    (posture === "plateforme" && currentUserPlateformeRole === "super_admin_plateforme") ||
     currentUserRole === "admin";
 
   const [sites, setSites] = useState<SelectSiteType[]>([]);

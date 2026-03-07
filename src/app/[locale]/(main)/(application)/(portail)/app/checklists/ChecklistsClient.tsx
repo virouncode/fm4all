@@ -47,11 +47,9 @@ export function ChecklistsClient() {
 
   // Peut créer/modifier/supprimer des checklists (au moins manager)
   const canManageChecklist =
-    !!rolePlateformeAdhesion ||
-    roleClientAdhesion === "admin" ||
-    roleClientAdhesion === "manager" ||
-    rolePrestataireAdhesion === "admin" ||
-    rolePrestataireAdhesion === "manager";
+    (posture === "plateforme" && !!rolePlateformeAdhesion) ||
+    (posture === "client" && (roleClientAdhesion === "admin" || roleClientAdhesion === "manager")) ||
+    (posture === "prestataire" && (rolePrestataireAdhesion === "admin" || rolePrestataireAdhesion === "manager"));
 
   // Data — uniquement pour déterminer quels services afficher
   const [systemPacks, setSystemPacks] = useState<

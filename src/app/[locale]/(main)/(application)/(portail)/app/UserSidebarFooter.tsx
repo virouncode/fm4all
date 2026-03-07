@@ -17,6 +17,7 @@ import {
 import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/auth-client";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
+import { clearPostureAction } from "@/server/actions/activePostureAction";
 import { getDocumentAction } from "@/server/actions/documentsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { User2 } from "lucide-react";
@@ -69,6 +70,7 @@ export default function UserSidebarFooter() {
 
   const handleSignOut = async () => {
     try {
+      await clearPostureAction();
       await authClient.signOut({
         fetchOptions: {
           onSuccess: () => {

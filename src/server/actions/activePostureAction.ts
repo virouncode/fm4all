@@ -18,3 +18,8 @@ export async function setActivePostureAction(posture: RoleEntrepriseType) {
     maxAge: 60 * 60 * 24 * 180,
   });
 }
+
+export async function clearPostureAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete("fm4all:postureActive");
+}

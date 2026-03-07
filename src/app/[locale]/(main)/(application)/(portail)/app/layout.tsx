@@ -47,7 +47,7 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AppProvider bootstrap={payload}>
+    <AppProvider bootstrap={payload} cookiePosture={postureActive ?? null}>
       <SidebarProvider>
         <div className="bg-background flex h-screen w-full overflow-hidden">
           <UserSidebar />
