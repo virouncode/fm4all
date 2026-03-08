@@ -4,6 +4,7 @@ import { getUserPrestataireSiteRole } from "@/server/queries/userPrestataireSite
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 /**
  * Retourne la posture active depuis le cookie (client | prestataire | plateforme | undefined).
@@ -26,7 +27,10 @@ export async function getActivePosture(): Promise<string | undefined> {
  * Règle : si l'utilisateur a choisi la posture prestataire ou client,
  * son rôle plateforme ne doit pas override ses permissions dans cette posture.
  */
-export async function getEffectivePlateformeRole(userId: string) {
+/**
+ * Memoized per request — cookie + DB hit au maximum une fois par action/render.
+ */
+export const getEffectivePlateformeRole = cache(async (userId: string) => {
   const cookieStore = await cookies();
   const posture = cookieStore.get("fm4all:postureActive")?.value;
 
@@ -34,7 +38,7 @@ export async function getEffectivePlateformeRole(userId: string) {
   if (posture !== "plateforme") return null;
 
   return getUserPlateformeAdhesion(userId);
-}
+});
 
 /**
  * Résout le rôle effectif d'un utilisateur sur un site, en fonction de la posture active.

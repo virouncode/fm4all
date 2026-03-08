@@ -295,7 +295,7 @@ export function TicketMessagesSection({
         <div
           className={cn(
             "max-w-[70%] rounded-lg px-4 py-2",
-            isCurrentUser ? "bg-primary text-primary-foreground" : "bg-muted",
+            isCurrentUser ? "bg-primary text-primary-foreground" : "bg-muted border border-border",
           )}
         >
           <p className="text-sm break-words whitespace-pre-wrap">

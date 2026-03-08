@@ -29,7 +29,6 @@ import { z } from "zod";
 
 // Queries
 import { getSession } from "@/server/auth/get-session";
-import { getTicketMessagesFiltered } from "@/server/queries/ticketMessages.query";
 import {
   getTicketById,
   getTicketsByPerimetre,
@@ -586,63 +585,6 @@ export const assignTicketAction = actionClient
     const parsedTicket = selectTicketSchema.parse(updatedTicket);
 
     return { ticket: parsedTicket };
-  });
-
-// ═══════════════════════════════════════════════════════════════
-// GET TICKET MESSAGES
-// ═══════════════════════════════════════════════════════════════
-
-export const getTicketMessagesAction = actionClient
-  .metadata({ actionName: "getTicketMessagesAction" })
-  .inputSchema(
-    z.object({
-      ticketId: z.uuid(),
-      entrepriseId: z.uuid(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-
-    if (!currentUser) {
-      throw errors.unauthorized("Vous n'êtes pas authentifié.");
-    }
-
-    // Vérifier accès entreprise (posture-aware)
-    const hasEntrepriseAccess = await hasAccessToEntreprise(
-      currentUser.id,
-      parsedInput.entrepriseId,
-    );
-
-    if (!hasEntrepriseAccess) {
-      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
-    }
-
-    // Vérifier accès ticket
-    const hasTicketAccess = await canUserAccessTicket({
-      userId: currentUser.id,
-      ticketId: parsedInput.ticketId,
-      entrepriseId: parsedInput.entrepriseId,
-    });
-
-    if (!hasTicketAccess) {
-      throw errors.forbidden(
-        "Vous n'avez pas accès à ce ticket (périmètre insuffisant).",
-      );
-    }
-
-    // Récupérer messages filtrés
-    const messages = await getTicketMessagesFiltered({
-      ticketId: parsedInput.ticketId,
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
-
-    return { messages };
   });
 
 // ═══════════════════════════════════════════════════════════════

@@ -5,6 +5,7 @@ import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesi
 import { eq, and } from "drizzle-orm";
 import { createSelectSchema } from "drizzle-zod";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 const selectUserClientAdhesionSchema = createSelectSchema(userClientAdhesions);
 const selectUserPrestataireAdhesionSchema = createSelectSchema(userPrestataireAdhesions);
@@ -33,32 +34,18 @@ export async function hasAccessToEntreprise(
   }
 
   if (posture === "prestataire") {
-    const adhesion = await db.query.userPrestataireAdhesions.findFirst({
-      where: and(
-        eq(userPrestataireAdhesions.userId, userId),
-        eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
-        eq(userPrestataireAdhesions.statut, "actif"),
-      ),
-    });
-    return !!adhesion;
+    // 1 user = 1 entreprise prestataire : on vérifie que l'entrepriseId correspond
+    const adhesion = await _getPrestataireAdhesion(userId);
+    return adhesion?.entrepriseId === entrepriseId;
   }
 
   // client (défaut)
-  const adhesion = await db.query.userClientAdhesions.findFirst({
-    where: and(
-      eq(userClientAdhesions.userId, userId),
-      eq(userClientAdhesions.entrepriseId, entrepriseId),
-      eq(userClientAdhesions.statut, "actif"),
-    ),
-  });
+  const adhesion = await _getClientAdhesion(userId, entrepriseId);
   return !!adhesion;
 }
 
-/**
- * Retourne l'adhésion prestataire active d'un utilisateur (sans filtrer sur entrepriseId).
- * Un utilisateur n'appartient qu'à une seule entreprise prestataire.
- */
-export async function getUserPrestataireAdhesion({ userId }: { userId: string }) {
+// Primitives cachées — params positionnels pour que cache() déduplique correctement
+const _getPrestataireAdhesion = cache(async (userId: string) => {
   const [row] = await db
     .select()
     .from(userPrestataireAdhesions)
@@ -72,15 +59,9 @@ export async function getUserPrestataireAdhesion({ userId }: { userId: string })
 
   if (!row) return null;
   return selectUserPrestataireAdhesionSchema.parse(row);
-}
+});
 
-export async function getUserClientAdhesion({
-  userId,
-  entrepriseId,
-}: {
-  userId: string;
-  entrepriseId: string;
-}) {
+const _getClientAdhesion = cache(async (userId: string, entrepriseId: string) => {
   const [row] = await db
     .select()
     .from(userClientAdhesions)
@@ -95,4 +76,26 @@ export async function getUserClientAdhesion({
 
   if (!row) return null;
   return selectUserClientAdhesionSchema.parse(row);
+});
+
+/**
+ * Retourne l'adhésion prestataire active d'un utilisateur (sans filtrer sur entrepriseId).
+ * Un utilisateur n'appartient qu'à une seule entreprise prestataire.
+ * Memoized per request.
+ */
+export async function getUserPrestataireAdhesion({ userId }: { userId: string }) {
+  return _getPrestataireAdhesion(userId);
+}
+
+/**
+ * Memoized per request.
+ */
+export async function getUserClientAdhesion({
+  userId,
+  entrepriseId,
+}: {
+  userId: string;
+  entrepriseId: string;
+}) {
+  return _getClientAdhesion(userId, entrepriseId);
 }
