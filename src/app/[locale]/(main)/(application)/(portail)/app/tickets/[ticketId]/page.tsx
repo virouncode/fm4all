@@ -63,17 +63,11 @@ export default async function TicketDetailsPage({
     posture = "plateforme";
     entrepriseId = ticket.proprietaireEntrepriseId;
   } else if (postureCookie === "prestataire") {
-    // Branche prestataire : vérifier adhésion prestataire, puis matching ticket
+    // Branche prestataire : ticket doit être assigné à l'entreprise du prestataire
     const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
-    if (prestataireAdhesion) {
-      const prestId = prestataireAdhesion.entrepriseId;
-      if (
-        ticket.assigneEntrepriseId === prestId ||
-        ticket.demandeurEntrepriseId === prestId
-      ) {
-        entrepriseId = prestId;
-        posture = "prestataire";
-      }
+    if (prestataireAdhesion && ticket.assigneEntrepriseId === prestataireAdhesion.entrepriseId) {
+      entrepriseId = prestataireAdhesion.entrepriseId;
+      posture = "prestataire";
     }
   } else {
     // Branche client (défaut) : vérifier adhesion client

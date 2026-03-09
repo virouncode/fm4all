@@ -3,7 +3,8 @@ import "server-only";
 import { db } from "@/db";
 import { tickets, ticketMessages } from "@/db/schema/tickets";
 import { sites } from "@/db/schema/sites";
-import { clientPrestataireRelations, entreprises } from "@/db/schema/entreprises";
+import { userPrestataireAdhesions } from "@/db/schema/users";
+import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { user } from "@/db/schema/auth";
 import { documents, documentsLinks } from "@/db/schema/documents";
 import { getUserAccessibleSiteIdsForTickets } from "@/server/utils/ticketsPerimetre.utils";
@@ -60,9 +61,9 @@ export async function getTicketsByPerimetre({
   page: number;
   pageSize: number;
 }> {
-  // 1. Calculer les siteIds accessibles selon posture
+  // 1. Calculer le périmètre accessible selon posture
   let accessibleSiteIds: string[] = [];
-  let clientEntrepriseIds: string[] = [];
+  let prestataireIsAdmin = false;
 
   if (posture === "client") {
     // Client: sites du périmètre effectif
@@ -71,12 +72,26 @@ export async function getTicketsByPerimetre({
       entrepriseId,
     });
   } else if (posture === "prestataire") {
-    // Prestataire: tickets de tous les clients liés via clientPrestataireRelations
-    const relations = await db
-      .select({ clientEntrepriseId: clientPrestataireRelations.clientEntrepriseId })
-      .from(clientPrestataireRelations)
-      .where(eq(clientPrestataireRelations.prestataireEntrepriseId, entrepriseId));
-    clientEntrepriseIds = relations.map((r) => r.clientEntrepriseId);
+    // Prestataire: tickets assignés à son entreprise
+    // Admin → tous les tickets assignés, sinon filtrer par sites attribués
+    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+      columns: { role: true },
+    });
+
+    if (!prestataireAdhesion) {
+      return { items: [], total: 0, page: filters.page, pageSize: filters.pageSize };
+    }
+
+    prestataireIsAdmin = prestataireAdhesion.role === "admin";
+
+    if (!prestataireIsAdmin) {
+      accessibleSiteIds = await getAllPrestataireSiteIds({ userId });
+    }
   }
 
   // 2. Construire WHERE clause
@@ -85,30 +100,21 @@ export async function getTicketsByPerimetre({
   // Filtre périmètre
   if (posture === "plateforme") {
     // Plateforme: aucun filtre de périmètre, voit TOUS les tickets
-    // (Pas de condition ici)
   } else if (posture === "client") {
-    // Client: filtrer par sites accessibles
     if (accessibleSiteIds.length === 0) {
-      // Aucun site accessible → aucun ticket
-      return {
-        items: [],
-        total: 0,
-        page: filters.page,
-        pageSize: filters.pageSize,
-      };
+      return { items: [], total: 0, page: filters.page, pageSize: filters.pageSize };
     }
     conditions.push(inArray(tickets.siteId, accessibleSiteIds));
   } else if (posture === "prestataire") {
-    // Prestataire: tickets des clients liés
-    if (clientEntrepriseIds.length === 0) {
-      return {
-        items: [],
-        total: 0,
-        page: filters.page,
-        pageSize: filters.pageSize,
-      };
+    if (!prestataireIsAdmin && accessibleSiteIds.length === 0) {
+      return { items: [], total: 0, page: filters.page, pageSize: filters.pageSize };
     }
-    conditions.push(inArray(tickets.proprietaireEntrepriseId, clientEntrepriseIds));
+    // Uniquement les tickets assignés à l'entreprise du prestataire
+    conditions.push(eq(tickets.assigneEntrepriseId, entrepriseId));
+    // Non-admin: restreindre aux sites attribués
+    if (!prestataireIsAdmin) {
+      conditions.push(inArray(tickets.siteId, accessibleSiteIds));
+    }
   }
 
   // Filtres métier

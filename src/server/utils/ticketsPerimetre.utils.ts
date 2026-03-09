@@ -1,9 +1,14 @@
 import "server-only";
 
 import { db } from "@/db";
+import { userPrestataireAdhesions } from "@/db/schema/users";
 import { getUserClientSiteAttributions } from "@/server/queries/userSiteAttributions.query";
-import { getUserPrestataireSiteAttributions } from "@/server/queries/userPrestataireSiteAttributions.query";
+import {
+  getAllPrestataireSiteIds,
+  getUserPrestataireSiteAttributions,
+} from "@/server/queries/userPrestataireSiteAttributions.query";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { and, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
 type DbOrTransaction =
@@ -99,13 +104,25 @@ export async function canUserAccessTicket({
   const posture = cookieStore.get("fm4all:postureActive")?.value;
 
   if (posture === "prestataire") {
-    // Prestataire: ticket assigné à son entreprise, à lui directement,
-    // ou dont il est le demandeur (cas où le prestataire a créé le ticket)
-    return (
-      ticket.assigneEntrepriseId === entrepriseId ||
-      ticket.assigneUserId === userId ||
-      ticket.demandeurEntrepriseId === entrepriseId
-    );
+    // Seuls les tickets assignés à l'entreprise sont visibles
+    if (ticket.assigneEntrepriseId !== entrepriseId) return false;
+
+    // Admin → accès total aux tickets de l'entreprise
+    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+      columns: { role: true },
+    });
+
+    if (!prestataireAdhesion) return false;
+    if (prestataireAdhesion.role === "admin") return true;
+
+    // Non-admin: vérifier attribution sur le site du ticket
+    const siteIds = await getAllPrestataireSiteIds({ userId });
+    return siteIds.includes(ticket.siteId);
   }
 
   // client (défaut)
