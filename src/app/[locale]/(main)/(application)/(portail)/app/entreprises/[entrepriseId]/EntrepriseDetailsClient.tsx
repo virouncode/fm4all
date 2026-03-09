@@ -248,6 +248,11 @@ export function EntrepriseDetailsClient({
                   "$1 $2 $3 $4",
                 )}
               </p>
+              {entreprise.numeroTva && (
+                <p className="text-muted-foreground mt-0.5 font-mono text-xs">
+                  TVA : {entreprise.numeroTva}
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -409,6 +414,7 @@ export function EntrepriseDetailsClient({
             entrepriseId={entreprise.id}
             currentNom={entreprise.nom}
             currentSiret={entreprise.siret}
+            currentNumeroTva={entreprise.numeroTva}
             onSuccess={handleUpdate}
           />
 

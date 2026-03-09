@@ -52,6 +52,8 @@ type SiretState =
   | { status: "not_found" }
   | { status: "error"; message: string };
 
+const FR_TVA_REGEX = /^FR[A-HJ-NP-Z0-9]{2}\d{9}$/;
+
 const dialogFormSchema = z
   .object({
     nom: z.string().min(1, "Nom de l'entreprise obligatoire"),
@@ -59,6 +61,14 @@ const dialogFormSchema = z
     nomContact: z.string(),
     emailContact: z.string().email("Email invalide").or(z.literal("")),
     phoneContact: z.string(),
+    numeroTva: z
+      .string()
+      .regex(
+        FR_TVA_REGEX,
+        "Format attendu : FR + 2 caractères + 9 chiffres (ex: FR71941928640)",
+      )
+      .or(z.literal(""))
+      .optional(),
     roles: z
       .array(z.enum(roleEntrepriseCodes))
       .min(1, "Sélectionnez au moins un rôle"),
@@ -129,6 +139,7 @@ export function EntrepriseFormDialog({
       nomContact: "",
       emailContact: "",
       phoneContact: "",
+      numeroTva: "",
       roles: [],
       serviceIds: [],
     },
@@ -154,6 +165,7 @@ export function EntrepriseFormDialog({
       nomContact: "",
       emailContact: "",
       phoneContact: "",
+      numeroTva: "",
       roles: [],
       serviceIds: [],
     });
@@ -252,6 +264,7 @@ export function EntrepriseFormDialog({
       nomContact: data.nomContact || undefined,
       emailContact: data.emailContact || undefined,
       phoneContact: data.phoneContact,
+      numeroTva: data.numeroTva || undefined,
       roles: data.roles,
       serviceIds: data.serviceIds,
     });
@@ -437,6 +450,13 @@ export function EntrepriseFormDialog({
                             label="Téléphone"
                           />
                         </div>
+
+                        <RhfInput<DialogFormType>
+                          name="numeroTva"
+                          label="Numéro de TVA"
+                          placeholder="FR71941928640"
+                          className="font-mono uppercase"
+                        />
                       </>
                     )}
                   </div>

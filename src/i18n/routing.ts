@@ -389,6 +389,18 @@ export const routing = defineRouting({
       fr: "/app/parametres",
       en: "/app/parametres",
     },
+    "/app/devis": {
+      fr: "/app/devis",
+      en: "/app/devis",
+    },
+    "/app/devis/[devisId]": {
+      fr: "/app/devis/[devisId]",
+      en: "/app/devis/[devisId]",
+    },
+    "/app/devis/nouveau": {
+      fr: "/app/devis/nouveau",
+      en: "/app/devis/nouveau",
+    },
     "/app/tickets": {
       fr: "/app/tickets",
       en: "/app/tickets",

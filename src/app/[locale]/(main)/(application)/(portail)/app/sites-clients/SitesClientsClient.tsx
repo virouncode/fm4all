@@ -1,6 +1,5 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -221,14 +220,16 @@ export function SitesClientsClient() {
   return (
     <div className="flex flex-col gap-4">
       {/* Sélecteur client */}
-      <div className="flex flex-col gap-1.5">
-        <Label>Client</Label>
+      <div className="flex flex-shrink-0 items-center gap-2">
+        <span className="text-muted-foreground whitespace-nowrap text-sm">
+          Client :
+        </span>
         <Select
           value={selectedClientId ?? ""}
           onValueChange={handleClientChange}
           disabled={loadingClients}
         >
-          <SelectTrigger className="w-full max-w-sm">
+          <SelectTrigger className="h-8 w-64">
             <SelectValue
               placeholder={
                 loadingClients ? "Chargement…" : "Sélectionnez un client"

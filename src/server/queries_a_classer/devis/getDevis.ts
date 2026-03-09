@@ -10,7 +10,7 @@ import {
   selectDevisSchema,
   SelectDevisType,
   SORTABLE_DEVIS_COLUMNS,
-} from "@/zod-schemas/devis";
+} from "@/zod-schemas/devisComparateur";
 import { and, asc, desc, eq, gte, ilike, lt, SQL } from "drizzle-orm";
 
 export const getAllDevis = async (params: {

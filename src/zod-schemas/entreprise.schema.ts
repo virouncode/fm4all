@@ -6,6 +6,18 @@ import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { entrepriseRoles, entreprises } from "../db/schema";
 
+// Numéro de TVA français : FR + 2 chars [A-HJ-NP-Z0-9] (pas O ni I) + 9 chiffres
+const FR_TVA_REGEX = /^FR[A-HJ-NP-Z0-9]{2}\d{9}$/;
+
+export const numeroTvaSchema = z
+  .string()
+  .regex(
+    FR_TVA_REGEX,
+    "Le numéro de TVA doit être au format FR + 2 caractères + 9 chiffres (ex: FR71941928640)",
+  )
+  .or(z.literal(""))
+  .optional();
+
 export const entrepriseSelectSchema = createSelectSchema(entreprises);
 export type EntrepriseSelectType = z.infer<typeof entrepriseSelectSchema>;
 
@@ -37,6 +49,7 @@ export const insertEntrepriseStep1Schema = z.object({
     .or(z.literal(""))
     .optional(),
   phoneContact: phoneNumberSchemaEmpty("Numéro de téléphone invalide"),
+  numeroTva: numeroTvaSchema,
   roles: z
     .array(roleEntrepriseSchema)
     .min(1, "Au moins un rôle est obligatoire"),
@@ -73,6 +86,7 @@ export const updateEntrepriseInfosSchema = z.object({
     .string()
     .min(1, "Le SIRET est obligatoire")
     .refine(isValidSIRET, "Le SIRET est invalide"),
+  numeroTva: numeroTvaSchema,
 });
 export type UpdateEntrepriseInfosType = z.infer<
   typeof updateEntrepriseInfosSchema
@@ -141,6 +155,7 @@ export type EntrepriseWithDetails = {
   id: string;
   nom: string;
   siret: string;
+  numeroTva: string | null;
   prenomContact: string | null;
   nomContact: string | null;
   emailContact: string | null;

@@ -21,7 +21,7 @@ import {
   selectDevisSchema,
   SelectDevisType,
   SORTABLE_DEVIS_COLUMNS,
-} from "@/zod-schemas/devis";
+} from "@/zod-schemas/devisComparateur";
 import {
   selectFournisseurSchema,
   SelectFournisseurType,

@@ -108,8 +108,10 @@ export const devisStatutCodes = devisStatutCT.map((i) => i.code) as unknown as [
 ];
 
 export const devisTypePrixCT = [
-  { code: "recurrent", name: "Récurrent" },
-  { code: "one_shot", name: "One shot" },
+  { code: "abonnement", name: "Abonnement" },
+  { code: "one_shot", name: "One-shot" },
+  { code: "installation", name: "Installation" },
+  { code: "frais_livraison", name: "Livraison" },
 ] as const;
 
 export const devisTypePrixCodes = devisTypePrixCT.map(
@@ -179,6 +181,19 @@ export const devisLigneUniteCodes = devisLigneUniteCT.map(
 ) as unknown as [
   (typeof devisLigneUniteCT)[number]["code"],
   ...(typeof devisLigneUniteCT)[number]["code"][],
+];
+
+export const devisPeriodeFacturationCT = [
+  { code: "semaine", name: "Semaine" },
+  { code: "mois", name: "Mois" },
+  { code: "annee", name: "Année" },
+] as const;
+
+export const devisPeriodeFacturationCodes = devisPeriodeFacturationCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof devisPeriodeFacturationCT)[number]["code"],
+  ...(typeof devisPeriodeFacturationCT)[number]["code"][],
 ];
 
 export const siteAttributionScopeCT = [

@@ -37,6 +37,7 @@ export const entreprises = pgTable(
     logoId: uuid("logo_id").references((): AnyPgColumn => documents.id, {
       onDelete: "set null",
     }),
+    numeroTva: text("numero_tva"),
     createdById: uuid("created_by_id").references(() => user.id, {
       onDelete: "set null",
     }),

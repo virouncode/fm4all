@@ -26,6 +26,7 @@ type Props = {
   entrepriseId: string;
   currentNom: string;
   currentSiret: string;
+  currentNumeroTva: string | null;
   onSuccess: () => void;
 };
 
@@ -35,6 +36,7 @@ export function EditEntrepriseInfosDialog({
   entrepriseId,
   currentNom,
   currentSiret,
+  currentNumeroTva,
   onSuccess,
 }: Props) {
   const form = useForm<UpdateEntrepriseInfosType>({
@@ -44,6 +46,7 @@ export function EditEntrepriseInfosDialog({
       entrepriseId,
       nom: currentNom,
       siret: currentSiret,
+      numeroTva: currentNumeroTva ?? "",
     },
   });
 
@@ -51,7 +54,7 @@ export function EditEntrepriseInfosDialog({
 
   useEffect(() => {
     if (!open) return;
-    form.reset({ entrepriseId, nom: currentNom, siret: currentSiret });
+    form.reset({ entrepriseId, nom: currentNom, siret: currentSiret, numeroTva: currentNumeroTva ?? "" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -90,6 +93,12 @@ export function EditEntrepriseInfosDialog({
               label="SIRET"
               requiredMark
               placeholder="123 456 789 00000"
+            />
+            <RhfInput<UpdateEntrepriseInfosType>
+              name="numeroTva"
+              label="Numéro de TVA"
+              placeholder="FR71941928640"
+              className="font-mono uppercase"
             />
 
             <div className="flex justify-end gap-2 pt-2">

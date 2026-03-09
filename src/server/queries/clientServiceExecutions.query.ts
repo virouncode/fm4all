@@ -79,6 +79,7 @@ export type PrestataireAvecDetails = {
   id: string;
   nom: string;
   siret: string;
+  numeroTva: string | null;
   prenomContact: string | null;
   nomContact: string | null;
   emailContact: string | null;
@@ -147,6 +148,7 @@ export async function getClientPrestatairesAvecDetails(
       id: entreprises.id,
       nom: entreprises.nom,
       siret: entreprises.siret,
+      numeroTva: entreprises.numeroTva,
       prenomContact: entreprises.prenomContact,
       nomContact: entreprises.nomContact,
       emailContact: entreprises.emailContact,
@@ -977,6 +979,7 @@ export type ClientAvecDetails = {
   id: string;
   nom: string;
   siret: string;
+  numeroTva: string | null;
   prenomContact: string | null;
   nomContact: string | null;
   emailContact: string | null;
@@ -1049,6 +1052,7 @@ export async function getMesClients(
       id: entreprises.id,
       nom: entreprises.nom,
       siret: entreprises.siret,
+      numeroTva: entreprises.numeroTva,
       prenomContact: entreprises.prenomContact,
       nomContact: entreprises.nomContact,
       emailContact: entreprises.emailContact,

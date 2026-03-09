@@ -2,12 +2,19 @@ import {
   index,
   integer,
   numeric,
+  pgSequence,
   pgTable,
   text,
   uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+export const devisNumeroSeq = pgSequence("devis_numero_seq", {
+  startWith: 1,
+  increment: 1,
+  cache: 1,
+});
 import {
   createdAt,
   createdById,
@@ -18,11 +25,7 @@ import {
 } from "../schema-helper";
 import { user } from "./auth";
 import { entreprises } from "./entreprises";
-import {
-  devisLigneUniteEnum,
-  devisStatutEnum,
-  devisTypePrixEnum,
-} from "./enums";
+import { devisPeriodeFacturationEnum, devisStatutEnum, devisTypePrixEnum } from "./enums";
 import { prospects } from "./prospects";
 import { services } from "./services";
 import { sites } from "./sites";
@@ -114,9 +117,13 @@ export const devis = pgTable(
     ticketId: uuid("ticket_id").references(() => tickets.id, {
       onDelete: "set null",
     }),
+    numero: varchar("numero", { length: 20 }).unique(),
     titre: varchar("titre", { length: 255 }).notNull(),
     description: text("description"),
+    noteInterne: text("note_interne"),
     statut: devisStatutEnum("statut").notNull().default("brouillon"),
+    remiseGlobaleHt: integer("remise_globale_ht").notNull().default(0),
+    dateEmission: timestamptz("date_emission"),
     validTo: timestamptz("valid_to"),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
@@ -124,6 +131,7 @@ export const devis = pgTable(
     updatedAt: updatedAt(),
   },
   (table) => [
+    index("devis_site_id_idx").on(table.siteId),
     index("devis_ticket_id_idx").on(table.ticketId),
     index("devis_statut_idx").on(table.statut),
     index("devis_created_at_idx").on(table.createdAt),
@@ -143,12 +151,13 @@ export const devisLignes = pgTable(
     designation: varchar("designation", { length: 255 }).notNull(),
     description: text("description"),
     quantite: numeric("quantite", { precision: 12, scale: 3 }).notNull(),
-    unite: devisLigneUniteEnum("unite").notNull(),
+    unite: varchar("unite", { length: 100 }).notNull(),
     prixUnitaireHt: integer("prix_unitaire_ht").notNull(), // *100
     tauxTva: integer("taux_tva").notNull(), // *100
     ordre: integer("ordre").notNull(), //position de la ligne dans le devis
     remiseHtMontant: integer("remise_ht").notNull().default(0), // *100
     typePrix: devisTypePrixEnum("type_prix").notNull(),
+    periodeFacturation: devisPeriodeFacturationEnum("periode_facturation"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdById: createdById(() => user),

@@ -87,6 +87,11 @@ export function EntrepriseCard({
             <p className="text-muted-foreground mt-0.5 font-mono text-xs">
               {siret}
             </p>
+            {entreprise.numeroTva && (
+              <p className="text-muted-foreground font-mono text-xs">
+                TVA : {entreprise.numeroTva}
+              </p>
+            )}
           </div>
         </div>
 

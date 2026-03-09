@@ -1,0 +1,1 @@
+CREATE INDEX "devis_site_id_idx" ON "devis" USING btree ("site_id");

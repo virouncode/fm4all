@@ -1,5 +1,6 @@
 import z from "zod";
 import {
+  devisPeriodeFacturationEnum,
   devisStatutEnum,
   devisTypePrixEnum,
   occurrenceStatutEnum,
@@ -24,6 +25,13 @@ export type DevisTypePrixType = z.infer<typeof devisTypePrixSchema>;
 
 export const devisStatutSchema = z.enum(devisStatutEnum.enumValues);
 export type DevisStatutType = z.infer<typeof devisStatutSchema>;
+
+export const devisPeriodeFacturationSchema = z.enum(
+  devisPeriodeFacturationEnum.enumValues,
+);
+export type DevisPeriodeFacturationType = z.infer<
+  typeof devisPeriodeFacturationSchema
+>;
 
 export const ticketPrioriteSchema = z.enum(ticketPrioriteEnum.enumValues);
 export type TicketPrioriteType = z.infer<typeof ticketPrioriteSchema>;
@@ -56,3 +64,6 @@ export type OccurrenceTransitionStatutType = z.infer<
 
 export const occurrenceTacheStatutSchema = z.enum(occurrenceTacheStatutEnum.enumValues);
 export type OccurrenceTacheStatutType = z.infer<typeof occurrenceTacheStatutSchema>;
+
+export const devisLigneUniteSchema = z.string().min(1, "Unité obligatoire");
+export type DevisLigneUniteType = string;

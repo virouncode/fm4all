@@ -211,6 +211,41 @@
       "when": 1772885319218,
       "tag": "0029_tricky_captain_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1772977097662,
+      "tag": "0030_premium_switch",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1772993116054,
+      "tag": "0031_wonderful_sentry",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1772996265386,
+      "tag": "0032_cute_machine_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1773000000000,
+      "tag": "0033_devis_lignes_unite_varchar",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1773010000000,
+      "tag": "0034_devis_type_prix_periode",
+      "breakpoints": true
     }
   ]
 }
