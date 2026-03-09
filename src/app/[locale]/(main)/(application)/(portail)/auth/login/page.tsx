@@ -1,7 +1,7 @@
 "use client";
 
 import BackgroundClient from "@/components/backgrounds/BackgroundClient";
-import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
+import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -94,15 +94,19 @@ export default function SignIn() {
             <Form {...form}>
               <form onSubmit={handleSubmit(submitForm)}>
                 <div className="grid gap-4">
-                  <InputWithLabel<SignInType>
-                    fieldTitle="Email"
-                    nameInSchema="email"
+                  <RhfInput<SignInType>
+                    label="Email"
+                    name="email"
                     type="email"
+                    autoComplete="username"
+                    requiredMark
                   />
-                  <InputWithLabel<SignInType>
-                    fieldTitle="Mot de passe"
-                    nameInSchema="password"
+                  <RhfInput<SignInType>
+                    label="Mot de passe"
+                    name="password"
                     type="password"
+                    autoComplete="current-password"
+                    requiredMark
                   />
                   <Link
                     href="/auth/forgot-password"

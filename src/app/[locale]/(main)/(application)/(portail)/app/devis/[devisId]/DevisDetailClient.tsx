@@ -374,7 +374,7 @@ export function DevisDetailClient({
 
       const pdfBytes = await pdfDoc.save();
       const filename = `devis-${devisNumero}.pdf`;
-      const file = new File([pdfBytes], filename, { type: "application/pdf" });
+      const file = new File([pdfBytes.buffer as ArrayBuffer], filename, { type: "application/pdf" });
 
       const { key: tempKey } = await uploadFileToS3({
         file,

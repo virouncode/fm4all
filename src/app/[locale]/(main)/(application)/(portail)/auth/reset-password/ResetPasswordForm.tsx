@@ -1,5 +1,5 @@
 "use client";
-import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
+import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
@@ -63,17 +63,21 @@ const ResetPasswordForm = ({ token }: ResetPasswordProps) => {
       <form onSubmit={form.handleSubmit(submitForm)}>
         <div className="grid gap-4">
           <div className="space-y-3">
-            <InputWithLabel<ResetPasswordType>
-              fieldTitle="Nouveau mot de passe*"
-              nameInSchema="password"
+            <RhfInput<ResetPasswordType>
+              label="Nouveau mot de passe"
+              name="password"
               type="password"
+              autoComplete="new-password"
+              requiredMark
             />
             <PasswordStrengthIndicator password={passwordValue} />
           </div>
-          <InputWithLabel<ResetPasswordType>
-            fieldTitle="Confirmation mot de passe*"
-            nameInSchema="passwordConfirmation"
+          <RhfInput<ResetPasswordType>
+            label="Confirmation mot de passe"
+            name="passwordConfirmation"
             type="password"
+            autoComplete="new-password"
+            requiredMark
           />
           <Button className="w-full text-base" disabled={loading} size="lg">
             {loading ? (

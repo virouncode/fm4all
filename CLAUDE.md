@@ -2403,7 +2403,69 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 
 ---
 
-**Dernière mise à jour**: 2026-03-07
+## Changelog (2026-03-09)
+
+**Module Devis — PDF + responsable_site** :
+
+- ✅ `DevisPreviewCard` : prop `pdfMode` pour ajuster l'espacement lors de la capture html2canvas
+- ✅ Génération PDF : format A4 fixe (595×842pt) avec pdf-lib, logo converti en data URL pour contourner CORS
+- ✅ `responsable_site` affiché dans le preview (création + détail), en remontant la hiérarchie via `sitesArborescence`
+- ✅ Bouton Printer (ouvre le PDF dans un nouvel onglet)
+
+**Pièges CSS à retenir** :
+
+#### ❌ `[&_p]:!important` cible TOUS les `<p>` enfants
+```tsx
+// FAUX : mb-10 sur le <p> sera écrasé par [&_p]:!mb-0.5 du parent
+<div className="[&_p]:!mb-0.5">
+  <p className="mb-10">DE</p>  // ❌ mb-10 ignoré car !important du parent gagne
+</div>
+
+// CORRECT : passer les éléments à exclure en <div>
+<div className="[&_p]:!mb-0.5">
+  <div className="mb-10">DE</div>  // ✅ <div> non ciblé par [&_p]
+  <p className="text-xs">contact</p>  // ✅ reçoit bien mb-0.5
+</div>
+```
+
+#### ❌ html2canvas ne peut pas charger les URLs S3 présignées (CORS)
+Pour les images dans une capture html2canvas, convertir en data URL :
+```typescript
+const resp = await fetch(presignedUrl);
+const blob = await resp.blob();
+const dataUrl = await new Promise<string>((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result as string);
+  reader.onerror = reject;
+  reader.readAsDataURL(blob);
+});
+// Utiliser dataUrl dans le state — html2canvas peut le lire sans CORS
+```
+
+#### ❌ Alignement tables avec html2canvas : classes Tailwind ignorées
+Les classes `text-left`, `text-right`, `text-center` sur `<th>/<td>` peuvent ne pas être capturées.
+→ Toujours utiliser `style={{ textAlign: "left" }}` inline.
+
+#### Pattern `userClientSiteAttributions` + hiérarchie de sites
+Quand on cherche un `responsable_site` pour un site donné, ne PAS faire de match exact sur `siteId`.
+Une attribution peut être sur un site parent avec `scope = "subtree"`. Toujours joindre `sitesArborescence` :
+```typescript
+.innerJoin(sitesArborescence, and(
+  eq(sitesArborescence.ancetreId, userClientSiteAttributions.siteId),
+  eq(sitesArborescence.descendantId, targetSiteId),
+  eq(sitesArborescence.entrepriseId, entrepriseId),
+))
+.where(and(
+  eq(userClientSiteAttributions.role, "responsable_site"),
+  or(eq(sitesArborescence.profondeur, 0), eq(userClientSiteAttributions.scope, "subtree")),
+))
+.orderBy(asc(sitesArborescence.profondeur))
+.limit(1)
+```
+
+---
+
+**Dernière mise à jour**: 2026-03-09
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 
