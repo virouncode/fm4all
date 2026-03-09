@@ -12,6 +12,8 @@ type DevisDemandeGridProps = {
   isError: boolean;
   hasMore: boolean;
   loadMore: () => void;
+  showClient?: boolean;
+  showDevisCount?: boolean;
   onItemClick?: (item: DevisDemandeAvecDetails) => void;
 };
 
@@ -22,6 +24,8 @@ export function DevisDemandeGrid({
   isError,
   hasMore,
   loadMore,
+  showClient = false,
+  showDevisCount = false,
   onItemClick,
 }: DevisDemandeGridProps) {
   const { targetRef } = useIntersection({
@@ -65,6 +69,8 @@ export function DevisDemandeGrid({
           <DevisDemandeCard
             key={item.id}
             demande={item}
+            showClient={showClient}
+            showDevisCount={showDevisCount}
             onClick={() => onItemClick?.(item)}
           />
         ))}

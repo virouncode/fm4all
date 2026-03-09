@@ -23,6 +23,7 @@ export type DevisAvecDetails = SelectDevisType & {
   siteNom: string;
   createdByPrenom: string | null;
   createdByNom: string | null;
+  serviceNoms: string[];
 };
 
 export type DevisAvecLignes = SelectDevisType & {
@@ -189,10 +190,21 @@ export async function getDevisPaginated(
   if (scopeCondition) conditions.push(scopeCondition);
   if (query.statut) conditions.push(eq(devis.statut, query.statut));
   if (query.siteId) conditions.push(eq(devis.siteId, query.siteId));
+  if (query.clientId) conditions.push(eq(devis.proprietaireEntrepriseId, query.clientId));
+  if (query.emetteurId) conditions.push(eq(devis.emetteurEntrepriseId, query.emetteurId));
+  if (query.serviceId) {
+    conditions.push(
+      sql`EXISTS (SELECT 1 FROM devis_lignes dl WHERE dl.devis_id = ${devis.id} AND dl.service_id = ${query.serviceId}::uuid)`,
+    );
+  }
   if (query.search) {
     const term = `%${query.search}%`;
     conditions.push(
-      or(ilike(devis.titre, term), ilike(devis.numero, term)) as SQL,
+      or(
+        ilike(devis.titre, term),
+        ilike(devis.numero, term),
+        ilike(devis.description, term),
+      ) as SQL,
     );
   }
 
@@ -200,6 +212,8 @@ export async function getDevisPaginated(
 
   const orderColumn = (() => {
     switch (query.orderBy) {
+      case "updatedAt":
+        return devis.updatedAt;
       case "numero":
         return devis.numero;
       case "titre":
@@ -233,6 +247,13 @@ export async function getDevisPaginated(
         siteNom: sites.nom,
         createdByPrenom: createdByUser.prenom,
         createdByNom: createdByUser.nom,
+        serviceNoms: sql<string[]>`(
+          SELECT COALESCE(ARRAY_AGG(DISTINCT s.nom ORDER BY s.nom), '{}')
+          FROM devis_lignes dl
+          INNER JOIN services s ON s.id = dl.service_id
+          WHERE dl.devis_id = ${devis.id}
+          AND dl.service_id IS NOT NULL
+        )`,
       })
       .from(devis)
       .innerJoin(proprietaire, eq(devis.proprietaireEntrepriseId, proprietaire.id))
@@ -260,6 +281,7 @@ export async function getDevisPaginated(
       siteNom: r.siteNom,
       createdByPrenom: r.createdByPrenom ?? null,
       createdByNom: r.createdByNom ?? null,
+      serviceNoms: r.serviceNoms ?? [],
     })),
     total,
   };

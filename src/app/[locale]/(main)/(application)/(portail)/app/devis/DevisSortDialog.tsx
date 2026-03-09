@@ -17,35 +17,24 @@ import {
 import { useRouter } from "@/i18n/navigation";
 import { ArrowDownAZ, ArrowDownUp, ArrowUpAZ } from "lucide-react";
 
+type SortOptionType = {
+  value: string;
+  label: string;
+};
+
 type DevisSortDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   searchParams: Record<string, string | undefined>;
-  hideProprietaire?: boolean;
+  sortOptions: SortOptionType[];
 };
-
-const SORT_OPTIONS = [
-  { value: "createdAt", label: "Date de création" },
-  { value: "dateEmission", label: "Date d'émission" },
-  { value: "validTo", label: "Date de validité" },
-  { value: "numero", label: "Numéro" },
-  { value: "titre", label: "Titre" },
-  { value: "statut", label: "Statut" },
-  { value: "siteNom", label: "Site" },
-  { value: "emetteurEntrepriseNom", label: "Émetteur" },
-  { value: "proprietaireEntrepriseNom", label: "Client" },
-] as const;
-
 
 export function DevisSortDialog({
   open,
   onOpenChange,
   searchParams,
-  hideProprietaire = false,
+  sortOptions,
 }: DevisSortDialogProps) {
-  const visibleOptions = SORT_OPTIONS.filter(
-    (o) => !(hideProprietaire && o.value === "proprietaireEntrepriseNom"),
-  );
   const router = useRouter();
 
   const currentOrderBy = searchParams.orderBy ?? "createdAt";
@@ -85,7 +74,7 @@ export function DevisSortDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {visibleOptions.map((option) => (
+                {sortOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

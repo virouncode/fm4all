@@ -5,6 +5,9 @@ type SearchParamsType = {
   tab?: string;
   statut?: string;
   siteId?: string;
+  clientId?: string;
+  emetteurId?: string;
+  serviceId?: string;
   search?: string;
   orderBy?: string;
   orderDir?: string;

@@ -1,5 +1,6 @@
 import z from "zod";
 import {
+  devisDemandeStatutEnum,
   devisPeriodeFacturationEnum,
   devisStatutEnum,
   devisTypePrixEnum,
@@ -25,6 +26,11 @@ export type DevisTypePrixType = z.infer<typeof devisTypePrixSchema>;
 
 export const devisStatutSchema = z.enum(devisStatutEnum.enumValues);
 export type DevisStatutType = z.infer<typeof devisStatutSchema>;
+
+export const devisDemandeStatutSchema = z.enum(
+  devisDemandeStatutEnum.enumValues,
+);
+export type DevisDemandeStatutType = z.infer<typeof devisDemandeStatutSchema>;
 
 export const devisPeriodeFacturationSchema = z.enum(
   devisPeriodeFacturationEnum.enumValues,

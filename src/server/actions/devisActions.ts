@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "@/db";
+import { user } from "@/db/schema/auth";
 import { devis, devisLignes, devisNumeroSeq } from "@/db/schema/devis";
 import { documents, documentsLinks } from "@/db/schema/documents";
-import { user } from "@/db/schema/auth";
 import { sitesArborescence } from "@/db/schema/sites";
 import { userClientSiteAttributions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
@@ -11,26 +11,27 @@ import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import { getDevisById, getDevisPaginated } from "@/server/queries/devis.query";
 import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
+import { promoteS3Key } from "@/server/s3/s3";
 import {
   canUserEditDevis,
   canUserEmettreDevis,
 } from "@/server/utils/devisPermissions.utils";
-import { promoteS3Key } from "@/server/s3/s3";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   devisQuerySchema,
   emettreDevisSchema,
   insertDevisLigneSchema,
   insertDevisSchema,
-  reorderDevisLignesSchema,
   refuserDevisSchema,
+  reorderDevisLignesSchema,
   saveDevisWithLignesSchema,
   signerDevisSchema,
   updateDevisLigneSchema,
   updateDevisSchema,
 } from "@/zod-schemas/devis.schema";
-import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { and, asc, eq, or, sql } from "drizzle-orm";
+import { entreprises } from "@/db/schema/entreprises";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
@@ -52,17 +53,61 @@ export const getDevisAction = actionClient
     let scopeCondition = undefined;
     if (!plateformeRole?.role) {
       const { entrepriseId } = parsedInput;
-      const adhesion = await hasAccessToEntreprise(currentUser.id, entrepriseId);
+      const adhesion = await hasAccessToEntreprise(
+        currentUser.id,
+        entrepriseId,
+      );
       if (!adhesion) throw errors.forbidden("Accès refusé.");
       scopeCondition = sql`(${devis.emetteurEntrepriseId} = ${entrepriseId} OR ${devis.proprietaireEntrepriseId} = ${entrepriseId})`;
     }
 
-    return getDevisPaginated(parsedInput, scopeCondition);
+    return getDevisPaginated(
+      { ...parsedInput, emetteurId: parsedInput.emetteurId },
+      scopeCondition,
+    );
+  });
+
+export const getDevisEmetteursAction = actionClient
+  .metadata({ actionName: "getDevisEmetteursAction" })
+  .inputSchema(
+    z.object({ entrepriseId: z.uuid() }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+
+    if (!plateformeRole?.role) {
+      const hasAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        parsedInput.entrepriseId,
+      );
+      if (!hasAccess) throw errors.forbidden("Accès refusé.");
+    }
+
+    const rows = await db
+      .selectDistinct({ id: entreprises.id, nom: entreprises.nom })
+      .from(devis)
+      .innerJoin(entreprises, eq(devis.emetteurEntrepriseId, entreprises.id))
+      .where(
+        plateformeRole?.role
+          ? undefined
+          : eq(devis.proprietaireEntrepriseId, parsedInput.entrepriseId),
+      )
+      .orderBy(asc(entreprises.nom));
+
+    return { emetteurs: rows };
   });
 
 export const getDevisDetailAction = actionClient
   .metadata({ actionName: "getDevisDetailAction" })
-  .inputSchema(z.object({ devisId: z.string().uuid() }), {
+  .inputSchema(z.object({ devisId: z.uuid() }), {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -78,9 +123,13 @@ export const getDevisDetailAction = actionClient
     if (!plateformeRole?.role) {
       const [asEmetteur, asProprietaire] = await Promise.all([
         hasAccessToEntreprise(currentUser.id, devisRow.emetteurEntrepriseId),
-        hasAccessToEntreprise(currentUser.id, devisRow.proprietaireEntrepriseId),
+        hasAccessToEntreprise(
+          currentUser.id,
+          devisRow.proprietaireEntrepriseId,
+        ),
       ]);
-      if (!asEmetteur && !asProprietaire) throw errors.forbidden("Accès refusé.");
+      if (!asEmetteur && !asProprietaire)
+        throw errors.forbidden("Accès refusé.");
     }
 
     return { devis: devisRow };
@@ -101,14 +150,28 @@ export const insertDevisAction = actionClient
 
     // La plateforme ne crée pas de devis
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (plateformeRole?.role) throw errors.forbidden("La plateforme ne peut pas créer de devis directement.");
+    if (plateformeRole?.role)
+      throw errors.forbidden(
+        "La plateforme ne peut pas créer de devis directement.",
+      );
 
     // L'utilisateur doit être dans l'entreprise émettrice
-    const hasAccess = await hasAccessToEntreprise(currentUser.id, parsedInput.emetteurEntrepriseId);
-    if (!hasAccess) throw errors.forbidden("Vous ne pouvez pas créer un devis au nom de cette entreprise.");
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.emetteurEntrepriseId,
+    );
+    if (!hasAccess)
+      throw errors.forbidden(
+        "Vous ne pouvez pas créer un devis au nom de cette entreprise.",
+      );
 
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalStrings: ["devisDemandeId", "ticketId", "description", "noteInterne"] as const,
+      optionalStrings: [
+        "devisDemandeId",
+        "ticketId",
+        "description",
+        "noteInterne",
+      ] as const,
     });
 
     const [inserted] = await db
@@ -146,10 +209,18 @@ export const updateDevisAction = actionClient
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     const canEdit = await canUserEditDevis(currentUser.id, parsedInput.id);
-    if (!canEdit) throw errors.forbidden("Modification impossible : le devis est émis ou vous n'avez pas les droits.");
+    if (!canEdit)
+      throw errors.forbidden(
+        "Modification impossible : le devis est émis ou vous n'avez pas les droits.",
+      );
 
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalStrings: ["devisDemandeId", "ticketId", "description", "noteInterne"] as const,
+      optionalStrings: [
+        "devisDemandeId",
+        "ticketId",
+        "description",
+        "noteInterne",
+      ] as const,
     });
 
     const [updated] = await db
@@ -159,7 +230,9 @@ export const updateDevisAction = actionClient
         ...(normalized.titre && { titre: normalized.titre }),
         description: normalized.description,
         noteInterne: normalized.noteInterne,
-        ...(normalized.remiseGlobaleHt !== undefined && { remiseGlobaleHt: normalized.remiseGlobaleHt }),
+        ...(normalized.remiseGlobaleHt !== undefined && {
+          remiseGlobaleHt: normalized.remiseGlobaleHt,
+        }),
         validTo: normalized.validTo,
         updatedById: currentUser.id,
       })
@@ -171,7 +244,7 @@ export const updateDevisAction = actionClient
 
 export const deleteDevisAction = actionClient
   .metadata({ actionName: "deleteDevisAction" })
-  .inputSchema(z.object({ devisId: z.string().uuid() }), {
+  .inputSchema(z.object({ devisId: z.uuid() }), {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -181,7 +254,10 @@ export const deleteDevisAction = actionClient
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     const canEdit = await canUserEditDevis(currentUser.id, parsedInput.devisId);
-    if (!canEdit) throw errors.forbidden("Suppression impossible : le devis est émis ou vous n'avez pas les droits.");
+    if (!canEdit)
+      throw errors.forbidden(
+        "Suppression impossible : le devis est émis ou vous n'avez pas les droits.",
+      );
 
     await db.delete(devis).where(eq(devis.id, parsedInput.devisId));
     return { success: true };
@@ -255,14 +331,22 @@ export const updateDevisLigneAction = actionClient
     const [updated] = await db
       .update(devisLignes)
       .set({
-        ...(normalized.serviceId !== undefined && { serviceId: normalized.serviceId }),
+        ...(normalized.serviceId !== undefined && {
+          serviceId: normalized.serviceId,
+        }),
         ...(normalized.designation && { designation: normalized.designation }),
         description: normalized.description,
         ...(normalized.quantite && { quantite: normalized.quantite }),
         ...(normalized.unite && { unite: normalized.unite }),
-        ...(normalized.prixUnitaireHt !== undefined && { prixUnitaireHt: normalized.prixUnitaireHt }),
-        ...(normalized.tauxTva !== undefined && { tauxTva: normalized.tauxTva }),
-        ...(normalized.remiseHtMontant !== undefined && { remiseHtMontant: normalized.remiseHtMontant }),
+        ...(normalized.prixUnitaireHt !== undefined && {
+          prixUnitaireHt: normalized.prixUnitaireHt,
+        }),
+        ...(normalized.tauxTva !== undefined && {
+          tauxTva: normalized.tauxTva,
+        }),
+        ...(normalized.remiseHtMontant !== undefined && {
+          remiseHtMontant: normalized.remiseHtMontant,
+        }),
         ...(normalized.typePrix && { typePrix: normalized.typePrix }),
         ...(normalized.ordre !== undefined && { ordre: normalized.ordre }),
         updatedById: currentUser.id,
@@ -275,7 +359,7 @@ export const updateDevisLigneAction = actionClient
 
 export const deleteDevisLigneAction = actionClient
   .metadata({ actionName: "deleteDevisLigneAction" })
-  .inputSchema(z.object({ ligneId: z.string().uuid() }), {
+  .inputSchema(z.object({ ligneId: z.uuid() }), {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -342,10 +426,18 @@ export const saveDevisWithLignesAction = actionClient
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (plateformeRole?.role)
-      throw errors.forbidden("La plateforme ne peut pas créer ou modifier de devis.");
+      throw errors.forbidden(
+        "La plateforme ne peut pas créer ou modifier de devis.",
+      );
 
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalStrings: ["id", "devisDemandeId", "ticketId", "description", "noteInterne"] as const,
+      optionalStrings: [
+        "id",
+        "devisDemandeId",
+        "ticketId",
+        "description",
+        "noteInterne",
+      ] as const,
     });
 
     const savedDevis = await db.transaction(async (tx) => {
@@ -358,7 +450,10 @@ export const saveDevisWithLignesAction = actionClient
         if (existing.statut !== "brouillon")
           throw errors.conflict("Le devis n'est plus modifiable.");
 
-        const hasAccess = await hasAccessToEntreprise(currentUser.id, existing.emetteurEntrepriseId);
+        const hasAccess = await hasAccessToEntreprise(
+          currentUser.id,
+          existing.emetteurEntrepriseId,
+        );
         if (!hasAccess) throw errors.forbidden("Accès refusé.");
 
         const [updated] = await tx
@@ -376,7 +471,9 @@ export const saveDevisWithLignesAction = actionClient
           .returning();
 
         // Remplacer toutes les lignes
-        await tx.delete(devisLignes).where(eq(devisLignes.devisId, normalized.id));
+        await tx
+          .delete(devisLignes)
+          .where(eq(devisLignes.devisId, normalized.id));
         if (parsedInput.lignes.length > 0) {
           await tx.insert(devisLignes).values(
             parsedInput.lignes.map((l) => ({
@@ -401,9 +498,14 @@ export const saveDevisWithLignesAction = actionClient
         return updated;
       } else {
         // CREATE
-        const hasAccess = await hasAccessToEntreprise(currentUser.id, parsedInput.emetteurEntrepriseId);
+        const hasAccess = await hasAccessToEntreprise(
+          currentUser.id,
+          parsedInput.emetteurEntrepriseId,
+        );
         if (!hasAccess)
-          throw errors.forbidden("Vous ne pouvez pas créer un devis au nom de cette entreprise.");
+          throw errors.forbidden(
+            "Vous ne pouvez pas créer un devis au nom de cette entreprise.",
+          );
 
         const [inserted] = await tx
           .insert(devis)
@@ -467,8 +569,12 @@ export const emettreDevisAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const canEmettre = await canUserEmettreDevis(currentUser.id, parsedInput.devisId);
-    if (!canEmettre) throw errors.forbidden("Vous ne pouvez pas émettre ce devis.");
+    const canEmettre = await canUserEmettreDevis(
+      currentUser.id,
+      parsedInput.devisId,
+    );
+    if (!canEmettre)
+      throw errors.forbidden("Vous ne pouvez pas émettre ce devis.");
 
     const updated = await db.transaction(async (tx) => {
       // Générer le numéro unique via la séquence PostgreSQL
@@ -517,9 +623,13 @@ export const signerDevisAction = actionClient
       where: eq(devis.id, parsedInput.devisId),
     });
     if (!devisRow) throw errors.notFound("Devis introuvable.");
-    if (devisRow.statut !== "emis") throw errors.conflict("Le devis n'est pas émis.");
+    if (devisRow.statut !== "emis")
+      throw errors.conflict("Le devis n'est pas émis.");
 
-    const hasAccess = await hasAccessToEntreprise(currentUser.id, devisRow.proprietaireEntrepriseId);
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      devisRow.proprietaireEntrepriseId,
+    );
     if (!hasAccess) throw errors.forbidden("Accès refusé.");
 
     const [updated] = await db
@@ -538,12 +648,15 @@ export const saveDevisPdfAction = actionClient
   .metadata({ actionName: "saveDevisPdfAction" })
   .inputSchema(
     z.object({
-      devisId: z.string().uuid(),
+      devisId: z.uuid(),
       tempKey: z.string().min(1),
       filename: z.string().min(1),
       sizeBytes: z.number().int().min(0),
     }),
-    { handleValidationErrorsShape: async (ve) => flattenValidationErrors(ve).fieldErrors },
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
@@ -612,9 +725,13 @@ export const refuserDevisAction = actionClient
       where: eq(devis.id, parsedInput.devisId),
     });
     if (!devisRow) throw errors.notFound("Devis introuvable.");
-    if (devisRow.statut !== "emis") throw errors.conflict("Le devis n'est pas émis.");
+    if (devisRow.statut !== "emis")
+      throw errors.conflict("Le devis n'est pas émis.");
 
-    const hasAccess = await hasAccessToEntreprise(currentUser.id, devisRow.proprietaireEntrepriseId);
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      devisRow.proprietaireEntrepriseId,
+    );
     if (!hasAccess) throw errors.forbidden("Accès refusé.");
 
     const [updated] = await db
@@ -633,10 +750,13 @@ export const getSiteResponsableAction = actionClient
   .metadata({ actionName: "getSiteResponsableAction" })
   .inputSchema(
     z.object({
-      siteId: z.string().uuid(),
-      entrepriseId: z.string().uuid(),
+      siteId: z.uuid(),
+      entrepriseId: z.uuid(),
     }),
-    { handleValidationErrorsShape: async (ve) => flattenValidationErrors(ve).fieldErrors },
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();

@@ -9,12 +9,6 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-
-export const devisNumeroSeq = pgSequence("devis_numero_seq", {
-  startWith: 1,
-  increment: 1,
-  cache: 1,
-});
 import {
   createdAt,
   createdById,
@@ -25,11 +19,22 @@ import {
 } from "../schema-helper";
 import { user } from "./auth";
 import { entreprises } from "./entreprises";
-import { devisPeriodeFacturationEnum, devisStatutEnum, devisTypePrixEnum } from "./enums";
+import {
+  devisDemandeStatutEnum,
+  devisPeriodeFacturationEnum,
+  devisStatutEnum,
+  devisTypePrixEnum,
+} from "./enums";
 import { prospects } from "./prospects";
 import { services } from "./services";
 import { sites } from "./sites";
 import { tickets } from "./tickets";
+
+export const devisNumeroSeq = pgSequence("devis_numero_seq", {
+  startWith: 1,
+  increment: 1,
+  cache: 1,
+});
 
 export const devisTemporaires = pgTable(
   "devis_temporaires",
@@ -68,6 +73,7 @@ export const devisDemandes = pgTable(
       .references(() => services.id, { onDelete: "cascade" }),
     titre: varchar("titre", { length: 255 }).notNull(),
     description: text("description").notNull(),
+    statut: devisDemandeStatutEnum("statut").notNull().default("ouverte"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdById: createdById(() => user),

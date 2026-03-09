@@ -2,8 +2,8 @@ import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import { getDevisById } from "@/server/queries/devis.query";
 import { getServicesByPrestataire } from "@/server/queries/services.query";
-import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
-import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { getUserClientAdhesion, hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
+import { getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { Handshake } from "lucide-react";
 import { DevisDetailClient } from "./DevisDetailClient";
 
@@ -49,12 +49,37 @@ export default async function DevisDetailPage({ params, searchParams }: DevisDet
     ? false
     : await hasAccessToEntreprise(currentUser.id, devisRow!.proprietaireEntrepriseId);
 
+  // canSigner/canRefuser — règles métier (voir docs/regles_metier.md) :
+  // - roleAdhesion === "admin" (enterprise-level) → oui
+  // - siteRole === "responsable_site" (attribution site) → oui
+  // - tous les autres (manager, collaborateur, demandeur_site, observateur_site) → non
+  // - devis expiré (now() > validTo) → non
+  const isExpired = devisRow!.validTo ? new Date() > devisRow!.validTo : false;
+  let canActOnDevis = false;
+  if (isProprietaire && devisRow!.statut === "emis" && !isExpired) {
+    const adhesion = await getUserClientAdhesion({
+      userId: currentUser.id,
+      entrepriseId: devisRow!.proprietaireEntrepriseId,
+    });
+    if (adhesion?.role === "admin") {
+      canActOnDevis = true;
+    } else {
+      const siteRole = await resolvePostureAwareSiteRole({
+        userId: currentUser.id,
+        siteId: devisRow!.siteId,
+        entrepriseId: devisRow!.proprietaireEntrepriseId,
+      });
+      canActOnDevis = siteRole === "responsable_site";
+    }
+  }
+
   const permissions = {
     canEdit: isEmetteur && devisRow!.statut === "brouillon",
     canEmettre: isEmetteur && devisRow!.statut === "brouillon",
-    canSigner: isProprietaire && devisRow!.statut === "emis",
-    canRefuser: isProprietaire && devisRow!.statut === "emis",
+    canSigner: canActOnDevis,
+    canRefuser: canActOnDevis,
     isReadOnly: !!plateformeRole?.role,
+    isExpired,
   };
 
   const services = await getServicesByPrestataire(devisRow!.emetteurEntrepriseId);

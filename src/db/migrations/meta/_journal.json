@@ -246,6 +246,20 @@
       "when": 1773010000000,
       "tag": "0034_devis_type_prix_periode",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1773070410621,
+      "tag": "0035_fast_skrulls",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1773071261937,
+      "tag": "0036_romantic_sugar_man",
+      "breakpoints": true
     }
   ]
 }

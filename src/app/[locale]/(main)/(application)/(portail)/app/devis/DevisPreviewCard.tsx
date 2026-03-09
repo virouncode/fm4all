@@ -169,16 +169,20 @@ export function DevisPreviewCard({ devis, pdfMode = false }: Props) {
                 </span>
               </div>
             )}
-            {devis.dateEmission && (
-              <div className="flex items-center gap-2">
-                <span className="w-28 text-xs text-gray-500">
-                  Date d&apos;émission
+            <div className="flex items-center gap-2">
+              <span className="w-28 text-xs text-gray-500">
+                Date d&apos;émission
+              </span>
+              {devis.statut === "brouillon" && !devis.numero ? (
+                <span className="text-xs text-gray-400 italic">
+                  attribuée à l&apos;émission
                 </span>
+              ) : devis.dateEmission ? (
                 <span className="text-xs font-medium">
                   {formatDate(devis.dateEmission)}
                 </span>
-              </div>
-            )}
+              ) : null}
+            </div>
             {devis.validTo && (
               <div className="flex items-center gap-2">
                 <span className="w-28 text-xs text-gray-500">

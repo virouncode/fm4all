@@ -172,7 +172,6 @@ export const devisNouveauSchema = z.object({
     .min(1, "Titre obligatoire")
     .max(255)
     .transform(capitalizeFirstWord),
-  dateEmission: z.string(),
   validTo: z.string(),
   lignes: z.array(devisNouveauLigneSchema).min(1),
   remiseGlobaleHtEur: z.string(),
@@ -257,9 +256,11 @@ export const devisDemandeQuerySchema = z.object({
   entrepriseId: z.string().min(1),
   statut: devisDemandeStatutSchema.optional(),
   siteId: z.string().optional(),
+  clientId: z.string().optional(),
+  serviceId: z.string().optional(),
   search: z.string().optional(),
   orderBy: z
-    .enum(["createdAt", "titre", "statut", "updatedAt", "siteNom", "serviceNom"])
+    .enum(["createdAt", "titre", "statut", "updatedAt", "siteNom", "serviceNom", "proprietaireEntrepriseNom"])
     .default("createdAt"),
   orderDir: z.enum(["asc", "desc"]).default("desc"),
   page: z.number().int().min(1).default(1),
@@ -273,10 +274,14 @@ export const devisQuerySchema = z.object({
   entrepriseId: z.uuid(),
   statut: devisStatutSchema.optional(),
   siteId: z.uuid().optional(),
+  clientId: z.string().optional(),
+  emetteurId: z.string().optional(),
+  serviceId: z.string().optional(),
   search: z.string().optional(),
   orderBy: z
     .enum([
       "createdAt",
+      "updatedAt",
       "dateEmission",
       "numero",
       "titre",

@@ -16,15 +16,19 @@ export const devisIdLabelMap = new Map<string, string>([
   ["emetteurEntrepriseNom", "Émetteur"],
   ["proprietaireEntrepriseNom", "Client"],
   ["siteNom", "Site"],
+  ["serviceNoms", "Service(s)"],
   ["dateEmission", "Émis le"],
   ["validTo", "Valide jusqu'au"],
   ["createdAt", "Créé le"],
+  ["updatedAt", "Modifié le"],
 ]);
 
 export const createDevisColumns = ({
   hideProprietaire = false,
-}: { hideProprietaire?: boolean } = {}): ColumnDef<DevisAvecDetails>[] =>
-  [
+  hideEmetteur = false,
+  hideService = true,
+}: { hideProprietaire?: boolean; hideEmetteur?: boolean; hideService?: boolean } = {}): ColumnDef<DevisAvecDetails>[] => {
+  const cols: (ColumnDef<DevisAvecDetails> | false)[] = [
   {
     accessorKey: "numero",
     header: ({ column }) => (
@@ -61,7 +65,7 @@ export const createDevisColumns = ({
     },
     size: 110,
   },
-  {
+  !hideEmetteur && {
     accessorKey: "emetteurEntrepriseNom",
     header: ({ column }) => (
       <SortableHeader column={column} label="Émetteur" />
@@ -87,6 +91,18 @@ export const createDevisColumns = ({
     cell: ({ getValue }) => (
       <span className="text-sm text-muted-foreground">{getValue() as string}</span>
     ),
+  },
+  !hideService && {
+    accessorKey: "serviceNoms",
+    header: () => <span className="text-xs font-medium">Service(s)</span>,
+    cell: ({ getValue }) => {
+      const noms = getValue() as string[];
+      return (
+        <span className="text-muted-foreground text-sm">
+          {noms.length > 0 ? noms.join(", ") : <span className="italic">—</span>}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "dateEmission",
@@ -124,4 +140,18 @@ export const createDevisColumns = ({
     ),
     size: 110,
   },
-].filter(Boolean) as ColumnDef<DevisAvecDetails>[];
+  {
+    accessorKey: "updatedAt",
+    header: ({ column }) => (
+      <SortableHeader column={column} label="Modifié le" className="w-28" />
+    ),
+    cell: ({ getValue }) => (
+      <span className="text-sm text-muted-foreground">
+        {formatDevisDate(getValue() as Date)}
+      </span>
+    ),
+    size: 110,
+  },
+];
+  return cols.filter((c): c is ColumnDef<DevisAvecDetails> => c !== false);
+};

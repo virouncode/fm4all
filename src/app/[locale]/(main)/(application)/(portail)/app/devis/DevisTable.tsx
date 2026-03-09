@@ -1,7 +1,6 @@
 "use client";
 
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
 import type { DevisAvecDetails } from "@/server/queries/devis.query";
@@ -20,6 +19,9 @@ import { DevisSortDialog } from "./DevisSortDialog";
 type SearchParamsType = {
   statut?: string;
   siteId?: string;
+  clientId?: string;
+  emetteurId?: string;
+  serviceId?: string;
   search?: string;
   orderBy?: string;
   orderDir?: string;
@@ -29,10 +31,19 @@ type FiltersType = {
   search?: string;
   statut?: string;
   siteId?: string;
+  clientId?: string;
+  emetteurId?: string;
+  serviceId?: string;
+};
+
+type SortOptionType = {
+  value: string;
+  label: string;
 };
 
 type OrderByType =
   | "createdAt"
+  | "updatedAt"
   | "dateEmission"
   | "numero"
   | "titre"
@@ -45,6 +56,7 @@ type OrderByType =
 function toOrderBy(value: string | undefined): OrderByType {
   const validValues: OrderByType[] = [
     "createdAt",
+    "updatedAt",
     "dateEmission",
     "numero",
     "titre",
@@ -72,11 +84,24 @@ function toStatut(value: string | undefined): DevisStatutType | undefined {
 
 type DevisTableProps = {
   searchParams: SearchParamsType;
+  hideProprietaire: boolean;
+  hideEmetteur: boolean;
+  hideService?: boolean;
+  canCreate: boolean;
+  posture: "client" | "prestataire" | "plateforme";
+  sortOptions: SortOptionType[];
 };
 
-export function DevisTable({ searchParams }: DevisTableProps) {
+export function DevisTable({
+  searchParams,
+  hideProprietaire,
+  hideEmetteur,
+  hideService = true,
+  canCreate,
+  posture,
+  sortOptions,
+}: DevisTableProps) {
   const entreprise = useAppStore((state) => state.entreprise);
-  const posture = useAppStore((state) => state.postureActive);
   const router = useRouter();
 
   const devisView = useUiStore((state) => state.devisView);
@@ -90,7 +115,6 @@ export function DevisTable({ searchParams }: DevisTableProps) {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  // Dialogs
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
 
@@ -107,6 +131,9 @@ export function DevisTable({ searchParams }: DevisTableProps) {
         entrepriseId: entreprise.id,
         statut: toStatut(searchParams.statut),
         siteId: searchParams.siteId || undefined,
+        clientId: searchParams.clientId || undefined,
+        emetteurId: searchParams.emetteurId || undefined,
+        serviceId: searchParams.serviceId || undefined,
         search: searchParams.search || undefined,
         orderBy: toOrderBy(searchParams.orderBy),
         orderDir: toOrderDir(searchParams.orderDir),
@@ -150,6 +177,9 @@ export function DevisTable({ searchParams }: DevisTableProps) {
         entrepriseId: entreprise.id,
         statut: toStatut(searchParams.statut),
         siteId: searchParams.siteId || undefined,
+        clientId: searchParams.clientId || undefined,
+        emetteurId: searchParams.emetteurId || undefined,
+        serviceId: searchParams.serviceId || undefined,
         search: searchParams.search || undefined,
         orderBy: toOrderBy(searchParams.orderBy),
         orderDir: toOrderDir(searchParams.orderDir),
@@ -184,6 +214,9 @@ export function DevisTable({ searchParams }: DevisTableProps) {
       if (filters.search) query.search = filters.search;
       if (filters.statut) query.statut = filters.statut;
       if (filters.siteId) query.siteId = filters.siteId;
+      if (filters.clientId) query.clientId = filters.clientId;
+      if (filters.emetteurId) query.emetteurId = filters.emetteurId;
+      if (filters.serviceId) query.serviceId = filters.serviceId;
       if (searchParams.orderBy) query.orderBy = searchParams.orderBy;
       if (searchParams.orderDir) query.orderDir = searchParams.orderDir;
       router.replace({ pathname: "/app/devis", query });
@@ -196,6 +229,9 @@ export function DevisTable({ searchParams }: DevisTableProps) {
     if (searchParams.search) count++;
     if (searchParams.statut) count++;
     if (searchParams.siteId) count++;
+    if (searchParams.clientId) count++;
+    if (searchParams.emetteurId) count++;
+    if (searchParams.serviceId) count++;
     return count;
   }, [searchParams]);
 
@@ -203,18 +239,12 @@ export function DevisTable({ searchParams }: DevisTableProps) {
     search: searchParams.search,
     statut: searchParams.statut,
     siteId: searchParams.siteId,
+    clientId: searchParams.clientId,
+    emetteurId: searchParams.emetteurId,
+    serviceId: searchParams.serviceId,
   };
 
-  const sortSearchParams: Record<string, string | undefined> = {
-    statut: searchParams.statut,
-    siteId: searchParams.siteId,
-    search: searchParams.search,
-    orderBy: searchParams.orderBy,
-    orderDir: searchParams.orderDir,
-  };
-
-  const columns = createDevisColumns({ hideProprietaire: posture === "client" });
-  const canCreate = posture === "prestataire";
+  const columns = createDevisColumns({ hideProprietaire, hideEmetteur, hideService });
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -242,23 +272,20 @@ export function DevisTable({ searchParams }: DevisTableProps) {
 
         {/* Actions — droite */}
         <div className="flex items-center gap-2">
-          {/* Filtrer */}
           <Button
             size="sm"
             variant="outline"
             onClick={() => setFiltersDialogOpen(true)}
-            className="relative"
           >
             <Filter className="h-4 w-4" />
             Filtrer
             {activeFiltersCount > 0 && (
-              <Badge className="bg-primary text-primary-foreground absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full p-0 text-[10px]">
+              <span className="bg-primary text-primary-foreground ml-1 rounded-full px-1.5 text-xs">
                 {activeFiltersCount}
-              </Badge>
+              </span>
             )}
           </Button>
 
-          {/* Trier */}
           <Button
             size="sm"
             variant="outline"
@@ -268,7 +295,6 @@ export function DevisTable({ searchParams }: DevisTableProps) {
             Trier
           </Button>
 
-          {/* Nouveau devis */}
           {canCreate && (
             <Button
               size="sm"
@@ -291,7 +317,8 @@ export function DevisTable({ searchParams }: DevisTableProps) {
             isError={isError}
             hasMore={hasMore}
             loadMore={loadMore}
-            hideProprietaire={posture === "client"}
+            hideProprietaire={hideProprietaire}
+            hideEmetteur={hideEmetteur}
             onItemClick={(item) =>
               router.push({
                 pathname: "/app/devis/[devisId]",
@@ -328,12 +355,13 @@ export function DevisTable({ searchParams }: DevisTableProps) {
         onOpenChange={setFiltersDialogOpen}
         currentFilters={currentFilters}
         onApply={handleFiltersApply}
+        posture={posture}
       />
       <DevisSortDialog
         open={sortDialogOpen}
         onOpenChange={setSortDialogOpen}
-        searchParams={sortSearchParams}
-        hideProprietaire={posture === "client"}
+        searchParams={searchParams as Record<string, string | undefined>}
+        sortOptions={sortOptions}
       />
     </div>
   );

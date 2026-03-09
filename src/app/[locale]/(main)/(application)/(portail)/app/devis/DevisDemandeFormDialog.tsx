@@ -183,6 +183,7 @@ export function DevisDemandeFormDialog({
           createdByPrenom: null,
           createdByNom: null,
           devisCount: 0,
+          proprietaireEntrepriseNom: null,
         });
         onOpenChange(false);
       }
@@ -211,6 +212,7 @@ export function DevisDemandeFormDialog({
           createdByPrenom: demande.createdByPrenom,
           createdByNom: demande.createdByNom,
           devisCount: demande.devisCount,
+          proprietaireEntrepriseNom: demande.proprietaireEntrepriseNom,
         });
         onOpenChange(false);
       }
@@ -295,7 +297,7 @@ export function DevisDemandeFormDialog({
               {/* Pièces jointes */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Pièces jointes</p>
+                  <p className="text-sm font-medium">Pièces jointes <span className="text-muted-foreground font-normal">(max 5 Mo)</span></p>
                   <Button
                     type="button"
                     variant="outline"

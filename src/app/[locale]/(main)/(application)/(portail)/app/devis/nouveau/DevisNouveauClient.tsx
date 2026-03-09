@@ -124,7 +124,6 @@ function calcTtcStr(prixHtEur: string, tauxTva: string): string {
 type PreviewValuesType = {
   titre?: string;
   description?: string;
-  dateEmission?: string;
   validTo?: string;
   remiseGlobaleHtEur?: string;
   lignes?: Array<{
@@ -170,7 +169,7 @@ function buildPreview(
     description: values.description || null,
     statut: "brouillon",
     remiseGlobaleHt: eurToCentimes(values.remiseGlobaleHtEur ?? ""),
-    dateEmission: values.dateEmission ? new Date(values.dateEmission) : new Date(),
+    dateEmission: null,
     validTo: values.validTo ? new Date(values.validTo) : null,
     updatedAt: null,
     emetteurEntrepriseNom: emetteur.nom,
@@ -231,7 +230,6 @@ export function DevisNouveauClient({ emetteur, services }: DevisNouveauClientPro
       proprietaireEntrepriseId: "",
       siteId: "",
       titre: "",
-      dateEmission: format(new Date(), "yyyy-MM-dd"),
       validTo: "",
       lignes: [{ ...DEFAULT_LIGNE }],
       remiseGlobaleHtEur: "",
@@ -354,7 +352,6 @@ export function DevisNouveauClient({ emetteur, services }: DevisNouveauClientPro
         titre: data.titre.trim(),
         description: data.description.trim() || undefined,
         noteInterne: data.noteInterne.trim() || undefined,
-        dateEmission: data.dateEmission ? new Date(data.dateEmission) : undefined,
         remiseGlobaleHt: eurToCentimes(data.remiseGlobaleHtEur),
         validTo: data.validTo ? new Date(data.validTo) : undefined,
         lignes: data.lignes.map((l, i) => ({
@@ -603,12 +600,6 @@ function Step1({
             label="Titre du devis"
             requiredMark
             placeholder="ex : Nettoyage locaux Q1 2026"
-          />
-
-          {/* Date d'émission */}
-          <RhfDatePicker<DevisNouveauFormType>
-            name="dateEmission"
-            label="Date d'émission"
           />
 
           {/* Date d'expiration */}

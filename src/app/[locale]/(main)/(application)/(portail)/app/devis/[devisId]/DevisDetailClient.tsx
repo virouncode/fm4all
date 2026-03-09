@@ -75,6 +75,7 @@ type PermissionsType = {
   canSigner: boolean;
   canRefuser: boolean;
   isReadOnly: boolean;
+  isExpired: boolean;
 };
 
 type Props = {
@@ -278,6 +279,7 @@ export function DevisDetailClient({
     canSigner: permissions.canSigner && devis.statut === "emis",
     canRefuser: permissions.canRefuser && devis.statut === "emis",
     isReadOnly: permissions.isReadOnly || devis.statut !== "brouillon",
+    isExpired: permissions.isExpired,
   };
 
   const badge = getDevisStatutBadge(devis.statut);
@@ -735,7 +737,13 @@ export function DevisDetailClient({
       {/* ── Preview A4 ── */}
       <div className="flex flex-1 flex-col overflow-auto bg-gray-100 dark:bg-gray-950">
         {/* Boutons signer / refuser au-dessus du preview */}
-        {(effectivePermissions.canSigner || effectivePermissions.canRefuser) && (
+        {permissions.isExpired && devis.statut === "emis" ? (
+          <div className="flex shrink-0 justify-center px-8 pt-4 pb-2">
+            <p className="text-destructive text-sm font-medium">
+              Ce devis est expiré et ne peut plus être signé.
+            </p>
+          </div>
+        ) : (effectivePermissions.canSigner || effectivePermissions.canRefuser) && (
           <div className="flex shrink-0 justify-center gap-3 px-8 pt-4 pb-2">
             {effectivePermissions.canSigner && (
               <Button disabled={disabled} onClick={handleSigner}>

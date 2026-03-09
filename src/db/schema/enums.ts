@@ -9,6 +9,7 @@ import {
   modePilotageCodes,
   contratStatutCodes,
   contratTypeCodes,
+  devisDemandeStatutCodes,
   devisLigneUniteCodes,
   devisPeriodeFacturationCodes,
   devisStatutCodes,
@@ -132,6 +133,10 @@ export const devisLigneUniteEnum = pgEnum(
   devisLigneUniteCodes,
 );
 export const devisStatutEnum = pgEnum("devis_statut", devisStatutCodes);
+export const devisDemandeStatutEnum = pgEnum(
+  "devis_demande_statut",
+  devisDemandeStatutCodes,
+);
 export const devisTypePrixEnum = pgEnum("devis_type_prix", devisTypePrixCodes);
 export const devisPeriodeFacturationEnum = pgEnum(
   "devis_periode_facturation",

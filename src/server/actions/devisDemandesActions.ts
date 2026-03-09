@@ -1,8 +1,10 @@
 "use server";
 
 import { db } from "@/db";
+import { clientPrestataireRelations } from "@/db/schema/entreprises";
 import { documents, documentsLinks } from "@/db/schema/documents";
 import { devis, devisDemandes } from "@/db/schema/devis";
+import { userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -11,9 +13,15 @@ import {
   getDevisDemandeAttachments,
   getDevisDemandeById,
   getDevisDemandesPaginated,
+  getDevisDemandesPaginatedForPrestataire,
 } from "@/server/queries/devisDemandes.query";
 import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
-import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { getServicesByPrestataire } from "@/server/queries/services.query";
+import {
+  getActivePosture,
+  getEffectivePlateformeRole,
+} from "@/server/utils/permissions.utils";
+import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import {
   assertDevisDemandeOwnership,
   canUserCreateDevisDemande,
@@ -47,26 +55,72 @@ export const getDevisDemandesAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
+    // Branche plateforme
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-
-    if (!plateformeRole?.role) {
-      const adhesion = await hasAccessToEntreprise(
-        currentUser.id,
-        parsedInput.entrepriseId,
-      );
-      if (!adhesion) throw errors.forbidden("Accès refusé.");
-
-      // Calculer les siteIds accessibles (null = admin, tableau = filtrage)
-      const scopeSiteIds = await getAccessibleSiteIdsForUser({
-        userId: currentUser.id,
-        entrepriseId: parsedInput.entrepriseId,
-      });
-
-      return getDevisDemandesPaginated(parsedInput, scopeSiteIds ?? undefined);
+    if (plateformeRole?.role) {
+      return getDevisDemandesPaginated(parsedInput);
     }
 
-    // Plateforme : accès complet sans restriction
-    return getDevisDemandesPaginated(parsedInput);
+    // Branche prestataire
+    const posture = await getActivePosture();
+    if (posture === "prestataire") {
+      const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
+      if (!prestataireAdhesion) throw errors.forbidden("Accès refusé.");
+
+      const prestataireEntrepriseId = prestataireAdhesion.entrepriseId;
+
+      // Clients du prestataire (via clientPrestataireRelations)
+      const clientRows = await db
+        .select({ clientEntrepriseId: clientPrestataireRelations.clientEntrepriseId })
+        .from(clientPrestataireRelations)
+        .where(eq(clientPrestataireRelations.prestataireEntrepriseId, prestataireEntrepriseId));
+      const allClientIds = clientRows.map((r) => r.clientEntrepriseId);
+
+      // Services proposés par le prestataire
+      const serviceRows = await getServicesByPrestataire(prestataireEntrepriseId);
+      const allServiceIds = serviceRows.map((r) => r.id);
+
+      // Scope sites : admin prestataire → undefined (aucune restriction), sinon attribués
+      let scopeSiteIds: string[] | undefined = undefined;
+      if (prestataireAdhesion.role !== "admin") {
+        scopeSiteIds = await getAllPrestataireSiteIds({ userId: currentUser.id });
+      }
+
+      return getDevisDemandesPaginatedForPrestataire({
+        allClientIds,
+        allServiceIds,
+        scopeSiteIds,
+        clientId: parsedInput.clientId,
+        serviceId: parsedInput.serviceId,
+        siteId: parsedInput.siteId,
+        statut: parsedInput.statut,
+        search: parsedInput.search,
+        orderBy: parsedInput.orderBy,
+        orderDir: parsedInput.orderDir,
+        page: parsedInput.page,
+        pageSize: parsedInput.pageSize,
+      });
+    }
+
+    // Branche client (défaut)
+    const adhesion = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
+    if (!adhesion) throw errors.forbidden("Accès refusé.");
+
+    // Calculer les siteIds accessibles (null = admin, tableau = filtrage)
+    const scopeSiteIds = await getAccessibleSiteIdsForUser({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    return getDevisDemandesPaginated(parsedInput, scopeSiteIds ?? undefined);
   });
 
 // ============================= GET DEMANDE BY ID ==============================//

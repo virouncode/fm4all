@@ -1,15 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { DevisDemandeAvecDetails } from "@/server/queries/devisDemandes.query";
-import { Building2, Calendar, FileText } from "lucide-react";
+import { Calendar, Clock, FileText } from "lucide-react";
 import { formatDevisDate, getDevisDemandeStatutBadge } from "./helpers";
 
 type DevisDemandeCardProps = {
   demande: DevisDemandeAvecDetails;
+  showClient?: boolean;
+  showDevisCount?: boolean;
   onClick?: () => void;
 };
 
-export function DevisDemandeCard({ demande, onClick }: DevisDemandeCardProps) {
+export function DevisDemandeCard({ demande, showClient = false, showDevisCount = false, onClick }: DevisDemandeCardProps) {
   const badge = getDevisDemandeStatutBadge(demande.statut);
 
   return (
@@ -48,6 +50,14 @@ export function DevisDemandeCard({ demande, onClick }: DevisDemandeCardProps) {
 
       <CardContent className="flex flex-1 flex-col text-sm">
         <div className="flex-grow space-y-1">
+          {showClient && demande.proprietaireEntrepriseNom && (
+            <div className="flex gap-1.5">
+              <span className="text-muted-foreground shrink-0">Client :</span>
+              <span className="truncate font-medium">
+                {demande.proprietaireEntrepriseNom}
+              </span>
+            </div>
+          )}
           {demande.siteNom && (
             <div className="flex gap-1.5">
               <span className="text-muted-foreground shrink-0">Site :</span>
@@ -61,7 +71,7 @@ export function DevisDemandeCard({ demande, onClick }: DevisDemandeCardProps) {
             </div>
           )}
           {demande.description && (
-            <p className="text-muted-foreground mt-2 line-clamp-2 text-sm">
+            <p className="text-muted-foreground mt-1.5 line-clamp-3 text-xs">
               {demande.description}
             </p>
           )}
@@ -69,12 +79,10 @@ export function DevisDemandeCard({ demande, onClick }: DevisDemandeCardProps) {
 
         <div className="text-muted-foreground mt-2 flex items-center justify-between border-t pt-2 text-xs">
           <div className="flex items-center gap-1.5">
-            <Building2 className="size-3 shrink-0" />
-            {demande.createdByPrenom
-              ? `${demande.createdByPrenom} ${demande.createdByNom ?? ""}`.trim()
-              : "—"}
+            <Clock className="size-3 shrink-0" />
+            Modifié le {formatDevisDate(demande.updatedAt)}
           </div>
-          {demande.devisCount > 0 && (
+          {showDevisCount && demande.devisCount > 0 && (
             <div className="flex items-center gap-1.5">
               <FileText className="size-3 shrink-0" />
               <Badge variant="outline" className="text-xs">

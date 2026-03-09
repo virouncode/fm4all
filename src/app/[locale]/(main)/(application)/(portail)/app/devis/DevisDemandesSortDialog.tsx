@@ -17,25 +17,23 @@ import {
 import { useRouter } from "@/i18n/navigation";
 import { ArrowDownAZ, ArrowDownUp, ArrowUpAZ } from "lucide-react";
 
+type SortOptionType = {
+  value: string;
+  label: string;
+};
+
 type DevisDemandesSortDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   searchParams: Record<string, string | undefined>;
+  sortOptions: SortOptionType[];
 };
-
-const SORT_OPTIONS = [
-  { value: "createdAt", label: "Date de création" },
-  { value: "updatedAt", label: "Date de modification" },
-  { value: "titre", label: "Titre" },
-  { value: "statut", label: "Statut" },
-  { value: "siteNom", label: "Site" },
-  { value: "serviceNom", label: "Service" },
-] as const;
 
 export function DevisDemandesSortDialog({
   open,
   onOpenChange,
   searchParams,
+  sortOptions,
 }: DevisDemandesSortDialogProps) {
   const router = useRouter();
 
@@ -76,7 +74,7 @@ export function DevisDemandesSortDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {SORT_OPTIONS.map((option) => (
+                {sortOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

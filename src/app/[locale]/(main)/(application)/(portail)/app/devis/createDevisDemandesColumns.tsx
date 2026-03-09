@@ -9,6 +9,7 @@ import { formatDevisDate, getDevisDemandeStatutBadge } from "./helpers";
 export const devisDemandesIdLabelMap = new Map<string, string>([
   ["titre", "Titre"],
   ["statut", "Statut"],
+  ["proprietaireEntrepriseNom", "Client"],
   ["siteNom", "Site"],
   ["serviceNom", "Service"],
   ["devisCount", "Devis reçus"],
@@ -16,8 +17,11 @@ export const devisDemandesIdLabelMap = new Map<string, string>([
   ["updatedAt", "Modifié le"],
 ]);
 
-export const createDevisDemandesColumns =
-  (): ColumnDef<DevisDemandeAvecDetails>[] => [
+export const createDevisDemandesColumns = ({
+  showClient = false,
+  showDevisCount = false,
+}: { showClient?: boolean; showDevisCount?: boolean } = {}): ColumnDef<DevisDemandeAvecDetails>[] => {
+  const cols: (ColumnDef<DevisDemandeAvecDetails> | false)[] = [
     {
       accessorKey: "titre",
       header: ({ column }) => (
@@ -41,6 +45,17 @@ export const createDevisDemandesColumns =
       },
       size: 110,
     },
+    showClient && {
+      accessorKey: "proprietaireEntrepriseNom",
+      header: ({ column }) => (
+        <SortableHeader column={column} label="Client" />
+      ),
+      cell: ({ getValue }) => (
+        <span className="text-muted-foreground text-sm font-medium">
+          {(getValue() as string | null) ?? "—"}
+        </span>
+      ),
+    },
     {
       accessorKey: "siteNom",
       header: ({ column }) => (
@@ -63,7 +78,7 @@ export const createDevisDemandesColumns =
         </span>
       ),
     },
-    {
+    showDevisCount && {
       accessorKey: "devisCount",
       header: "Devis reçus",
       cell: ({ getValue }) => {
@@ -83,6 +98,18 @@ export const createDevisDemandesColumns =
       size: 100,
     },
     {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <SortableHeader column={column} label="Modifié le" className="w-28" />
+      ),
+      cell: ({ getValue }) => (
+        <span className="text-muted-foreground text-sm">
+          {formatDevisDate(getValue() as Date)}
+        </span>
+      ),
+      size: 110,
+    },
+    {
       accessorKey: "createdAt",
       header: ({ column }) => (
         <SortableHeader column={column} label="Créé le" className="w-28" />
@@ -95,3 +122,6 @@ export const createDevisDemandesColumns =
       size: 110,
     },
   ];
+
+  return cols.filter((c): c is ColumnDef<DevisDemandeAvecDetails> => c !== false);
+};

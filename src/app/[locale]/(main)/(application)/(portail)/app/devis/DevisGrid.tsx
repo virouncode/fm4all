@@ -13,6 +13,7 @@ type DevisGridProps = {
   hasMore: boolean;
   loadMore: () => void;
   hideProprietaire?: boolean;
+  hideEmetteur?: boolean;
   onItemClick?: (item: DevisAvecDetails) => void;
 };
 
@@ -24,6 +25,7 @@ export function DevisGrid({
   hasMore,
   loadMore,
   hideProprietaire = false,
+  hideEmetteur = false,
   onItemClick,
 }: DevisGridProps) {
   const { targetRef } = useIntersection({
@@ -68,6 +70,7 @@ export function DevisGrid({
             key={item.id}
             devis={item}
             hideProprietaire={hideProprietaire}
+            hideEmetteur={hideEmetteur}
             onClick={() => onItemClick?.(item)}
           />
         ))}
