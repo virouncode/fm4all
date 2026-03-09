@@ -11,31 +11,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
-import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/auth-client";
 import { createSignInSchema, SignInType } from "@/zod-schemas/signIn";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useForm, useFormState } from "react-hook-form";
+import { toast } from "sonner";
+
+const defaultValues: SignInType = {
+  email: "",
+  password: "",
+};
 
 export default function SignIn() {
   const router = useRouter();
-  const t = useTranslations("auth");
-
-  const defaultValues: SignInType = {
-    email: "",
-    password: "",
-  };
 
   const form = useForm<SignInType>({
     mode: "all",
     resolver: zodResolver(
       createSignInSchema({
-        email: t("email-obligatoire"),
-        emailInvalid: t("email-invalide"),
-        password: t("mot-de-passe-obligatoire"),
+        email: "Email obligatoire",
+        emailInvalid: "Email invalide",
+        password: "Mot de passe obligatoire",
       }),
     ),
     defaultValues,
@@ -48,32 +46,34 @@ export default function SignIn() {
     await authClient.signIn.email(data, {
       onError: (ctx) => {
         if (ctx.error.status === 403) {
-          toast({
-            title: t("adresse-email-non-verifiee"),
-            description: t(
-              "un-nouveau-lien-de-verification-vient-de-vous-etre-envoye-merci-de-consulter-votre-boite-de-reception",
-            ),
-            variant: "destructive",
+          toast.error("Adresse email non vérifiée", {
+            description:
+              "Un nouveau lien de vérification vient de vous être envoyé. Merci de consulter votre boîte de réception.",
           });
           return;
         }
-        toast({
-          title: t("erreur"),
+        if (ctx.error.status === 401) {
+          toast.error("Identifiants incorrects", {
+            description: "Email ou mot de passe invalide.",
+          });
+          return;
+        }
+        if (ctx.error.status === 400) {
+          toast.error("Email invalide", {
+            description: "Veuillez saisir une adresse email valide.",
+          });
+          return;
+        }
+        toast.error("Erreur de connexion", {
           description:
-            ctx.error.message ||
-            t(
-              "une-erreur-est-survenue-lors-de-la-connexion-veuillez-reessayer",
-            ),
-          variant: "destructive",
+            "Une erreur est survenue lors de la connexion. Veuillez réessayer.",
         });
       },
       onSuccess: async () => {
         router.push("/app");
         router.refresh();
-        toast({
-          title: t("connexion-reussie"),
-          description: t("vous-etes-maintenant-connecte"),
-          variant: "default",
+        toast.success("Connexion réussie", {
+          description: "Vous êtes maintenant connecté.",
         });
       },
     });
@@ -85,11 +85,9 @@ export default function SignIn() {
         <BackgroundClient />
         <Card className="w-sm">
           <CardHeader>
-            <CardTitle className="text-lg md:text-xl">
-              {t("connexion")}
-            </CardTitle>
+            <CardTitle className="text-lg md:text-xl">Connexion</CardTitle>
             <CardDescription className="w-full text-xs md:text-sm">
-              {t("entrez-votre-email-et-mot-de-passe-pour-vous-connecter")}
+              Entrez votre email et mot de passe pour vous connecter
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -97,12 +95,12 @@ export default function SignIn() {
               <form onSubmit={handleSubmit(submitForm)}>
                 <div className="grid gap-4">
                   <InputWithLabel<SignInType>
-                    fieldTitle={t("email")}
+                    fieldTitle="Email"
                     nameInSchema="email"
                     type="email"
                   />
                   <InputWithLabel<SignInType>
-                    fieldTitle={t("mot-de-passe")}
+                    fieldTitle="Mot de passe"
                     nameInSchema="password"
                     type="password"
                   />
@@ -110,7 +108,7 @@ export default function SignIn() {
                     href="/auth/forgot-password"
                     className="text-sm underline"
                   >
-                    {t("mot-de-passe-oublie")}
+                    Mot de passe oublié ?
                   </Link>
                   <Button
                     className="w-full text-base"
@@ -120,7 +118,7 @@ export default function SignIn() {
                     {isSubmitting ? (
                       <Loader2 size={16} className="animate-spin" />
                     ) : (
-                      t("connexion")
+                      "Connexion"
                     )}
                   </Button>
                 </div>
