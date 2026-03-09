@@ -1,5 +1,9 @@
 import "server-only";
 
+import {
+  getUserClientAdhesion,
+  getUserPrestataireAdhesion,
+} from "@/server/queries/userAdhesions.query";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { TicketStatutType } from "@/zod-schemas/enums";
@@ -73,7 +77,19 @@ export async function isStatusTransitionAllowed({
     entrepriseId: ticket.proprietaireEntrepriseId,
   });
 
-  const isResponsable = effectiveRoleStr === "responsable_site";
+  // Admin entreprise → équivalent responsable_site (bypass site attribution)
+  let isEnterpriseAdmin = false;
+  if (effectiveRoleStr !== "responsable_site") {
+    if (posture === "prestataire") {
+      const adhesion = await getUserPrestataireAdhesion({ userId });
+      isEnterpriseAdmin = adhesion?.role === "admin";
+    } else {
+      const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
+      isEnterpriseAdmin = adhesion?.role === "admin";
+    }
+  }
+
+  const isResponsable = effectiveRoleStr === "responsable_site" || isEnterpriseAdmin;
 
   // ── ÉTATS FINAUX ── verrouillés (plateforme déjà géré ci-dessus)
   if (
