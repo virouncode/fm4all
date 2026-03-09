@@ -2,7 +2,7 @@ import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import { getDevisById } from "@/server/queries/devis.query";
 import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { Handshake } from "lucide-react";
 import { DevisDetailClient } from "./DevisDetailClient";
 
@@ -26,7 +26,7 @@ export default async function DevisDetailPage({ params }: DevisDetailPageProps) 
   }
 
   // Vérifier accès (plateforme OU emetteur OU propriétaire)
-  const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
+  const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
   if (!plateformeRole?.role) {
     const [asEmetteur, asProprietaire] = await Promise.all([
       hasAccessToEntreprise(currentUser.id, devisRow!.emetteurEntrepriseId),

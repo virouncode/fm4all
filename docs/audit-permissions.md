@@ -1,31 +1,154 @@
 # Audit Permissions — FM4ALL
 
-> Dernière mise à jour : 2026-03-08 (session 5)
+> Dernière mise à jour : 2026-03-09 (session 6 — audit complet)
 > Branch : new-bo
-> Scope : `src/app/[locale]/(main)/(application)/(portail)/app` + imports
+> Scope : `src/app/[locale]/(main)/(application)/(portail)/app` + `auth`
+
+---
+
+## Architecture de Protection Globale
+
+### Layout-level Auth Guard (CRITIQUE)
+
+**Fichier** : `src/app/[locale]/(main)/(application)/(portail)/app/layout.tsx`
+
+Le layout protège **toutes** les pages `/app/` :
+1. `getSession()` → redirect `/auth/login` si pas de session
+2. `bootstrapUser(userId, postureActive)` → redirect `/auth/unauthorized` si bootstrap échoue
+
+Les pages sans `getSession()` individuel sont **quand même protégées** par ce guard global. Elles scopent leurs données via les server actions.
+
+---
+
+## Tableau Complet des Permissions par Module
+
+### Pages `/app/`
+
+| Page | Route | Guard Individuel | Postures Autorisées | Scoping Données | Statut |
+|------|-------|-----------------|---------------------|-----------------|--------|
+| Dashboard | `/app/` | Layout uniquement | Toutes | N/A (placeholder) | ✅ OK |
+| Checklists | `/app/checklists` | Layout uniquement | Toutes | Via server actions | ✅ OK |
+| Contrats | `/app/contrats` | Layout uniquement | Toutes | N/A (placeholder) | ⚠️ Placeholder |
+| Devis (liste) | `/app/devis` | Layout uniquement | Toutes | Via DevisTable + actions | ✅ OK |
+| Devis nouveau | `/app/devis/nouveau` | ✅ Prestataire (cookie + DB) | Prestataire | Cookie posture + adhésion prestataire | ✅ OK |
+| Devis détail | `/app/devis/[id]` | ✅ Multi-rôle (posture-aware) | Plateforme/Émetteur/Propriétaire | `getEffectivePlateformeRole` + hasAccessToEntreprise | ✅ OK |
+| Documents | `/app/documents` | Layout uniquement | Toutes | N/A (placeholder) | ⚠️ Placeholder |
+| Entreprises | `/app/entreprises` | ✅ Plateforme (DB-only) | Plateforme | `getUserPlateformeAdhesion` | ✅ OK |
+| Entreprise détail | `/app/entreprises/[id]` | ✅ Plateforme (DB-only) | Plateforme | `getUserPlateformeAdhesion` | ✅ OK |
+| Facturation | `/app/facturation` | Layout uniquement | Toutes | N/A (placeholder) | ⚠️ Placeholder |
+| Mes Clients | `/app/mes-clients` | ✅ Prestataire actif | Prestataire | `userPrestataireAdhesions.statut=actif` | ✅ OK |
+| Mes Prestataires | `/app/mes-prestataires` | ✅ Client actif | Client | `userClientAdhesions.statut=actif` | ✅ OK |
+| Mes Sites Clients | `/app/mes-sites-clients` | ✅ Prestataire actif | Prestataire | `userPrestataireAdhesions.statut=actif` | ✅ OK |
+| Mon Entreprise | `/app/mon-entreprise` | Layout uniquement | Toutes | Entreprise du bootstrap | ✅ OK |
+| Paramètres | `/app/parametres` | Layout uniquement | Toutes | N/A (placeholder) | ⚠️ Placeholder |
+| Prestations | `/app/prestations` | Layout uniquement | Toutes | Via PrestationsClient + actions | ✅ OK |
+| Prestation détail | `/app/prestations/[id]` | ✅ Posture-aware complet | Toutes (scoped) | `getEffectivePlateformeRole` + adhésions | ✅ OK |
+| Occurrence détail | `/app/prestations/[id]/occurrences/[id]` | ✅ Posture-aware complet | Toutes (scoped) | `getEffectivePlateformeRole` + modePilotage | ✅ Excellent |
+| Services | `/app/services` | ✅ Plateforme (DB-only) | Plateforme | `getUserPlateformeAdhesion` | ✅ OK |
+| Sites Clients | `/app/sites-clients` | ✅ Plateforme (DB-only) | Plateforme | `getUserPlateformeAdhesion` | ✅ OK |
+| Sites | `/app/sites` | Layout uniquement | Toutes | Via SitesClient + actions | ✅ OK |
+| Tickets | `/app/tickets` | Layout uniquement | Toutes | Via TicketsTable + actions | ✅ OK |
+| Ticket détail | `/app/tickets/[id]` | ✅ Posture-aware complet | Toutes (scoped) | Cookie posture + adhésions | ✅ Excellent |
+| Utilisateurs | `/app/utilisateurs` | Layout uniquement | Toutes | Via UsersClient + actions | ✅ OK |
+
+### Pages `/auth/`
+
+| Page | Route | Protection | Description |
+|------|-------|-----------|-------------|
+| Login | `/auth/login` | Publique | Formulaire connexion |
+| Mot de passe oublié | `/auth/forgot-password` | Publique | Demande reset |
+| Reset password | `/auth/reset-password` | Token URL validé | Reset/activation mot de passe |
+| Inscription admin | `/auth/inscription-admin` | Token invitation validé (acceptedAt=NULL, expiresAt futur) | Création compte via invitation |
+| Redirect | `/auth/redirect` | Session requise | Handler post-login |
+| Email OK | `/auth/email-ok` | Publique | Confirmation email |
+| Unauthorized | `/auth/unauthorized` | Publique | Page d'erreur accès refusé |
+
+---
+
+## Matrice de Permissions par Action
+
+### Module Tickets
+
+| Action | Plateforme | Client Admin | Client Responsable | Client Demandeur | Client Observateur | Prest. Admin | Prest. Responsable | Prest. Intervenant |
+|--------|-----------|-------------|-------------------|------------------|--------------------|-------------|-------------------|-------------------|
+| Voir liste | ✅ | ✅ (ses sites) | ✅ (ses sites) | ✅ (ses sites) | ✅ (ses sites) | ✅ (assigné) | ✅ (assigné + ses sites) | ❌ |
+| Voir détail | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Créer | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ |
+| Éditer titre/desc | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ |
+| Éditer type/priorité | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| Assigner prestataire | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Assigner utilisateur | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| Changer statut | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| Message public | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Message client_only | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Message prestataire_only | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ |
+
+### Module Occurrences / Tâches
+
+*Conditionné par le `modePilotage` de l'occurrence : client/prestataire/collaboration*
+
+| Action | Plateforme | Client Admin* | Prest. Admin* | Responsable Site* | Demandeur (client)* | Intervenant (prest.)* |
+|--------|-----------|--------------|--------------|------------------|--------------------|-----------------------|
+| Voir | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Créer/modifier tâche ad-hoc | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Démarrer tâche | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Terminer tâche | ✅ | ✅ | ✅ | ✅ | si assignée | si assignée |
+| Non applicable / Non honorée | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Annuler tâche | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Corriger temps passé | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Ajouter PJ preuve | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Assigner intervenant | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
+
+### Module Devis
+
+| Action | Plateforme | Émetteur (prestataire) | Propriétaire (client) | Autres |
+|--------|-----------|----------------------|----------------------|--------|
+| Voir liste | ✅ | ✅ (ses devis) | ✅ (reçus) | ❌ |
+| Voir détail | ✅ (read-only) | ✅ | ✅ | ❌ |
+| Créer | ❌ | ✅ | ❌ | ❌ |
+| Éditer (brouillon) | ❌ | ✅ | ❌ | ❌ |
+| Émettre | ❌ | ✅ si brouillon | ❌ | ❌ |
+| Signer | ❌ | ❌ | ✅ si emis | ❌ |
+| Refuser | ❌ | ❌ | ✅ si emis | ❌ |
+
+### Module Sites
+
+| Action | Plateforme | Client Admin/Manager | Client Responsable Site | Prest. Proxy (si client sans admin actif) |
+|--------|-----------|---------------------|------------------------|-----------------------------------------|
+| Voir ses sites | ✅ (tous) | ✅ | ✅ (attribués) | ✅ (ses clients) |
+| Créer site | ✅ | ✅ | ❌ | ✅ |
+| Modifier site | ✅ | ✅ | ❌ | ✅ |
+| Archiver site | ✅ | ✅ | ❌ | ✅ |
+
+### Module Utilisateurs
+
+| Action | Plateforme | Client Admin | Client Manager | Prest. Admin | Prest. Manager |
+|--------|-----------|-------------|----------------|-------------|----------------|
+| Voir liste | ✅ (posture-aware) | ✅ (son entreprise) | ✅ | ✅ (son entreprise) | ✅ |
+| Inviter | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Rattacher existant | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Modifier rôle | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Désactiver | ✅ | ✅ | ❌ | ✅ | ❌ |
 
 ---
 
 ## Légende
 
-- ✅ Corrigé
+- ✅ Corrigé / OK
 - 🔴 Bug critique non corrigé
 - 🟠 Bug moyen non corrigé
-- 🟡 Comportement à valider / question métier
+- 🟡 Bug mineur / comportement à valider
+- ⚠️ Placeholder (module non implémenté)
 
 ---
 
-## BUGS CORRIGÉS
+## BUGS CORRIGÉS (Sessions Précédentes)
 
 ### ✅ BUG-01 — `getAccessibleSitesAction` : erreur forbidden en posture prestataire
 
 **Fichier** : `src/server/actions/sitesActions.ts`
 
-**Problème** : L'action ne vérifiait que `userClientAdhesions`. Un prestataire obtenait systématiquement "Vous n'avez pas accès à cette entreprise." en ouvrant `/app/tickets`.
-
-**Fix** : Ajout d'une branche prestataire :
-- `entrepriseId` = propre entreprise du prestataire → retourne `[]`
-- `entrepriseId` = client lié (via `clientPrestataireRelations`) → retourne les sites du client
+**Fix** : Branche prestataire ajoutée — own ID → `[]`, client lié → sites du client.
 
 ---
 
@@ -33,181 +156,125 @@
 
 **Fichier** : `src/server/actions/entreprisesActions.ts`
 
-**Problème** : L'action était réservée à la plateforme uniquement. Le select "Client" dans le filtre des tickets était toujours vide pour un prestataire.
-
-**Fix** : Ajout branche prestataire → `getMesClients(prestataireEntrepriseId)` (réutilise la logique existante de `/app/mes-clients`).
+**Fix** : Branche prestataire → `getMesClients(prestataireEntrepriseId)`.
 
 ---
 
-### ✅ BUG-03 + BUG-04 + BUG-05 — Périmètre tickets prestataire : règles de visibilité
+### ✅ BUG-03 + BUG-04 + BUG-05 — Périmètre tickets prestataire
 
-**Fichiers** :
-- `src/server/queries/tickets.query.ts`
-- `src/server/utils/ticketsPerimetre.utils.ts`
-- `src/app/[locale]/(main)/(application)/(portail)/app/tickets/[ticketId]/page.tsx`
+**Fichiers** : `tickets.query.ts`, `ticketsPerimetre.utils.ts`, `tickets/[id]/page.tsx`
 
-**Règles métier (clarifiées 2026-03-08)** :
-- **Admin prestataire** → voit TOUS les tickets où `assigneEntrepriseId === prestataireId`
-- **Autres rôles prestataire** (responsable_site, demandeur_site, observateur_site, intervenant_site) → tickets où `assigneEntrepriseId === prestataireId` ET site dans leurs attributions
-- **BUG-05** : Cohérence liste/détail → si le ticket est visible en liste, il est accessible en détail (même règle)
+**Règles** :
+- Admin → tous les tickets assignés à son entreprise
+- Non-admin → tickets assignés + site dans ses attributions
 
-**Fix (session 1 → mauvais fix corrigé en session 2)** :
-- Session 1 : périmètre incorrectement fixé à `proprietaireEntrepriseId IN clients` (le prestataire voyait les tickets de ses clients même non assignés)
-- Session 2 : corrigé → `assigneEntrepriseId === prestataireId`
-
-**Détail du fix dans `getTicketsByPerimetre`** :
+**Fix (corrigé 2 fois — session 1 incorrecte, session 2 correcte)** :
 ```typescript
-// Récupère le rôle entreprise du prestataire
-const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
-  where: and(eq(...userId), eq(...entrepriseId), eq(...statut, "actif")),
-});
-
+// getTicketsByPerimetre
 if (prestataireAdhesion.role === "admin") {
-  // Admin: tous les tickets assignés à l'entreprise
   conditions.push(eq(tickets.assigneEntrepriseId, entrepriseId));
 } else {
-  // Non-admin: tickets assignés ET sur sites attribués
-  accessibleSiteIds = await getAllPrestataireSiteIds({ userId }); // cross-clients
+  accessibleSiteIds = await getAllPrestataireSiteIds({ userId });
   conditions.push(eq(tickets.assigneEntrepriseId, entrepriseId));
   conditions.push(inArray(tickets.siteId, accessibleSiteIds));
 }
-```
-
-**Détail du fix dans `canUserAccessTicket`** :
-```typescript
-if (posture === "prestataire") {
-  if (ticket.assigneEntrepriseId !== entrepriseId) return false;
-  if (prestataireAdhesion.role === "admin") return true;
-  const siteIds = await getAllPrestataireSiteIds({ userId });
-  return siteIds.includes(ticket.siteId);
-}
+// canUserAccessTicket
+if (ticket.assigneEntrepriseId !== entrepriseId) return false;
+if (prestataireAdhesion.role === "admin") return true;
+return (await getAllPrestataireSiteIds({ userId })).includes(ticket.siteId);
 ```
 
 ---
 
-## BUGS NON CORRIGÉS
+### ✅ BUG-06 — `ticketsPermissions.utils.ts` : prestataire admin bloqué à l'édition
 
-### ✅ BUG-06 — Fonctions de permission : prestataire admin bloqué sur l'édition
+**Problème** : Admin sans attribution site → `resolvePostureAwareSiteRole` → `null` → toutes permissions `false`.
 
-**Fichiers** :
-- `src/server/utils/ticketsPermissions.utils.ts`
-- `src/server/utils/ticketsTransitions.utils.ts`
-
-**Problème** : Les fonctions `canUserEditTicketBasicFields`, `canUserEditStatut`, etc. utilisaient `resolvePostureAwareSiteRole` pour obtenir le rôle effectif. Pour un **prestataire admin** sans attribution de site explicite chez le client, ce rôle était `null` → toutes les permissions d'édition retournaient `false`.
-
-**Règle métier clarifiée** : L'admin entreprise n'est **pas** équivalent à `responsable_site` — il est **au-dessus** : accès à tous les sites sans attribution explicite. Le manager n'a aucun traitement spécial ; les utilisateurs non-admin tombent dans les rôles de site (`responsable_site`, `demandeur_site`, `observateur_site`, `intervenant_site`).
-
-**Fix** :
-
-Ajout d'un helper privé `isTicketsEnterpriseAdmin` dans `ticketsPermissions.utils.ts` (pattern identique à `canManageOccurrence`) :
-
-```typescript
-async function isTicketsEnterpriseAdmin(userId: string, entrepriseId: string): Promise<boolean> {
-  const cookieStore = await cookies();
-  const posture = cookieStore.get("fm4all:postureActive")?.value;
-  if (posture === "prestataire") {
-    const adhesion = await getUserPrestataireAdhesion({ userId });
-    return adhesion?.role === "admin";
-  }
-  const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
-  return adhesion?.role === "admin";
-}
-```
-
-Toutes les fonctions (`canUserEditTicketBasicFields`, `canUserEditStatut`, `canUserAssignTicket`, `canUserEditAssignedEntreprise`, `canUserEditPriorite`, `canUserCreateTicket`, `getAvailableStatutsForUser`) suivent désormais le pattern :
-1. Résoudre le rôle site via `resolvePostureAwareSiteRole`
-2. Si le niveau est suffisant → `return true`
-3. Sinon → `return isTicketsEnterpriseAdmin(userId, entrepriseId)` (fallback admin bypass)
-
-Dans `ticketsTransitions.utils.ts`, `isResponsable` inclut désormais l'admin entreprise :
-```typescript
-const isResponsable = effectiveRoleStr === "responsable_site" || isEnterpriseAdmin;
-```
+**Fix** : Helper `isTicketsEnterpriseAdmin` + fallback dans toutes les fonctions de permission.
 
 ---
 
-### ✅ BUG-07 — `getEntreprisesPrestatairesAction` : retourne TOUS les prestataires
+### ✅ BUG-07 — `getEntreprisesPrestatairesAction` : retournait tous les prestataires
 
-**Fichier** : `src/server/actions/entreprisesActions.ts`
-
-**Problème** : L'action ne vérifiait que l'authentification. Elle retournait tous les prestataires de la plateforme à n'importe quel utilisateur connecté.
-
-**Impact** : Un client voyait des prestataires qui ne sont pas les siens dans le filtre "Assigné à" des tickets.
-
-**Fix** : Scopé selon la posture (lecture du cookie `fm4all:postureActive`) :
-- **Plateforme** → `getEntreprisesPrestataires()` (tous)
-- **Prestataire** → `getUserPrestataireAdhesion({ userId })` puis lookup nom → tableau à 1 élément (lui-même)
-- **Client** (défaut) → `userClientAdhesions` (unique par userId) → `getClientPrestataires(entrepriseId)` (ses prestataires actifs via executions)
+**Fix** : Scopé par posture — plateforme → tous, prestataire → lui-même, client → ses prestataires.
 
 ---
 
-### ✅ BUG-09 — Périmètre occurrences : prestataire voit toutes les occurrences d'une prestation
+### ✅ BUG-09 — Occurrence : non-admin prestataire contourne via URL directe
 
-**Fichiers** :
-- `src/app/.../prestations/[prestationId]/page.tsx`
-- `src/app/.../prestations/[prestationId]/occurrences/[occurrenceId]/page.tsx`
-
-**Problème** : `prestataireHasExecutionOnPrestation` ne vérifiait que l'entreprise (company-level). Un prestataire non-admin pouvait accéder via URL directe à une prestation dont son entreprise a une exécution, même si le site n'est pas dans ses attributions.
-
-**Note** : Le flux UX normal (liste → détail) était déjà protégé (`attributedSiteIds` dans `getPrestationsByPrestataire`). C'est le bypass par URL directe qui était le vrai risque.
-
-**Fix** : Après `prestataireHasExecutionOnPrestation`, si non-admin, vérification du site via `getAllPrestataireSiteIds({ userId })` dans les deux pages :
-```typescript
-if (pAdhesion.role !== "admin") {
-  const attributedSiteIds = await getAllPrestataireSiteIds({ userId: currentUser.id });
-  if (!attributedSiteIds.includes(prestation.siteId)) notFound();
-}
-```
+**Fix** : Après `prestataireHasExecutionOnPrestation`, si non-admin → vérification `getAllPrestataireSiteIds`.
 
 ---
 
-### ✅ BUG-10 — `getUsers` en posture prestataire : filtre `statut: "actif"` manquant
+### ✅ BUG-10 — `getUsers` : filtre statut actif
 
-**Fichier** : `src/server/queries/users.query.ts`
-
-**Verdict** : Pas un bug. Les branches prestataire et client sont identiques — pas de filtre `statut` par défaut, filtrable via `statutAdhesion`. `/app/utilisateurs` est une page de gestion : montrer tous les utilisateurs (actifs et inactifs) par défaut est intentionnel.
+**Verdict** : Pas un bug. Affichage actifs + inactifs intentionnel pour page de gestion.
 
 ---
 
-### ✅ BUG-11 — Machine d'état : annulation depuis états avancés + prestataire responsable_site
+### ✅ BUG-11 — Machine d'état tickets : annulation depuis états avancés
 
-**Fichiers** :
-- `src/server/utils/ticketsTransitions.utils.ts`
-- `src/server/utils/ticketsPermissions.utils.ts`
-
-**Verdict getAvailableStatutsForUser** : Pas un bug (résolu par BUG-06). `resolvePostureAwareSiteRole` → `getUserPrestataireSiteRole` retourne bien `"responsable_site"` pour un prestataire attributé → level 3 → statuts disponibles.
-
-**Écart machine d'état corrigé** : Le brainstorming limite l'annulation à `nouveau` et `pris_en_charge` uniquement. Le code autorisait aussi `annule` depuis `en_attente_prestataire`, `en_attente_client` et `a_valider`. Ces transitions ont été supprimées pour s'aligner avec la spec.
+**Fix** : Annulation limitée à `nouveau` et `pris_en_charge` uniquement (aligné spec).
 
 ---
 
 ### ✅ BUG-12 — UX : select "Sites" vide pour prestataire sans filtre client
 
-**Fichier** : `src/app/.../app/tickets/TicketsFiltersDialog.tsx`
-
-**Fix** : Select "Site" disabled + placeholder "Sélectionnez d'abord un client" quand `postureActive === "prestataire"` et aucun client sélectionné.
+**Fix** : Select disabled + placeholder "Sélectionnez d'abord un client".
 
 ---
 
-### ✅ BUG-13 — `insertTicketAction` : un prestataire peut-il créer un ticket ?
+### ✅ BUG-13 — `insertTicketAction` : prestataire ne pouvait pas créer de ticket
 
-**Fichier** : `src/app/.../app/tickets/TicketsTable.tsx`
-
-**Verdict** : Oui — le brainstorming le confirme (admin, responsable_site, demandeur_site en posture prestataire).
-
-**Fix** : Suppression de la condition `posture !== "prestataire"` qui masquait le bouton. Le `TicketFormDialog` gérait déjà la posture prestataire (select client, sites filtrés, `proprietaireEntrepriseId = client`, `demandeurEntrepriseId = prestataire`). La permission serveur `canUserCreateTicket` rejette observateur/intervenant.
+**Fix** : Suppression condition bloquante côté UI. `canUserCreateTicket` gère correctement les cas.
 
 ---
 
-### ✅ BUG-14 — `getUsersAction` en posture plateforme : retourne seulement les users FM4ALL
+### ✅ BUG-14 — `getUsersAction` en posture plateforme : retournait seulement l'équipe FM4ALL
 
-**Fichiers** : `src/server/actions/usersActions.ts`, `src/app/.../app/utilisateurs/UsersClient.tsx`
+**Fix** : Fallback `getEffectivePlateformeRole` + sélecteur Type/Entreprise dans `UsersClient.tsx`.
 
-**Contexte** : En posture plateforme, `getUsers` retournait uniquement les users ayant `userPlateformeAdhesions` (l'équipe FM4ALL). La branche "client" de `getUsersAction` n'avait pas de fallback plateforme, empêchant un admin plateforme de voir les users des entreprises clientes/prestataires.
+---
 
-**Fix** :
-1. **`usersActions.ts`** — Ajout du fallback `getEffectivePlateformeRole` dans la branche client (cohérent avec la branche prestataire qui l'avait déjà).
-2. **`UsersClient.tsx`** — Ajout d'un sélecteur "Type" (Plateforme / Client / Prestataire) + sélecteur "Entreprise" affiché uniquement en posture plateforme. Par défaut : Type=Plateforme (→ userPlateformeAdhesions de FM4ALL). En sélectionnant Client ou Prestataire, la liste des entreprises se charge dynamiquement et les users correspondants s'affichent.
+## BUGS CORRIGÉS (Session 2026-03-09)
+
+### ✅ BUG-15 — `devis/[devisId]/page.tsx` : bypass plateforme non posture-aware
+
+**Fichier** : `src/app/[locale]/(main)/(application)/(portail)/app/devis/[devisId]/page.tsx`
+
+**Problème** : Utilisait `getUserPlateformeAdhesion` (DB-only) au lieu de `getEffectivePlateformeRole` (DB + cookie).
+
+**Impact** : Un FM4ALL en posture "client" était traité comme plateforme (`isReadOnly: true`), perdant ses permissions d'émetteur ou propriétaire.
+
+**Fix** : Remplacement de `getUserPlateformeAdhesion` par `getEffectivePlateformeRole`. Import mis à jour.
+
+---
+
+### ✅ BUG-16 — `prestations/[prestationId]/page.tsx` : `canManage` toujours `false` pour client admin sans attribution site
+
+**Fichier** : `src/app/[locale]/(main)/(application)/(portail)/app/prestations/[prestationId]/page.tsx`
+
+**Problème** : `canManage` ne tenait pas compte du rôle `admin` — seul `responsable_site` via `resolvePostureAwareSiteRole` le déclenchait. Un client admin sans attribution site explicite obtenait `canManage = false` malgré `canChangeModePilotage = true`.
+
+**Fix** : Admin bypass ajouté — cohérent avec `occurrences/[id]/page.tsx` :
+```typescript
+if (clientAdhesion?.role === "admin") {
+  canManage = true;
+} else {
+  const siteRole = await resolvePostureAwareSiteRole({...});
+  canManage = siteRole === "responsable_site";
+}
+```
+
+---
+
+### ✅ BUG-17 — `devis/nouveau/page.tsx` : guard ne vérifiait pas la posture active
+
+**Fichier** : `src/app/[locale]/(main)/(application)/(portail)/app/devis/nouveau/page.tsx`
+
+**Problème** : `getUserPrestataireAdhesion` vérifiait uniquement l'adhésion DB. Un FM4ALL avec les deux rôles (plateforme + prestataire) pouvait accéder en toute posture.
+
+**Fix** : Vérification du cookie posture ajoutée avant le check DB — redirect si `posture !== "prestataire"`.
 
 ---
 
@@ -222,7 +289,47 @@ if (pAdhesion.role !== "admin") {
 | BUG-07 | Moyen | Entreprises | ✅ Corrigé |
 | BUG-09 | Moyen | Occurrences | ✅ Corrigé |
 | BUG-10 | Moyen | Utilisateurs | ✅ Pas un bug |
-| BUG-11 | Moyen | Tickets permissions | ✅ Corrigé |
+| BUG-11 | Moyen | Tickets machine d'état | ✅ Corrigé |
 | BUG-12 | Faible | Tickets UX | ✅ Corrigé |
 | BUG-13 | Faible | Tickets création | ✅ Corrigé |
 | BUG-14 | Faible | Utilisateurs plateforme | ✅ Corrigé |
+| BUG-15 | Moyen | Devis détail | ✅ Corrigé |
+| BUG-16 | Moyen | Prestation détail | ✅ Corrigé |
+| BUG-17 | Faible | Devis nouveau | ✅ Corrigé |
+
+---
+
+## Analyse par Couche
+
+### Layout (protection globale)
+
+`app/layout.tsx` — Protège TOUT `/app/` :
+- Session → `/auth/login`
+- Bootstrap → `/auth/unauthorized`
+
+### Pages (protection spécifique)
+
+Avec guard individuel (en plus du layout) :
+- `/app/devis/nouveau` — cookie posture + adhésion prestataire ✅
+- `/app/devis/[id]` — posture-aware complet ✅
+- `/app/entreprises` — plateforme DB-only ✅
+- `/app/entreprises/[id]` — plateforme DB-only ✅
+- `/app/mes-clients` — prestataire actif ✅
+- `/app/mes-prestataires` — client actif ✅
+- `/app/mes-sites-clients` — prestataire actif ✅
+- `/app/prestations/[id]` — posture-aware complet ✅
+- `/app/prestations/[id]/occurrences/[id]` — posture-aware complet ✅
+- `/app/services` — plateforme DB-only ✅
+- `/app/sites-clients` — plateforme DB-only ✅
+- `/app/tickets/[id]` — posture-aware complet ✅
+
+Sans guard individuel (layout suffit) :
+- Dashboard, Checklists, Sites, Tickets, Prestations, Utilisateurs, Mon Entreprise
+- Données scopées via server actions
+
+### Server Actions (protection données)
+
+Pattern standard :
+1. `hasAccessToEntreprise(userId, entrepriseId)` — posture-aware
+2. `getEffectivePlateformeRole(userId)` — pour bypasses plateforme
+3. Calcul permissions selon rôle entreprise + rôle site

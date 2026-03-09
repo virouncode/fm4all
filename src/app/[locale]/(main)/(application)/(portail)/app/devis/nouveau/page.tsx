@@ -2,6 +2,7 @@ import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import { getEntrepriseWithDetailsById } from "@/server/queries/entreprises.query";
 import { getUserPrestataireAdhesion } from "@/server/queries/userAdhesions.query";
+import { cookies } from "next/headers";
 import { DevisNouveauClient } from "./DevisNouveauClient";
 
 export default async function DevisNouveauPage() {
@@ -12,7 +13,13 @@ export default async function DevisNouveauPage() {
 
   const currentUser = session!.user;
 
-  // Cette page est réservée aux prestataires
+  // Cette page est réservée aux prestataires en posture prestataire
+  const cookieStore = await cookies();
+  const posture = cookieStore.get("fm4all:postureActive")?.value;
+  if (posture !== "prestataire") {
+    redirect({ href: "/auth/unauthorized", locale: "fr" });
+  }
+
   const prestataireAdhesion = await getUserPrestataireAdhesion({
     userId: currentUser.id,
   });

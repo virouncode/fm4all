@@ -107,12 +107,16 @@ export default async function PrestationDetailPage({
 
   let canManage = isPlateforme;
   if (!isPlateforme) {
-    const siteRole = await resolvePostureAwareSiteRole({
-      userId: currentUser.id,
-      siteId: prestation.siteId,
-      entrepriseId: prestation.entrepriseId,
-    });
-    canManage = siteRole === "responsable_site";
+    if (clientAdhesion?.role === "admin") {
+      canManage = true;
+    } else {
+      const siteRole = await resolvePostureAwareSiteRole({
+        userId: currentUser.id,
+        siteId: prestation.siteId,
+        entrepriseId: prestation.entrepriseId,
+      });
+      canManage = siteRole === "responsable_site";
+    }
   }
 
   const isClientAdmin =
