@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { devis, devisLignes } from "@/db/schema/devis";
 import { entreprises } from "@/db/schema/entreprises";
 import { documents, documentsLinks } from "@/db/schema/documents";
-import { sites } from "@/db/schema/sites";
+import { sites, sitesArborescence } from "@/db/schema/sites";
 import { user } from "@/db/schema/auth";
 import { userClientSiteAttributions } from "@/db/schema/users";
 import type {
@@ -12,7 +12,7 @@ import type {
   SelectDevisType,
   DevisQueryType,
 } from "@/zod-schemas/devis.schema";
-import { and, asc, count, desc, eq, ilike, isNull, or, SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNull, or, SQL, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 // ============================= TYPES ENRICHIS ==============================//
@@ -98,7 +98,7 @@ export async function getDevisById(
 
   const r = row[0];
 
-  // Récupérer le responsable_site du site concerné
+  // Récupérer le responsable_site du site concerné (remonte la hiérarchie via closure table)
   const responsableSiteUser = alias(user, "responsableSiteUser");
   const [responsable, pdfDoc] = await Promise.all([
     db
@@ -113,13 +113,25 @@ export async function getDevisById(
         responsableSiteUser,
         eq(userClientSiteAttributions.userId, responsableSiteUser.id),
       )
-      .where(
+      .innerJoin(
+        sitesArborescence,
         and(
-          eq(userClientSiteAttributions.siteId, r.devis.siteId),
-          eq(userClientSiteAttributions.entrepriseId, r.devis.proprietaireEntrepriseId),
-          eq(userClientSiteAttributions.role, "responsable_site"),
+          eq(sitesArborescence.ancetreId, userClientSiteAttributions.siteId),
+          eq(sitesArborescence.descendantId, r.devis.siteId),
+          eq(sitesArborescence.entrepriseId, r.devis.proprietaireEntrepriseId),
         ),
       )
+      .where(
+        and(
+          eq(userClientSiteAttributions.entrepriseId, r.devis.proprietaireEntrepriseId),
+          eq(userClientSiteAttributions.role, "responsable_site"),
+          or(
+            eq(sitesArborescence.profondeur, 0),
+            eq(userClientSiteAttributions.scope, "subtree"),
+          ),
+        ),
+      )
+      .orderBy(asc(sitesArborescence.profondeur))
       .limit(1),
     // Récupérer le PDF du devis si existant
     db

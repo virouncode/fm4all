@@ -43,6 +43,7 @@ import {
   Download,
   Loader2,
   Plus,
+  Printer,
   Send,
   Trash2,
   XCircle,
@@ -558,10 +559,26 @@ export function DevisDetailClient({
               </Button>
             )}
             {pdfStorageKey && (
-              <Button size="sm" variant="outline" onClick={handleDownloadPdf}>
-                <Download className="h-4 w-4" />
-                PDF
-              </Button>
+              <>
+                <Button size="sm" variant="outline" onClick={handleDownloadPdf}>
+                  <Download className="h-4 w-4" />
+                  PDF
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  title="Imprimer le devis"
+                  onClick={async () => {
+                    const url = await getPresignedReadUrl({
+                      key: pdfStorageKey,
+                      proprietaireEntrepriseId: devis.emetteurEntrepriseId,
+                    });
+                    window.open(url, "_blank");
+                  }}
+                >
+                  <Printer className="h-4 w-4" />
+                </Button>
+              </>
             )}
             {effectivePermissions.canSigner && (
               <Button size="sm" disabled={disabled} onClick={handleSigner}>

@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { devis, devisLignes, devisNumeroSeq } from "@/db/schema/devis";
 import { documents, documentsLinks } from "@/db/schema/documents";
 import { user } from "@/db/schema/auth";
+import { sitesArborescence } from "@/db/schema/sites";
 import { userClientSiteAttributions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
@@ -29,7 +30,7 @@ import {
   updateDevisSchema,
 } from "@/zod-schemas/devis.schema";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, eq, or, sql } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
@@ -651,13 +652,25 @@ export const getSiteResponsableAction = actionClient
       })
       .from(userClientSiteAttributions)
       .innerJoin(user, eq(userClientSiteAttributions.userId, user.id))
-      .where(
+      .innerJoin(
+        sitesArborescence,
         and(
-          eq(userClientSiteAttributions.siteId, parsedInput.siteId),
-          eq(userClientSiteAttributions.entrepriseId, parsedInput.entrepriseId),
-          eq(userClientSiteAttributions.role, "responsable_site"),
+          eq(sitesArborescence.ancetreId, userClientSiteAttributions.siteId),
+          eq(sitesArborescence.descendantId, parsedInput.siteId),
+          eq(sitesArborescence.entrepriseId, parsedInput.entrepriseId),
         ),
       )
+      .where(
+        and(
+          eq(userClientSiteAttributions.entrepriseId, parsedInput.entrepriseId),
+          eq(userClientSiteAttributions.role, "responsable_site"),
+          or(
+            eq(sitesArborescence.profondeur, 0),
+            eq(userClientSiteAttributions.scope, "subtree"),
+          ),
+        ),
+      )
+      .orderBy(asc(sitesArborescence.profondeur))
       .limit(1);
 
     return { responsable: rows[0] ?? null };
