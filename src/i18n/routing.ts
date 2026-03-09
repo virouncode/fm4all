@@ -127,11 +127,7 @@ export const routing = defineRouting({
       fr: "/carriere",
       en: "/careers",
     },
-    "/auth/redirect": {
-      fr: "/auth/redirect",
-      en: "/auth/redirect",
-    },
-    "/auth/email-ok": {
+"/auth/email-ok": {
       fr: "/auth/email-ok",
       en: "/auth/email-ok",
     },
