@@ -5,7 +5,7 @@ import { prospects } from "@/db/schema/prospects";
 import { ilike, or, sql, count, asc, desc } from "drizzle-orm";
 import type { SelectProspectType } from "@/zod-schemas/entreprise.schema";
 
-type GetProspectsPaginatedParams = {
+type GetProspectsPaginatedParamsType = {
   search?: string;
   orderBy?: "nomEntreprise" | "createdAt";
   orderDir?: "asc" | "desc";
@@ -23,7 +23,7 @@ export async function getProspectsPaginated({
   orderDir = "asc",
   page,
   pageSize,
-}: GetProspectsPaginatedParams): Promise<SelectProspectType[]> {
+}: GetProspectsPaginatedParamsType): Promise<SelectProspectType[]> {
   const offset = (page - 1) * pageSize;
 
   const searchFilter = search

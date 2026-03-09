@@ -2,7 +2,7 @@ import { HandPlatter } from "lucide-react";
 import { Suspense } from "react";
 import PrestationsClient from "./PrestationsClient";
 
-type SearchParams = {
+type SearchParamsType = {
   statut?: string;
   serviceId?: string;
   siteId?: string;
@@ -13,7 +13,7 @@ type SearchParams = {
 };
 
 type PrestationsPageProps = {
-  searchParams: Promise<SearchParams>;
+  searchParams: Promise<SearchParamsType>;
 };
 
 export default async function PrestationsPage({

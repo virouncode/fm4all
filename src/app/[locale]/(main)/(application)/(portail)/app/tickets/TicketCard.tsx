@@ -10,12 +10,12 @@ import {
   getTicketTypeLabel,
 } from "./helpers";
 
-type EntrepriseMinimal = { id: string; nom: string };
+type EntrepriseMinimalType = { id: string; nom: string };
 
 type TicketCardProps = {
   ticket: SelectTicketType;
   sites: SelectSiteType[];
-  entreprises: EntrepriseMinimal[];
+  entreprises: EntrepriseMinimalType[];
   onClick?: () => void;
 }
 

@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { sitesArborescence } from "@/db/schema/sites";
 import { eq, and, gt } from "drizzle-orm";
 
-type DbOrTransaction = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0];
+type DbOrTransactionType = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /**
  * INSERT: Créer les entrées de closure table pour un nouveau site
@@ -23,7 +23,7 @@ export async function insertSiteArborescence({
   siteId: string;
   parentId: string | null;
   userId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }) {
   const dbClient = tx || db;
 
@@ -80,7 +80,7 @@ export async function deleteSiteArborescence({
 }: {
   entrepriseId: string;
   siteId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }) {
   const dbClient = tx || db;
 
@@ -106,7 +106,7 @@ export async function siteHasChildren({
 }: {
   entrepriseId: string;
   siteId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const dbClient = tx || db;
 
@@ -146,7 +146,7 @@ export async function getDescendantsOfSite({
 }: {
   entrepriseId: string;
   siteId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<string[]> {
   const dbClient = tx || db;
 

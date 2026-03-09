@@ -13,7 +13,7 @@ import { resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { and, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
-type DbOrTransaction =
+type DbOrTransactionType =
   | typeof db
   | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -79,7 +79,7 @@ export async function canUserCreateTicket({
   userId: string;
   siteId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   // Plateforme → accès total
   const platformRole = await getEffectivePlateformeRole(userId);
@@ -167,7 +167,7 @@ export async function canUserUpdateTicket({
   ticketId: string;
   entrepriseId: string;
   updateData: Record<string, unknown>;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
@@ -215,7 +215,7 @@ export async function canUserEditTicketBasicFields({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
@@ -266,7 +266,7 @@ export async function canUserEditTypeAndPriorite({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
@@ -315,7 +315,7 @@ export async function canUserEditAssigneEntrepriseId({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
@@ -365,7 +365,7 @@ export async function canUserEditAssigneUserId({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
@@ -415,7 +415,7 @@ export async function canUserEditStatut({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
@@ -463,7 +463,7 @@ export async function getAvailableStatutsForUser({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<string[]> {
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return [...ALL_STATUTS];
@@ -511,7 +511,7 @@ export async function canUserAssignTicket({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   return canUserEditAssigneEntrepriseId({
     userId,

@@ -17,7 +17,7 @@ import { useFormContext, type FieldValues, type Path } from "react-hook-form";
 
 // Utilise le type exact du composant (le root d’InputOTP n’est pas un <input/> classique)
 type BaseProps = React.ComponentPropsWithoutRef<typeof InputOTP>;
-type OTPRef = React.ComponentRef<typeof InputOTP>;
+type OTPRefType = React.ComponentRef<typeof InputOTP>;
 
 type RhfOTPProps<S extends FieldValues> = {
   label?: string;
@@ -27,7 +27,7 @@ type RhfOTPProps<S extends FieldValues> = {
   className?: string;
   inputClassName?: string;
   requiredMark?: boolean;
-  ref?: React.Ref<OTPRef>; // <- ref alignée sur le vrai root d’InputOTP
+  ref?: React.Ref<OTPRefType>; // <- ref alignée sur le vrai root d’InputOTP
   onChange?: (value: string) => void;
   onBlur?: React.FocusEventHandler<HTMLDivElement>; // blur du group, pas d’un input unique
   onComplete?: (value: string) => void;

@@ -33,7 +33,7 @@ import { PrestationFormDialog } from "./PrestationFormDialog";
 import { PrestationsFiltersDialog } from "./PrestationsFiltersDialog";
 import { PrestationsSortDialog } from "./PrestationsSortDialog";
 
-type SearchParams = {
+type SearchParamsType = {
   statut?: string;
   serviceId?: string;
   siteId?: string;
@@ -52,7 +52,7 @@ type FiltersType = {
 };
 
 type PrestationsClientProps = {
-  searchParams: SearchParams;
+  searchParams: SearchParamsType;
 }
 
 export default function PrestationsClient({

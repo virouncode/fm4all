@@ -33,7 +33,7 @@ const tarifSchema = z.object({
   table: z.enum(["nettoyageTarifs", "nettoyageRepasseTarifs"]),
   gamme: z.enum(["essentiel", "confort", "excellence"]),
 });
-type Tarif = {
+type TarifType = {
   id: number;
   field: keyof SelectNettoyageTarifFournisseurType;
   value: number;
@@ -49,7 +49,7 @@ export const updateNettoyageTarifAction = actionClient
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(
-    async ({ parsedInput: nettoyageTarifInput }: { parsedInput: Tarif }) => {
+    async ({ parsedInput: nettoyageTarifInput }: { parsedInput: TarifType }) => {
       const locale = await getLocale();
       const session = await getSession();
       const currentUser = session?.user;

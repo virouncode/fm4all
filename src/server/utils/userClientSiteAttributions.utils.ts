@@ -9,7 +9,7 @@ import type {
 } from "@/zod-schemas/userSiteAttribution.schema";
 import { getSiteAncestorsFromClosureTable } from "../queries/userSiteAttributions.query";
 
-type DbOrTransaction =
+type DbOrTransactionType =
   | typeof db
   | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -34,7 +34,7 @@ export async function resolveUserRightsOnSite({
   userId: string;
   siteId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<{
   role: RoleClientAttributionType;
   scope: "self" | "subtree";
@@ -119,7 +119,7 @@ export async function resolveUserRightsOnSite_OLD({
   userId: string;
   siteId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<{
   role: RoleClientAttributionType;
   scope: "self" | "subtree";
@@ -213,7 +213,7 @@ export async function resolveUserEffectiveRoleOnSite({
   userId: string;
   siteId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<RoleClientAttributionType | null> {
   const dbClient = tx || db;
 
@@ -309,7 +309,7 @@ export async function resolveUserEffectiveRolesOnSites({
   userId: string;
   siteIds: string[];
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<Map<string, RoleClientAttributionType | null>> {
   if (siteIds.length === 0) {
     return new Map();
@@ -444,7 +444,7 @@ export async function userHasRoleOnSite({
   siteId: string;
   role: RoleClientAttributionType;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const resolved = await resolveUserEffectiveRoleOnSite({
     userId,

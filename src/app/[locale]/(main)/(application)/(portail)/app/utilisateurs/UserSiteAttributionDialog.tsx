@@ -128,9 +128,9 @@ export function UserSiteAttributionDialog({
     .extend({
       clientId: z.string().optional(),
     });
-  type FormValues = z.infer<typeof formSchema>;
+  type FormValuesType = z.infer<typeof formSchema>;
 
-  const form = useForm<FormValues>({
+  const form = useForm<FormValuesType>({
     resolver: zodResolver(formSchema),
     mode: "onTouched",
     defaultValues: {
@@ -310,7 +310,7 @@ export function UserSiteAttributionDialog({
     }
   };
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: FormValuesType) => {
     if (selectedSiteIds.length === 0) {
       toast.error("Veuillez sélectionner au moins un site");
       return;
@@ -447,7 +447,7 @@ export function UserSiteAttributionDialog({
             <div className="flex-1 space-y-4 overflow-y-auto px-6 pb-2">
             {/* Sélecteur de client (posture prestataire uniquement) */}
             {isPrestataire && (
-              <RhfControlledSelect<FormValues>
+              <RhfControlledSelect<FormValuesType>
                 name="clientId"
                 label="Client"
                 requiredMark

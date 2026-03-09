@@ -161,7 +161,7 @@ const prestationFormSchema = z
     }
   });
 
-type PrestationFormValues = z.infer<typeof prestationFormSchema>;
+type PrestationFormValuesType = z.infer<typeof prestationFormSchema>;
 
 // Schéma step 2 (exécution) — utilisé uniquement en posture prestataire
 const executionStep2Schema = z
@@ -208,7 +208,7 @@ const executionStep2Schema = z
     }
   });
 
-type ExecutionStep2Values = z.infer<typeof executionStep2Schema>;
+type ExecutionStep2ValuesType = z.infer<typeof executionStep2Schema>;
 
 // ──────────────────────────────────────────────
 // Constantes
@@ -312,7 +312,7 @@ type PrestationFormDialogProps = {
   prestation?: PrestationListItem;
 };
 
-type ServiceOption = {
+type ServiceOptionType = {
   id: string;
   nom: string;
   serviceEntrepriseId?: string; // Défini uniquement en posture prestataire
@@ -345,7 +345,7 @@ export function PrestationFormDialog({
   const [responsableSiteIds, setResponsableSiteIds] = useState<string[] | null>(
     null,
   );
-  const [services, setServices] = useState<ServiceOption[]>([]);
+  const [services, setServices] = useState<ServiceOptionType[]>([]);
   // serviceEntrepriseId résolu depuis la sélection de service (posture prestataire)
   const [selectedServiceEntrepriseId, setSelectedServiceEntrepriseId] =
     useState<string>("");
@@ -362,7 +362,7 @@ export function PrestationFormDialog({
   const [siteTreeTouched, setSiteTreeTouched] = useState(false);
 
   // ── Form step 1 ──
-  const form = useForm<PrestationFormValues>({
+  const form = useForm<PrestationFormValuesType>({
     resolver: zodResolver(prestationFormSchema),
     mode: "onTouched",
     defaultValues: isEdit
@@ -410,7 +410,7 @@ export function PrestationFormDialog({
   });
 
   // ── Form step 2 (uniquement posture prestataire) ──
-  const execForm = useForm<ExecutionStep2Values>({
+  const execForm = useForm<ExecutionStep2ValuesType>({
     resolver: zodResolver(executionStep2Schema),
     mode: "onTouched",
     defaultValues: {
@@ -736,7 +736,7 @@ export function PrestationFormDialog({
   });
 
   // ── Submit final ──
-  const onSubmitStep1 = async (data: PrestationFormValues) => {
+  const onSubmitStep1 = async (data: PrestationFormValuesType) => {
     if (isEdit) {
       const result = await updatePrestationAction({
         id: data.id!,
@@ -795,7 +795,7 @@ export function PrestationFormDialog({
 
   // Submit combiné (posture prestataire, step 2)
   const onSubmitPrestataire = execForm.handleSubmit(
-    async (execData: ExecutionStep2Values) => {
+    async (execData: ExecutionStep2ValuesType) => {
       const step1Data = form.getValues();
       const perimetre = computePerimetre(anchorId!);
 
@@ -903,7 +903,7 @@ export function PrestationFormDialog({
           </div>
 
           {/* Mode de pilotage */}
-          <RhfControlledSelect<ExecutionStep2Values>
+          <RhfControlledSelect<ExecutionStep2ValuesType>
             name="modePilotage"
             label="Mode de pilotage"
             requiredMark
@@ -919,13 +919,13 @@ export function PrestationFormDialog({
 
           {/* Dates de validité */}
           <div className="grid grid-cols-2 gap-4">
-            <RhfDatePicker<ExecutionStep2Values>
+            <RhfDatePicker<ExecutionStep2ValuesType>
               name="dateDebutValidite"
               label="Date de début"
               requiredMark
               buttonClassName="w-full"
             />
-            <RhfDatePicker<ExecutionStep2Values>
+            <RhfDatePicker<ExecutionStep2ValuesType>
               name="dateFinValidite"
               label="Date de fin (optionnelle)"
               buttonClassName="w-full"
@@ -933,7 +933,7 @@ export function PrestationFormDialog({
           </div>
 
           {/* Priorité */}
-          <RhfInput<ExecutionStep2Values>
+          <RhfInput<ExecutionStep2ValuesType>
             name="priorite"
             label="Priorité"
             requiredMark
@@ -1253,7 +1253,7 @@ export function PrestationFormDialog({
                         <Label>
                           Client <span className="text-destructive">*</span>
                         </Label>
-                        <RhfControlledSelect<PrestationFormValues>
+                        <RhfControlledSelect<PrestationFormValuesType>
                           name="entrepriseId"
                           label=""
                           placeholder="Sélectionnez un client"
@@ -1272,7 +1272,7 @@ export function PrestationFormDialog({
                     )}
 
                     <div className="space-y-1.5">
-                      <RhfControlledSelect<PrestationFormValues>
+                      <RhfControlledSelect<PrestationFormValuesType>
                         name="serviceId"
                         label="Service"
                         requiredMark
@@ -1330,7 +1330,7 @@ export function PrestationFormDialog({
                   </h3>
 
                   {posture === "plateforme" && (
-                    <RhfControlledSelect<PrestationFormValues>
+                    <RhfControlledSelect<PrestationFormValuesType>
                       name="modeCommercial"
                       label="Mode commercial"
                       selectClassName="w-full"
@@ -1343,7 +1343,7 @@ export function PrestationFormDialog({
                   )}
 
                   <div className="grid grid-cols-2 gap-4">
-                    <RhfControlledSelect<PrestationFormValues>
+                    <RhfControlledSelect<PrestationFormValuesType>
                       name="frequence"
                       label="Fréquence"
                       requiredMark
@@ -1362,7 +1362,7 @@ export function PrestationFormDialog({
                       </SelectItem>
                     </RhfControlledSelect>
 
-                    <RhfControlledSelect<PrestationFormValues>
+                    <RhfControlledSelect<PrestationFormValuesType>
                       name="modePlanning"
                       label="Mode de planification"
                       selectClassName="w-full"
@@ -1373,7 +1373,7 @@ export function PrestationFormDialog({
                   </div>
 
                   {showFrequenceParPeriode && (
-                    <RhfInput<PrestationFormValues>
+                    <RhfInput<PrestationFormValuesType>
                       name="frequenceParPeriode"
                       label={frequenceParPeriodeLabel}
                       placeholder="Ex: 2"
@@ -1383,7 +1383,7 @@ export function PrestationFormDialog({
                   )}
 
                   {showIntervalleJours && (
-                    <RhfInput<PrestationFormValues>
+                    <RhfInput<PrestationFormValuesType>
                       name="intervalleJours"
                       label="Intervalle (en jours)"
                       placeholder="Ex: 14"
@@ -1399,12 +1399,12 @@ export function PrestationFormDialog({
                 <div className="space-y-4">
                   <h3 className="text-sm font-semibold">Période</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <RhfDatePicker<PrestationFormValues>
+                    <RhfDatePicker<PrestationFormValuesType>
                       name="dateDebut"
                       label="Date de début"
                       buttonClassName="w-full"
                     />
-                    <RhfDatePicker<PrestationFormValues>
+                    <RhfDatePicker<PrestationFormValuesType>
                       name="dateFin"
                       label="Date de fin"
                       buttonClassName="w-full"
@@ -1465,13 +1465,13 @@ export function PrestationFormDialog({
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
-                        <RhfInput<PrestationFormValues>
+                        <RhfInput<PrestationFormValuesType>
                           name="heureDebutPreference"
                           label="Heure de début préférée"
                           placeholder="Ex: 08:00"
                           description="Format HH:MM"
                         />
-                        <RhfInput<PrestationFormValues>
+                        <RhfInput<PrestationFormValuesType>
                           name="dureeEstimeeMinutes"
                           label="Durée estimée (min)"
                           placeholder="Ex: 120"
@@ -1486,7 +1486,7 @@ export function PrestationFormDialog({
 
                 {/* ── NOTES ── */}
                 <div className="pb-2">
-                  <RhfTextArea<PrestationFormValues>
+                  <RhfTextArea<PrestationFormValuesType>
                     name="notes"
                     label="Notes"
                     placeholder="Informations complémentaires, consignes particulières..."

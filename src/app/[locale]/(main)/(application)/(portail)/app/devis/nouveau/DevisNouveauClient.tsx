@@ -23,7 +23,7 @@ import { getSitesAction } from "@/server/actions/sitesActions";
 import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions.query";
 import {
   devisNouveauSchema,
-  type DevisNouveauFormType as FormType,
+  type DevisNouveauFormType,
 } from "@/zod-schemas/devis.schema";
 import {
   type DevisPeriodeFacturationType,
@@ -46,7 +46,7 @@ import { DevisPreviewCard } from "../DevisPreviewCard";
 
 // ============================= TYPES ==============================//
 
-type SiteOption = {
+type SiteOptionType = {
   id: string;
   nom: string;
   adresse: string;
@@ -54,7 +54,7 @@ type SiteOption = {
   ville: string;
 };
 
-export type EmetteurInfo = {
+export type EmetteurInfoType = {
   id: string;
   nom: string;
   siret: string;
@@ -66,8 +66,8 @@ export type EmetteurInfo = {
   logoStorageKey?: string | null;
 };
 
-type Props = {
-  emetteur: EmetteurInfo;
+type DevisNouveauClientProps = {
+  emetteur: EmetteurInfoType;
 };
 
 // ============================= CONSTANTES ==============================//
@@ -79,7 +79,7 @@ const TVA_OPTIONS = [
   { value: "0", label: "0 %" },
 ] as const;
 
-const DEFAULT_LIGNE: FormType["lignes"][0] = {
+const DEFAULT_LIGNE: DevisNouveauFormType["lignes"][0] = {
   designation: "",
   description: "",
   quantite: "1",
@@ -107,7 +107,7 @@ function calcTtcStr(prixHtEur: string, tauxTva: string): string {
 }
 
 // Type permissif pour useWatch (tous les champs sont optionnels y compris dans les objets imbriqués)
-type PreviewValues = {
+type PreviewValuesType = {
   titre?: string;
   description?: string;
   dateEmission?: string;
@@ -128,10 +128,10 @@ type PreviewValues = {
 };
 
 function buildPreview(
-  emetteur: EmetteurInfo,
+  emetteur: EmetteurInfoType,
   selectedClient: ClientAvecDetails | null,
-  selectedSite: SiteOption | null,
-  values: PreviewValues,
+  selectedSite: SiteOptionType | null,
+  values: PreviewValuesType,
   emetteurLogoUrl: string | null,
 ): DevisPreviewData {
   const lignes = values.lignes ?? [];
@@ -183,17 +183,17 @@ function buildPreview(
 
 // ============================= COMPOSANT ==============================//
 
-export function DevisNouveauClient({ emetteur }: Props) {
+export function DevisNouveauClient({ emetteur }: DevisNouveauClientProps) {
   const router = useRouter();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [clients, setClients] = useState<ClientAvecDetails[]>([]);
-  const [sites, setSites] = useState<SiteOption[]>([]);
+  const [sites, setSites] = useState<SiteOptionType[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
   const [loadingSites, setLoadingSites] = useState(false);
   const [selectedClient, setSelectedClient] =
     useState<ClientAvecDetails | null>(null);
-  const [selectedSite, setSelectedSite] = useState<SiteOption | null>(null);
+  const [selectedSite, setSelectedSite] = useState<SiteOptionType | null>(null);
   const [openLines, setOpenLines] = useState<Set<number>>(new Set([0]));
   const [emetteurLogoUrl, setEmetteurLogoUrl] = useState<string | null>(null);
 
@@ -208,7 +208,7 @@ export function DevisNouveauClient({ emetteur }: Props) {
       .catch(() => null);
   }, [emetteur.logoStorageKey, emetteur.id]);
 
-  const form = useForm<FormType>({
+  const form = useForm<DevisNouveauFormType>({
     resolver: zodResolver(devisNouveauSchema),
     mode: "onTouched",
     defaultValues: {
@@ -319,7 +319,7 @@ export function DevisNouveauClient({ emetteur }: Props) {
   }
 
   // ─── Soumission ──────────────────────────────────────────────────
-  async function onSubmit(data: FormType) {
+  async function onSubmit(data: DevisNouveauFormType) {
     if (!selectedClient || !selectedSite) return;
 
     try {
@@ -478,7 +478,7 @@ export function DevisNouveauClient({ emetteur }: Props) {
 type Step1Props = {
   clients: ClientAvecDetails[];
   loadingClients: boolean;
-  sites: SiteOption[];
+  sites: SiteOptionType[];
   loadingSites: boolean;
   onClientChange: (id: string) => void;
   onSiteChange: (id: string) => void;
@@ -496,10 +496,10 @@ function Step1({
   onSetValidToRelative,
   onContinuer,
 }: Step1Props) {
-  const proprietaireId = useWatch<FormType, "proprietaireEntrepriseId">({
+  const proprietaireId = useWatch<DevisNouveauFormType, "proprietaireEntrepriseId">({
     name: "proprietaireEntrepriseId",
   });
-  const validTo = useWatch<FormType, "validTo">({ name: "validTo" });
+  const validTo = useWatch<DevisNouveauFormType, "validTo">({ name: "validTo" });
 
   return (
     <div className="space-y-8">
@@ -510,7 +510,7 @@ function Step1({
         </h2>
 
         <div className="space-y-4">
-          <RhfControlledSelect<FormType>
+          <RhfControlledSelect<DevisNouveauFormType>
             name="proprietaireEntrepriseId"
             label="Client"
             requiredMark
@@ -528,7 +528,7 @@ function Step1({
             ))}
           </RhfControlledSelect>
 
-          <RhfControlledSelect<FormType>
+          <RhfControlledSelect<DevisNouveauFormType>
             name="siteId"
             label="Site"
             requiredMark
@@ -570,7 +570,7 @@ function Step1({
           </div>
 
           {/* Titre */}
-          <RhfInput<FormType>
+          <RhfInput<DevisNouveauFormType>
             name="titre"
             label="Titre du devis"
             requiredMark
@@ -578,7 +578,7 @@ function Step1({
           />
 
           {/* Date d'émission */}
-          <RhfDatePicker<FormType>
+          <RhfDatePicker<DevisNouveauFormType>
             name="dateEmission"
             label="Date d'émission"
           />
@@ -602,7 +602,7 @@ function Step1({
                 );
               })}
             </div>
-            <RhfDatePicker<FormType> name="validTo" />
+            <RhfDatePicker<DevisNouveauFormType> name="validTo" />
           </div>
         </div>
       </section>
@@ -617,7 +617,7 @@ function Step1({
 // ============================= ÉTAPE 2 ==============================//
 
 type Step2Props = {
-  fields: ReturnType<typeof useFieldArray<FormType, "lignes">>["fields"];
+  fields: ReturnType<typeof useFieldArray<DevisNouveauFormType, "lignes">>["fields"];
   openLines: Set<number>;
   onToggleLine: (index: number) => void;
   onAddLigne: () => void;
@@ -672,7 +672,7 @@ function Step2({
           Remise sur le total
         </h2>
         <div className="flex items-center gap-2">
-          <RhfInput<FormType>
+          <RhfInput<DevisNouveauFormType>
             name="remiseGlobaleHtEur"
             type="number"
             min="0"
@@ -692,7 +692,7 @@ function Step2({
             (visible par le client)
           </span>
         </h2>
-        <RhfTextArea<FormType>
+        <RhfTextArea<DevisNouveauFormType>
           name="description"
           placeholder="Ajoutez des précisions sur le devis, conditions particulières…"
           rows={3}
@@ -705,7 +705,7 @@ function Step2({
           Note interne{" "}
           <span className="font-normal normal-case">(non imprimée)</span>
         </h2>
-        <RhfTextArea<FormType>
+        <RhfTextArea<DevisNouveauFormType>
           name="noteInterne"
           placeholder="Note visible uniquement par votre équipe…"
           rows={2}
@@ -742,32 +742,32 @@ function LigneAccordion({
   onToggle,
   onRemove,
 }: LigneAccordionProps) {
-  const { control, setValue } = useFormContext<FormType>();
+  const { control, setValue } = useFormContext<DevisNouveauFormType>();
 
   // useWatch pour affichage accordion header + calcul TTC
-  const designation = useWatch<FormType>({
+  const designation = useWatch<DevisNouveauFormType>({
     control,
-    name: `lignes.${index}.designation` as Path<FormType>,
+    name: `lignes.${index}.designation` as Path<DevisNouveauFormType>,
   });
-  const prixHtEur = useWatch<FormType>({
+  const prixHtEur = useWatch<DevisNouveauFormType>({
     control,
-    name: `lignes.${index}.prixUnitaireHtEur` as Path<FormType>,
+    name: `lignes.${index}.prixUnitaireHtEur` as Path<DevisNouveauFormType>,
   });
-  const tauxTva = useWatch<FormType>({
+  const tauxTva = useWatch<DevisNouveauFormType>({
     control,
-    name: `lignes.${index}.tauxTva` as Path<FormType>,
+    name: `lignes.${index}.tauxTva` as Path<DevisNouveauFormType>,
   });
-  const hasRemise = useWatch<FormType>({
+  const hasRemise = useWatch<DevisNouveauFormType>({
     control,
-    name: `lignes.${index}.hasRemise` as Path<FormType>,
+    name: `lignes.${index}.hasRemise` as Path<DevisNouveauFormType>,
   });
-  const typePrix = useWatch<FormType>({
+  const typePrix = useWatch<DevisNouveauFormType>({
     control,
-    name: `lignes.${index}.typePrix` as Path<FormType>,
+    name: `lignes.${index}.typePrix` as Path<DevisNouveauFormType>,
   });
-  const periodeFacturation = useWatch<FormType>({
+  const periodeFacturation = useWatch<DevisNouveauFormType>({
     control,
-    name: `lignes.${index}.periodeFacturation` as Path<FormType>,
+    name: `lignes.${index}.periodeFacturation` as Path<DevisNouveauFormType>,
   });
 
   const periodeLabel =
@@ -827,16 +827,16 @@ function LigneAccordion({
       {isOpen && (
         <div className="space-y-3 border-t px-4 pt-3 pb-4">
           {/* Désignation */}
-          <RhfInput<FormType>
+          <RhfInput<DevisNouveauFormType>
             label="Titre"
-            name={`lignes.${index}.designation` as Path<FormType>}
+            name={`lignes.${index}.designation` as Path<DevisNouveauFormType>}
             placeholder="ex : Nettoyage des locaux"
           />
 
           {/* Description */}
-          <RhfTextArea<FormType>
+          <RhfTextArea<DevisNouveauFormType>
             label="Détails (optionnel)"
-            name={`lignes.${index}.description` as Path<FormType>}
+            name={`lignes.${index}.description` as Path<DevisNouveauFormType>}
             placeholder="Ajoutez plus de détails"
             rows={2}
           />
@@ -847,15 +847,15 @@ function LigneAccordion({
             <div className="flex flex-col gap-2">
               <Label className="text-sm">Quantité</Label>
               <div className="flex gap-1">
-                <RhfInput<FormType>
-                  name={`lignes.${index}.quantite` as Path<FormType>}
+                <RhfInput<DevisNouveauFormType>
+                  name={`lignes.${index}.quantite` as Path<DevisNouveauFormType>}
                   type="number"
                   min="0"
                   step="0.001"
                   inputClassName="w-20 shrink-0"
                 />
-                <RhfComboboxInput<FormType>
-                  name={`lignes.${index}.unite` as Path<FormType>}
+                <RhfComboboxInput<DevisNouveauFormType>
+                  name={`lignes.${index}.unite` as Path<DevisNouveauFormType>}
                   options={devisLigneUniteCT.map((u) => ({
                     value: u.code,
                     label: u.name,
@@ -870,14 +870,14 @@ function LigneAccordion({
             <div className="flex flex-col gap-2">
               <Label className="text-sm">Type</Label>
               <div className="flex min-w-0 gap-1 overflow-hidden">
-                <RhfControlledSelect<FormType>
+                <RhfControlledSelect<DevisNouveauFormType>
                   name={`lignes.${index}.typePrix` as never}
                   selectClassName="w-full"
                   className="min-w-0 flex-1"
                   onChange={(v) => {
                     if (v !== "abonnement") {
                       setValue(
-                        `lignes.${index}.periodeFacturation` as Path<FormType>,
+                        `lignes.${index}.periodeFacturation` as Path<DevisNouveauFormType>,
                         "" as never,
                       );
                     }
@@ -890,7 +890,7 @@ function LigneAccordion({
                   ))}
                 </RhfControlledSelect>
                 {String(typePrix) === "abonnement" && (
-                  <RhfControlledSelect<FormType>
+                  <RhfControlledSelect<DevisNouveauFormType>
                     name={`lignes.${index}.periodeFacturation` as never}
                     selectClassName="w-full"
                     className="min-w-0 flex-1"
@@ -918,8 +918,8 @@ function LigneAccordion({
                 <span className="text-muted-foreground absolute top-[18px] left-3 -translate-y-1/2 text-xs">
                   EUR
                 </span>
-                <RhfInput<FormType>
-                  name={`lignes.${index}.prixUnitaireHtEur` as Path<FormType>}
+                <RhfInput<DevisNouveauFormType>
+                  name={`lignes.${index}.prixUnitaireHtEur` as Path<DevisNouveauFormType>}
                   type="number"
                   min="0"
                   step="0.01"
@@ -930,7 +930,7 @@ function LigneAccordion({
             </div>
 
             {/* TVA */}
-            <RhfControlledSelect<FormType>
+            <RhfControlledSelect<DevisNouveauFormType>
               name={`lignes.${index}.tauxTva` as never}
               label="TVA"
               selectClassName="w-full"
@@ -966,7 +966,7 @@ function LigneAccordion({
               className="text-primary flex items-center gap-1 text-xs hover:underline"
               onClick={() =>
                 setValue(
-                  `lignes.${index}.hasRemise` as Path<FormType>,
+                  `lignes.${index}.hasRemise` as Path<DevisNouveauFormType>,
                   true as never,
                 )
               }
@@ -983,11 +983,11 @@ function LigneAccordion({
                   className="text-muted-foreground hover:text-destructive text-xs"
                   onClick={() => {
                     setValue(
-                      `lignes.${index}.hasRemise` as Path<FormType>,
+                      `lignes.${index}.hasRemise` as Path<DevisNouveauFormType>,
                       false as never,
                     );
                     setValue(
-                      `lignes.${index}.remiseHtMontantEur` as Path<FormType>,
+                      `lignes.${index}.remiseHtMontantEur` as Path<DevisNouveauFormType>,
                       "" as never,
                     );
                   }}
@@ -999,8 +999,8 @@ function LigneAccordion({
                 <span className="text-muted-foreground absolute top-[18px] left-3 -translate-y-1/2 text-xs">
                   EUR
                 </span>
-                <RhfInput<FormType>
-                  name={`lignes.${index}.remiseHtMontantEur` as Path<FormType>}
+                <RhfInput<DevisNouveauFormType>
+                  name={`lignes.${index}.remiseHtMontantEur` as Path<DevisNouveauFormType>}
                   type="number"
                   min="0"
                   step="0.01"

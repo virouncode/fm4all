@@ -98,8 +98,8 @@ type Props = {
 export function DevisPreviewCard({ devis }: Props) {
   const lignes = devis.lignes;
 
-  type TotauxTva = { base: number; tva: number };
-  const totauxParTaux: Record<number, TotauxTva> = {};
+  type TotauxTvaType = { base: number; tva: number };
+  const totauxParTaux: Record<number, TotauxTvaType> = {};
 
   let totalHtBrut = 0;
   let totalRemiseLignes = 0;

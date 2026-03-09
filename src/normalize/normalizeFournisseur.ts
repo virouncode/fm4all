@@ -13,9 +13,9 @@ import {
 
 /*eslint-disable @typescript-eslint/no-explicit-any */
 
-type FournisseurInput = InsertFournisseurType | UpdateFournisseurType;
+type FournisseurInputType = InsertFournisseurType | UpdateFournisseurType;
 
-export function normalizeFournisseur<T extends FournisseurInput>(input: T): T {
+export function normalizeFournisseur<T extends FournisseurInputType>(input: T): T {
   const clone: any = { ...input };
 
   // --- Champs obligatoires ---

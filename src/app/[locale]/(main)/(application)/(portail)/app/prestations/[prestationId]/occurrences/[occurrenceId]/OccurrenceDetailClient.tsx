@@ -103,7 +103,7 @@ type OccurrenceDetailClientProps = {
   currentUserNom: string | null;
 }
 
-type LinkedTicket = {
+type LinkedTicketType = {
   id: string;
   titre: string;
   statut: string;
@@ -112,7 +112,7 @@ type LinkedTicket = {
   createdAt: Date;
 }
 
-type AssignableUser = {
+type AssignableUserType = {
   id: string;
   prenom: string;
   nom: string;
@@ -173,7 +173,7 @@ export function OccurrenceDetailClient({
   const [taches, setTaches] = useState<OccurrenceTacheDetail[]>(initialTaches);
   const [occurrenceStatut, setOccurrenceStatut] = useState(occurrence.statut);
   const [isEditingDates, setIsEditingDates] = useState(false);
-  const [linkedTickets, setLinkedTickets] = useState<LinkedTicket[]>([]);
+  const [linkedTickets, setLinkedTickets] = useState<LinkedTicketType[]>([]);
 
   // Occurrence-level assignee (mutable)
   const [occurrenceAssigneeUserId, setOccurrenceAssigneeUserId] = useState<string | null>(
@@ -186,7 +186,7 @@ export function OccurrenceDetailClient({
     occurrence.assigneeNom,
   );
   const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
-  const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUserType[]>([]);
   const [loadingAssignees, setLoadingAssignees] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
   const [applyToTaches, setApplyToTaches] = useState(false);
@@ -199,7 +199,7 @@ export function OccurrenceDetailClient({
         entrepriseId: prestation.entrepriseId,
       });
       if (result?.data?.tickets) {
-        setLinkedTickets(result.data.tickets as LinkedTicket[]);
+        setLinkedTickets(result.data.tickets as LinkedTicketType[]);
       }
     }
     void loadLinkedTickets();
@@ -412,7 +412,7 @@ export function OccurrenceDetailClient({
     }
   };
 
-  const handleTicketLinked = (ticket: LinkedTicket) => {
+  const handleTicketLinked = (ticket: LinkedTicketType) => {
     setLinkedTickets((prev) => [...prev, ticket]);
   };
 
@@ -977,7 +977,7 @@ function TacheRow({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
-  const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUserType[]>([]);
   const [isAssigning, setIsAssigning] = useState(false);
   const [localTempsPasseSecondes, setLocalTempsPasseSecondes] = useState<number | null>(tache.tempsPasseSecondes ?? null);
   const [isEditingTempsPasse, setIsEditingTempsPasse] = useState(false);
@@ -992,7 +992,7 @@ function TacheRow({
         entrepriseId: prestataireEntrepriseId,
       });
       if (result?.data?.users) {
-        setAssignableUsers(result.data.users as AssignableUser[]);
+        setAssignableUsers(result.data.users as AssignableUserType[]);
       }
     }
   };
@@ -1966,12 +1966,12 @@ function LinkedTicketsCard({
 }: {
   occurrenceId: string;
   entrepriseId: string;
-  linkedTickets: LinkedTicket[];
-  onLinked: (ticket: LinkedTicket) => void;
+  linkedTickets: LinkedTicketType[];
+  onLinked: (ticket: LinkedTicketType) => void;
   onUnlinked: (ticketId: string) => void;
 }) {
   const [linkPopoverOpen, setLinkPopoverOpen] = useState(false);
-  const [availableTickets, setAvailableTickets] = useState<LinkedTicket[]>([]);
+  const [availableTickets, setAvailableTickets] = useState<LinkedTicketType[]>([]);
   const [isLoadingAvailable, setIsLoadingAvailable] = useState(false);
   const [isLinking, setIsLinking] = useState<string | null>(null);
   const [isUnlinking, setIsUnlinking] = useState<string | null>(null);
@@ -1985,13 +1985,13 @@ function LinkedTicketsCard({
         entrepriseId,
       });
       if (result?.data?.tickets) {
-        setAvailableTickets(result.data.tickets as LinkedTicket[]);
+        setAvailableTickets(result.data.tickets as LinkedTicketType[]);
       }
       setIsLoadingAvailable(false);
     }
   };
 
-  const handleLink = async (ticket: LinkedTicket) => {
+  const handleLink = async (ticket: LinkedTicketType) => {
     setIsLinking(ticket.id);
     const result = await linkTicketToOccurrenceAction({
       ticketId: ticket.id,

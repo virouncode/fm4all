@@ -2,7 +2,7 @@ import { Ticket } from "lucide-react";
 import { Suspense } from "react";
 import { TicketsTable } from "./TicketsTable";
 
-type SearchParams = {
+type SearchParamsType = {
   // Filtres
   search?: string;
   statut?: string;
@@ -19,7 +19,7 @@ type SearchParams = {
 };
 
 type TicketsPageProps = {
-  searchParams: Promise<SearchParams>;
+  searchParams: Promise<SearchParamsType>;
 };
 
 export default async function TicketsPage({ searchParams }: TicketsPageProps) {

@@ -2,7 +2,7 @@ import { Handshake } from "lucide-react";
 import { Suspense } from "react";
 import { DevisTable } from "./DevisTable";
 
-type SearchParams = {
+type SearchParamsType = {
   statut?: string;
   siteId?: string;
   search?: string;
@@ -11,7 +11,7 @@ type SearchParams = {
 };
 
 type DevisPageProps = {
-  searchParams: Promise<SearchParams>;
+  searchParams: Promise<SearchParamsType>;
 };
 
 export default async function DevisPage({ searchParams }: DevisPageProps) {

@@ -26,9 +26,9 @@ const emailSchema = z.object({
   useTemplate: z.boolean().optional(),
 });
 
-type MailgunAttachment = { data: Buffer; filename: string };
+type MailgunAttachmentType = { data: Buffer; filename: string };
 
-type EmailWithTemplate = {
+type EmailWithTemplateType = {
   from: string;
   to: string[];
   bcc?: string[];
@@ -36,10 +36,10 @@ type EmailWithTemplate = {
   template: string;
   "h:X-Mailgun-Variables": string;
   "h:Reply-To"?: string;
-  attachment?: MailgunAttachment[];
+  attachment?: MailgunAttachmentType[];
 };
 
-type EmailWithoutTemplate = {
+type EmailWithoutTemplateType = {
   from: string;
   to: string[];
   bcc?: string[];
@@ -47,7 +47,7 @@ type EmailWithoutTemplate = {
   text: string;
   html?: string;
   "h:Reply-To"?: string;
-  attachment?: MailgunAttachment[];
+  attachment?: MailgunAttachmentType[];
 };
 
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10MB (ajuste)
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         : undefined;
 
     // 1) Si attachmentDocumentId: on récupère le doc en DB
-    let attachment: MailgunAttachment[] | undefined;
+    let attachment: MailgunAttachmentType[] | undefined;
 
     if (body.attachmentDocumentId) {
       const doc = await getDocumentById(body.attachmentDocumentId);
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
 
     // Sans template
     if (body.useTemplate === false) {
-      const emailOptions: EmailWithoutTemplate = {
+      const emailOptions: EmailWithoutTemplateType = {
         ...base,
         html: body.html ? body.html : undefined,
         text: body.html ? "" : body.text,
@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Avec template
-    const emailOptions: EmailWithTemplate = {
+    const emailOptions: EmailWithTemplateType = {
       ...base,
       template: "general",
       "h:X-Mailgun-Variables": JSON.stringify({

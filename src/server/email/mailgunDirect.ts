@@ -2,7 +2,7 @@ import formData from "form-data";
 import Mailgun from "mailgun.js";
 import "server-only";
 
-type SendEmailDirectParams = {
+type SendEmailDirectParamsType = {
   to: string;
   from?: string;
   subject: string;
@@ -13,7 +13,7 @@ type SendEmailDirectParams = {
   useTemplate?: boolean;
 };
 
-export async function sendEmailDirect(params: SendEmailDirectParams) {
+export async function sendEmailDirect(params: SendEmailDirectParamsType) {
   const apiKey = process.env.MAILGUN_API_KEY;
   if (!apiKey) {
     throw new Error("MAILGUN_API_KEY is not configured");

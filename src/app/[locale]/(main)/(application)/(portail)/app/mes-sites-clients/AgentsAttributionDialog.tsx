@@ -41,7 +41,7 @@ type AgentsAttributionDialogProps = {
   ) => void;
 }
 
-type PrestataireUser = {
+type PrestataireUserType = {
   id: string;
   prenom: string;
   nom: string;
@@ -55,7 +55,7 @@ export function AgentsAttributionDialog({
   prestataireEntrepriseId,
   onAttributionChange,
 }: AgentsAttributionDialogProps) {
-  const [allUsers, setAllUsers] = useState<PrestataireUser[]>([]);
+  const [allUsers, setAllUsers] = useState<PrestataireUserType[]>([]);
   const [agents, setAgents] = useState<PrestataireUserOnSite[]>(
     site.agentsAttribues,
   );

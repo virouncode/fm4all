@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from "react";
 
-type UseIntersectionOptions = {
+type UseIntersectionOptionsType = {
   isLoading: boolean; // tu es en train de charger une page
   hasMore: boolean; // il reste encore des éléments à charger
   onLoadMore: () => Promise<void> | void; // callback appelé quand on atteint le sentinel
@@ -18,7 +18,7 @@ const useIntersection = <TElement extends HTMLElement | null>({
   rootMargin = "0px",
   threshold = 0.1,
   disabled = false,
-}: UseIntersectionOptions) => {
+}: UseIntersectionOptionsType) => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const rootRef = useRef<TElement>(null);
 

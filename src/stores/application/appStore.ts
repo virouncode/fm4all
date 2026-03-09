@@ -26,7 +26,7 @@ export type BootstrapPayload = {
   rolePlateformeAdhesion: RolePlateformeAdhesionType | null;
 };
 
-type AppStore = {
+type AppStoreType = {
   // state
   user: AppUser | null;
   entreprise: EntrepriseSelectType | null;
@@ -43,7 +43,7 @@ type AppStore = {
   reset: () => void;
 };
 
-export const useAppStore = create<AppStore>((set, get) => ({
+export const useAppStore = create<AppStoreType>((set, get) => ({
   user: null,
   entreprise: null,
   roleClientAdhesion: null,

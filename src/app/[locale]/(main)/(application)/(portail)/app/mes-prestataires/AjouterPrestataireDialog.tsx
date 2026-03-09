@@ -35,7 +35,7 @@ import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-type SiretState =
+type SiretStateType =
   | { status: "idle" }
   | { status: "searching" }
   // Entreprise trouvée, sans rôle prestataire → on peut ajouter le rôle + services
@@ -79,7 +79,7 @@ export function AjouterPrestataireDialog({
 }: AjouterPrestataireDialogProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [siretInput, setSiretInput] = useState("");
-  const [siretState, setSiretState] = useState<SiretState>({ status: "idle" });
+  const [siretState, setSiretState] = useState<SiretStateType>({ status: "idle" });
   const [creating, setCreating] = useState(false);
   const [services, setServices] = useState<Array<{ id: string; nom: string }>>(
     [],

@@ -59,7 +59,7 @@ const tarifSchema = z.object({
     "poubelle",
   ]),
 });
-type Tarif = {
+type TarifType = {
   id: number;
   field: keyof SelectHygieneDistribTarifsFournisseurType;
   value: number;
@@ -82,7 +82,7 @@ export const updateHygieneTarifDistribAction = actionClient
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(
-    async ({ parsedInput: hygieneTarifInput }: { parsedInput: Tarif }) => {
+    async ({ parsedInput: hygieneTarifInput }: { parsedInput: TarifType }) => {
       const locale = await getLocale();
       const session = await getSession();
       const currentUser = session?.user;
@@ -169,7 +169,7 @@ const tarifInstalSchema = z.object({
   value: z.number().min(1, "La valeur est requise"),
   effectif: z.number().min(1, "L'effectif est requis"),
 });
-type TarifInstal = {
+type TarifInstalType = {
   id: number;
   field: keyof SelectHygieneInstalDistribTarifsFournisseurType;
   value: number;
@@ -186,7 +186,7 @@ export const updateHygieneTarifInstalAction = actionClient
     async ({
       parsedInput: hygieneTarifInput,
     }: {
-      parsedInput: TarifInstal;
+      parsedInput: TarifInstalType;
     }) => {
       const locale = await getLocale();
       const session = await getSession();
@@ -280,7 +280,7 @@ const tarifConsoSchema = z.object({
   value: z.number().min(1, "La valeur est requise"),
   effectif: z.number().min(1, "L'effectif est requis"),
 });
-type TarifConso = {
+type TarifConsoType = {
   id: number;
   field: keyof SelectHygieneConsoTarifsFournisseurType;
   value: number;
@@ -294,7 +294,7 @@ export const updateHygieneTarifConsoAction = actionClient
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(
-    async ({ parsedInput: hygieneTarifInput }: { parsedInput: TarifConso }) => {
+    async ({ parsedInput: hygieneTarifInput }: { parsedInput: TarifConsoType }) => {
       const locale = await getLocale();
       const session = await getSession();
       const currentUser = session?.user;

@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   devIndicators: {
     position: "bottom-right",
   },
-  transpilePackages: ["sanity"],
+  transpilePackages: ["sanity", "@smithy"],
   images: {
     remotePatterns: [
       {

@@ -63,7 +63,7 @@ type ExecutionFormDialogProps = {
   onSuccess: (executions: ExecutionWithPrix[]) => void;
 };
 
-type PrestatairItem = {
+type PrestatairItemType = {
   serviceEntrepriseId: string;
   entrepriseId: string;
   nom: string;
@@ -149,7 +149,7 @@ export function ExecutionFormDialog({
   serviceNom,
   onSuccess,
 }: ExecutionFormDialogProps) {
-  const [prestataires, setPrestataires] = useState<PrestatairItem[]>([]);
+  const [prestataires, setPrestataires] = useState<PrestatairItemType[]>([]);
   const [loadingPrestataires, setLoadingPrestataires] = useState(false);
   const [prestataireHasActiveAdmin, setPrestataireHasActiveAdmin] = useState(true);
 

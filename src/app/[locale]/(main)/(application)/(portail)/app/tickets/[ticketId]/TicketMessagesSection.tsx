@@ -30,7 +30,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 
-type MessageAttachment = {
+type MessageAttachmentType = {
   id: string;
   storageKey: string;
   filename: string;
@@ -38,7 +38,7 @@ type MessageAttachment = {
   sizeBytes: number;
 };
 
-type Message = {
+type MessageType = {
   id: string;
   ticketId: string;
   auteurUserId: string | null;
@@ -47,7 +47,7 @@ type Message = {
   createdAt: Date;
   auteurPrenom: string | null;
   auteurNom: string | null;
-  attachments: MessageAttachment[];
+  attachments: MessageAttachmentType[];
 };
 
 type TicketMessagesSectionProps = {
@@ -55,7 +55,7 @@ type TicketMessagesSectionProps = {
   entrepriseId: string;
   proprietaireEntrepriseId: string;
   currentUserId: string;
-  initialMessages: Message[];
+  initialMessages: MessageType[];
   posture: "client" | "prestataire" | "plateforme";
 };
 
@@ -68,7 +68,7 @@ function AttachmentThumbnail({
   isCurrentUser,
   onClick,
 }: {
-  attachment: MessageAttachment;
+  attachment: MessageAttachmentType;
   proprietaireEntrepriseId: string;
   isCurrentUser: boolean;
   onClick: () => void;
@@ -204,7 +204,7 @@ export function TicketMessagesSection({
     });
   };
 
-  const handlePreviewAttachment = async (attachment: MessageAttachment) => {
+  const handlePreviewAttachment = async (attachment: MessageAttachmentType) => {
     setLoadingPreview(true);
 
     try {
@@ -258,7 +258,7 @@ export function TicketMessagesSection({
     }
   };
 
-  const renderMessage = (msg: Message) => {
+  const renderMessage = (msg: MessageType) => {
     const isCurrentUser = msg.auteurUserId === currentUserId;
     const auteurNom =
       msg.auteurPrenom && msg.auteurNom

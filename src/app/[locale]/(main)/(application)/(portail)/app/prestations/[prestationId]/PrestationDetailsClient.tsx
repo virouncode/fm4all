@@ -1397,7 +1397,7 @@ const OCCURRENCE_STATUT_LABELS: Record<
   annulee: { label: "Annulée", className: "bg-gray-100 text-gray-600" },
 };
 
-type OccurrenceStatutFilter =
+type OccurrenceStatutFilterType =
   | "planifiee"
   | "en_cours"
   | "terminee"
@@ -1405,13 +1405,13 @@ type OccurrenceStatutFilter =
   | "annulee"
   | "";
 
-type OccurrenceFiltersState = {
-  statut: OccurrenceStatutFilter;
+type OccurrenceFiltersStateType = {
+  statut: OccurrenceStatutFilterType;
   nonAssignedOnly: boolean;
   siteId: string;
 };
 
-const DEFAULT_FILTERS: OccurrenceFiltersState = {
+const DEFAULT_FILTERS: OccurrenceFiltersStateType = {
   statut: "",
   nonAssignedOnly: false,
   siteId: "",
@@ -1438,7 +1438,7 @@ function InterventionsTab({
     useState<OccurrenceListItem[]>(initialOccurrences);
   const [displayedTotal, setDisplayedTotal] = useState(totalOccurrences);
   const [filters, setFilters] =
-    useState<OccurrenceFiltersState>(DEFAULT_FILTERS);
+    useState<OccurrenceFiltersStateType>(DEFAULT_FILTERS);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
@@ -1495,7 +1495,7 @@ function InterventionsTab({
     prestation.statut === "actif" && prestation.modePlanning === "planifie";
 
   const applyFilters = async (
-    newFilters: OccurrenceFiltersState,
+    newFilters: OccurrenceFiltersStateType,
     newSortDir: "asc" | "desc",
   ) => {
     setIsFiltering(true);
@@ -1520,7 +1520,7 @@ function InterventionsTab({
     setIsFiltering(false);
   };
 
-  const handleFiltersApply = (newFilters: OccurrenceFiltersState) => {
+  const handleFiltersApply = (newFilters: OccurrenceFiltersStateType) => {
     setFilters(newFilters);
     void applyFilters(newFilters, sortDir);
   };
@@ -1715,8 +1715,8 @@ function OccurrencesFiltersDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentFilters: OccurrenceFiltersState;
-  onApply: (filters: OccurrenceFiltersState) => void;
+  currentFilters: OccurrenceFiltersStateType;
+  onApply: (filters: OccurrenceFiltersStateType) => void;
   availableSites: Array<{ id: string; nom: string }>;
 }) {
   const activeFiltersCount = [
@@ -1725,7 +1725,7 @@ function OccurrencesFiltersDialog({
     currentFilters.siteId !== "",
   ].filter(Boolean).length;
 
-  const handleChange = (partial: Partial<OccurrenceFiltersState>) => {
+  const handleChange = (partial: Partial<OccurrenceFiltersStateType>) => {
     onApply({ ...currentFilters, ...partial });
   };
 
@@ -1749,7 +1749,7 @@ function OccurrencesFiltersDialog({
               value={currentFilters.statut || "all"}
               onValueChange={(v) =>
                 handleChange({
-                  statut: v === "all" ? "" : (v as OccurrenceStatutFilter),
+                  statut: v === "all" ? "" : (v as OccurrenceStatutFilterType),
                 })
               }
             >

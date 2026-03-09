@@ -13,7 +13,7 @@ import {
 import { sitesArborescence } from "@/db/schema/sites";
 import { and, asc, count, eq, gte, inArray, isNull, lte, or, gt } from "drizzle-orm";
 
-type DbOrTransaction =
+type DbOrTransactionType =
   | typeof db
   | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -39,7 +39,7 @@ export async function getEffectiveSitesForService({
   clientServiceId: string;
   entrepriseId: string;
   rootSiteId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<string[]> {
   const dbClient = tx ?? db;
 
@@ -153,7 +153,7 @@ export async function pickExecutionForOccurrence({
   entrepriseId: string;
   siteId: string;
   targetDate: Date;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<string | null> {
   const dbClient = tx ?? db;
 
@@ -206,7 +206,7 @@ export async function pickExecutionForOccurrence({
 // 3. GÉNÉRATION DES DATES D'OCCURRENCES (logique pure, pas de DB)
 // ---------------------------------------------------------------------------
 
-type ClientServiceForGen = {
+type ClientServiceForGenType = {
   frequence: string;
   frequenceParPeriode: number | null;
   intervalleJours: number | null;
@@ -257,7 +257,7 @@ function isoWeekday(d: Date): number {
  *   - heureDebutPreference appliquée sur chaque date
  */
 export function generateOccurrenceDates(
-  cs: ClientServiceForGen,
+  cs: ClientServiceForGenType,
   windowStart: Date,
   windowEnd: Date,
 ): Date[] {
@@ -488,7 +488,7 @@ export async function snapshotOccurrenceTaches({
 }: {
   occurrenceId: string;
   tacheListeTemplateId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }) {
   const dbClient = tx ?? db;
 
@@ -540,7 +540,7 @@ export async function ensureOccurrencesWindow({
   clientServiceId: string;
   now: Date;
   daysAhead?: number;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<{ created: number; skipped: number }> {
   const dbClient = tx ?? db;
 
@@ -590,7 +590,7 @@ export async function ensureOccurrencesWindow({
       .map((o) => `${o.siteId}|${o.dateDebutPrevue!.toISOString()}`),
   );
 
-  const csForGen: ClientServiceForGen = {
+  const csForGen: ClientServiceForGenType = {
     frequence: cs.frequence,
     frequenceParPeriode: cs.frequenceParPeriode,
     intervalleJours: cs.intervalleJours,
@@ -768,7 +768,7 @@ export async function backfillOccurrencesWithExecution({
 }: {
   clientServiceId: string;
   now: Date;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<{ updated: number }> {
   const dbClient = tx ?? db;
 
@@ -839,7 +839,7 @@ export async function deleteFuturePlanifieeOccurrences({
 }: {
   clientServiceId: string;
   now: Date;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<{ deleted: number }> {
   const dbClient = tx ?? db;
 
@@ -880,7 +880,7 @@ export async function cancelFuturePlanifieeOccurrences({
 }: {
   clientServiceId: string;
   now: Date;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<{ cancelled: number }> {
   const dbClient = tx ?? db;
 
@@ -966,7 +966,7 @@ export async function insertPrixAppliquesForOccurrence({
   tx,
 }: {
   occurrenceId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<void> {
   const dbClient = tx ?? db;
 

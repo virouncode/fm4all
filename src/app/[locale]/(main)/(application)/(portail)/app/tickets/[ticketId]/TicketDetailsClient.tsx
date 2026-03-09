@@ -58,7 +58,7 @@ import { EditAttachmentsDialog } from "./EditAttachmentsDialog";
 import { EditDescriptionDialog } from "./EditDescriptionDialog";
 import { TicketMessagesSection } from "./TicketMessagesSection";
 
-type DocumentMinimal = {
+type DocumentMinimalType = {
   id: string;
   storageProvider: string;
   storageKey: string;
@@ -68,7 +68,7 @@ type DocumentMinimal = {
   createdAt: Date;
 };
 
-type MessageAttachment = {
+type MessageAttachmentType = {
   id: string;
   storageKey: string;
   filename: string;
@@ -76,7 +76,7 @@ type MessageAttachment = {
   sizeBytes: number;
 };
 
-type Message = {
+type MessageType = {
   id: string;
   ticketId: string;
   auteurUserId: string | null;
@@ -85,7 +85,7 @@ type Message = {
   createdAt: Date;
   auteurPrenom: string | null;
   auteurNom: string | null;
-  attachments: MessageAttachment[];
+  attachments: MessageAttachmentType[];
 };
 
 type TicketDetailsClientProps = {
@@ -108,8 +108,8 @@ type TicketDetailsClientProps = {
   proprietaireEntreprise: EntrepriseSelectType | null;
   demandeurEntreprise: EntrepriseSelectType | null;
   assigneEntreprise: EntrepriseSelectType | null;
-  attachments: DocumentMinimal[];
-  messages: Message[];
+  attachments: DocumentMinimalType[];
+  messages: MessageType[];
 };
 
 export function TicketDetailsClient({
@@ -146,7 +146,7 @@ export function TicketDetailsClient({
   );
   const [loadingUrls, setLoadingUrls] = useState(true);
   const [selectedAttachment, setSelectedAttachment] =
-    useState<DocumentMinimal | null>(null);
+    useState<DocumentMinimalType | null>(null);
   const [loadingDialogUrl, setLoadingDialogUrl] = useState(false);
 
   // Callback pour rafraîchir la page après update

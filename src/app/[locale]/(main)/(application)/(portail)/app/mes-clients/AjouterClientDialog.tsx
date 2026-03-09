@@ -32,7 +32,7 @@ import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-type SiretState =
+type SiretStateType =
   | { status: "idle" }
   | { status: "searching" }
   | { status: "found"; entreprise: { id: string; nom: string; siret: string } }
@@ -64,7 +64,7 @@ export function AjouterClientDialog({
   onSuccess,
 }: AjouterClientDialogProps) {
   const [siretInput, setSiretInput] = useState("");
-  const [siretState, setSiretState] = useState<SiretState>({ status: "idle" });
+  const [siretState, setSiretState] = useState<SiretStateType>({ status: "idle" });
   const [creating, setCreating] = useState(false);
 
   const siretValide = isValidSIRET(siretInput);

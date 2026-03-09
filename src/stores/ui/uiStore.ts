@@ -9,7 +9,7 @@ export type TicketView = "list" | "grid";
 export type PrestationView = "list" | "grid";
 export type EntrepriseView = "list" | "grid";
 
-type UiStore = {
+type UiStoreType = {
   // state
   ticketView: TicketView;
   prestationView: PrestationView;
@@ -21,7 +21,7 @@ type UiStore = {
   setEntrepriseView: (view: EntrepriseView) => void;
 };
 
-export const useUiStore = create<UiStore>()(
+export const useUiStore = create<UiStoreType>()(
   persist(
     (set) => ({
       // default state

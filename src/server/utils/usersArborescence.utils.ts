@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { usersArborescence } from "@/db/schema/users";
 import { eq, and } from "drizzle-orm";
 
-type DbOrTransaction =
+type DbOrTransactionType =
   | typeof db
   | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -25,7 +25,7 @@ export async function insertUserArborescence({
   userId: string;
   parentId: string | null;
   createdById: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }) {
   const dbClient = tx || db;
 
@@ -76,7 +76,7 @@ export async function deleteUserArborescence({
 }: {
   entrepriseId: string;
   userId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }) {
   const dbClient = tx || db;
 
@@ -98,7 +98,7 @@ export async function userHasChildren({
 }: {
   entrepriseId: string;
   userId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const dbClient = tx || db;
 
@@ -130,7 +130,7 @@ export async function isUserDescendant({
   entrepriseId: string;
   ancetreId: string;
   descendantId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<boolean> {
   const dbClient = tx || db;
 

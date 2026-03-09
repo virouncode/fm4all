@@ -30,13 +30,13 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-type ServiceGroup = {
+type ServiceGroupType = {
   serviceId: string;
   serviceNom: string;
   systemPacks: TacheListeTemplateWithServiceNom[];
 };
 
-type TypeProprietaire = "all" | "systeme" | "client" | "prestataire";
+type TypeProprietaireType = "all" | "systeme" | "client" | "prestataire";
 
 export function ChecklistsClient() {
   const posture = useAppStore((s) => s.postureActive);
@@ -60,7 +60,7 @@ export function ChecklistsClient() {
   // Filtres
   const [serviceFilter, setServiceFilter] = useState<string>("all");
 
-  const [typeFilter, setTypeFilter] = useState<TypeProprietaire>("all");
+  const [typeFilter, setTypeFilter] = useState<TypeProprietaireType>("all");
   const [entrepriseFilterId, setEntrepriseFilterId] = useState<string>("");
   const [entreprisesList, setEntreprisesList] = useState<
     Array<{ id: string; nom: string }>
@@ -190,8 +190,8 @@ export function ChecklistsClient() {
 
   // ====================== GROUP BY SERVICE ======================
 
-  const serviceGroups = useMemo((): ServiceGroup[] => {
-    const map = new Map<string, ServiceGroup>();
+  const serviceGroups = useMemo((): ServiceGroupType[] => {
+    const map = new Map<string, ServiceGroupType>();
     for (const pack of systemPacks) {
       const existing = map.get(pack.serviceId) ?? {
         serviceId: pack.serviceId,
@@ -278,7 +278,7 @@ export function ChecklistsClient() {
             </span>
             <Select
               value={typeFilter}
-              onValueChange={(v) => setTypeFilter(v as TypeProprietaire)}
+              onValueChange={(v) => setTypeFilter(v as TypeProprietaireType)}
             >
               <SelectTrigger className="h-8 w-44 text-sm">
                 <SelectValue />
@@ -473,10 +473,10 @@ function ServiceGroupCard({
   nonSystemBadgeRole,
   onPacksChanged,
 }: {
-  group: ServiceGroup;
+  group: ServiceGroupType;
   posture: string | null;
   isPlateformMode: boolean;
-  typeFilter: TypeProprietaire;
+  typeFilter: TypeProprietaireType;
   proprietaireEntrepriseId: string | null;
   clientEntrepriseIdsForAllMode?: Set<string>;
   canManage?: boolean;
@@ -487,11 +487,11 @@ function ServiceGroupCard({
 
   // En mode "all" plateforme : grouper par propriétaire, un TacheListeManagerContent par groupe
   if (isPlateformMode && typeFilter === "all") {
-    type ProprietaireGroup = {
+    type ProprietaireGroupType = {
       proprietaireEntrepriseId: string | null;
       proprietaireEntrepriseNom: string | null;
     };
-    const proprietaireGroupMap = new Map<string | null, ProprietaireGroup>();
+    const proprietaireGroupMap = new Map<string | null, ProprietaireGroupType>();
     for (const pack of group.systemPacks) {
       const key = pack.proprietaireEntrepriseId;
       if (!proprietaireGroupMap.has(key)) {

@@ -501,7 +501,7 @@ export function SiteFormDialog({ mode, site }: Props) {
 
 **RÈGLE CRITIQUE — Toujours utiliser les composants RHF** :
 
-**TOUJOURS** utiliser les composants RHF (`RhfInput`, `RhfControlledSelect`, `RhfTextArea`, etc.) dans les formulaires. Ne jamais utiliser les composants shadcn bruts (`Input`, `Select`, `Textarea`) directement dans un form RHF. Exception : pour les champs dans `useFieldArray` avec des chemins dynamiques (ex: `lignes.${index}.tauxTva`), utiliser `FormField` + composant shadcn.
+**TOUJOURS** utiliser les composants RHF (`RhfInput`, `RhfControlledSelect`, `RhfTextArea`, etc.) dans les formulaires. Ne jamais utiliser les composants shadcn bruts (`Input`, `Select`, `Textarea`) directement dans un form RHF.
 
 **Convention**:
 
@@ -535,21 +535,14 @@ function LigneAccordion({ index }: { index: number }) {
         label="Titre"
       />
 
-      {/* Selects dans array : FormField + Select (RhfControlledSelect a StringFieldPath constraint) */}
-      <FormField
-        control={control}
-        name={`lignes.${index}.tauxTva` as Path<FormType>}
-        render={({ field }) => (
-          <FormItem>
-            <FormControl>
-              <Select value={String(field.value ?? "")} onValueChange={field.onChange}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{/* options */}</SelectContent>
-              </Select>
-            </FormControl>
-          </FormItem>
-        )}
-      />
+      {/* Selects dans array : RhfControlledSelect avec cast "as never" sur le name */}
+      {/* RhfControlledSelect a une contrainte StringFieldPath — contournée avec "as never" */}
+      <RhfControlledSelect<FormType>
+        name={`lignes.${index}.tauxTva` as never}
+        label="TVA"
+      >
+        {/* options */}
+      </RhfControlledSelect>
 
       {/* setValue pour les booléens dans array */}
       <button onClick={() => setValue(`lignes.${index}.hasRemise` as Path<FormType>, true as never)}>
@@ -1739,6 +1732,11 @@ pnpm db:generate    # Generate migrations
    - Composants: `PascalCase.tsx`
    - Actions: `[verb][Entity]Action` (ex: `insertSiteAction`)
    - Queries: `get[Entity]By[Criteria]` (ex: `getSitesByEntreprise`)
+   - **Types TypeScript** :
+     - Toujours utiliser `type`, jamais `interface` (sauf augmentation globale ex: `interface Window`)
+     - Suffixe `Type` obligatoire : `type SearchParamsType`, `type SiteOptionType`, etc.
+     - Exception : props de composants React → suffixe `Props` : `type MyComponentProps`
+     - Jamais `as FormType` (alias local) — utiliser le nom complet importé directement
 
 ---
 

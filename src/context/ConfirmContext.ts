@@ -12,6 +12,6 @@ export type ConfirmOptions = {
   danger?: boolean;
 };
 
-type ConfirmContextValue = (opts: ConfirmOptions) => Promise<boolean>;
+type ConfirmContextValueType = (opts: ConfirmOptions) => Promise<boolean>;
 
-export const ConfirmContext = createContext<ConfirmContextValue | null>(null);
+export const ConfirmContext = createContext<ConfirmContextValueType | null>(null);

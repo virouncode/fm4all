@@ -43,7 +43,7 @@ import { getDevisStatutBadge } from "../helpers";
 
 // ============================= TYPES ==============================//
 
-type LocalLigne = {
+type LocalLigneType = {
   tempId: string;
   id?: string; // DB id si existant
   designation: string;
@@ -58,7 +58,7 @@ type LocalLigne = {
   isOpen: boolean;
 };
 
-type Permissions = {
+type PermissionsType = {
   canEdit: boolean;
   canEmettre: boolean;
   canSigner: boolean;
@@ -68,7 +68,7 @@ type Permissions = {
 
 type Props = {
   devis: DevisAvecLignes;
-  permissions: Permissions;
+  permissions: PermissionsType;
 };
 
 // ============================= CONSTANTES ==============================//
@@ -98,7 +98,7 @@ function calcTtc(prixHtEur: string, tauxTva: number): string {
   return ttc.toFixed(2).replace(".", ",");
 }
 
-function lignesFromDb(dbLignes: DevisAvecLignes["lignes"]): LocalLigne[] {
+function lignesFromDb(dbLignes: DevisAvecLignes["lignes"]): LocalLigneType[] {
   return dbLignes.map((l) => ({
     tempId: l.id,
     id: l.id,
@@ -116,7 +116,7 @@ function lignesFromDb(dbLignes: DevisAvecLignes["lignes"]): LocalLigne[] {
   }));
 }
 
-function newLigne(ordre: number): LocalLigne {
+function newLigne(ordre: number): LocalLigneType {
   return {
     tempId: crypto.randomUUID(),
     designation: "",
@@ -134,7 +134,7 @@ function newLigne(ordre: number): LocalLigne {
 
 function buildPreview(
   devis: DevisAvecLignes,
-  lignes: LocalLigne[],
+  lignes: LocalLigneType[],
   titre: string,
   description: string,
   remiseGlobaleHtEur: string,
@@ -186,7 +186,7 @@ export function DevisDetailClient({ devis: initialDevis, permissions }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // État éditeur (brouillon modifiable)
-  const [lignes, setLignes] = useState<LocalLigne[]>(() =>
+  const [lignes, setLignes] = useState<LocalLigneType[]>(() =>
     lignesFromDb(initialDevis.lignes),
   );
   const [titre, setTitre] = useState(initialDevis.titre);
@@ -338,7 +338,7 @@ export function DevisDetailClient({ devis: initialDevis, permissions }: Props) {
 
   // ===== Gestion lignes =====
 
-  function updateLigne(tempId: string, patch: Partial<LocalLigne>) {
+  function updateLigne(tempId: string, patch: Partial<LocalLigneType>) {
     setLignes((prev) =>
       prev.map((l) => (l.tempId === tempId ? { ...l, ...patch } : l)),
     );
@@ -623,9 +623,9 @@ export function DevisDetailClient({ devis: initialDevis, permissions }: Props) {
 // ============================= LIGNE ACCORDION ==============================//
 
 type LigneAccordionProps = {
-  ligne: LocalLigne;
+  ligne: LocalLigneType;
   index: number;
-  onChange: (patch: Partial<LocalLigne>) => void;
+  onChange: (patch: Partial<LocalLigneType>) => void;
   onRemove: () => void;
 };
 

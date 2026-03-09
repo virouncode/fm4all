@@ -8,7 +8,7 @@ import type { EntrepriseWithDetails } from "@/zod-schemas/entreprise.schema";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type ServiceItem = { serviceId: string; nom: string };
+type ServiceItemType = { serviceId: string; nom: string };
 
 export function MonEntrepriseClient() {
   const entreprise = useAppStore((s) => s.entreprise);
@@ -17,7 +17,7 @@ export function MonEntrepriseClient() {
 
   const [data, setData] = useState<{
     entreprise: EntrepriseWithDetails;
-    services: ServiceItem[];
+    services: ServiceItemType[];
   } | null>(null);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);

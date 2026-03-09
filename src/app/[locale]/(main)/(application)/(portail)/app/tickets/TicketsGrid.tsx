@@ -6,12 +6,12 @@ import { SelectTicketType } from "@/zod-schemas/ticket.schema";
 import { Loader2 } from "lucide-react";
 import { TicketCard } from "./TicketCard";
 
-type EntrepriseMinimal = { id: string; nom: string };
+type EntrepriseMinimalType = { id: string; nom: string };
 
 type TicketsGridProps = {
   tickets: SelectTicketType[];
   sites: SelectSiteType[];
-  entreprises: EntrepriseMinimal[];
+  entreprises: EntrepriseMinimalType[];
   isLoading: boolean;
   isLoadingMore: boolean;
   isError: boolean;

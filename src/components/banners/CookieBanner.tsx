@@ -20,8 +20,8 @@ const CONSENT_DATE_KEY = "cookie_consent_date";
 // À ajuster selon ta politique (souvent 6 mois / 12 mois en prod)
 const CONSENT_EXPIRATION_MS = 1000 * 60 * 60 * 24; // 24h
 
-type StoredConsent = boolean | null;
-type StoredConsentDate = number | null;
+type StoredConsentType = boolean | null;
+type StoredConsentDateType = number | null;
 
 function safeRemove(key: string) {
   try {
@@ -35,7 +35,7 @@ export default function CookieBanner() {
   const t = useTranslations("cookieBanniere");
   const pathname = usePathname();
 
-  const [consent, setConsent] = useState<StoredConsent>(null);
+  const [consent, setConsent] = useState<StoredConsentType>(null);
 
   const shouldOpen = useMemo(
     () => consent === null && pathname !== "/cookies",
@@ -44,11 +44,11 @@ export default function CookieBanner() {
 
   // 1) Lire la décision stockée + expiration
   useEffect(() => {
-    const storedConsent = getLocalStorage(CONSENT_KEY, null) as StoredConsent;
+    const storedConsent = getLocalStorage(CONSENT_KEY, null) as StoredConsentType;
     const storedDate = getLocalStorage(
       CONSENT_DATE_KEY,
       null,
-    ) as StoredConsentDate;
+    ) as StoredConsentDateType;
 
     if (storedConsent === null || storedDate === null) {
       setConsent(null);

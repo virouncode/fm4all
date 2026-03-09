@@ -32,7 +32,7 @@ import { ComponentProps } from "react";
 
 type LinkHrefType = ComponentProps<typeof Link>["href"];
 
-type NavItem = {
+type NavItemType = {
   key: string;
   label: string;
   href: LinkHrefType;
@@ -40,12 +40,12 @@ type NavItem = {
   match?: "startsWith" | "exact";
 };
 
-type NavSection = {
+type NavSectionType = {
   label?: string;
-  items: NavItem[];
+  items: NavItemType[];
 };
 
-const NAV: Record<RoleEntrepriseType, NavSection[]> = {
+const NAV: Record<RoleEntrepriseType, NavSectionType[]> = {
   client: [
     {
       items: [
@@ -407,7 +407,7 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
   ],
 };
 
-function isActive(pathname: string, href: string, match: NavItem["match"]) {
+function isActive(pathname: string, href: string, match: NavItemType["match"]) {
   if (match === "exact") return pathname === href;
   return (
     pathname === href ||

@@ -45,7 +45,7 @@ import { z } from "zod";
 import { getRoleBadgeStyles } from "./helpers";
 import { ProspectPickerDialog } from "./ProspectPickerDialog";
 
-type SiretState =
+type SiretStateType =
   | { status: "idle" }
   | { status: "searching" }
   | { status: "found"; entreprise: { id: string; nom: string; siret: string } }
@@ -89,7 +89,7 @@ const dialogFormSchema = z
 
 type DialogFormType = z.infer<typeof dialogFormSchema>;
 
-type ServiceItem = { id: string; nom: string };
+type ServiceItemType = { id: string; nom: string };
 
 const ROLES: {
   value: RoleEntrepriseType;
@@ -121,8 +121,8 @@ export function EntrepriseFormDialog({
 }: EntrepriseFormDialogProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [siretInput, setSiretInput] = useState("");
-  const [siretState, setSiretState] = useState<SiretState>({ status: "idle" });
-  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [siretState, setSiretState] = useState<SiretStateType>({ status: "idle" });
+  const [services, setServices] = useState<ServiceItemType[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
   const [prospectPickerOpen, setProspectPickerOpen] = useState(false);
 

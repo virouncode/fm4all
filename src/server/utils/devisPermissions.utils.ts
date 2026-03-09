@@ -6,7 +6,7 @@ import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { and, eq } from "drizzle-orm";
 
-type DevisPermissions = {
+type DevisPermissionsType = {
   canView: boolean;
   canCreate: boolean;
   canEdit: boolean; // brouillon uniquement
@@ -23,13 +23,13 @@ type DevisPermissions = {
  * - Prestataire (emetteurEntrepriseId) : créer, éditer brouillon, émettre
  * - Client (proprietaireEntrepriseId) : voir, signer ou refuser les devis émis
  */
-export async function getDevisPermissions({
+export async function getDevisPermissionsType({
   userId,
   devisId,
 }: {
   userId: string;
   devisId: string;
-}): Promise<DevisPermissions> {
+}): Promise<DevisPermissionsType> {
   const [devisRow, plateformeRole] = await Promise.all([
     db.query.devis.findFirst({ where: eq(devis.id, devisId) }),
     getEffectivePlateformeRole(userId),
@@ -108,7 +108,7 @@ export async function canUserEditDevis(
   userId: string,
   devisId: string,
 ): Promise<boolean> {
-  const perms = await getDevisPermissions({ userId, devisId });
+  const perms = await getDevisPermissionsType({ userId, devisId });
   return perms.canEdit;
 }
 
@@ -116,6 +116,6 @@ export async function canUserEmettreDevis(
   userId: string,
   devisId: string,
 ): Promise<boolean> {
-  const perms = await getDevisPermissions({ userId, devisId });
+  const perms = await getDevisPermissionsType({ userId, devisId });
   return perms.canEmettre;
 }

@@ -5,7 +5,7 @@ import { Building2 } from "lucide-react";
 import { Suspense } from "react";
 import { EntreprisesTable } from "./EntreprisesTable";
 
-type SearchParams = {
+type SearchParamsType = {
   search?: string;
   role?: string;
   orderBy?: string;
@@ -13,7 +13,7 @@ type SearchParams = {
 };
 
 type EntreprisesPageProps = {
-  searchParams: Promise<SearchParams>;
+  searchParams: Promise<SearchParamsType>;
 };
 
 export default async function EntreprisesPage({

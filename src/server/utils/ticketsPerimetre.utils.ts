@@ -11,7 +11,7 @@ import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { and, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
-type DbOrTransaction =
+type DbOrTransactionType =
   | typeof db
   | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -33,7 +33,7 @@ export async function getUserAccessibleSiteIdsForTickets({
 }: {
   userId: string;
   entrepriseId: string;
-  tx?: DbOrTransaction;
+  tx?: DbOrTransactionType;
 }): Promise<string[]> {
   const cookieStore = await cookies();
   const posture = cookieStore.get("fm4all:postureActive")?.value;

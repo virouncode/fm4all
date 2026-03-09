@@ -26,7 +26,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-type EntrepriseMinimal = { id: string; nom: string };
+type EntrepriseMinimalType = { id: string; nom: string };
 
 const filtersSchema = z.object({
   search: z.string().optional(),
@@ -59,10 +59,10 @@ export function TicketsFiltersDialog({
 
   // Entreprise lists
   const [clientEntreprises, setClientEntreprises] = useState<
-    EntrepriseMinimal[]
+    EntrepriseMinimalType[]
   >([]);
   const [prestataireEntreprises, setPrestataireEntreprises] = useState<
-    EntrepriseMinimal[]
+    EntrepriseMinimalType[]
   >([]);
 
   // Sites state (moved from TicketsTable)

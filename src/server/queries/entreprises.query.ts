@@ -118,7 +118,7 @@ export async function getEntreprisesPrestataires(): Promise<
 
 // ==================== PAGINATED LIST ====================
 
-type GetEntreprisesPaginatedParams = {
+type GetEntreprisesPaginatedParamsType = {
   search?: string;
   role?: RoleEntrepriseType;
   orderBy?: "nom" | "createdAt";
@@ -138,7 +138,7 @@ export async function getEntreprisesPaginated({
   orderDir = "asc",
   page,
   pageSize,
-}: GetEntreprisesPaginatedParams): Promise<EntrepriseWithDetails[]> {
+}: GetEntreprisesPaginatedParamsType): Promise<EntrepriseWithDetails[]> {
   const offset = (page - 1) * pageSize;
 
   // Sous-query pour filtrer par rôle si nécessaire

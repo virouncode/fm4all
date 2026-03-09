@@ -12,7 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { createDevisColumns, devisIdLabelMap } from "./createDevisColumns";
 
-type SearchParams = {
+type SearchParamsType = {
   statut?: string;
   siteId?: string;
   search?: string;
@@ -54,7 +54,7 @@ function toStatut(value: string | undefined): DevisStatutType | undefined {
 }
 
 type DevisTableProps = {
-  searchParams: SearchParams;
+  searchParams: SearchParamsType;
 };
 
 export function DevisTable({ searchParams }: DevisTableProps) {

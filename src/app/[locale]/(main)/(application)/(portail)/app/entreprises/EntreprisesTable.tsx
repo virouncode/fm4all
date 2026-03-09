@@ -23,7 +23,7 @@ import { EntreprisesGrid } from "./EntreprisesGrid";
 import { EntreprisesSortDialog } from "./EntreprisesSortDialog";
 import { InviterEntrepriseAdminDialog } from "./InviterEntrepriseAdminDialog";
 
-type SearchParams = {
+type SearchParamsType = {
   search?: string;
   role?: string;
   orderBy?: string;
@@ -55,7 +55,7 @@ function toRoleOrUndefined(
 }
 
 type EntreprisesTableProps = {
-  searchParams: SearchParams;
+  searchParams: SearchParamsType;
 };
 
 export function EntreprisesTable({ searchParams }: EntreprisesTableProps) {

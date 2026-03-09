@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getRoleBadgeStyles } from "../helpers";
 
-type ServiceItem = { id: string; nom: string };
+type ServiceItemType = { id: string; nom: string };
 
 const ROLES: {
   value: RoleEntrepriseType;
@@ -58,7 +58,7 @@ export function EditEntrepriseRolesDialog({
 }: Props) {
   const [localRoles, setLocalRoles] = useState<RoleEntrepriseType[]>([]);
   const [localServiceIds, setLocalServiceIds] = useState<string[]>([]);
-  const [allServices, setAllServices] = useState<ServiceItem[]>([]);
+  const [allServices, setAllServices] = useState<ServiceItemType[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{

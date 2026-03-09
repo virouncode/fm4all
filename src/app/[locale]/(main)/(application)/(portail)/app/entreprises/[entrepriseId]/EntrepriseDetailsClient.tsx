@@ -30,11 +30,11 @@ import { EditEntrepriseInfosDialog } from "./EditEntrepriseInfosDialog";
 import { EditEntrepriseLogoDialog } from "./EditEntrepriseLogoDialog";
 import { EditEntrepriseRolesDialog } from "./EditEntrepriseRolesDialog";
 
-type ServiceItem = { serviceId: string; nom: string };
+type ServiceItemType = { serviceId: string; nom: string };
 
 type EntrepriseDetailsClientProps = {
   entreprise: EntrepriseWithDetails;
-  services: ServiceItem[];
+  services: ServiceItemType[];
   logoUrl: string | null;
   logoStorageKey: string | null;
   /** Si false, les boutons "Modifier" et l'avatar cliquable sont masqués (non-admin) */

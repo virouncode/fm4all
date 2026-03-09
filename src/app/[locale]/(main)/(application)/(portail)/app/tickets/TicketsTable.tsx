@@ -30,9 +30,9 @@ import { TicketsFiltersDialog } from "./TicketsFiltersDialog";
 import { TicketsGrid } from "./TicketsGrid";
 import { TicketsSortDialog } from "./TicketsSortDialog";
 
-type EntrepriseMinimal = { id: string; nom: string };
+type EntrepriseMinimalType = { id: string; nom: string };
 
-type SearchParams = {
+type SearchParamsType = {
   // Filtres
   search?: string;
   statut?: string;
@@ -100,7 +100,7 @@ function toOrderDir(value: string | undefined): "asc" | "desc" {
 }
 
 type TicketsTableProps = {
-  searchParams: SearchParams;
+  searchParams: SearchParamsType;
 };
 
 export function TicketsTable({ searchParams }: TicketsTableProps) {
@@ -115,7 +115,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   // Data state
   const [tickets, setTickets] = useState<SelectTicketType[]>([]);
   const [sites, setSites] = useState<SelectSiteType[]>([]);
-  const [entreprises, setEntreprises] = useState<EntrepriseMinimal[]>([]);
+  const [entreprises, setEntreprises] = useState<EntrepriseMinimalType[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
