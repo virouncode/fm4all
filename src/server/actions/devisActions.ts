@@ -3,6 +3,8 @@
 import { db } from "@/db";
 import { devis, devisLignes, devisNumeroSeq } from "@/db/schema/devis";
 import { documents, documentsLinks } from "@/db/schema/documents";
+import { user } from "@/db/schema/auth";
+import { userClientSiteAttributions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -622,4 +624,41 @@ export const refuserDevisAction = actionClient
 
     if (!updated) throw errors.conflict("Le devis n'est plus émis.");
     return { devis: updated };
+  });
+
+// ============================= GET RESPONSABLE SITE ==============================//
+
+export const getSiteResponsableAction = actionClient
+  .metadata({ actionName: "getSiteResponsableAction" })
+  .inputSchema(
+    z.object({
+      siteId: z.string().uuid(),
+      entrepriseId: z.string().uuid(),
+    }),
+    { handleValidationErrorsShape: async (ve) => flattenValidationErrors(ve).fieldErrors },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const rows = await db
+      .select({
+        prenom: user.prenom,
+        nom: user.nom,
+        email: user.email,
+        phone: user.phone,
+      })
+      .from(userClientSiteAttributions)
+      .innerJoin(user, eq(userClientSiteAttributions.userId, user.id))
+      .where(
+        and(
+          eq(userClientSiteAttributions.siteId, parsedInput.siteId),
+          eq(userClientSiteAttributions.entrepriseId, parsedInput.entrepriseId),
+          eq(userClientSiteAttributions.role, "responsable_site"),
+        ),
+      )
+      .limit(1);
+
+    return { responsable: rows[0] ?? null };
   });

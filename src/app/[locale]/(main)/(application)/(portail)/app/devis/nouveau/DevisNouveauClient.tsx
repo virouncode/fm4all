@@ -18,7 +18,7 @@ import {
 import { useRouter } from "@/i18n/navigation";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
-import { saveDevisWithLignesAction } from "@/server/actions/devisActions";
+import { getSiteResponsableAction, saveDevisWithLignesAction } from "@/server/actions/devisActions";
 import { getSitesAction } from "@/server/actions/sitesActions";
 import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions.query";
 import {
@@ -45,6 +45,13 @@ import type { DevisPreviewData, DevisPreviewLigne } from "../DevisPreviewCard";
 import { DevisPreviewCard } from "../DevisPreviewCard";
 
 // ============================= TYPES ==============================//
+
+type SiteResponsableType = {
+  prenom: string;
+  nom: string;
+  email: string;
+  phone: string | null;
+};
 
 type SiteOptionType = {
   id: string;
@@ -140,6 +147,7 @@ function buildPreview(
   selectedSite: SiteOptionType | null,
   values: PreviewValuesType,
   emetteurLogoUrl: string | null,
+  siteResponsable: SiteResponsableType | null,
 ): DevisPreviewData {
   const lignes = values.lignes ?? [];
   const previewLignes: DevisPreviewLigne[] = lignes.map((l) => ({
@@ -180,10 +188,10 @@ function buildPreview(
     siteAdresse: selectedSite?.adresse ?? "",
     siteCodePostal: selectedSite?.codePostal ?? null,
     siteVille: selectedSite?.ville ?? null,
-    siteContactPrenom: selectedClient?.prenomContact ?? null,
-    siteContactNom: selectedClient?.nomContact ?? null,
-    siteContactEmail: selectedClient?.emailContact ?? null,
-    siteContactPhone: selectedClient?.phoneContact ?? null,
+    siteContactPrenom: siteResponsable?.prenom ?? null,
+    siteContactNom: siteResponsable?.nom ?? null,
+    siteContactEmail: siteResponsable?.email ?? null,
+    siteContactPhone: siteResponsable?.phone ?? null,
     lignes: previewLignes,
   };
 }
@@ -201,6 +209,7 @@ export function DevisNouveauClient({ emetteur, services }: DevisNouveauClientPro
   const [selectedClient, setSelectedClient] =
     useState<ClientAvecDetails | null>(null);
   const [selectedSite, setSelectedSite] = useState<SiteOptionType | null>(null);
+  const [siteResponsable, setSiteResponsable] = useState<SiteResponsableType | null>(null);
   const [openLines, setOpenLines] = useState<Set<number>>(new Set([0]));
   const [emetteurLogoUrl, setEmetteurLogoUrl] = useState<string | null>(null);
 
@@ -257,11 +266,18 @@ export function DevisNouveauClient({ emetteur, services }: DevisNouveauClientPro
     void load();
   }, [emetteur.id]);
 
+  // ─── Chargement du responsable_site ─────────────────────────────
+  async function loadResponsableForSite(siteId: string, entrepriseId: string) {
+    const result = await getSiteResponsableAction({ siteId, entrepriseId });
+    setSiteResponsable(result?.data?.responsable ?? null);
+  }
+
   // ─── Chargement des sites pour un client ────────────────────────
   async function loadSitesForClient(clientId: string) {
     if (!clientId) {
       setSites([]);
       setSelectedSite(null);
+      setSiteResponsable(null);
       form.setValue("siteId", "");
       return;
     }
@@ -382,6 +398,7 @@ export function DevisNouveauClient({ emetteur, services }: DevisNouveauClientPro
     selectedSite,
     watchedValues,
     emetteurLogoUrl,
+    siteResponsable,
   );
 
   const { isSubmitting } = form.formState;
@@ -431,6 +448,11 @@ export function DevisNouveauClient({ emetteur, services }: DevisNouveauClientPro
                   onSiteChange={(siteId) => {
                     const site = sites.find((s) => s.id === siteId) ?? null;
                     setSelectedSite(site);
+                    if (site && selectedClient) {
+                      void loadResponsableForSite(site.id, selectedClient.id);
+                    } else {
+                      setSiteResponsable(null);
+                    }
                   }}
                   onSetValidToRelative={(days) => {
                     const target = format(

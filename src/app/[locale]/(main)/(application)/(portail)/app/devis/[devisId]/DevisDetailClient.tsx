@@ -173,6 +173,10 @@ function buildPreview(
     siteAdresse: devis.siteAdresse,
     siteCodePostal: devis.siteCodePostal,
     siteVille: devis.siteVille,
+    siteContactPrenom: devis.siteResponsablePrenom,
+    siteContactNom: devis.siteResponsableNom,
+    siteContactEmail: devis.siteResponsableEmail,
+    siteContactPhone: devis.siteResponsablePhone,
     lignes: previewLignes,
   };
 }
@@ -194,14 +198,28 @@ export function DevisDetailClient({
   const [openLines, setOpenLines] = useState<Set<number>>(new Set());
   const pdfRef = useRef<HTMLDivElement>(null);
 
-  // Charger l'URL présignée du logo de l'émetteur
+  // Charger le logo de l'émetteur en data URL (pour html2canvas — CORS)
   useEffect(() => {
     if (!initialDevis.emetteurLogoStorageKey) return;
     getPresignedReadUrl({
       key: initialDevis.emetteurLogoStorageKey,
       proprietaireEntrepriseId: initialDevis.emetteurEntrepriseId,
     })
-      .then(setEmetteurLogoUrl)
+      .then(async (url) => {
+        try {
+          const resp = await fetch(url);
+          const blob = await resp.blob();
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          setEmetteurLogoUrl(dataUrl);
+        } catch {
+          setEmetteurLogoUrl(url); // fallback si fetch échoue
+        }
+      })
       .catch(() => null);
   }, [initialDevis.emetteurLogoStorageKey, initialDevis.emetteurEntrepriseId]);
 
@@ -245,6 +263,15 @@ export function DevisDetailClient({
 
   // useWatch pour la preview live (évite form.watch() dans le render)
   const watchedValues = useWatch({ control: form.control });
+
+  // Permissions effectives dérivées du statut local (change après émission/signature/refus)
+  const effectivePermissions: PermissionsType = {
+    canEdit: permissions.canEdit && devis.statut === "brouillon",
+    canEmettre: permissions.canEmettre && devis.statut === "brouillon",
+    canSigner: permissions.canSigner && devis.statut === "emis",
+    canRefuser: permissions.canRefuser && devis.statut === "emis",
+    isReadOnly: permissions.isReadOnly || devis.statut !== "brouillon",
+  };
 
   const badge = getDevisStatutBadge(devis.statut);
   const preview = buildPreview(devis, watchedValues, emetteurLogoUrl);
@@ -296,6 +323,30 @@ export function DevisDetailClient({
       const html2canvas = (await import("html2canvas-pro")).default;
       const { PDFDocument } = await import("pdf-lib");
 
+      // Convertir le logo en data URL pour éviter les problèmes CORS avec html2canvas
+      if (emetteurLogoUrl) {
+        const imgEl = pdfRef.current.querySelector("img") as HTMLImageElement | null;
+        if (imgEl) {
+          try {
+            const resp = await fetch(emetteurLogoUrl);
+            const blob = await resp.blob();
+            const dataUrl = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result as string);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+            imgEl.src = dataUrl;
+            await new Promise<void>((resolve) => {
+              imgEl.onload = () => resolve();
+              imgEl.onerror = () => resolve(); // continuer même si erreur
+            });
+          } catch {
+            // Continuer sans logo si erreur
+          }
+        }
+      }
+
       const canvas = await html2canvas(pdfRef.current, {
         scale: 2,
         useCORS: true,
@@ -304,10 +355,21 @@ export function DevisDetailClient({
 
       const imgData = canvas.toDataURL("image/png");
       const pdfDoc = await PDFDocument.create();
-      // A4 at 72 dpi: 595 x 842 pts
-      const page = pdfDoc.addPage([595, 842]);
+      // Page A4 fixe : 595pt × 842pt (210mm × 297mm)
+      const pageWidth = 595;
+      const pageHeight = 842;
+      const page = pdfDoc.addPage([pageWidth, pageHeight]);
       const pngImage = await pdfDoc.embedPng(imgData);
-      page.drawImage(pngImage, { x: 0, y: 0, width: 595, height: 842 });
+      // Hauteur du contenu en pt (proportionnelle à la largeur A4)
+      const contentHeightPt = Math.round((canvas.height / canvas.width) * pageWidth);
+      // pdf-lib : origine en bas à gauche → dessiner depuis le haut de la page
+      const drawY = pageHeight - Math.min(contentHeightPt, pageHeight);
+      page.drawImage(pngImage, {
+        x: 0,
+        y: drawY,
+        width: pageWidth,
+        height: Math.min(contentHeightPt, pageHeight),
+      });
 
       const pdfBytes = await pdfDoc.save();
       const filename = `devis-${devisNumero}.pdf`;
@@ -343,10 +405,17 @@ export function DevisDetailClient({
         key: pdfStorageKey,
         proprietaireEntrepriseId: devis.emetteurEntrepriseId,
       });
+      // Fetch en blob pour forcer le téléchargement sans quitter la page
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
+      a.href = blobUrl;
       a.download = `devis-${devis.numero ?? devis.id}.pdf`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
     } catch {
       toast.error("Erreur lors du téléchargement du PDF");
     }
@@ -478,7 +547,7 @@ export function DevisDetailClient({
             )}
           </div>
           <div className="flex items-center gap-2">
-            {permissions.canEmettre && (
+            {effectivePermissions.canEmettre && (
               <Button size="sm" disabled={disabled || isPdfGenerating} onClick={handleEmettre}>
                 {isPdfGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -494,13 +563,13 @@ export function DevisDetailClient({
                 PDF
               </Button>
             )}
-            {permissions.canSigner && (
+            {effectivePermissions.canSigner && (
               <Button size="sm" disabled={disabled} onClick={handleSigner}>
                 <CheckCircle className="h-4 w-4" />
                 Signer
               </Button>
             )}
-            {permissions.canRefuser && (
+            {effectivePermissions.canRefuser && (
               <Button
                 size="sm"
                 variant="destructive"
@@ -516,7 +585,7 @@ export function DevisDetailClient({
 
         {/* Contenu scrollable */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          {permissions.canEdit ? (
+          {effectivePermissions.canEdit ? (
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="space-y-8 pb-6">
@@ -659,7 +728,7 @@ export function DevisDetailClient({
             // ===== MODE LECTURE SEULE =====
             <ReadOnlyDevisView
               devis={devis}
-              permissions={permissions}
+              permissions={effectivePermissions}
               disabled={disabled}
               onSigner={handleSigner}
               onRefuser={handleRefuser}
@@ -693,7 +762,7 @@ export function DevisDetailClient({
         style={{ position: "absolute", left: "-9999px", top: 0, zIndex: -1 }}
       >
         <div ref={pdfRef}>
-          <DevisPreviewCard devis={preview} />
+          <DevisPreviewCard devis={preview} pdfMode />
         </div>
       </div>
     </div>

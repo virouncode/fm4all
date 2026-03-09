@@ -93,9 +93,10 @@ function periodeSuffix(
 
 type Props = {
   devis: DevisPreviewData;
+  pdfMode?: boolean;
 };
 
-export function DevisPreviewCard({ devis }: Props) {
+export function DevisPreviewCard({ devis, pdfMode = false }: Props) {
   const lignes = devis.lignes;
 
   type TotauxTvaType = { base: number; tva: number };
@@ -138,11 +139,11 @@ export function DevisPreviewCard({ devis }: Props) {
         width: "210mm",
         minHeight: "297mm",
         fontSize: "9pt",
-        lineHeight: "1.5",
+        lineHeight: pdfMode ? "1.2" : "1.5",
       }}
     >
       {/* ═══ EN-TÊTE ═══ */}
-      <div className="flex items-start justify-between px-10 pt-10 pb-6">
+      <div className="flex items-start justify-between px-10 pt-8 pb-4">
         {/* Titre + infos */}
         <div>
           <p
@@ -212,14 +213,21 @@ export function DevisPreviewCard({ devis }: Props) {
       </div>
 
       {/* ═══ ÉMETTEUR + DESTINATAIRE ═══ */}
-      <div className="grid grid-cols-2 gap-0 px-10 py-6">
+      <div className={`grid grid-cols-2 gap-0 px-10 ${pdfMode ? "py-2" : "py-3"}`}>
         {/* Émetteur */}
-        <div className="border-r border-gray-200 pr-6">
-          <p className="text-primary mb-2 text-xs font-semibold tracking-wider uppercase">
+        <div className={`border-r border-gray-200 pr-6 ${pdfMode ? "[&_p]:!leading-snug [&_p]:!mb-0.5" : ""}`}>
+          <div className={`text-primary text-xs font-semibold tracking-wider uppercase ${pdfMode ? "mb-4" : "mb-2"}`}>
             De
-          </p>
-          <p className="text-sm font-bold">{devis.emetteurEntrepriseNom}</p>
-          <div className="mt-1 space-y-0.5">
+          </div>
+          <div className={`text-sm font-bold ${pdfMode ? "mb-2" : ""}`}>{devis.emetteurEntrepriseNom}</div>
+          <div className={pdfMode ? "" : "mt-1 space-y-0.5"}>
+            {(devis.emetteurPrenomContact || devis.emetteurNomContact) && (
+              <p className="text-xs text-gray-600">
+                {[devis.emetteurPrenomContact, devis.emetteurNomContact]
+                  .filter(Boolean)
+                  .join(" ")}
+              </p>
+            )}
             {devis.emetteurEmailContact && (
               <p className="text-xs text-gray-600">
                 {devis.emetteurEmailContact}
@@ -242,14 +250,14 @@ export function DevisPreviewCard({ devis }: Props) {
         </div>
 
         {/* Destinataire */}
-        <div className="pl-6">
-          <p className="text-primary mb-2 text-xs font-semibold tracking-wider uppercase">
+        <div className={`pl-6 ${pdfMode ? "[&_p]:!leading-snug [&_p]:!mb-0.5" : ""}`}>
+          <div className={`text-primary text-xs font-semibold tracking-wider uppercase ${pdfMode ? "mb-4" : "mb-2"}`}>
             À
-          </p>
-          <p className="text-sm font-bold">
+          </div>
+          <div className={`text-sm font-bold ${pdfMode ? "mb-2" : ""}`}>
             {devis.proprietaireEntrepriseNom || "—"}
-          </p>
-          <div className="mt-1 space-y-0.5">
+          </div>
+          <div className={pdfMode ? "" : "mt-1 space-y-0.5"}>
             {devis.proprietaireEntrepriseSiret && (
               <p className="text-xs text-gray-500">
                 SIRET : {devis.proprietaireEntrepriseSiret}
@@ -262,7 +270,7 @@ export function DevisPreviewCard({ devis }: Props) {
             )}
             {/* Site d'intervention */}
             {devis.siteNom && (
-              <div className="mt-2 border-t border-gray-100 pt-2">
+              <div className={pdfMode ? "mt-3 border-t border-gray-100 pt-3" : "mt-2 border-t border-gray-100 pt-2"}>
                 <p className="text-xs tracking-wide text-gray-400 uppercase">
                   Site d&apos;intervention
                 </p>
@@ -273,7 +281,7 @@ export function DevisPreviewCard({ devis }: Props) {
                   <p className="text-xs text-gray-500">{siteAdresseComplete}</p>
                 )}
                 {(devis.siteContactPrenom || devis.siteContactNom) && (
-                  <p className="mt-1 text-xs text-gray-600">
+                  <p className="text-xs text-gray-600">
                     {[devis.siteContactPrenom, devis.siteContactNom]
                       .filter(Boolean)
                       .join(" ")}
@@ -310,32 +318,32 @@ export function DevisPreviewCard({ devis }: Props) {
           <thead>
             <tr className="bg-primary text-primary-foreground">
               <th
-                className="px-3 py-2 text-left font-semibold"
-                style={{ width: "42%" }}
+                className="px-3 py-2 font-semibold"
+                style={{ width: "42%", textAlign: "left" }}
               >
                 Description
               </th>
               <th
-                className="px-2 py-2 text-center font-semibold"
-                style={{ width: "10%" }}
+                className="px-2 py-2 font-semibold"
+                style={{ width: "10%", textAlign: "center" }}
               >
                 Qté
               </th>
               <th
-                className="px-2 py-2 text-right font-semibold"
-                style={{ width: "18%" }}
+                className="px-2 py-2 font-semibold"
+                style={{ width: "18%", textAlign: "right" }}
               >
                 Prix unitaire
               </th>
               <th
-                className="px-2 py-2 text-center font-semibold"
-                style={{ width: "10%" }}
+                className="px-2 py-2 font-semibold"
+                style={{ width: "10%", textAlign: "center" }}
               >
                 TVA (%)
               </th>
               <th
-                className="px-3 py-2 text-right font-semibold"
-                style={{ width: "20%" }}
+                className="px-3 py-2 font-semibold"
+                style={{ width: "20%", textAlign: "right" }}
               >
                 Total HT
               </th>
@@ -361,7 +369,7 @@ export function DevisPreviewCard({ devis }: Props) {
                     key={l.id ?? idx}
                     className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
                   >
-                    <td className="border-b border-gray-100 px-3 py-2">
+                    <td className="border-b border-gray-100 px-3 py-2" style={{ textAlign: "left" }}>
                       <p className="font-medium">{l.designation}</p>
                       {l.description && (
                         <p className="mt-0.5 text-xs text-gray-500">
@@ -369,11 +377,11 @@ export function DevisPreviewCard({ devis }: Props) {
                         </p>
                       )}
                     </td>
-                    <td className="border-b border-gray-100 px-2 py-2 text-center">
+                    <td className="border-b border-gray-100 px-2 py-2" style={{ textAlign: "center" }}>
                       {formatQty(l.quantite)}{" "}
                       <span className="text-xs text-gray-400">{l.unite}</span>
                     </td>
-                    <td className="border-b border-gray-100 px-2 py-2 text-right">
+                    <td className="border-b border-gray-100 px-2 py-2" style={{ textAlign: "right" }}>
                       {l.prixUnitaireHt > 0 ? (
                         <span>
                           {formatEur(l.prixUnitaireHt)}
@@ -387,10 +395,10 @@ export function DevisPreviewCard({ devis }: Props) {
                         "—"
                       )}
                     </td>
-                    <td className="border-b border-gray-100 px-2 py-2 text-center text-gray-600">
+                    <td className="border-b border-gray-100 px-2 py-2 text-gray-600" style={{ textAlign: "center" }}>
                       {l.tauxTva / 100} %
                     </td>
-                    <td className="border-b border-gray-100 px-3 py-2 text-right font-medium">
+                    <td className="border-b border-gray-100 px-3 py-2 font-medium" style={{ textAlign: "right" }}>
                       {l.remiseHtMontant > 0 ? (
                         <span>
                           <span className="mr-1 text-xs text-gray-400 line-through">
@@ -472,7 +480,7 @@ export function DevisPreviewCard({ devis }: Props) {
       )}
 
       {/* ═══ PIED DE PAGE ═══ */}
-      <div className="border-primary/20 bg-primary/[0.06] mt-auto border-t-2 px-10 py-4 text-center text-xs text-gray-500">
+      <div className={`border-primary/20 bg-primary/[0.06] mt-auto border-t-2 px-10 text-center text-xs text-gray-500 ${pdfMode ? "py-2 [&_p]:!leading-snug [&_p]:!mb-0.5" : "py-4"}`}>
         <p className="font-medium">{devis.emetteurEntrepriseNom}</p>
         <p>SIRET {devis.emetteurEntrepriseSiret}</p>
         {devis.emetteurEntrepriseNumeroTva && (

@@ -6,6 +6,7 @@ import { entreprises } from "@/db/schema/entreprises";
 import { documents, documentsLinks } from "@/db/schema/documents";
 import { sites } from "@/db/schema/sites";
 import { user } from "@/db/schema/auth";
+import { userClientSiteAttributions } from "@/db/schema/users";
 import type {
   SelectDevisLigneType,
   SelectDevisType,
@@ -37,6 +38,10 @@ export type DevisAvecLignes = SelectDevisType & {
   emetteurPrenomContact: string | null;
   emetteurNomContact: string | null;
   emetteurLogoStorageKey: string | null;
+  siteResponsablePrenom: string | null;
+  siteResponsableNom: string | null;
+  siteResponsableEmail: string | null;
+  siteResponsablePhone: string | null;
   pdfStorageKey: string | null;
   siteNom: string;
   siteAdresse: string;
@@ -91,21 +96,46 @@ export async function getDevisById(
     .where(eq(devisLignes.devisId, devisId))
     .orderBy(asc(devisLignes.ordre));
 
-  // Récupérer le PDF du devis si existant
-  const pdfDoc = await db
-    .select({ storageKey: documents.storageKey })
-    .from(documentsLinks)
-    .innerJoin(documents, eq(documentsLinks.documentId, documents.id))
-    .where(
-      and(
-        eq(documentsLinks.devisId, devisId),
-        eq(documents.categorie, "devis"),
-        isNull(documentsLinks.ticketId),
-      ),
-    )
-    .limit(1);
-
   const r = row[0];
+
+  // Récupérer le responsable_site du site concerné
+  const responsableSiteUser = alias(user, "responsableSiteUser");
+  const [responsable, pdfDoc] = await Promise.all([
+    db
+      .select({
+        prenom: responsableSiteUser.prenom,
+        nom: responsableSiteUser.nom,
+        email: responsableSiteUser.email,
+        phone: responsableSiteUser.phone,
+      })
+      .from(userClientSiteAttributions)
+      .innerJoin(
+        responsableSiteUser,
+        eq(userClientSiteAttributions.userId, responsableSiteUser.id),
+      )
+      .where(
+        and(
+          eq(userClientSiteAttributions.siteId, r.devis.siteId),
+          eq(userClientSiteAttributions.entrepriseId, r.devis.proprietaireEntrepriseId),
+          eq(userClientSiteAttributions.role, "responsable_site"),
+        ),
+      )
+      .limit(1),
+    // Récupérer le PDF du devis si existant
+    db
+      .select({ storageKey: documents.storageKey })
+      .from(documentsLinks)
+      .innerJoin(documents, eq(documentsLinks.documentId, documents.id))
+      .where(
+        and(
+          eq(documentsLinks.devisId, devisId),
+          eq(documents.categorie, "devis"),
+          isNull(documentsLinks.ticketId),
+        ),
+      )
+      .limit(1),
+  ]);
+
   return {
     ...r.devis,
     proprietaireEntrepriseNom: r.proprietaireEntrepriseNom,
@@ -119,6 +149,10 @@ export async function getDevisById(
     emetteurPrenomContact: r.emetteurPrenomContact,
     emetteurNomContact: r.emetteurNomContact,
     emetteurLogoStorageKey: r.emetteurLogoStorageKey,
+    siteResponsablePrenom: responsable[0]?.prenom ?? null,
+    siteResponsableNom: responsable[0]?.nom ?? null,
+    siteResponsableEmail: responsable[0]?.email ?? null,
+    siteResponsablePhone: responsable[0]?.phone ?? null,
     pdfStorageKey: pdfDoc[0]?.storageKey ?? null,
     siteNom: r.siteNom,
     siteAdresse: r.siteAdresse,
