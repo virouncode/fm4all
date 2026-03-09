@@ -9,10 +9,13 @@ import { DevisDetailClient } from "./DevisDetailClient";
 
 type DevisDetailPageProps = {
   params: Promise<{ devisId: string; locale: string }>;
+  searchParams: Promise<{ tab?: string }>;
 };
 
-export default async function DevisDetailPage({ params }: DevisDetailPageProps) {
+export default async function DevisDetailPage({ params, searchParams }: DevisDetailPageProps) {
   const { devisId } = await params;
+  const { tab } = await searchParams;
+  const backTab = tab === "propositions" ? "propositions" : tab === "demandes" ? "demandes" : undefined;
 
   const session = await getSession();
   if (!session?.user) {
@@ -61,11 +64,11 @@ export default async function DevisDetailPage({ params }: DevisDetailPageProps) 
       <div className="mb-4 flex flex-shrink-0 items-center gap-2">
         <Handshake className="text-primary size-6" />
         <h1 className="flex-shrink-0 text-2xl font-bold">
-          {devisRow!.numero ?? `Devis – ${devisRow!.titre}`}
+          {devisRow!.numero ? `Devis ${devisRow!.numero}` : `Devis – ${devisRow!.titre}`}
         </h1>
       </div>
 
-      <DevisDetailClient devis={devisRow!} permissions={permissions} services={services} pdfStorageKey={devisRow!.pdfStorageKey} />
+      <DevisDetailClient devis={devisRow!} permissions={permissions} services={services} pdfStorageKey={devisRow!.pdfStorageKey} backTab={backTab} />
     </div>
   );
 }

@@ -210,6 +210,12 @@ export async function getDevisPaginated(
         return devis.dateEmission;
       case "validTo":
         return devis.validTo;
+      case "siteNom":
+        return sites.nom;
+      case "emetteurEntrepriseNom":
+        return emetteur.nom;
+      case "proprietaireEntrepriseNom":
+        return proprietaire.nom;
       default:
         return devis.createdAt;
     }

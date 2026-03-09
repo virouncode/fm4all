@@ -4,18 +4,27 @@ import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import type { DevisAvecDetails } from "@/server/queries/devis.query";
-import { getDevisAction } from "@/server/actions/devisActions";
+import {
+  getDevisDemandesAction,
+  getDevisDemandeByIdAction,
+} from "@/server/actions/devisDemandesActions";
+import type { DevisDemandeAvecDetails } from "@/server/queries/devisDemandes.query";
+import type { DevisDemandePermissionsType } from "@/server/utils/devisDemandesPermissions.utils";
 import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
-import type { DevisStatutType } from "@/zod-schemas/enums";
+import type { DevisDemandeStatutType } from "@/zod-schemas/enums";
 import { ArrowDownUp, Filter, Grid3x3, List, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { createDevisColumns, devisIdLabelMap } from "./createDevisColumns";
-import { DevisFiltersDialog } from "./DevisFiltersDialog";
-import { DevisGrid } from "./DevisGrid";
-import { DevisSortDialog } from "./DevisSortDialog";
+import {
+  createDevisDemandesColumns,
+  devisDemandesIdLabelMap,
+} from "./createDevisDemandesColumns";
+import { DevisDemandeDetailDialog } from "./DevisDemandeDetailDialog";
+import { DevisDemandeFiltersDialog } from "./DevisDemandeFiltersDialog";
+import { DevisDemandeFormDialog } from "./DevisDemandeFormDialog";
+import { DevisDemandeGrid } from "./DevisDemandeGrid";
+import { DevisDemandesSortDialog } from "./DevisDemandesSortDialog";
 
 type SearchParamsType = {
   statut?: string;
@@ -31,31 +40,25 @@ type FiltersType = {
   siteId?: string;
 };
 
-type OrderByType =
+type OrderByDemandeType =
   | "createdAt"
-  | "dateEmission"
-  | "numero"
   | "titre"
   | "statut"
-  | "validTo"
+  | "updatedAt"
   | "siteNom"
-  | "emetteurEntrepriseNom"
-  | "proprietaireEntrepriseNom";
+  | "serviceNom";
 
-function toOrderBy(value: string | undefined): OrderByType {
-  const validValues: OrderByType[] = [
+function toOrderBy(value: string | undefined): OrderByDemandeType {
+  const valid: OrderByDemandeType[] = [
     "createdAt",
-    "dateEmission",
-    "numero",
     "titre",
     "statut",
-    "validTo",
+    "updatedAt",
     "siteNom",
-    "emetteurEntrepriseNom",
-    "proprietaireEntrepriseNom",
+    "serviceNom",
   ];
-  return value && validValues.includes(value as OrderByType)
-    ? (value as OrderByType)
+  return value && valid.includes(value as OrderByDemandeType)
+    ? (value as OrderByDemandeType)
     : "createdAt";
 }
 
@@ -63,26 +66,33 @@ function toOrderDir(value: string | undefined): "asc" | "desc" {
   return value === "asc" || value === "desc" ? value : "desc";
 }
 
-function toStatut(value: string | undefined): DevisStatutType | undefined {
-  const valid: DevisStatutType[] = ["brouillon", "emis", "signe", "refuse"];
-  return value && valid.includes(value as DevisStatutType)
-    ? (value as DevisStatutType)
+function toStatutDemande(
+  value: string | undefined,
+): DevisDemandeStatutType | undefined {
+  const valid: DevisDemandeStatutType[] = [
+    "ouverte",
+    "en_cours",
+    "cloturee",
+    "annulee",
+    "archivee",
+  ];
+  return value && valid.includes(value as DevisDemandeStatutType)
+    ? (value as DevisDemandeStatutType)
     : undefined;
 }
 
-type DevisTableProps = {
+type DevisDemandesTableProps = {
   searchParams: SearchParamsType;
 };
 
-export function DevisTable({ searchParams }: DevisTableProps) {
+export function DevisDemandesTable({ searchParams }: DevisDemandesTableProps) {
   const entreprise = useAppStore((state) => state.entreprise);
-  const posture = useAppStore((state) => state.postureActive);
   const router = useRouter();
 
-  const devisView = useUiStore((state) => state.devisView);
-  const setDevisView = useUiStore((state) => state.setDevisView);
+  const devisDemandeView = useUiStore((state) => state.devisDemandeView);
+  const setDevisDemandeView = useUiStore((state) => state.setDevisDemandeView);
 
-  const [items, setItems] = useState<DevisAvecDetails[]>([]);
+  const [items, setItems] = useState<DevisDemandeAvecDetails[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -91,21 +101,29 @@ export function DevisTable({ searchParams }: DevisTableProps) {
   const [isError, setIsError] = useState(false);
 
   // Dialogs
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
+  const [editingDemande, setEditingDemande] =
+    useState<DevisDemandeAvecDetails | null>(null);
+  const [selectedDemande, setSelectedDemande] =
+    useState<DevisDemandeAvecDetails | null>(null);
+  const [selectedPermissions, setSelectedPermissions] =
+    useState<DevisDemandePermissionsType | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   const pageSize = 30;
 
-  const loadDevis = useCallback(async () => {
+  const loadDemandes = useCallback(async () => {
     if (!entreprise?.id) return;
-
     setLoading(true);
     setIsError(false);
 
     try {
-      const result = await getDevisAction({
+      const result = await getDevisDemandesAction({
         entrepriseId: entreprise.id,
-        statut: toStatut(searchParams.statut),
+        statut: toStatutDemande(searchParams.statut),
         siteId: searchParams.siteId || undefined,
         search: searchParams.search || undefined,
         orderBy: toOrderBy(searchParams.orderBy),
@@ -128,7 +146,7 @@ export function DevisTable({ searchParams }: DevisTableProps) {
         setPage(1);
       }
     } catch {
-      toast.error("Erreur lors du chargement des devis");
+      toast.error("Erreur lors du chargement des demandes");
       setIsError(true);
     } finally {
       setLoading(false);
@@ -136,19 +154,18 @@ export function DevisTable({ searchParams }: DevisTableProps) {
   }, [entreprise?.id, searchParams, pageSize]);
 
   useEffect(() => {
-    loadDevis();
-  }, [loadDevis]);
+    loadDemandes();
+  }, [loadDemandes]);
 
   const loadMore = useCallback(async () => {
     if (!entreprise?.id || isLoadingMore || !hasMore) return;
-
     const nextPage = page + 1;
     setIsLoadingMore(true);
 
     try {
-      const result = await getDevisAction({
+      const result = await getDevisDemandesAction({
         entrepriseId: entreprise.id,
-        statut: toStatut(searchParams.statut),
+        statut: toStatutDemande(searchParams.statut),
         siteId: searchParams.siteId || undefined,
         search: searchParams.search || undefined,
         orderBy: toOrderBy(searchParams.orderBy),
@@ -180,7 +197,7 @@ export function DevisTable({ searchParams }: DevisTableProps) {
 
   const handleFiltersApply = useCallback(
     (filters: FiltersType) => {
-      const query: Record<string, string> = { tab: "propositions" };
+      const query: Record<string, string> = { tab: "demandes" };
       if (filters.search) query.search = filters.search;
       if (filters.statut) query.statut = filters.statut;
       if (filters.siteId) query.siteId = filters.siteId;
@@ -205,6 +222,56 @@ export function DevisTable({ searchParams }: DevisTableProps) {
     siteId: searchParams.siteId,
   };
 
+  const handleRowClick = async (row: DevisDemandeAvecDetails) => {
+    setLoadingDetail(true);
+    try {
+      const result = await getDevisDemandeByIdAction({ id: row.id });
+      if (result?.serverError) {
+        toast.error(result.serverError.message);
+        return;
+      }
+      if (result?.data) {
+        setSelectedDemande(result.data.demande);
+        setSelectedPermissions(result.data.permissions);
+        setDetailDialogOpen(true);
+      }
+    } catch {
+      toast.error("Erreur lors du chargement de la demande");
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+  const handleFormSuccess = (demande: DevisDemandeAvecDetails) => {
+    if (editingDemande) {
+      setItems((prev) => prev.map((d) => (d.id === demande.id ? demande : d)));
+    } else {
+      setItems((prev) => [demande, ...prev]);
+      setTotal((prev) => prev + 1);
+    }
+    setEditingDemande(null);
+  };
+
+  const handleDeleted = (id: string) => {
+    setItems((prev) => prev.filter((d) => d.id !== id));
+    setTotal((prev) => prev - 1);
+    setSelectedDemande(null);
+  };
+
+  const handleStatutChanged = (updated: DevisDemandeAvecDetails) => {
+    setItems((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
+    setSelectedDemande(updated);
+  };
+
+  const handleEdit = () => {
+    if (selectedDemande) {
+      setEditingDemande(selectedDemande);
+      setFormDialogOpen(true);
+    }
+  };
+
+  const columns = createDevisDemandesColumns();
+
   const sortSearchParams: Record<string, string | undefined> = {
     statut: searchParams.statut,
     siteId: searchParams.siteId,
@@ -212,9 +279,6 @@ export function DevisTable({ searchParams }: DevisTableProps) {
     orderBy: searchParams.orderBy,
     orderDir: searchParams.orderDir,
   };
-
-  const columns = createDevisColumns({ hideProprietaire: posture === "client" });
-  const canCreate = posture === "prestataire";
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -224,17 +288,17 @@ export function DevisTable({ searchParams }: DevisTableProps) {
         <div className="flex items-center rounded-md border">
           <Button
             size="sm"
-            variant={devisView === "list" ? "default" : "ghost"}
+            variant={devisDemandeView === "list" ? "default" : "ghost"}
             className="rounded-r-none border-r"
-            onClick={() => setDevisView("list")}
+            onClick={() => setDevisDemandeView("list")}
           >
             <List className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            variant={devisView === "grid" ? "default" : "ghost"}
+            variant={devisDemandeView === "grid" ? "default" : "ghost"}
             className="rounded-l-none"
-            onClick={() => setDevisView("grid")}
+            onClick={() => setDevisDemandeView("grid")}
           >
             <Grid3x3 className="h-4 w-4" />
           </Button>
@@ -268,72 +332,83 @@ export function DevisTable({ searchParams }: DevisTableProps) {
             Trier
           </Button>
 
-          {/* Nouveau devis */}
-          {canCreate && (
-            <Button
-              size="sm"
-              onClick={() => router.push("/app/devis/nouveau")}
-            >
-              <Plus className="h-4 w-4" />
-              Nouveau devis
-            </Button>
-          )}
+          {/* Nouvelle demande */}
+          <Button
+            size="sm"
+            onClick={() => {
+              setEditingDemande(null);
+              setFormDialogOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            Nouvelle demande
+          </Button>
         </div>
       </div>
 
       {/* Contenu */}
       <div className="flex-1 overflow-hidden">
-        {devisView === "grid" ? (
-          <DevisGrid
+        {devisDemandeView === "grid" ? (
+          <DevisDemandeGrid
             items={items}
-            isLoading={loading}
+            isLoading={loading || loadingDetail}
             isLoadingMore={isLoadingMore}
             isError={isError}
             hasMore={hasMore}
             loadMore={loadMore}
-            hideProprietaire={posture === "client"}
-            onItemClick={(item) =>
-              router.push({
-                pathname: "/app/devis/[devisId]",
-                params: { devisId: item.id },
-                query: { tab: "propositions" },
-              })
-            }
+            onItemClick={handleRowClick}
           />
         ) : (
-          <InfiniteDataTable<DevisAvecDetails>
+          <InfiniteDataTable<DevisDemandeAvecDetails>
             columns={columns}
             items={items}
-            isLoading={loading}
+            isLoading={loading || loadingDetail}
             isError={isError}
             isLoadingMore={isLoadingMore}
             hasMore={hasMore}
             loadMore={loadMore}
             total={total}
-            idLabelMap={devisIdLabelMap}
-            onRowClick={(row) => {
-              router.push({
-                pathname: "/app/devis/[devisId]",
-                params: { devisId: row.id },
-                query: { tab: "propositions" },
-              });
-            }}
+            idLabelMap={devisDemandesIdLabelMap}
+            onRowClick={handleRowClick}
           />
         )}
       </div>
 
       {/* Dialogs */}
-      <DevisFiltersDialog
+      <DevisDemandeFormDialog
+        open={formDialogOpen}
+        onOpenChange={(open) => {
+          setFormDialogOpen(open);
+          if (!open) setEditingDemande(null);
+        }}
+        mode={editingDemande ? "edit" : "create"}
+        demande={editingDemande ?? undefined}
+        onSuccess={handleFormSuccess}
+      />
+
+      {selectedDemande && selectedPermissions && (
+        <DevisDemandeDetailDialog
+          open={detailDialogOpen}
+          onOpenChange={setDetailDialogOpen}
+          demande={selectedDemande}
+          permissions={selectedPermissions}
+          onEdit={handleEdit}
+          onDeleted={handleDeleted}
+          onStatutChanged={handleStatutChanged}
+        />
+      )}
+
+      <DevisDemandeFiltersDialog
         open={filtersDialogOpen}
         onOpenChange={setFiltersDialogOpen}
         currentFilters={currentFilters}
         onApply={handleFiltersApply}
       />
-      <DevisSortDialog
+
+      <DevisDemandesSortDialog
         open={sortDialogOpen}
         onOpenChange={setSortDialogOpen}
         searchParams={sortSearchParams}
-        hideProprietaire={posture === "client"}
       />
     </div>
   );

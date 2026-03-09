@@ -21,7 +21,10 @@ export const devisIdLabelMap = new Map<string, string>([
   ["createdAt", "Créé le"],
 ]);
 
-export const createDevisColumns = (): ColumnDef<DevisAvecDetails>[] => [
+export const createDevisColumns = ({
+  hideProprietaire = false,
+}: { hideProprietaire?: boolean } = {}): ColumnDef<DevisAvecDetails>[] =>
+  [
   {
     accessorKey: "numero",
     header: ({ column }) => (
@@ -67,7 +70,7 @@ export const createDevisColumns = (): ColumnDef<DevisAvecDetails>[] => [
       <span className="text-sm">{getValue() as string}</span>
     ),
   },
-  {
+  !hideProprietaire && {
     accessorKey: "proprietaireEntrepriseNom",
     header: ({ column }) => (
       <SortableHeader column={column} label="Client" />
@@ -121,4 +124,4 @@ export const createDevisColumns = (): ColumnDef<DevisAvecDetails>[] => [
     ),
     size: 110,
   },
-];
+].filter(Boolean) as ColumnDef<DevisAvecDetails>[];

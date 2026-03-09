@@ -1,8 +1,8 @@
 import { Handshake } from "lucide-react";
-import { Suspense } from "react";
-import { DevisTable } from "./DevisTable";
+import { DevisPageClient } from "./DevisPageClient";
 
 type SearchParamsType = {
+  tab?: string;
   statut?: string;
   siteId?: string;
   search?: string;
@@ -16,6 +16,8 @@ type DevisPageProps = {
 
 export default async function DevisPage({ searchParams }: DevisPageProps) {
   const params = await searchParams;
+  const activeTab =
+    params.tab === "propositions" ? "propositions" : "demandes";
 
   return (
     <div className="container mx-auto flex h-full flex-col px-6 py-4">
@@ -24,11 +26,7 @@ export default async function DevisPage({ searchParams }: DevisPageProps) {
         <h1 className="flex-shrink-0 text-2xl font-bold">Devis</h1>
       </div>
 
-      <div className="flex-1 overflow-hidden">
-        <Suspense fallback={<div>Chargement...</div>}>
-          <DevisTable searchParams={params} />
-        </Suspense>
-      </div>
+      <DevisPageClient activeTab={activeTab} searchParams={params} />
     </div>
   );
 }

@@ -16,7 +16,7 @@ import {
   devisPeriodeFacturationCT,
   devisTypePrixCT,
 } from "@/constants/codeTables";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { getPresignedReadUrl, uploadFileToS3 } from "@/lib/s3/upload-helper";
 import {
   emettreDevisAction,
@@ -48,6 +48,7 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react";
+
 import { useEffect, useRef, useState } from "react";
 import {
   useFieldArray,
@@ -81,6 +82,7 @@ type Props = {
   permissions: PermissionsType;
   services: ServiceOptionType[];
   pdfStorageKey?: string | null;
+  backTab?: "propositions" | "demandes";
 };
 
 // ============================= CONSTANTES ==============================//
@@ -189,7 +191,11 @@ export function DevisDetailClient({
   permissions,
   services,
   pdfStorageKey: initialPdfStorageKey,
+  backTab,
 }: Props) {
+  const backHref = backTab
+    ? ({ pathname: "/app/devis", query: { tab: backTab } } as const)
+    : ({ pathname: "/app/devis" } as const);
   const router = useRouter();
   const [devis, setDevis] = useState(initialDevis);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -515,7 +521,7 @@ export function DevisDetailClient({
     }
 
     toast.success("Devis sauvegardé");
-    router.push("/app/devis");
+    router.push(backHref);
   }
 
   const disabled = isSubmitting || isTransitioning;
@@ -529,23 +535,15 @@ export function DevisDetailClient({
         {/* Header fixe */}
         <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b px-6 py-3">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              type="button"
-              onClick={() => router.push("/app/devis")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Retour
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={backHref}>
+                <ArrowLeft className="h-4 w-4" />
+                Retour
+              </Link>
             </Button>
             <Badge className={`text-xs ${badge.className}`}>
               {badge.label}
             </Badge>
-            {devis.numero && (
-              <span className="text-muted-foreground font-mono text-sm">
-                {devis.numero}
-              </span>
-            )}
           </div>
           <div className="flex items-center gap-2">
             {effectivePermissions.canEmettre && (
@@ -579,23 +577,6 @@ export function DevisDetailClient({
                   <Printer className="h-4 w-4" />
                 </Button>
               </>
-            )}
-            {effectivePermissions.canSigner && (
-              <Button size="sm" disabled={disabled} onClick={handleSigner}>
-                <CheckCircle className="h-4 w-4" />
-                Signer
-              </Button>
-            )}
-            {effectivePermissions.canRefuser && (
-              <Button
-                size="sm"
-                variant="destructive"
-                disabled={disabled}
-                onClick={handleRefuser}
-              >
-                <XCircle className="h-4 w-4" />
-                Refuser
-              </Button>
             )}
           </div>
         </div>
@@ -746,19 +727,34 @@ export function DevisDetailClient({
             <ReadOnlyDevisView
               devis={devis}
               permissions={effectivePermissions}
-              disabled={disabled}
-              onSigner={handleSigner}
-              onRefuser={handleRefuser}
             />
           )}
         </div>
       </div>
 
       {/* ── Preview A4 ── */}
-      <div className="flex flex-1 items-start justify-center overflow-auto bg-gray-100 p-16 dark:bg-gray-950">
+      <div className="flex flex-1 flex-col overflow-auto bg-gray-100 dark:bg-gray-950">
+        {/* Boutons signer / refuser au-dessus du preview */}
+        {(effectivePermissions.canSigner || effectivePermissions.canRefuser) && (
+          <div className="flex shrink-0 justify-center gap-3 px-8 pt-4 pb-2">
+            {effectivePermissions.canSigner && (
+              <Button disabled={disabled} onClick={handleSigner}>
+                <CheckCircle className="h-4 w-4" />
+                Signer le devis
+              </Button>
+            )}
+            {effectivePermissions.canRefuser && (
+              <Button variant="destructive" disabled={disabled} onClick={handleRefuser}>
+                <XCircle className="h-4 w-4" />
+                Refuser le devis
+              </Button>
+            )}
+          </div>
+        )}
+        <div className={`flex flex-1 items-start justify-center ${effectivePermissions.canSigner || effectivePermissions.canRefuser ? "pt-3 pb-8 px-8" : "p-8"}`}>
         {/* Wrapper aux dimensions scalées — évite que transform réserve l'espace A4 complet */}
         <div
-          className="shrink-0"
+          className="shrink-0 rounded shadow-md ring-1 ring-gray-200 dark:ring-gray-700"
           style={{
             width: "calc(210mm * 0.75)",
             height: "calc(297mm * 0.75)",
@@ -783,6 +779,7 @@ export function DevisDetailClient({
         </div>
       </div>
     </div>
+  </div>
   );
 }
 
@@ -1101,17 +1098,11 @@ function LigneAccordion({
 type ReadOnlyDevisViewProps = {
   devis: DevisAvecLignes;
   permissions: PermissionsType;
-  disabled: boolean;
-  onSigner: () => void;
-  onRefuser: () => void;
 };
 
 function ReadOnlyDevisView({
   devis,
   permissions,
-  disabled,
-  onSigner,
-  onRefuser,
 }: ReadOnlyDevisViewProps) {
   const fmt = (c: number) =>
     (c / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
@@ -1315,23 +1306,6 @@ function ReadOnlyDevisView({
         </section>
       )}
 
-      {/* Actions */}
-      {(permissions.canSigner || permissions.canRefuser) && (
-        <div className="flex flex-col gap-2 pt-2">
-          {permissions.canSigner && (
-            <Button disabled={disabled} onClick={onSigner}>
-              <CheckCircle className="h-4 w-4" />
-              Signer le devis
-            </Button>
-          )}
-          {permissions.canRefuser && (
-            <Button variant="destructive" disabled={disabled} onClick={onRefuser}>
-              <XCircle className="h-4 w-4" />
-              Refuser le devis
-            </Button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
