@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@/db";
 import { tickets, ticketMessages } from "@/db/schema/tickets";
 import { sites } from "@/db/schema/sites";
-import { entreprises } from "@/db/schema/entreprises";
+import { clientPrestataireRelations, entreprises } from "@/db/schema/entreprises";
 import { user } from "@/db/schema/auth";
 import { documents, documentsLinks } from "@/db/schema/documents";
 import { getUserAccessibleSiteIdsForTickets } from "@/server/utils/ticketsPerimetre.utils";
@@ -62,6 +62,7 @@ export async function getTicketsByPerimetre({
 }> {
   // 1. Calculer les siteIds accessibles selon posture
   let accessibleSiteIds: string[] = [];
+  let clientEntrepriseIds: string[] = [];
 
   if (posture === "client") {
     // Client: sites du périmètre effectif
@@ -69,6 +70,13 @@ export async function getTicketsByPerimetre({
       userId,
       entrepriseId,
     });
+  } else if (posture === "prestataire") {
+    // Prestataire: tickets de tous les clients liés via clientPrestataireRelations
+    const relations = await db
+      .select({ clientEntrepriseId: clientPrestataireRelations.clientEntrepriseId })
+      .from(clientPrestataireRelations)
+      .where(eq(clientPrestataireRelations.prestataireEntrepriseId, entrepriseId));
+    clientEntrepriseIds = relations.map((r) => r.clientEntrepriseId);
   }
 
   // 2. Construire WHERE clause
@@ -91,13 +99,16 @@ export async function getTicketsByPerimetre({
     }
     conditions.push(inArray(tickets.siteId, accessibleSiteIds));
   } else if (posture === "prestataire") {
-    // Prestataire: tickets assignés
-    conditions.push(
-      or(
-        eq(tickets.assigneEntrepriseId, entrepriseId),
-        eq(tickets.assigneUserId, userId),
-      ),
-    );
+    // Prestataire: tickets des clients liés
+    if (clientEntrepriseIds.length === 0) {
+      return {
+        items: [],
+        total: 0,
+        page: filters.page,
+        pageSize: filters.pageSize,
+      };
+    }
+    conditions.push(inArray(tickets.proprietaireEntrepriseId, clientEntrepriseIds));
   }
 
   // Filtres métier

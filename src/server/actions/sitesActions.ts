@@ -292,26 +292,53 @@ export const getAccessibleSitesAction = actionClient
       return sites;
     }
 
-    // Si pas plateforme, vérifier accès entreprise via adhésion
-    const adhesion = await db.query.userClientAdhesions.findFirst({
+    // Branche client : vérifier adhésion client
+    const clientAdhesion = await db.query.userClientAdhesions.findFirst({
       where: and(
         eq(userClientAdhesions.userId, currentUser.id),
         eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
       ),
     });
 
-    if (!adhesion) {
-      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    if (clientAdhesion) {
+      // Récupérer sites accessibles (filtré par attributions + rôle si demandé)
+      const sites = await getAccessibleSitesByUser({
+        userId: currentUser.id,
+        entrepriseId: parsedInput.entrepriseId,
+        filterRole: parsedInput.filterByRole,
+      });
+      return sites;
     }
 
-    // Récupérer sites accessibles (filtré par attributions + rôle si demandé)
-    const sites = await getAccessibleSitesByUser({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-      filterRole: parsedInput.filterByRole,
+    // Branche prestataire : vérifier adhésion prestataire active
+    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, currentUser.id),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
     });
 
-    return sites;
+    if (prestataireAdhesion) {
+      // L'entreprise passée est la propre entreprise du prestataire → pas de sites client à retourner
+      if (parsedInput.entrepriseId === prestataireAdhesion.entrepriseId) {
+        return [];
+      }
+
+      // Vérifier que le client est lié à ce prestataire
+      const relation = await db.query.clientPrestataireRelations.findFirst({
+        where: and(
+          eq(clientPrestataireRelations.clientEntrepriseId, parsedInput.entrepriseId),
+          eq(clientPrestataireRelations.prestataireEntrepriseId, prestataireAdhesion.entrepriseId),
+        ),
+      });
+
+      if (relation) {
+        const sites = await getSitesByEntrepriseId(parsedInput.entrepriseId);
+        return sites;
+      }
+    }
+
+    throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
   });
 
 // ==================== GET SITES FOR PRESTATION ====================

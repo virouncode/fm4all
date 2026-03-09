@@ -21,6 +21,7 @@ import {
   getEntrepriseWithDetailsById,
   getServicesByEntrepriseId,
 } from "@/server/queries/entreprises.query";
+import { getMesClients } from "@/server/queries/clientServiceExecutions.query";
 import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import {
   getProspectsPaginated,
@@ -63,12 +64,12 @@ export const getEntreprisesAction = actionClient
 
 /**
  * Récupère la liste des entreprises clientes
- * Réservé à la plateforme uniquement
+ * - Plateforme : toutes les entreprises clientes
+ * - Prestataire : uniquement les clients liés via clientPrestataireRelations
  */
 export const getEntreprisesClientesAction = actionClient
   .metadata({ actionName: "getEntreprisesClientesAction" })
   .action(async () => {
-    // Vérifier que l'utilisateur est plateforme
     const session = await getSession();
     const currentUser = session?.user;
 
@@ -76,17 +77,27 @@ export const getEntreprisesClientesAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
+    // Branche plateforme : toutes les entreprises clientes
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-
-    if (!plateformeRole) {
-      throw errors.forbidden(
-        "Seule la plateforme peut accéder à cette ressource.",
-      );
+    if (plateformeRole) {
+      const clients = await getEntreprisesClientes();
+      return { clients };
     }
 
-    const clients = await getEntreprisesClientes();
+    // Branche prestataire : ses clients via getMesClients (même logique que /app/mes-clients)
+    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, currentUser.id),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    });
+    if (prestataireAdhesion) {
+      const mesClients = await getMesClients(prestataireAdhesion.entrepriseId);
+      const clients = mesClients.map((c) => ({ id: c.id, nom: c.nom }));
+      return { clients };
+    }
 
-    return { clients };
+    throw errors.forbidden("Accès non autorisé.");
   });
 
 /**
@@ -348,11 +359,12 @@ export const createEntrepriseAction = actionClient
       phoneContact,
       roles,
       serviceIds,
+      numeroTva,
     } = parsedInput;
 
     // Normaliser les champs optionnels: "" → null + appliquer la casse
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalStrings: ["prenomContact", "nomContact", "emailContact", "phoneContact"] as const,
+      optionalStrings: ["prenomContact", "nomContact", "emailContact", "phoneContact", "numeroTva"] as const,
     });
 
     // Nettoyer le nom (capitalisation) et le SIRET (supprimer espaces éventuels)
@@ -387,6 +399,7 @@ export const createEntrepriseAction = actionClient
             nomContact: normalized.nomContact ? capitalizeWords(normalized.nomContact) : null,
             emailContact: normalized.emailContact ? lower(normalized.emailContact) : null,
             phoneContact: normalized.phoneContact,
+            numeroTva: normalized.numeroTva ? normalized.numeroTva.toUpperCase() : null,
             createdById: currentUser.id,
             updatedById: currentUser.id,
           })
@@ -465,9 +478,10 @@ export const updateEntrepriseInfosAction = actionClient
     if (!plateformeRole)
       throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
 
-    const { entrepriseId, nom, siret } = parsedInput;
+    const { entrepriseId, nom, siret, numeroTva } = parsedInput;
     const nomClean = upper(nom);
     const siretClean = siret.trim().replace(/\s/g, "");
+    const numeroTvaClean = numeroTva && numeroTva !== "" ? numeroTva.toUpperCase() : null;
 
     // Unicité nom (hors l'entreprise elle-même)
     const existingByNom = await db
@@ -481,7 +495,7 @@ export const updateEntrepriseInfosAction = actionClient
     try {
       await db
         .update(entreprises)
-        .set({ nom: nomClean, siret: siretClean, updatedById: currentUser.id })
+        .set({ nom: nomClean, siret: siretClean, numeroTva: numeroTvaClean, updatedById: currentUser.id })
         .where(eq(entreprises.id, entrepriseId));
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
