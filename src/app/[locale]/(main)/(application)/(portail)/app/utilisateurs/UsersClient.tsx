@@ -7,7 +7,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { adhesionStatutCodes, roleClientAdhesionCodes } from "@/constants/codeTables";
+import {
+  getEntreprisesClientesAction,
+  getEntreprisesPrestatairesAction,
+} from "@/server/actions/entreprisesActions";
 import { getUsersAction } from "@/server/actions/usersActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { UserWithAdhesionType } from "@/zod-schemas/user.schema";
@@ -36,6 +47,14 @@ export function UsersClient() {
   const canCreateRootUsers =
     currentUserPlateformeRole === "super_admin_plateforme" ||
     currentUserRole === "admin";
+
+  // Pour la posture plateforme : sélecteur de type + entreprise
+  const [viewType, setViewType] = useState<"plateforme" | "client" | "prestataire">(
+    postureActive === "plateforme" ? "plateforme" : ((postureActive ?? "client") as "plateforme" | "client" | "prestataire"),
+  );
+  const [viewEntreprises, setViewEntreprises] = useState<Array<{ id: string; nom: string }>>([]);
+  const [viewEntrepriseId, setViewEntrepriseId] = useState<string>(entreprise?.id ?? "");
+  const [loadingEntreprises, setLoadingEntreprises] = useState(false);
 
   const [users, setUsers] = useState<UserWithAdhesionType[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -69,12 +88,19 @@ export function UsersClient() {
   const loadUsers = async () => {
     if (!entreprise?.id) return;
 
+    // En posture plateforme : utiliser le sélecteur de type/entreprise
+    const queryPosture = postureActive === "plateforme" ? viewType : (postureActive ?? "client");
+    const queryEntrepriseId = postureActive === "plateforme" ? viewEntrepriseId : entreprise.id;
+
+    // Ne pas charger si on n'a pas encore d'entreprise sélectionnée (client/prestataire sans sélection)
+    if (!queryEntrepriseId) return;
+
     setLoading(true);
     try {
       // Build query params manually with proper typing
       const queryParams = {
-        entrepriseId: entreprise.id,
-        posture: (postureActive ?? "client") as "client" | "prestataire" | "plateforme",
+        entrepriseId: queryEntrepriseId,
+        posture: queryPosture as "client" | "prestataire" | "plateforme",
         search: searchFilter,
         roleAdhesion:
           roleFilter && roleFilter !== "all"
@@ -112,11 +138,47 @@ export function UsersClient() {
     }
   };
 
+  // Charger la liste des entreprises quand le type change (posture plateforme)
+  useEffect(() => {
+    if (postureActive !== "plateforme") return;
+    if (viewType === "plateforme") {
+      setViewEntreprises([]);
+      setViewEntrepriseId(entreprise?.id ?? "");
+      return;
+    }
+
+    async function loadEntreprises() {
+      setLoadingEntreprises(true);
+      try {
+        if (viewType === "client") {
+          const result = await getEntreprisesClientesAction();
+          if (result?.data?.clients) {
+            setViewEntreprises(result.data.clients);
+            setViewEntrepriseId(result.data.clients[0]?.id ?? "");
+          }
+        } else {
+          const result = await getEntreprisesPrestatairesAction();
+          if (result?.data?.prestataires) {
+            setViewEntreprises(result.data.prestataires);
+            setViewEntrepriseId(result.data.prestataires[0]?.id ?? "");
+          }
+        }
+      } catch {
+        toast.error("Erreur lors du chargement des entreprises");
+      } finally {
+        setLoadingEntreprises(false);
+      }
+    }
+
+    loadEntreprises();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewType, postureActive]);
+
   // Load users on mount and when filters/posture change
   useEffect(() => {
     loadUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entreprise?.id, postureActive, searchFilter, roleFilter, statutFilter]);
+  }, [entreprise?.id, postureActive, viewType, viewEntrepriseId, searchFilter, roleFilter, statutFilter]);
 
   // Déplier les ancêtres quand un utilisateur est sélectionné (par défaut ou par clic)
   useEffect(() => {
@@ -183,6 +245,58 @@ export function UsersClient() {
             <h2 className="text-xl font-semibold">
               Organisation des utilisateurs
             </h2>
+          </div>
+
+          <div className="flex gap-2">
+            {/* Sélecteurs Type + Entreprise (posture plateforme uniquement) */}
+            {postureActive === "plateforme" && (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground text-sm">Type :</span>
+                  <Select
+                    value={viewType}
+                    onValueChange={(v) =>
+                      setViewType(v as "plateforme" | "client" | "prestataire")
+                    }
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="plateforme">Plateforme</SelectItem>
+                      <SelectItem value="client">Client</SelectItem>
+                      <SelectItem value="prestataire">Prestataire</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {viewType !== "plateforme" && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground text-sm">Entreprise :</span>
+                    <Select
+                      value={viewEntrepriseId}
+                      onValueChange={setViewEntrepriseId}
+                      disabled={loadingEntreprises || viewEntreprises.length === 0}
+                    >
+                      <SelectTrigger className="w-52">
+                        <SelectValue
+                          placeholder={
+                            loadingEntreprises ? "Chargement..." : "Sélectionner"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {viewEntreprises.map((e) => (
+                          <SelectItem key={e.id} value={e.id}>
+                            {e.nom}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           <div className="flex gap-2">

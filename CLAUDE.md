@@ -493,9 +493,15 @@ export function SiteFormDialog({ mode, site }: Props) {
 **Composants RHF Disponibles**:
 
 - `RhfInput` - Input texte, number, email, etc.
-- `RhfControlledSelect` - Select avec Radix UI
+- `RhfControlledSelect` - Select avec Radix UI (prend des `<SelectItem>` en children)
 - `RhfTextArea` - Textarea
-- `RhfCheckbox`, `RhfSwitch`, etc.
+- `RhfCheckbox` - Checkbox booléen
+- `RhfDatePicker` - Sélecteur de date (stocke ISO `"YYYY-MM-DD"`, vide = `""`)
+- `RhfSwitch`, `RhfRadioGroup`, `RhfOTP`, `RhfDateTimePicker`, etc.
+
+**RÈGLE CRITIQUE — Toujours utiliser les composants RHF** :
+
+**TOUJOURS** utiliser les composants RHF (`RhfInput`, `RhfControlledSelect`, `RhfTextArea`, etc.) dans les formulaires. Ne jamais utiliser les composants shadcn bruts (`Input`, `Select`, `Textarea`) directement dans un form RHF. Exception : pour les champs dans `useFieldArray` avec des chemins dynamiques (ex: `lignes.${index}.tauxTva`), utiliser `FormField` + composant shadcn.
 
 **Convention**:
 
@@ -503,6 +509,76 @@ export function SiteFormDialog({ mode, site }: Props) {
 - Utiliser `useFormState` pour `isSubmitting` et `isDirty`
 - Désactiver submit si `isSubmitting || !isDirty`
 - Reset le form dans un `useEffect` quand le dialog s'ouvre
+- **Preview live** : utiliser `useWatch({ control: form.control })` — jamais `form.watch()` dans le render body
+
+**Pattern useFieldArray (listes dynamiques)** :
+
+```typescript
+// 1. useFieldArray au niveau du composant parent
+const { fields, append, remove } = useFieldArray({
+  control: form.control,
+  name: "lignes",
+});
+
+// 2. Composant accordéon par item — accède au form via useFormContext
+function LigneAccordion({ index }: { index: number }) {
+  const { control, setValue } = useFormContext<FormType>();
+
+  // useWatch pour lire les valeurs sans déclencher de re-render global
+  const designation = useWatch({ control, name: `lignes.${index}.designation` as Path<FormType> });
+
+  return (
+    <>
+      {/* Inputs texte : utiliser RhfInput avec cast Path<FormType> */}
+      <RhfInput<FormType>
+        name={`lignes.${index}.designation` as Path<FormType>}
+        label="Titre"
+      />
+
+      {/* Selects dans array : FormField + Select (RhfControlledSelect a StringFieldPath constraint) */}
+      <FormField
+        control={control}
+        name={`lignes.${index}.tauxTva` as Path<FormType>}
+        render={({ field }) => (
+          <FormItem>
+            <FormControl>
+              <Select value={String(field.value ?? "")} onValueChange={field.onChange}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{/* options */}</SelectContent>
+              </Select>
+            </FormControl>
+          </FormItem>
+        )}
+      />
+
+      {/* setValue pour les booléens dans array */}
+      <button onClick={() => setValue(`lignes.${index}.hasRemise` as Path<FormType>, true as never)}>
+        Ajouter remise
+      </button>
+    </>
+  );
+}
+
+// 3. Bouton ajout / suppression
+<Button onClick={() => append({ ...DEFAULT_ITEM })}>Ajouter</Button>
+<Button onClick={() => remove(index)}>Supprimer</Button>
+```
+
+**Type pour useWatch avec preview live** :
+
+```typescript
+// useWatch retourne DeepPartial (tous les champs optionnels y compris imbriqués)
+// Définir un type PreviewValues permissif pour la fonction de construction du preview
+type PreviewValues = {
+  titre?: string;
+  lignes?: Array<{ designation?: string; prixUnitaireHtEur?: string; /* ... */ }>;
+  // ...
+};
+
+// Construire le preview depuis les valeurs watchées
+const watchedValues = useWatch({ control: form.control });
+const preview = buildPreview(emetteur, client, site, watchedValues);
+```
 
 ### 6. Internationalisation (next-intl)
 

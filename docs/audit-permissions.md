@@ -1,6 +1,6 @@
 # Audit Permissions — FM4ALL
 
-> Dernière mise à jour : 2026-03-08 (session 2)
+> Dernière mise à jour : 2026-03-08 (session 5)
 > Branch : new-bo
 > Scope : `src/app/[locale]/(main)/(application)/(portail)/app` + imports
 
@@ -87,101 +87,127 @@ if (posture === "prestataire") {
 
 ## BUGS NON CORRIGÉS
 
-### 🔴 BUG-06 — Fonctions de permission : prestataire admin bloqué sur l'édition
+### ✅ BUG-06 — Fonctions de permission : prestataire admin bloqué sur l'édition
 
-**Fichier** : `src/server/utils/ticketsPermissions.utils.ts`
+**Fichiers** :
+- `src/server/utils/ticketsPermissions.utils.ts`
+- `src/server/utils/ticketsTransitions.utils.ts`
 
-**Problème** : Les fonctions `canUserEditTicketBasicFields`, `canUserEditStatut`, etc. utilisent `resolvePostureAwareSiteRole` pour obtenir le rôle effectif. Pour un **prestataire admin** sans attribution de site explicite chez le client, ce rôle est `null` → toutes les permissions d'édition retournent `false`.
+**Problème** : Les fonctions `canUserEditTicketBasicFields`, `canUserEditStatut`, etc. utilisaient `resolvePostureAwareSiteRole` pour obtenir le rôle effectif. Pour un **prestataire admin** sans attribution de site explicite chez le client, ce rôle était `null` → toutes les permissions d'édition retournaient `false`.
 
-Pourtant, l'admin prestataire peut VOIR tous les tickets de son entreprise (BUG-04/05 corrigés).
+**Règle métier clarifiée** : L'admin entreprise n'est **pas** équivalent à `responsable_site` — il est **au-dessus** : accès à tous les sites sans attribution explicite. Le manager n'a aucun traitement spécial ; les utilisateurs non-admin tombent dans les rôles de site (`responsable_site`, `demandeur_site`, `observateur_site`, `intervenant_site`).
 
-**Conséquence** : Un prestataire admin peut voir les tickets assignés à son entreprise mais ne peut ni modifier le statut, ni éditer le titre/description.
+**Fix** :
 
-**Fix attendu** : Ajouter un court-circuit sur le rôle entreprise pour prestataire admin :
+Ajout d'un helper privé `isTicketsEnterpriseAdmin` dans `ticketsPermissions.utils.ts` (pattern identique à `canManageOccurrence`) :
+
 ```typescript
-// Dans canUserEditTicketBasicFields, canUserEditStatut, etc.
-const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
-  where: and(eq(userId), eq(entrepriseId), eq(statut, "actif")),
-  columns: { role: true },
-});
-if (prestataireAdhesion?.role === "admin" && isInvolved) return true;
-// Sinon, résoudre via le rôle site...
+async function isTicketsEnterpriseAdmin(userId: string, entrepriseId: string): Promise<boolean> {
+  const cookieStore = await cookies();
+  const posture = cookieStore.get("fm4all:postureActive")?.value;
+  if (posture === "prestataire") {
+    const adhesion = await getUserPrestataireAdhesion({ userId });
+    return adhesion?.role === "admin";
+  }
+  const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
+  return adhesion?.role === "admin";
+}
+```
+
+Toutes les fonctions (`canUserEditTicketBasicFields`, `canUserEditStatut`, `canUserAssignTicket`, `canUserEditAssignedEntreprise`, `canUserEditPriorite`, `canUserCreateTicket`, `getAvailableStatutsForUser`) suivent désormais le pattern :
+1. Résoudre le rôle site via `resolvePostureAwareSiteRole`
+2. Si le niveau est suffisant → `return true`
+3. Sinon → `return isTicketsEnterpriseAdmin(userId, entrepriseId)` (fallback admin bypass)
+
+Dans `ticketsTransitions.utils.ts`, `isResponsable` inclut désormais l'admin entreprise :
+```typescript
+const isResponsable = effectiveRoleStr === "responsable_site" || isEnterpriseAdmin;
 ```
 
 ---
 
-### 🟠 BUG-07 — `getEntreprisesPrestatairesAction` : retourne TOUS les prestataires
+### ✅ BUG-07 — `getEntreprisesPrestatairesAction` : retourne TOUS les prestataires
 
 **Fichier** : `src/server/actions/entreprisesActions.ts`
 
-**Problème** : L'action ne vérifie que l'authentification. Elle retourne tous les prestataires de la plateforme à n'importe quel utilisateur connecté.
+**Problème** : L'action ne vérifiait que l'authentification. Elle retournait tous les prestataires de la plateforme à n'importe quel utilisateur connecté.
 
-**Impact** : Un client voit des prestataires qui ne sont pas les siens dans le filtre "Assigné à" des tickets.
+**Impact** : Un client voyait des prestataires qui ne sont pas les siens dans le filtre "Assigné à" des tickets.
 
-**Fix attendu** : Scoper selon la posture :
-- Plateforme → tous les prestataires
-- Client → ses prestataires (`getClientPrestataires(clientEntrepriseId)`)
-- Prestataire → lui-même uniquement
-
----
-
-### 🟠 BUG-09 — Périmètre occurrences : prestataire voit toutes les occurrences d'une prestation
-
-**Fichier** : `src/server/actions/clientServiceOccurrencesActions.ts`
-
-**Problème** : `getOccurrencesByPrestationAction` gate via `prestataireHasExecutionOnPrestation`. Un prestataire avec une exécution sur une prestation peut voir TOUTES les occurrences, même sur des sites non attribués.
-
-**Fix attendu** : Filtrer les occurrences par sites attribués (`getAllPrestataireSiteIds`) pour les prestataires non-admin.
+**Fix** : Scopé selon la posture (lecture du cookie `fm4all:postureActive`) :
+- **Plateforme** → `getEntreprisesPrestataires()` (tous)
+- **Prestataire** → `getUserPrestataireAdhesion({ userId })` puis lookup nom → tableau à 1 élément (lui-même)
+- **Client** (défaut) → `userClientAdhesions` (unique par userId) → `getClientPrestataires(entrepriseId)` (ses prestataires actifs via executions)
 
 ---
 
-### 🟠 BUG-10 — `getUsers` en posture prestataire : filtre `statut: "actif"` manquant
+### ✅ BUG-09 — Périmètre occurrences : prestataire voit toutes les occurrences d'une prestation
+
+**Fichiers** :
+- `src/app/.../prestations/[prestationId]/page.tsx`
+- `src/app/.../prestations/[prestationId]/occurrences/[occurrenceId]/page.tsx`
+
+**Problème** : `prestataireHasExecutionOnPrestation` ne vérifiait que l'entreprise (company-level). Un prestataire non-admin pouvait accéder via URL directe à une prestation dont son entreprise a une exécution, même si le site n'est pas dans ses attributions.
+
+**Note** : Le flux UX normal (liste → détail) était déjà protégé (`attributedSiteIds` dans `getPrestationsByPrestataire`). C'est le bypass par URL directe qui était le vrai risque.
+
+**Fix** : Après `prestataireHasExecutionOnPrestation`, si non-admin, vérification du site via `getAllPrestataireSiteIds({ userId })` dans les deux pages :
+```typescript
+if (pAdhesion.role !== "admin") {
+  const attributedSiteIds = await getAllPrestataireSiteIds({ userId: currentUser.id });
+  if (!attributedSiteIds.includes(prestation.siteId)) notFound();
+}
+```
+
+---
+
+### ✅ BUG-10 — `getUsers` en posture prestataire : filtre `statut: "actif"` manquant
 
 **Fichier** : `src/server/queries/users.query.ts`
 
-**Problème** : La branche prestataire ne filtre pas sur `statut: "actif"` des adhésions prestataires → des utilisateurs inactifs apparaissent.
-
-**Fix** : Ajouter `eq(userPrestataireAdhesions.statut, "actif")` dans la branche prestataire.
+**Verdict** : Pas un bug. Les branches prestataire et client sont identiques — pas de filtre `statut` par défaut, filtrable via `statutAdhesion`. `/app/utilisateurs` est une page de gestion : montrer tous les utilisateurs (actifs et inactifs) par défaut est intentionnel.
 
 ---
 
-### 🟡 BUG-11 — `getAvailableStatutsForUser` : prestataire non-admin ne peut jamais changer le statut
+### ✅ BUG-11 — Machine d'état : annulation depuis états avancés + prestataire responsable_site
 
-**Fichier** : `src/server/utils/ticketsPermissions.utils.ts`
+**Fichiers** :
+- `src/server/utils/ticketsTransitions.utils.ts`
+- `src/server/utils/ticketsPermissions.utils.ts`
 
-**Contexte** : `getAvailableStatutsForUser` retourne `[]` si le rôle site < 3. Pour un prestataire non-admin avec rôle `responsable_site` sur un site client, la fonction devrait retourner les statuts disponibles.
+**Verdict getAvailableStatutsForUser** : Pas un bug (résolu par BUG-06). `resolvePostureAwareSiteRole` → `getUserPrestataireSiteRole` retourne bien `"responsable_site"` pour un prestataire attributé → level 3 → statuts disponibles.
 
-**À vérifier** : Que `resolvePostureAwareSiteRole` retourne bien `"responsable_site"` pour un prestataire attributé à ce site chez ce client.
+**Écart machine d'état corrigé** : Le brainstorming limite l'annulation à `nouveau` et `pris_en_charge` uniquement. Le code autorisait aussi `annule` depuis `en_attente_prestataire`, `en_attente_client` et `a_valider`. Ces transitions ont été supprimées pour s'aligner avec la spec.
 
 ---
 
-### 🟡 BUG-12 — UX : select "Sites" vide pour prestataire sans filtre client
+### ✅ BUG-12 — UX : select "Sites" vide pour prestataire sans filtre client
 
 **Fichier** : `src/app/.../app/tickets/TicketsFiltersDialog.tsx`
 
-**Contexte** : Le select Sites est vide jusqu'à ce que le prestataire choisisse un client. Comportement fonctionnellement correct.
-
-**Amélioration** : Afficher "Sélectionnez d'abord un client pour voir ses sites" quand prestataire et aucun client sélectionné.
+**Fix** : Select "Site" disabled + placeholder "Sélectionnez d'abord un client" quand `postureActive === "prestataire"` et aucun client sélectionné.
 
 ---
 
-### 🟡 BUG-13 — `insertTicketAction` : un prestataire peut-il créer un ticket ?
+### ✅ BUG-13 — `insertTicketAction` : un prestataire peut-il créer un ticket ?
 
-**Fichier** : `src/server/actions/ticketsActions.ts`
+**Fichier** : `src/app/.../app/tickets/TicketsTable.tsx`
 
-**Contexte** : Le bouton "Nouveau ticket" est masqué côté frontend pour un prestataire. Mais `canUserCreateTicket` côté serveur autorise un prestataire s'il a une relation client-prestataire ET un rôle ≥ demandeur_site.
+**Verdict** : Oui — le brainstorming le confirme (admin, responsable_site, demandeur_site en posture prestataire).
 
-**Question métier** : Un prestataire doit-il pouvoir créer des tickets ? À valider.
+**Fix** : Suppression de la condition `posture !== "prestataire"` qui masquait le bouton. Le `TicketFormDialog` gérait déjà la posture prestataire (select client, sites filtrés, `proprietaireEntrepriseId = client`, `demandeurEntrepriseId = prestataire`). La permission serveur `canUserCreateTicket` rejette observateur/intervenant.
 
 ---
 
-### 🟡 BUG-14 — `getUsersAction` en posture plateforme : retourne seulement les users FM4ALL
+### ✅ BUG-14 — `getUsersAction` en posture plateforme : retourne seulement les users FM4ALL
 
-**Fichier** : `src/server/queries/users.query.ts`
+**Fichiers** : `src/server/actions/usersActions.ts`, `src/app/.../app/utilisateurs/UsersClient.tsx`
 
-**Contexte** : En posture plateforme, `getUsers` retourne uniquement les users ayant `userPlateformeAdhesions` (l'équipe FM4ALL). La plateforme peut-elle voir les users de n'importe quelle entreprise ?
+**Contexte** : En posture plateforme, `getUsers` retournait uniquement les users ayant `userPlateformeAdhesions` (l'équipe FM4ALL). La branche "client" de `getUsersAction` n'avait pas de fallback plateforme, empêchant un admin plateforme de voir les users des entreprises clientes/prestataires.
 
-**Question métier** : À valider.
+**Fix** :
+1. **`usersActions.ts`** — Ajout du fallback `getEffectivePlateformeRole` dans la branche client (cohérent avec la branche prestataire qui l'avait déjà).
+2. **`UsersClient.tsx`** — Ajout d'un sélecteur "Type" (Plateforme / Client / Prestataire) + sélecteur "Entreprise" affiché uniquement en posture plateforme. Par défaut : Type=Plateforme (→ userPlateformeAdhesions de FM4ALL). En sélectionnant Client ou Prestataire, la liste des entreprises se charge dynamiquement et les users correspondants s'affichent.
 
 ---
 
@@ -192,11 +218,11 @@ if (prestataireAdhesion?.role === "admin" && isInvolved) return true;
 | BUG-01 | Critique | Tickets/Sites | ✅ Corrigé |
 | BUG-02 | Critique | Tickets filtres | ✅ Corrigé |
 | BUG-03 + 04 + 05 | Critique | Tickets périmètre + détail | ✅ Corrigé |
-| BUG-06 | Critique | Tickets permissions édition | 🔴 À corriger |
-| BUG-07 | Moyen | Entreprises | 🟠 À corriger |
-| BUG-09 | Moyen | Occurrences | 🟠 À corriger |
-| BUG-10 | Moyen | Utilisateurs | 🟠 À corriger |
-| BUG-11 | Moyen | Tickets permissions | 🟡 À valider |
-| BUG-12 | Faible | Tickets UX | 🟡 Amélioration |
-| BUG-13 | Faible | Tickets création | 🟡 À valider |
-| BUG-14 | Faible | Utilisateurs plateforme | 🟡 À valider |
+| BUG-06 | Critique | Tickets permissions édition | ✅ Corrigé |
+| BUG-07 | Moyen | Entreprises | ✅ Corrigé |
+| BUG-09 | Moyen | Occurrences | ✅ Corrigé |
+| BUG-10 | Moyen | Utilisateurs | ✅ Pas un bug |
+| BUG-11 | Moyen | Tickets permissions | ✅ Corrigé |
+| BUG-12 | Faible | Tickets UX | ✅ Corrigé |
+| BUG-13 | Faible | Tickets création | ✅ Corrigé |
+| BUG-14 | Faible | Utilisateurs plateforme | ✅ Corrigé |

@@ -130,7 +130,11 @@ export const getUsersAction = actionClient
         ),
       });
       if (!adhesion) {
-        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        // Fallback: allow platform users too
+        const platformRole = await getEffectivePlateformeRole(currentUser.id);
+        if (!platformRole?.role) {
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        }
       }
     }
 

@@ -21,8 +21,8 @@ import {
   getEntrepriseWithDetailsById,
   getServicesByEntrepriseId,
 } from "@/server/queries/entreprises.query";
-import { getMesClients } from "@/server/queries/clientServiceExecutions.query";
-import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
+import { getMesClients, getClientPrestataires } from "@/server/queries/clientServiceExecutions.query";
+import { getUserClientAdhesion, getUserPrestataireAdhesion } from "@/server/queries/userAdhesions.query";
 import {
   getProspectsPaginated,
   countProspects,
@@ -39,7 +39,7 @@ import {
   type RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
 import { flattenValidationErrors } from "next-safe-action";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { z } from "zod";
 import { capitalizeWords, lower, normalizeForSubmit, upper } from "@/zod-helpers/normalize";
 import { sendEmailDirect } from "@/server/email/mailgunDirect";
@@ -110,7 +110,39 @@ export const getEntreprisesPrestatairesAction = actionClient
     const session = await getSession();
     if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const prestataires = await getEntreprisesPrestataires();
+    const userId = session.user.id;
+
+    // Plateforme → tous les prestataires
+    const plateformeRole = await getEffectivePlateformeRole(userId);
+    if (plateformeRole?.role) {
+      const prestataires = await getEntreprisesPrestataires();
+      return { prestataires };
+    }
+
+    const cookieStore = await cookies();
+    const posture = cookieStore.get("fm4all:postureActive")?.value;
+
+    // Prestataire → lui-même uniquement
+    if (posture === "prestataire") {
+      const adhesion = await getUserPrestataireAdhesion({ userId });
+      if (!adhesion) return { prestataires: [] };
+      const entreprise = await db.query.entreprises.findFirst({
+        where: eq(entreprises.id, adhesion.entrepriseId),
+        columns: { id: true, nom: true },
+      });
+      if (!entreprise) return { prestataires: [] };
+      return { prestataires: [{ id: entreprise.id, nom: entreprise.nom }] };
+    }
+
+    // Client (défaut) → ses prestataires uniquement
+    const clientAdhesion = await db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+    });
+    if (!clientAdhesion) return { prestataires: [] };
+    const prestataires = await getClientPrestataires(clientAdhesion.entrepriseId);
     return { prestataires };
   });
 

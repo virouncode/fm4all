@@ -20,6 +20,7 @@ function toEntrepriseCard(c: ClientAvecDetails): EntrepriseWithDetails {
     id: c.id,
     nom: c.nom,
     siret: c.siret,
+    numeroTva: c.numeroTva,
     prenomContact: c.prenomContact,
     nomContact: c.nomContact,
     emailContact: c.emailContact,

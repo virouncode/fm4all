@@ -475,13 +475,10 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
             <ArrowDownUp className="h-4 w-4" />
             Trier
           </Button>
-          {/* Bouton visible seulement si pas prestataire */}
-          {posture !== "prestataire" && (
-            <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Nouveau ticket
-            </Button>
-          )}
+          <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Nouveau ticket
+          </Button>
         </div>
       </div>
 

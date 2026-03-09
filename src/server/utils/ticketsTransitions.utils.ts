@@ -142,9 +142,6 @@ export async function isStatusTransitionAllowed({
       if (newStatut === "a_valider") {
         return isPrestataireSide && isResponsable;
       }
-      if (newStatut === "annule") {
-        return isResponsable;
-      }
       return false;
     }
 
@@ -156,9 +153,6 @@ export async function isStatusTransitionAllowed({
       if (newStatut === "a_valider") {
         return isPrestataireSide && isResponsable;
       }
-      if (newStatut === "annule") {
-        return isResponsable;
-      }
       return false;
     }
 
@@ -166,9 +160,6 @@ export async function isStatusTransitionAllowed({
       if (newStatut === "clos") {
         // Seul le client valide et clôt
         return isClientSide && isResponsable;
-      }
-      if (newStatut === "annule") {
-        return isResponsable;
       }
       return false;
     }

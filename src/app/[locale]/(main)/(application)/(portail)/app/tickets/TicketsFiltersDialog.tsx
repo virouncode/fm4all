@@ -395,10 +395,21 @@ export function TicketsFiltersDialog({
                   className="col-span-1"
                   selectClassName="w-full"
                   withError={false}
-                  disabled={loadingSites}
+                  disabled={
+                    loadingSites ||
+                    (postureActive === "prestataire" &&
+                      (!proprietaireEntrepriseId ||
+                        proprietaireEntrepriseId === "all"))
+                  }
                 >
                   <SelectItem value="all">
-                    {loadingSites ? "Chargement..." : "Tous les sites"}
+                    {loadingSites
+                      ? "Chargement..."
+                      : postureActive === "prestataire" &&
+                          (!proprietaireEntrepriseId ||
+                            proprietaireEntrepriseId === "all")
+                        ? "Sélectionnez d'abord un client"
+                        : "Tous les sites"}
                   </SelectItem>
                   {sites.map((s) => (
                     <SelectItem key={s.id} value={s.id}>

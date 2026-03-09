@@ -20,6 +20,7 @@ import {
   getEffectivePlateformeRole,
   resolvePostureAwareSiteRole,
 } from "@/server/utils/permissions.utils";
+import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -78,6 +79,12 @@ export default async function PrestationDetailPage({
         prestataireEntrepriseId,
       });
       if (!canAccess) notFound();
+
+      // Non-admin : vérifier que le site de la prestation est dans les sites attribués
+      if (prestataireAdhesion.role !== "admin") {
+        const attributedSiteIds = await getAllPrestataireSiteIds({ userId: currentUser.id });
+        if (!attributedSiteIds.includes(prestation.siteId)) notFound();
+      }
     } else {
       // client ou posture par défaut
       const clientAdhesion = await getUserClientAdhesion({
