@@ -2,6 +2,7 @@
 
 import { db } from "@/db";
 import { devis, devisLignes, devisNumeroSeq } from "@/db/schema/devis";
+import { documents, documentsLinks } from "@/db/schema/documents";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -11,6 +12,7 @@ import {
   canUserEditDevis,
   canUserEmettreDevis,
 } from "@/server/utils/devisPermissions.utils";
+import { promoteS3Key } from "@/server/s3/s3";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import {
   devisQuerySchema,
@@ -376,6 +378,7 @@ export const saveDevisWithLignesAction = actionClient
           await tx.insert(devisLignes).values(
             parsedInput.lignes.map((l) => ({
               devisId: normalized.id!,
+              serviceId: l.serviceId || null,
               designation: l.designation,
               description: l.description || null,
               quantite: l.quantite,
@@ -384,6 +387,7 @@ export const saveDevisWithLignesAction = actionClient
               tauxTva: l.tauxTva,
               remiseHtMontant: l.remiseHtMontant,
               typePrix: l.typePrix,
+              periodeFacturation: l.periodeFacturation || null,
               ordre: l.ordre,
               createdById: currentUser.id,
               updatedById: currentUser.id,
@@ -423,6 +427,7 @@ export const saveDevisWithLignesAction = actionClient
           await tx.insert(devisLignes).values(
             parsedInput.lignes.map((l) => ({
               devisId: inserted.id,
+              serviceId: l.serviceId || null,
               designation: l.designation,
               description: l.description || null,
               quantite: l.quantite,
@@ -431,6 +436,7 @@ export const saveDevisWithLignesAction = actionClient
               tauxTva: l.tauxTva,
               remiseHtMontant: l.remiseHtMontant,
               typePrix: l.typePrix,
+              periodeFacturation: l.periodeFacturation || null,
               ordre: l.ordre,
               createdById: currentUser.id,
               updatedById: currentUser.id,
@@ -519,8 +525,73 @@ export const signerDevisAction = actionClient
       .where(and(eq(devis.id, parsedInput.devisId), eq(devis.statut, "emis")))
       .returning();
 
-    if (!updated) throw errors.conflict("Le devis n'est plus émis.");
+    if (!updated) throw errors.conflict("Le devis n'est plus refusé.");
     return { devis: updated };
+  });
+
+// ============================= SAVE PDF ==============================//
+
+export const saveDevisPdfAction = actionClient
+  .metadata({ actionName: "saveDevisPdfAction" })
+  .inputSchema(
+    z.object({
+      devisId: z.string().uuid(),
+      tempKey: z.string().min(1),
+      filename: z.string().min(1),
+      sizeBytes: z.number().int().min(0),
+    }),
+    { handleValidationErrorsShape: async (ve) => flattenValidationErrors(ve).fieldErrors },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const devisRow = await db.query.devis.findFirst({
+      where: eq(devis.id, parsedInput.devisId),
+    });
+    if (!devisRow) throw errors.notFound("Devis introuvable.");
+
+    const [asEmetteur, asProprietaire] = await Promise.all([
+      hasAccessToEntreprise(currentUser.id, devisRow.emetteurEntrepriseId),
+      hasAccessToEntreprise(currentUser.id, devisRow.proprietaireEntrepriseId),
+    ]);
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!plateformeRole?.role && !asEmetteur && !asProprietaire) {
+      throw errors.forbidden("Accès refusé.");
+    }
+
+    const storageKey = await promoteS3Key({ tempKey: parsedInput.tempKey });
+
+    const result = await db.transaction(async (tx) => {
+      const [doc] = await tx
+        .insert(documents)
+        .values({
+          proprietaireEntrepriseId: devisRow.emetteurEntrepriseId,
+          categorie: "devis",
+          titre: parsedInput.filename,
+          storageProvider: "s3",
+          storageKey,
+          filename: parsedInput.filename,
+          mimeType: "application/pdf",
+          sizeBytes: parsedInput.sizeBytes,
+          createdById: currentUser.id,
+        })
+        .returning();
+
+      await tx.insert(documentsLinks).values({
+        documentId: doc.id,
+        proprietaireEntrepriseId: devisRow.emetteurEntrepriseId,
+        devisId: parsedInput.devisId,
+        visibilite: "public",
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      });
+
+      return { storageKey };
+    });
+
+    return result;
   });
 
 export const refuserDevisAction = actionClient

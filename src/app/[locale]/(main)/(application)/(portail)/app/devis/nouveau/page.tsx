@@ -2,6 +2,7 @@ import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import { getEntrepriseWithDetailsById } from "@/server/queries/entreprises.query";
 import { getUserPrestataireAdhesion } from "@/server/queries/userAdhesions.query";
+import { getServicesByPrestataire } from "@/server/queries/services.query";
 import { cookies } from "next/headers";
 import { DevisNouveauClient } from "./DevisNouveauClient";
 
@@ -48,5 +49,7 @@ export default async function DevisNouveauPage() {
     logoStorageKey: entreprise!.logoStorageKey ?? null,
   };
 
-  return <DevisNouveauClient emetteur={emetteur} />;
+  const services = await getServicesByPrestataire(entreprise!.id);
+
+  return <DevisNouveauClient emetteur={emetteur} services={services} />;
 }

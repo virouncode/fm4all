@@ -1,6 +1,7 @@
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import { getDevisById } from "@/server/queries/devis.query";
+import { getServicesByPrestataire } from "@/server/queries/services.query";
 import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { Handshake } from "lucide-react";
@@ -53,6 +54,8 @@ export default async function DevisDetailPage({ params }: DevisDetailPageProps) 
     isReadOnly: !!plateformeRole?.role,
   };
 
+  const services = await getServicesByPrestataire(devisRow!.emetteurEntrepriseId);
+
   return (
     <div className="container mx-auto flex h-full flex-col px-6 py-4">
       <div className="mb-4 flex flex-shrink-0 items-center gap-2">
@@ -62,7 +65,7 @@ export default async function DevisDetailPage({ params }: DevisDetailPageProps) 
         </h1>
       </div>
 
-      <DevisDetailClient devis={devisRow!} permissions={permissions} />
+      <DevisDetailClient devis={devisRow!} permissions={permissions} services={services} pdfStorageKey={devisRow!.pdfStorageKey} />
     </div>
   );
 }

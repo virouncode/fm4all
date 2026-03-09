@@ -66,8 +66,14 @@ export type EmetteurInfoType = {
   logoStorageKey?: string | null;
 };
 
+type ServiceOptionType = {
+  id: string;
+  nom: string;
+};
+
 type DevisNouveauClientProps = {
   emetteur: EmetteurInfoType;
+  services: ServiceOptionType[];
 };
 
 // ============================= CONSTANTES ==============================//
@@ -80,6 +86,7 @@ const TVA_OPTIONS = [
 ] as const;
 
 const DEFAULT_LIGNE: DevisNouveauFormType["lignes"][0] = {
+  serviceId: "",
   designation: "",
   description: "",
   quantite: "1",
@@ -183,7 +190,7 @@ function buildPreview(
 
 // ============================= COMPOSANT ==============================//
 
-export function DevisNouveauClient({ emetteur }: DevisNouveauClientProps) {
+export function DevisNouveauClient({ emetteur, services }: DevisNouveauClientProps) {
   const router = useRouter();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -335,6 +342,7 @@ export function DevisNouveauClient({ emetteur }: DevisNouveauClientProps) {
         remiseGlobaleHt: eurToCentimes(data.remiseGlobaleHtEur),
         validTo: data.validTo ? new Date(data.validTo) : undefined,
         lignes: data.lignes.map((l, i) => ({
+          serviceId: l.serviceId || undefined,
           designation: l.designation.trim() || "—",
           description: l.description.trim() || undefined,
           quantite: l.quantite || "1",
@@ -360,10 +368,7 @@ export function DevisNouveauClient({ emetteur }: DevisNouveauClientProps) {
 
       if (result?.data?.devis) {
         toast.success("Devis enregistré");
-        router.push({
-          pathname: "/app/devis/[devisId]",
-          params: { devisId: result.data.devis.id },
-        });
+        router.push("/app/devis");
       }
     } catch {
       toast.error("Erreur lors de l'enregistrement");
@@ -444,6 +449,7 @@ export function DevisNouveauClient({ emetteur }: DevisNouveauClientProps) {
                   onAddLigne={handleAddLigne}
                   onRemoveLigne={handleRemoveLigne}
                   isSubmitting={isSubmitting}
+                  services={services}
                 />
               )}
             </form>
@@ -623,6 +629,7 @@ type Step2Props = {
   onAddLigne: () => void;
   onRemoveLigne: (index: number) => void;
   isSubmitting: boolean;
+  services: ServiceOptionType[];
 };
 
 function Step2({
@@ -632,6 +639,7 @@ function Step2({
   onAddLigne,
   onRemoveLigne,
   isSubmitting,
+  services,
 }: Step2Props) {
   return (
     <div className="space-y-8 pb-6">
@@ -650,6 +658,7 @@ function Step2({
               canRemove={fields.length > 1}
               onToggle={() => onToggleLine(index)}
               onRemove={() => onRemoveLigne(index)}
+              services={services}
             />
           ))}
         </div>
@@ -733,6 +742,7 @@ type LigneAccordionProps = {
   canRemove: boolean;
   onToggle: () => void;
   onRemove: () => void;
+  services: ServiceOptionType[];
 };
 
 function LigneAccordion({
@@ -741,6 +751,7 @@ function LigneAccordion({
   canRemove,
   onToggle,
   onRemove,
+  services,
 }: LigneAccordionProps) {
   const { control, setValue } = useFormContext<DevisNouveauFormType>();
 
@@ -826,6 +837,22 @@ function LigneAccordion({
       {/* Body accordion */}
       {isOpen && (
         <div className="space-y-3 border-t px-4 pt-3 pb-4">
+          {/* Service */}
+          {services.length > 0 && (
+            <RhfControlledSelect<DevisNouveauFormType>
+              name={`lignes.${index}.serviceId` as never}
+              label="Service (optionnel)"
+              placeholder="Sélectionnez un service"
+              selectClassName="w-full"
+            >
+              {services.map((s) => (
+                <SelectItem key={s.id} value={s.id}>
+                  {s.nom}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
+          )}
+
           {/* Désignation */}
           <RhfInput<DevisNouveauFormType>
             label="Titre"

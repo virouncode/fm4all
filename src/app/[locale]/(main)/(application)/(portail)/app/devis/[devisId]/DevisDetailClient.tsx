@@ -1,41 +1,60 @@
 "use client";
 
+import { RhfComboboxInput } from "@/components/rhf/RhfComboboxInput";
+import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
+import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
+import { RhfInput } from "@/components/rhf/RhfInput";
+import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SelectItem } from "@/components/ui/select";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { devisLigneUniteCT, devisTypePrixCT } from "@/constants/codeTables";
+  devisLigneUniteCT,
+  devisPeriodeFacturationCT,
+  devisTypePrixCT,
+} from "@/constants/codeTables";
 import { useRouter } from "@/i18n/navigation";
+import { getPresignedReadUrl, uploadFileToS3 } from "@/lib/s3/upload-helper";
 import {
   emettreDevisAction,
   refuserDevisAction,
+  saveDevisPdfAction,
   saveDevisWithLignesAction,
   signerDevisAction,
 } from "@/server/actions/devisActions";
 import type { DevisAvecLignes } from "@/server/queries/devis.query";
+import {
+  devisEditSchema,
+  type DevisEditFormType,
+} from "@/zod-schemas/devis.schema";
 import type {
-  DevisLigneUniteType,
+  DevisPeriodeFacturationType,
   DevisTypePrixType,
 } from "@/zod-schemas/enums";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
   CheckCircle,
   ChevronDown,
   ChevronUp,
+  Download,
+  Loader2,
   Plus,
   Send,
   Trash2,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  useFieldArray,
+  useForm,
+  useFormContext,
+  useWatch,
+  type Path,
+} from "react-hook-form";
 import { toast } from "sonner";
 import type { DevisPreviewData, DevisPreviewLigne } from "../DevisPreviewCard";
 import { DevisPreviewCard } from "../DevisPreviewCard";
@@ -43,19 +62,9 @@ import { getDevisStatutBadge } from "../helpers";
 
 // ============================= TYPES ==============================//
 
-type LocalLigneType = {
-  tempId: string;
-  id?: string; // DB id si existant
-  designation: string;
-  description: string;
-  quantite: string;
-  unite: DevisLigneUniteType;
-  prixUnitaireHtEur: string;
-  tauxTva: number;
-  hasRemise: boolean;
-  remiseHtMontantEur: string;
-  typePrix: DevisTypePrixType;
-  isOpen: boolean;
+type ServiceOptionType = {
+  id: string;
+  nom: string;
 };
 
 type PermissionsType = {
@@ -69,16 +78,18 @@ type PermissionsType = {
 type Props = {
   devis: DevisAvecLignes;
   permissions: PermissionsType;
+  services: ServiceOptionType[];
+  pdfStorageKey?: string | null;
 };
 
 // ============================= CONSTANTES ==============================//
 
 const TVA_OPTIONS = [
-  { value: 2000, label: "20 %" },
-  { value: 1000, label: "10 %" },
-  { value: 550, label: "5,5 %" },
-  { value: 0, label: "0 %" },
-];
+  { value: "2000", label: "20 %" },
+  { value: "1000", label: "10 %" },
+  { value: "550", label: "5,5 %" },
+  { value: "0", label: "0 %" },
+] as const;
 
 // ============================= HELPERS ==============================//
 
@@ -91,74 +102,61 @@ function centimesToEurStr(c: number): string {
   return (c / 100).toFixed(2);
 }
 
-function calcTtc(prixHtEur: string, tauxTva: number): string {
+function calcTtcStr(prixHtEur: string, tauxTva: string): string {
   const ht = parseFloat(prixHtEur.replace(",", ".") || "0");
   if (isNaN(ht)) return "0,00";
-  const ttc = ht * (1 + tauxTva / 10000);
-  return ttc.toFixed(2).replace(".", ",");
+  const ttc = ht * (1 + Number(tauxTva) / 10000);
+  return ttc.toFixed(2);
 }
 
-function lignesFromDb(dbLignes: DevisAvecLignes["lignes"]): LocalLigneType[] {
-  return dbLignes.map((l) => ({
-    tempId: l.id,
-    id: l.id,
-    designation: l.designation,
-    description: l.description ?? "",
-    quantite: String(l.quantite),
-    unite: l.unite as DevisLigneUniteType,
-    prixUnitaireHtEur: centimesToEurStr(l.prixUnitaireHt),
-    tauxTva: l.tauxTva,
-    hasRemise: l.remiseHtMontant > 0,
-    remiseHtMontantEur:
-      l.remiseHtMontant > 0 ? centimesToEurStr(l.remiseHtMontant) : "",
-    typePrix: l.typePrix as DevisTypePrixType,
-    isOpen: false,
-  }));
-}
-
-function newLigne(ordre: number): LocalLigneType {
-  return {
-    tempId: crypto.randomUUID(),
-    designation: "",
-    description: "",
-    quantite: "1",
-    unite: "unite",
-    prixUnitaireHtEur: "",
-    tauxTva: 2000,
-    hasRemise: false,
-    remiseHtMontantEur: "",
-    typePrix: "one_shot",
-    isOpen: true,
-  };
-}
+// Type permissif pour useWatch (DeepPartial — tous les champs optionnels)
+type PreviewValuesType = {
+  titre?: string;
+  description?: string;
+  validTo?: string;
+  remiseGlobaleHtEur?: string;
+  lignes?: Array<{
+    designation?: string;
+    description?: string;
+    quantite?: string;
+    unite?: string;
+    prixUnitaireHtEur?: string;
+    tauxTva?: string;
+    hasRemise?: boolean;
+    remiseHtMontantEur?: string;
+    typePrix?: string;
+    periodeFacturation?: string;
+  }>;
+};
 
 function buildPreview(
   devis: DevisAvecLignes,
-  lignes: LocalLigneType[],
-  titre: string,
-  description: string,
-  remiseGlobaleHtEur: string,
-  validToStr: string,
+  values: PreviewValuesType,
+  emetteurLogoUrl: string | null,
 ): DevisPreviewData {
+  const lignes = values.lignes ?? [];
   const previewLignes: DevisPreviewLigne[] = lignes.map((l) => ({
-    id: l.tempId,
     designation: l.designation || "—",
     description: l.description || null,
     quantite: l.quantite || "0",
-    unite: l.unite,
-    prixUnitaireHt: eurToCentimes(l.prixUnitaireHtEur),
-    tauxTva: l.tauxTva,
-    remiseHtMontant: l.hasRemise ? eurToCentimes(l.remiseHtMontantEur) : 0,
+    unite: String(l.unite ?? ""),
+    prixUnitaireHt: eurToCentimes(l.prixUnitaireHtEur ?? ""),
+    tauxTva: Number(l.tauxTva ?? "2000"),
+    remiseHtMontant: l.hasRemise
+      ? eurToCentimes(l.remiseHtMontantEur ?? "")
+      : 0,
+    typePrix: l.typePrix || "one_shot",
+    periodeFacturation: l.periodeFacturation || null,
   }));
 
   return {
     numero: devis.numero,
-    titre: titre || devis.titre,
-    description: description || null,
+    titre: values.titre || devis.titre,
+    description: values.description || null,
     statut: devis.statut,
-    remiseGlobaleHt: eurToCentimes(remiseGlobaleHtEur),
+    remiseGlobaleHt: eurToCentimes(values.remiseGlobaleHtEur ?? ""),
     dateEmission: devis.dateEmission,
-    validTo: validToStr ? new Date(validToStr) : devis.validTo,
+    validTo: values.validTo ? new Date(values.validTo) : devis.validTo,
     updatedAt: devis.updatedAt,
     emetteurEntrepriseNom: devis.emetteurEntrepriseNom,
     emetteurEntrepriseSiret: devis.emetteurEntrepriseSiret,
@@ -167,6 +165,7 @@ function buildPreview(
     emetteurPhoneContact: devis.emetteurPhoneContact,
     emetteurPrenomContact: devis.emetteurPrenomContact,
     emetteurNomContact: devis.emetteurNomContact,
+    emetteurLogoUrl,
     proprietaireEntrepriseNom: devis.proprietaireEntrepriseNom,
     proprietaireEntrepriseSiret: devis.proprietaireEntrepriseSiret,
     proprietaireEntrepriseNumeroTva: devis.proprietaireEntrepriseNumeroTva,
@@ -180,54 +179,181 @@ function buildPreview(
 
 // ============================= COMPOSANT PRINCIPAL ==============================//
 
-export function DevisDetailClient({ devis: initialDevis, permissions }: Props) {
+export function DevisDetailClient({
+  devis: initialDevis,
+  permissions,
+  services,
+  pdfStorageKey: initialPdfStorageKey,
+}: Props) {
   const router = useRouter();
   const [devis, setDevis] = useState(initialDevis);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  const [pdfStorageKey, setPdfStorageKey] = useState<string | null>(initialPdfStorageKey ?? null);
+  const [emetteurLogoUrl, setEmetteurLogoUrl] = useState<string | null>(null);
+  const [openLines, setOpenLines] = useState<Set<number>>(new Set());
+  const pdfRef = useRef<HTMLDivElement>(null);
 
-  // État éditeur (brouillon modifiable)
-  const [lignes, setLignes] = useState<LocalLigneType[]>(() =>
-    lignesFromDb(initialDevis.lignes),
-  );
-  const [titre, setTitre] = useState(initialDevis.titre);
-  const [description, setDescription] = useState(
-    initialDevis.description ?? "",
-  );
-  const [noteInterne, setNoteInterne] = useState(
-    initialDevis.noteInterne ?? "",
-  );
-  const [remiseGlobaleHtEur, setRemiseGlobaleHtEur] = useState(
-    initialDevis.remiseGlobaleHt > 0
-      ? centimesToEurStr(initialDevis.remiseGlobaleHt)
-      : "",
-  );
-  const [validToStr, setValidToStr] = useState(
-    initialDevis.validTo
-      ? new Date(initialDevis.validTo).toISOString().slice(0, 10)
-      : "",
-  );
+  // Charger l'URL présignée du logo de l'émetteur
+  useEffect(() => {
+    if (!initialDevis.emetteurLogoStorageKey) return;
+    getPresignedReadUrl({
+      key: initialDevis.emetteurLogoStorageKey,
+      proprietaireEntrepriseId: initialDevis.emetteurEntrepriseId,
+    })
+      .then(setEmetteurLogoUrl)
+      .catch(() => null);
+  }, [initialDevis.emetteurLogoStorageKey, initialDevis.emetteurEntrepriseId]);
+
+  const form = useForm<DevisEditFormType>({
+    resolver: zodResolver(devisEditSchema),
+    mode: "onTouched",
+    defaultValues: {
+      titre: initialDevis.titre,
+      validTo: initialDevis.validTo
+        ? new Date(initialDevis.validTo).toISOString().slice(0, 10)
+        : "",
+      description: initialDevis.description ?? "",
+      noteInterne: initialDevis.noteInterne ?? "",
+      remiseGlobaleHtEur:
+        initialDevis.remiseGlobaleHt > 0
+          ? centimesToEurStr(initialDevis.remiseGlobaleHt)
+          : "",
+      lignes: initialDevis.lignes.map((l) => ({
+        serviceId: l.serviceId ?? "",
+        designation: l.designation,
+        description: l.description ?? "",
+        quantite: String(l.quantite),
+        unite: l.unite,
+        prixUnitaireHtEur: centimesToEurStr(l.prixUnitaireHt),
+        tauxTva: String(l.tauxTva),
+        hasRemise: l.remiseHtMontant > 0,
+        remiseHtMontantEur:
+          l.remiseHtMontant > 0 ? centimesToEurStr(l.remiseHtMontant) : "",
+        typePrix: l.typePrix as DevisTypePrixType,
+        periodeFacturation: l.periodeFacturation ?? "",
+      })),
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "lignes",
+  });
+
+  const { isSubmitting, isDirty } = form.formState;
+
+  // useWatch pour la preview live (évite form.watch() dans le render)
+  const watchedValues = useWatch({ control: form.control });
 
   const badge = getDevisStatutBadge(devis.statut);
+  const preview = buildPreview(devis, watchedValues, emetteurLogoUrl);
 
-  const preview = buildPreview(
-    devis,
-    permissions.canEdit ? lignes : lignesFromDb(devis.lignes),
-    permissions.canEdit ? titre : devis.titre,
-    permissions.canEdit ? description : (devis.description ?? ""),
-    permissions.canEdit
-      ? remiseGlobaleHtEur
-      : centimesToEurStr(devis.remiseGlobaleHt),
-    permissions.canEdit
-      ? validToStr
-      : devis.validTo
-        ? new Date(devis.validTo).toISOString().slice(0, 10)
-        : "",
-  );
+  // ─── Gestion lignes ──────────────────────────────────────────────
+  function handleAddLigne() {
+    append({
+      serviceId: "",
+      designation: "",
+      description: "",
+      quantite: "1",
+      unite: "",
+      prixUnitaireHtEur: "",
+      tauxTva: "2000",
+      hasRemise: false,
+      remiseHtMontantEur: "",
+      typePrix: "one_shot",
+      periodeFacturation: "",
+    });
+    setOpenLines((prev) => new Set(prev).add(fields.length));
+  }
 
-  // ===== Transitions statut =====
+  function handleRemoveLigne(index: number) {
+    remove(index);
+    setOpenLines((prev) => {
+      const next = new Set<number>();
+      prev.forEach((i) => {
+        if (i < index) next.add(i);
+        else if (i > index) next.add(i - 1);
+      });
+      return next;
+    });
+  }
+
+  function toggleLine(index: number) {
+    setOpenLines((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  }
+
+  // ─── Transitions statut ──────────────────────────────────────────
+  async function handleGenerateAndSavePdf(devisNumero: string) {
+    if (!pdfRef.current) return;
+    setIsPdfGenerating(true);
+    try {
+      const html2canvas = (await import("html2canvas-pro")).default;
+      const { PDFDocument } = await import("pdf-lib");
+
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdfDoc = await PDFDocument.create();
+      // A4 at 72 dpi: 595 x 842 pts
+      const page = pdfDoc.addPage([595, 842]);
+      const pngImage = await pdfDoc.embedPng(imgData);
+      page.drawImage(pngImage, { x: 0, y: 0, width: 595, height: 842 });
+
+      const pdfBytes = await pdfDoc.save();
+      const filename = `devis-${devisNumero}.pdf`;
+      const file = new File([pdfBytes], filename, { type: "application/pdf" });
+
+      const { key: tempKey } = await uploadFileToS3({
+        file,
+        proprietaireEntrepriseId: devis.emetteurEntrepriseId,
+        categorie: "devis",
+      });
+
+      const saveResult = await saveDevisPdfAction({
+        devisId: devis.id,
+        tempKey,
+        filename,
+        sizeBytes: pdfBytes.byteLength,
+      });
+
+      if (saveResult?.data?.storageKey) {
+        setPdfStorageKey(saveResult.data.storageKey);
+      }
+    } catch {
+      toast.error("Erreur lors de la génération du PDF");
+    } finally {
+      setIsPdfGenerating(false);
+    }
+  }
+
+  async function handleDownloadPdf() {
+    if (!pdfStorageKey) return;
+    try {
+      const url = await getPresignedReadUrl({
+        key: pdfStorageKey,
+        proprietaireEntrepriseId: devis.emetteurEntrepriseId,
+      });
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `devis-${devis.numero ?? devis.id}.pdf`;
+      a.click();
+    } catch {
+      toast.error("Erreur lors du téléchargement du PDF");
+    }
+  }
 
   async function handleEmettre() {
-    setIsSubmitting(true);
+    setIsTransitioning(true);
     try {
       const result = await emettreDevisAction({ devisId: devis.id });
       if (result?.serverError) {
@@ -236,15 +362,18 @@ export function DevisDetailClient({ devis: initialDevis, permissions }: Props) {
       }
       if (result?.data?.devis) {
         setDevis((prev) => ({ ...prev, ...result.data!.devis }));
-        toast.success(`Devis ${result.data.devis.numero} émis avec succès`);
+        const numero = result.data.devis.numero ?? devis.id;
+        toast.success(`Devis ${numero} émis avec succès`);
+        // Générer et enregistrer le PDF après émission
+        await handleGenerateAndSavePdf(numero);
       }
     } finally {
-      setIsSubmitting(false);
+      setIsTransitioning(false);
     }
   }
 
   async function handleSigner() {
-    setIsSubmitting(true);
+    setIsTransitioning(true);
     try {
       const result = await signerDevisAction({ devisId: devis.id });
       if (result?.serverError) {
@@ -256,12 +385,12 @@ export function DevisDetailClient({ devis: initialDevis, permissions }: Props) {
         toast.success("Devis signé avec succès");
       }
     } finally {
-      setIsSubmitting(false);
+      setIsTransitioning(false);
     }
   }
 
   async function handleRefuser() {
-    setIsSubmitting(true);
+    setIsTransitioning(true);
     try {
       const result = await refuserDevisAction({ devisId: devis.id });
       if (result?.serverError) {
@@ -273,346 +402,297 @@ export function DevisDetailClient({ devis: initialDevis, permissions }: Props) {
         toast.success("Devis refusé");
       }
     } finally {
-      setIsSubmitting(false);
+      setIsTransitioning(false);
     }
   }
 
-  // ===== Sauvegarde brouillon =====
+  // ─── Sauvegarde ──────────────────────────────────────────────────
+  async function onSubmit(data: DevisEditFormType) {
+    const result = await saveDevisWithLignesAction({
+      id: devis.id,
+      proprietaireEntrepriseId: devis.proprietaireEntrepriseId,
+      emetteurEntrepriseId: devis.emetteurEntrepriseId,
+      demandeurEntrepriseId: devis.demandeurEntrepriseId,
+      siteId: devis.siteId,
+      titre: data.titre.trim(),
+      description: data.description.trim() || undefined,
+      noteInterne: data.noteInterne.trim() || undefined,
+      remiseGlobaleHt: data.remiseGlobaleHtEur
+        ? eurToCentimes(data.remiseGlobaleHtEur)
+        : undefined,
+      validTo: data.validTo ? new Date(data.validTo) : undefined,
+      lignes: data.lignes.map((l, idx) => ({
+        serviceId: l.serviceId || undefined,
+        designation: l.designation.trim(),
+        description: l.description.trim() || undefined,
+        quantite: l.quantite || "1",
+        unite: l.unite,
+        prixUnitaireHt: eurToCentimes(l.prixUnitaireHtEur),
+        tauxTva: Number(l.tauxTva),
+        remiseHtMontant: l.hasRemise ? eurToCentimes(l.remiseHtMontantEur) : 0,
+        typePrix: l.typePrix as DevisTypePrixType,
+        periodeFacturation:
+          l.typePrix === "abonnement" && l.periodeFacturation
+            ? (l.periodeFacturation as DevisPeriodeFacturationType)
+            : undefined,
+        ordre: idx,
+      })),
+    });
 
-  async function handleSave() {
-    if (!titre.trim()) {
-      toast.error("Le titre est obligatoire");
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
       return;
     }
-    if (lignes.length === 0) {
-      toast.error("Ajoutez au moins une ligne");
-      return;
-    }
-    for (const l of lignes) {
-      if (!l.designation.trim()) {
-        toast.error("Chaque ligne doit avoir une désignation");
-        return;
-      }
-    }
 
-    setIsSubmitting(true);
-    try {
-      const result = await saveDevisWithLignesAction({
-        id: devis.id,
-        proprietaireEntrepriseId: devis.proprietaireEntrepriseId,
-        emetteurEntrepriseId: devis.emetteurEntrepriseId,
-        demandeurEntrepriseId: devis.demandeurEntrepriseId,
-        siteId: devis.siteId,
-        titre: titre.trim(),
-        description: description.trim() || undefined,
-        noteInterne: noteInterne.trim() || undefined,
-        remiseGlobaleHt: remiseGlobaleHtEur
-          ? eurToCentimes(remiseGlobaleHtEur)
-          : undefined,
-        validTo: validToStr ? new Date(validToStr) : undefined,
-        lignes: lignes.map((l, idx) => ({
-          designation: l.designation.trim(),
-          description: l.description.trim() || undefined,
-          quantite: l.quantite || "1",
-          unite: l.unite,
-          prixUnitaireHt: eurToCentimes(l.prixUnitaireHtEur),
-          tauxTva: l.tauxTva,
-          remiseHtMontant: l.hasRemise
-            ? eurToCentimes(l.remiseHtMontantEur)
-            : 0,
-          typePrix: l.typePrix,
-          ordre: idx,
-        })),
-      });
-
-      if (result?.serverError) {
-        toast.error(result.serverError.message);
-        return;
-      }
-
-      toast.success("Devis sauvegardé");
-    } finally {
-      setIsSubmitting(false);
-    }
+    toast.success("Devis sauvegardé");
+    router.push("/app/devis");
   }
 
-  // ===== Gestion lignes =====
-
-  function updateLigne(tempId: string, patch: Partial<LocalLigneType>) {
-    setLignes((prev) =>
-      prev.map((l) => (l.tempId === tempId ? { ...l, ...patch } : l)),
-    );
-  }
-
-  function removeLigne(tempId: string) {
-    setLignes((prev) => prev.filter((l) => l.tempId !== tempId));
-  }
-
-  function addLigne() {
-    setLignes((prev) => [...prev, newLigne(prev.length)]);
-  }
+  const disabled = isSubmitting || isTransitioning;
 
   // ============================= RENDER ==============================//
 
   return (
-    <div className="flex flex-1 flex-col gap-4 overflow-hidden">
-      {/* Barre d'actions */}
-      <div className="flex flex-shrink-0 items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/app/devis")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour
-          </Button>
-          <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
-          {devis.numero && (
-            <span className="text-muted-foreground font-mono text-sm">
-              {devis.numero}
-            </span>
-          )}
+    <div className="flex h-full overflow-hidden">
+      {/* ── Panneau gauche ── */}
+      <div className="flex w-[40%] flex-col overflow-hidden border-r">
+        {/* Header fixe */}
+        <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b px-6 py-3">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              type="button"
+              onClick={() => router.push("/app/devis")}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </Button>
+            <Badge className={`text-xs ${badge.className}`}>
+              {badge.label}
+            </Badge>
+            {devis.numero && (
+              <span className="text-muted-foreground font-mono text-sm">
+                {devis.numero}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {permissions.canEmettre && (
+              <Button size="sm" disabled={disabled || isPdfGenerating} onClick={handleEmettre}>
+                {isPdfGenerating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+                {isPdfGenerating ? "Génération PDF…" : "Émettre"}
+              </Button>
+            )}
+            {pdfStorageKey && (
+              <Button size="sm" variant="outline" onClick={handleDownloadPdf}>
+                <Download className="h-4 w-4" />
+                PDF
+              </Button>
+            )}
+            {permissions.canSigner && (
+              <Button size="sm" disabled={disabled} onClick={handleSigner}>
+                <CheckCircle className="h-4 w-4" />
+                Signer
+              </Button>
+            )}
+            {permissions.canRefuser && (
+              <Button
+                size="sm"
+                variant="destructive"
+                disabled={disabled}
+                onClick={handleRefuser}
+              >
+                <XCircle className="h-4 w-4" />
+                Refuser
+              </Button>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {permissions.canEdit && (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={isSubmitting}
-              onClick={handleSave}
-            >
-              Sauvegarder
-            </Button>
-          )}
-          {permissions.canEmettre && (
-            <Button size="sm" disabled={isSubmitting} onClick={handleEmettre}>
-              <Send className="h-4 w-4" />
-              Émettre
-            </Button>
-          )}
-          {permissions.canSigner && (
-            <Button size="sm" disabled={isSubmitting} onClick={handleSigner}>
-              <CheckCircle className="h-4 w-4" />
-              Signer
-            </Button>
-          )}
-          {permissions.canRefuser && (
-            <Button
-              size="sm"
-              variant="destructive"
-              disabled={isSubmitting}
-              onClick={handleRefuser}
-            >
-              <XCircle className="h-4 w-4" />
-              Refuser
-            </Button>
+        {/* Contenu scrollable */}
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+          {permissions.canEdit ? (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="space-y-8 pb-6">
+                  {/* Détails du devis */}
+                  <section>
+                    <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wide uppercase">
+                      Détails du devis
+                    </h2>
+                    <div className="space-y-4 rounded-lg border p-4">
+                      <RhfInput<DevisEditFormType>
+                        name="titre"
+                        label="Titre du devis"
+                        requiredMark
+                        placeholder="ex : Nettoyage locaux Q1 2026"
+                      />
+                      <div className="flex flex-col gap-2">
+                        <Label className="text-sm">
+                          Date d&apos;expiration
+                        </Label>
+                        <div className="mb-1 flex flex-wrap gap-2">
+                          {([15, 30, 90] as const).map((days) => (
+                            <Button
+                              key={days}
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                const d = new Date();
+                                d.setDate(d.getDate() + days);
+                                form.setValue(
+                                  "validTo",
+                                  d.toISOString().slice(0, 10),
+                                );
+                              }}
+                            >
+                              Dans {days} jours
+                            </Button>
+                          ))}
+                        </div>
+                        <RhfDatePicker<DevisEditFormType> name="validTo" />
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Produits et services */}
+                  <section>
+                    <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wide uppercase">
+                      Produits et services
+                    </h2>
+                    <div className="space-y-2">
+                      {fields.map((field, index) => (
+                        <LigneAccordion
+                          key={field.id}
+                          index={index}
+                          isOpen={openLines.has(index)}
+                          canRemove={fields.length > 1}
+                          onToggle={() => toggleLine(index)}
+                          onRemove={() => handleRemoveLigne(index)}
+                          services={services}
+                        />
+                      ))}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-primary mt-3"
+                      onClick={handleAddLigne}
+                    >
+                      <Plus className="mr-1 h-4 w-4" />
+                      Ajouter un élément
+                    </Button>
+                  </section>
+
+                  {/* Remise sur le total */}
+                  <section>
+                    <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
+                      Remise sur le total
+                    </h2>
+                    <div className="flex items-center gap-2">
+                      <RhfInput<DevisEditFormType>
+                        name="remiseGlobaleHtEur"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0,00"
+                        className="max-w-48"
+                      />
+                      <span className="text-muted-foreground text-sm">
+                        EUR HT
+                      </span>
+                    </div>
+                  </section>
+
+                  {/* Description */}
+                  <section>
+                    <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
+                      Description{" "}
+                      <span className="font-normal normal-case">
+                        (visible par le client)
+                      </span>
+                    </h2>
+                    <RhfTextArea<DevisEditFormType>
+                      name="description"
+                      placeholder="Ajoutez des précisions sur le devis, conditions particulières…"
+                      rows={3}
+                    />
+                  </section>
+
+                  {/* Note interne */}
+                  <section>
+                    <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
+                      Note interne{" "}
+                      <span className="font-normal normal-case">
+                        (non imprimée)
+                      </span>
+                    </h2>
+                    <RhfTextArea<DevisEditFormType>
+                      name="noteInterne"
+                      placeholder="Note visible uniquement par votre équipe…"
+                      rows={2}
+                    />
+                  </section>
+
+                  {/* CTA */}
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    type="submit"
+                    disabled={disabled || !isDirty}
+                  >
+                    {isSubmitting
+                      ? "Enregistrement…"
+                      : "Enregistrer le brouillon"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          ) : (
+            // ===== MODE LECTURE SEULE =====
+            <ReadOnlyDevisView
+              devis={devis}
+              permissions={permissions}
+              disabled={disabled}
+              onSigner={handleSigner}
+              onRefuser={handleRefuser}
+            />
           )}
         </div>
       </div>
 
-      {/* Split-screen */}
-      <div className="flex flex-1 gap-6 overflow-hidden">
-        {/* Colonne gauche */}
-        <div className="flex w-[380px] flex-shrink-0 flex-col gap-4 overflow-y-auto pr-1">
-          {permissions.canEdit ? (
-            // ===== MODE ÉDITEUR =====
-            <>
-              {/* Titre */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Titre du devis</Label>
-                <Input
-                  value={titre}
-                  onChange={(e) => setTitre(e.target.value)}
-                  placeholder="Titre du devis"
-                />
-              </div>
-
-              {/* Date validité */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">
-                  Valide jusqu&apos;au
-                </Label>
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { label: "15 j", days: 15 },
-                    { label: "30 j", days: 30 },
-                    { label: "90 j", days: 90 },
-                  ].map(({ label, days }) => (
-                    <Button
-                      key={days}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() => {
-                        const d = new Date();
-                        d.setDate(d.getDate() + days);
-                        setValidToStr(d.toISOString().slice(0, 10));
-                      }}
-                    >
-                      {label}
-                    </Button>
-                  ))}
-                  <Input
-                    type="date"
-                    className="h-7 w-36 text-xs"
-                    value={validToStr}
-                    onChange={(e) => setValidToStr(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Lignes */}
-              <div className="space-y-2">
-                <p className="text-xs font-semibold">Lignes</p>
-                {lignes.map((l, idx) => (
-                  <LigneAccordion
-                    key={l.tempId}
-                    ligne={l}
-                    index={idx}
-                    onChange={(patch) => updateLigne(l.tempId, patch)}
-                    onRemove={() => removeLigne(l.tempId)}
-                  />
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={addLigne}
-                >
-                  <Plus className="h-4 w-4" />
-                  Ajouter une ligne
-                </Button>
-              </div>
-
-              {/* Remise globale */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">
-                  Remise globale HT (€)
-                </Label>
-                <Input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  placeholder="0,00"
-                  value={remiseGlobaleHtEur}
-                  onChange={(e) => setRemiseGlobaleHtEur(e.target.value)}
-                />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">
-                  Description (visible client)
-                </Label>
-                <Textarea
-                  rows={3}
-                  placeholder="Description…"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-
-              {/* Note interne */}
-              <div className="space-y-1.5">
-                <Label className="text-muted-foreground text-xs font-semibold">
-                  Note interne (non visible client)
-                </Label>
-                <Textarea
-                  rows={2}
-                  placeholder="Note interne…"
-                  value={noteInterne}
-                  onChange={(e) => setNoteInterne(e.target.value)}
-                />
-              </div>
-            </>
-          ) : (
-            // ===== MODE LECTURE SEULE =====
-            <>
-              <div className="space-y-2 rounded-lg border p-4">
-                <h2 className="text-sm font-semibold">Informations</h2>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  <span className="text-muted-foreground">Émetteur</span>
-                  <span className="font-medium">
-                    {devis.emetteurEntrepriseNom}
-                  </span>
-                  <span className="text-muted-foreground">Client</span>
-                  <span className="font-medium">
-                    {devis.proprietaireEntrepriseNom}
-                  </span>
-                  <span className="text-muted-foreground">Site</span>
-                  <span>{devis.siteNom}</span>
-                  {devis.validTo && (
-                    <>
-                      <span className="text-muted-foreground">
-                        Valide jusqu&apos;au
-                      </span>
-                      <span>
-                        {new Date(devis.validTo).toLocaleDateString("fr-FR")}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2 rounded-lg border p-4">
-                <h2 className="text-sm font-semibold">
-                  Lignes ({devis.lignes.length})
-                </h2>
-                {devis.lignes.length === 0 ? (
-                  <p className="text-muted-foreground text-sm italic">
-                    Aucune ligne
-                  </p>
-                ) : (
-                  <div className="divide-y text-sm">
-                    {devis.lignes.map((l) => (
-                      <div key={l.id} className="py-2">
-                        <div className="flex justify-between font-medium">
-                          <span className="line-clamp-1">{l.designation}</span>
-                          <span className="ml-2 shrink-0 font-mono">
-                            {(
-                              (l.prixUnitaireHt * Number(l.quantite)) /
-                              100
-                            ).toLocaleString("fr-FR", {
-                              style: "currency",
-                              currency: "EUR",
-                            })}{" "}
-                            HT
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground text-xs">
-                          {Number(l.quantite)} {l.unite} ×{" "}
-                          {(l.prixUnitaireHt / 100).toLocaleString("fr-FR", {
-                            style: "currency",
-                            currency: "EUR",
-                          })}{" "}
-                          — TVA {l.tauxTva / 100}%
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {devis.noteInterne && !permissions.canSigner && (
-                <div className="space-y-1 rounded-lg border border-dashed p-4">
-                  <h2 className="text-muted-foreground text-sm font-semibold">
-                    Note interne
-                  </h2>
-                  <p className="text-sm whitespace-pre-wrap">
-                    {devis.noteInterne}
-                  </p>
-                </div>
-              )}
-            </>
-          )}
+      {/* ── Preview A4 ── */}
+      <div className="flex flex-1 items-start justify-center overflow-auto bg-gray-100 p-16 dark:bg-gray-950">
+        {/* Wrapper aux dimensions scalées — évite que transform réserve l'espace A4 complet */}
+        <div
+          className="shrink-0"
+          style={{
+            width: "calc(210mm * 0.75)",
+            height: "calc(297mm * 0.75)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{ transform: "scale(0.75)", transformOrigin: "top left" }}
+          >
+            <DevisPreviewCard devis={preview} />
+          </div>
         </div>
+      </div>
 
-        {/* Colonne droite : preview A4 */}
-        <div className="flex flex-1 flex-col items-center overflow-y-auto rounded-lg bg-gray-100 p-4 dark:bg-gray-900">
+      {/* ── Preview pleine taille hors-écran pour génération PDF ── */}
+      <div
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", top: 0, zIndex: -1 }}
+      >
+        <div ref={pdfRef}>
           <DevisPreviewCard devis={preview} />
         </div>
       </div>
@@ -623,208 +703,547 @@ export function DevisDetailClient({ devis: initialDevis, permissions }: Props) {
 // ============================= LIGNE ACCORDION ==============================//
 
 type LigneAccordionProps = {
-  ligne: LocalLigneType;
   index: number;
-  onChange: (patch: Partial<LocalLigneType>) => void;
+  isOpen: boolean;
+  canRemove: boolean;
+  onToggle: () => void;
   onRemove: () => void;
+  services: ServiceOptionType[];
 };
 
 function LigneAccordion({
-  ligne,
   index,
-  onChange,
+  isOpen,
+  canRemove,
+  onToggle,
   onRemove,
+  services,
 }: LigneAccordionProps) {
-  const ttc = calcTtc(ligne.prixUnitaireHtEur, ligne.tauxTva);
+  const { control, setValue } = useFormContext<DevisEditFormType>();
+
+  // useWatch pour affichage accordion header + calcul TTC
+  const designation = useWatch<DevisEditFormType>({
+    control,
+    name: `lignes.${index}.designation` as Path<DevisEditFormType>,
+  });
+  const prixHtEur = useWatch<DevisEditFormType>({
+    control,
+    name: `lignes.${index}.prixUnitaireHtEur` as Path<DevisEditFormType>,
+  });
+  const tauxTva = useWatch<DevisEditFormType>({
+    control,
+    name: `lignes.${index}.tauxTva` as Path<DevisEditFormType>,
+  });
+  const hasRemise = useWatch<DevisEditFormType>({
+    control,
+    name: `lignes.${index}.hasRemise` as Path<DevisEditFormType>,
+  });
+  const typePrix = useWatch<DevisEditFormType>({
+    control,
+    name: `lignes.${index}.typePrix` as Path<DevisEditFormType>,
+  });
+  const periodeFacturation = useWatch<DevisEditFormType>({
+    control,
+    name: `lignes.${index}.periodeFacturation` as Path<DevisEditFormType>,
+  });
+
+  const periodeLabel =
+    String(typePrix) === "abonnement" && periodeFacturation
+      ? ({
+          semaine: " /semaine",
+          mois: " /mois",
+          annee: " /an",
+        }[String(periodeFacturation)] ?? "")
+      : "";
+
+  const prixTtc = calcTtcStr(
+    String(prixHtEur ?? ""),
+    String(tauxTva ?? "2000"),
+  );
 
   return (
-    <div className="bg-card rounded-lg border">
-      {/* Header de l'accordéon */}
-      <div
-        className="flex cursor-pointer items-center justify-between px-3 py-2"
-        onClick={() => onChange({ isOpen: !ligne.isOpen })}
+    <div className="rounded-lg border">
+      {/* Header accordion */}
+      <button
+        type="button"
+        className="hover:bg-muted/30 flex w-full items-center justify-between px-4 py-3 text-left"
+        onClick={onToggle}
       >
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">
-            {ligne.designation || `Ligne ${index + 1}`}
-          </p>
-          {!ligne.isOpen && (
-            <p className="text-muted-foreground text-xs">
-              {ligne.quantite} {ligne.unite} ·{" "}
-              {ligne.prixUnitaireHtEur
-                ? `${parseFloat(ligne.prixUnitaireHtEur).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })} HT`
-                : "—"}
-            </p>
+        <span className="text-sm font-medium">
+          {String(designation) || `Élément ${index + 1}`}
+        </span>
+        <div className="flex items-center gap-2">
+          {canRemove && (
+            <span
+              role="button"
+              tabIndex={0}
+              className="text-muted-foreground hover:text-destructive p-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.stopPropagation();
+                  onRemove();
+                }
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </span>
           )}
-        </div>
-        <div className="ml-2 flex items-center gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="text-destructive h-6 w-6"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-          {ligne.isOpen ? (
+          {isOpen ? (
             <ChevronUp className="text-muted-foreground h-4 w-4" />
           ) : (
             <ChevronDown className="text-muted-foreground h-4 w-4" />
           )}
         </div>
-      </div>
+      </button>
 
-      {/* Contenu développé */}
-      {ligne.isOpen && (
-        <div className="space-y-3 border-t px-3 py-3">
+      {/* Body accordion */}
+      {isOpen && (
+        <div className="space-y-3 border-t px-4 pt-3 pb-4">
+          {/* Service */}
+          {services.length > 0 && (
+            <RhfControlledSelect<DevisEditFormType>
+              name={`lignes.${index}.serviceId` as never}
+              label="Service (optionnel)"
+              placeholder="Sélectionnez un service"
+              selectClassName="w-full"
+            >
+              {services.map((s) => (
+                <SelectItem key={s.id} value={s.id}>
+                  {s.nom}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
+          )}
+
           {/* Désignation */}
-          <div className="space-y-1">
-            <Label className="text-xs">Désignation *</Label>
-            <Input
-              value={ligne.designation}
-              onChange={(e) => onChange({ designation: e.target.value })}
-              placeholder="Désignation de la prestation"
-            />
-          </div>
+          <RhfInput<DevisEditFormType>
+            label="Titre"
+            name={`lignes.${index}.designation` as Path<DevisEditFormType>}
+            placeholder="ex : Nettoyage des locaux"
+          />
 
           {/* Description */}
-          <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs">Description</Label>
-            <Textarea
-              rows={2}
-              value={ligne.description}
-              onChange={(e) => onChange({ description: e.target.value })}
-              placeholder="Détails optionnels…"
-            />
-          </div>
+          <RhfTextArea<DevisEditFormType>
+            label="Détails (optionnel)"
+            name={`lignes.${index}.description` as Path<DevisEditFormType>}
+            placeholder="Ajoutez plus de détails"
+            rows={2}
+          />
 
-          {/* Quantité + Unité */}
-          <div className="flex gap-2">
-            <div className="flex-1 space-y-1">
-              <Label className="text-xs">Quantité *</Label>
-              <Input
-                type="number"
-                min={0}
-                step="any"
-                value={ligne.quantite}
-                onChange={(e) => onChange({ quantite: e.target.value })}
-                placeholder="1"
-              />
+          {/* Quantité + Unité + Type */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Quantité + Unité (inline) */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm">Quantité</Label>
+              <div className="flex gap-1">
+                <RhfInput<DevisEditFormType>
+                  name={`lignes.${index}.quantite` as Path<DevisEditFormType>}
+                  type="number"
+                  min="0"
+                  step="0.001"
+                  inputClassName="w-20 shrink-0"
+                />
+                <RhfComboboxInput<DevisEditFormType>
+                  name={`lignes.${index}.unite` as Path<DevisEditFormType>}
+                  options={devisLigneUniteCT.map((u) => ({
+                    value: u.code,
+                    label: u.name,
+                  }))}
+                  placeholder="Unité"
+                  className="flex-1"
+                />
+              </div>
             </div>
-            <div className="flex-1 space-y-1">
-              <Label className="text-xs">Unité *</Label>
-              <Select
-                value={ligne.unite}
-                onValueChange={(v) =>
-                  onChange({ unite: v as DevisLigneUniteType })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {devisLigneUniteCT.map((u) => (
-                    <SelectItem key={u.code} value={u.code}>
-                      {u.name}
+
+            {/* Type prix + Période */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm">Type</Label>
+              <div className="flex min-w-0 gap-1 overflow-hidden">
+                <RhfControlledSelect<DevisEditFormType>
+                  name={`lignes.${index}.typePrix` as never}
+                  selectClassName="w-full"
+                  className="min-w-0 flex-1"
+                  onChange={(v) => {
+                    if (v !== "abonnement") {
+                      setValue(
+                        `lignes.${index}.periodeFacturation` as Path<DevisEditFormType>,
+                        "" as never,
+                      );
+                    }
+                  }}
+                >
+                  {devisTypePrixCT.map((t) => (
+                    <SelectItem key={t.code} value={t.code}>
+                      {t.name}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
+                </RhfControlledSelect>
+                {String(typePrix) === "abonnement" && (
+                  <RhfControlledSelect<DevisEditFormType>
+                    name={`lignes.${index}.periodeFacturation` as never}
+                    selectClassName="w-full"
+                    className="min-w-0 flex-1"
+                    placeholder="Période"
+                  >
+                    {devisPeriodeFacturationCT.map((p) => (
+                      <SelectItem key={p.code} value={p.code}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Type prix */}
-          <div className="space-y-1">
-            <Label className="text-xs">Type de prix *</Label>
-            <Select
-              value={ligne.typePrix}
-              onValueChange={(v) =>
-                onChange({ typePrix: v as DevisTypePrixType })
-              }
+          {/* PU HT + TVA */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm">
+                Prix unitaire (HT{periodeLabel})
+              </Label>
+              <div className="relative">
+                <span className="text-muted-foreground absolute top-[18px] left-3 -translate-y-1/2 text-xs">
+                  EUR
+                </span>
+                <RhfInput<DevisEditFormType>
+                  name={
+                    `lignes.${index}.prixUnitaireHtEur` as Path<DevisEditFormType>
+                  }
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputClassName="pl-10"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+            <RhfControlledSelect<DevisEditFormType>
+              name={`lignes.${index}.tauxTva` as never}
+              label="TVA"
+              selectClassName="w-full"
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {devisTypePrixCT.map((t) => (
-                  <SelectItem key={t.code} value={t.code}>
-                    {t.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {TVA_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
           </div>
 
-          {/* PU HT + TVA + PU TTC */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="space-y-1">
-              <Label className="text-xs">PU HT (€) *</Label>
+          {/* PU TTC (calculé) */}
+          <div className="flex flex-col gap-1">
+            <Label className="text-sm">Prix unitaire (TTC{periodeLabel})</Label>
+            <div className="relative">
+              <span className="text-muted-foreground absolute top-[18px] left-3 -translate-y-1/2 text-xs">
+                EUR
+              </span>
               <Input
-                type="number"
-                min={0}
-                step="0.01"
-                value={ligne.prixUnitaireHtEur}
-                onChange={(e) =>
-                  onChange({ prixUnitaireHtEur: e.target.value })
-                }
-                placeholder="0,00"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">TVA *</Label>
-              <Select
-                value={String(ligne.tauxTva)}
-                onValueChange={(v) => onChange({ tauxTva: Number(v) })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TVA_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={String(opt.value)}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-muted-foreground text-xs">PU TTC</Label>
-              <Input
-                value={ttc}
+                value={prixTtc}
                 readOnly
-                className="bg-muted text-muted-foreground cursor-default"
+                disabled
+                className="bg-muted/50 pl-10"
               />
             </div>
           </div>
 
           {/* Remise ligne */}
-          <div className="space-y-1">
-            <Label className="flex cursor-pointer items-center gap-2 text-xs">
-              <input
-                type="checkbox"
-                checked={ligne.hasRemise}
-                onChange={(e) => onChange({ hasRemise: e.target.checked })}
-              />
-              Remise sur cette ligne
-            </Label>
-            {ligne.hasRemise && (
-              <Input
-                type="number"
-                min={0}
-                step="0.01"
-                placeholder="Montant remise HT (€)"
-                value={ligne.remiseHtMontantEur}
-                onChange={(e) =>
-                  onChange({ remiseHtMontantEur: e.target.value })
-                }
-              />
+          {!hasRemise ? (
+            <button
+              type="button"
+              className="text-primary flex items-center gap-1 text-xs hover:underline"
+              onClick={() =>
+                setValue(
+                  `lignes.${index}.hasRemise` as Path<DevisEditFormType>,
+                  true as never,
+                )
+              }
+            >
+              <Plus className="h-3 w-3" />
+              Ajouter une remise
+            </button>
+          ) : (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Remise (HT{periodeLabel})</Label>
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-destructive text-xs"
+                  onClick={() => {
+                    setValue(
+                      `lignes.${index}.hasRemise` as Path<DevisEditFormType>,
+                      false as never,
+                    );
+                    setValue(
+                      `lignes.${index}.remiseHtMontantEur` as Path<DevisEditFormType>,
+                      "" as never,
+                    );
+                  }}
+                >
+                  Supprimer la remise
+                </button>
+              </div>
+              <div className="relative">
+                <span className="text-muted-foreground absolute top-[18px] left-3 -translate-y-1/2 text-xs">
+                  EUR
+                </span>
+                <RhfInput<DevisEditFormType>
+                  name={
+                    `lignes.${index}.remiseHtMontantEur` as Path<DevisEditFormType>
+                  }
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputClassName="pl-10"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================= READ ONLY VIEW ==============================//
+
+type ReadOnlyDevisViewProps = {
+  devis: DevisAvecLignes;
+  permissions: PermissionsType;
+  disabled: boolean;
+  onSigner: () => void;
+  onRefuser: () => void;
+};
+
+function ReadOnlyDevisView({
+  devis,
+  permissions,
+  disabled,
+  onSigner,
+  onRefuser,
+}: ReadOnlyDevisViewProps) {
+  const fmt = (c: number) =>
+    (c / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+
+  // Calcul des totaux
+  const totalHtBrut = devis.lignes.reduce(
+    (sum, l) => sum + l.prixUnitaireHt * Number(l.quantite),
+    0,
+  );
+  const totalRemiseLignes = devis.lignes.reduce(
+    (sum, l) => sum + (l.remiseHtMontant ?? 0),
+    0,
+  );
+  const remiseGlobale = devis.remiseGlobaleHt ?? 0;
+  const totalHtNet = totalHtBrut - totalRemiseLignes - remiseGlobale;
+  const totalTva = devis.lignes.reduce((sum, l) => {
+    const htNet = l.prixUnitaireHt * Number(l.quantite) - (l.remiseHtMontant ?? 0);
+    return sum + Math.round((htNet * l.tauxTva) / 10000);
+  }, 0);
+  const totalTtc = totalHtNet + totalTva;
+
+  const periodeLabel = (l: DevisAvecLignes["lignes"][number]) => {
+    if (l.typePrix !== "abonnement" || !l.periodeFacturation) return "";
+    return { semaine: "/sem.", mois: "/mois", annee: "/an" }[l.periodeFacturation] ?? "";
+  };
+
+  return (
+    <div className="space-y-4 pb-6">
+      {/* Parties */}
+      <section>
+        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
+          Parties
+        </h2>
+        <div className="grid grid-cols-2 gap-3">
+          {/* Émetteur */}
+          <div className="rounded-lg border p-3 text-sm">
+            <p className="text-muted-foreground mb-1 text-xs font-medium uppercase tracking-wide">
+              Émetteur
+            </p>
+            <p className="font-semibold">{devis.emetteurEntrepriseNom}</p>
+            {devis.emetteurPrenomContact && (
+              <p className="text-muted-foreground text-xs">
+                {devis.emetteurPrenomContact} {devis.emetteurNomContact}
+              </p>
+            )}
+            {devis.emetteurEmailContact && (
+              <p className="text-muted-foreground text-xs">{devis.emetteurEmailContact}</p>
+            )}
+            {devis.emetteurPhoneContact && (
+              <p className="text-muted-foreground text-xs">{devis.emetteurPhoneContact}</p>
+            )}
+            <p className="text-muted-foreground mt-1 text-xs">
+              SIRET&nbsp;: {devis.emetteurEntrepriseSiret}
+            </p>
+            {devis.emetteurEntrepriseNumeroTva && (
+              <p className="text-muted-foreground text-xs">
+                TVA&nbsp;: {devis.emetteurEntrepriseNumeroTva}
+              </p>
             )}
           </div>
+          {/* Client */}
+          <div className="rounded-lg border p-3 text-sm">
+            <p className="text-muted-foreground mb-1 text-xs font-medium uppercase tracking-wide">
+              Client
+            </p>
+            <p className="font-semibold">{devis.proprietaireEntrepriseNom}</p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              SIRET&nbsp;: {devis.proprietaireEntrepriseSiret}
+            </p>
+            {devis.proprietaireEntrepriseNumeroTva && (
+              <p className="text-muted-foreground text-xs">
+                TVA&nbsp;: {devis.proprietaireEntrepriseNumeroTva}
+              </p>
+            )}
+            <p className="text-muted-foreground mt-2 text-xs font-medium uppercase tracking-wide">
+              Site
+            </p>
+            <p className="text-xs">{devis.siteNom}</p>
+            <p className="text-muted-foreground text-xs">
+              {devis.siteAdresse}, {devis.siteCodePostal} {devis.siteVille}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Dates */}
+      <section>
+        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
+          Dates
+        </h2>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 rounded-lg border p-3 text-sm">
+          {devis.dateEmission && (
+            <>
+              <span className="text-muted-foreground">Émission</span>
+              <span>{new Date(devis.dateEmission).toLocaleDateString("fr-FR")}</span>
+            </>
+          )}
+          {devis.validTo && (
+            <>
+              <span className="text-muted-foreground">Expiration</span>
+              <span>{new Date(devis.validTo).toLocaleDateString("fr-FR")}</span>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Lignes */}
+      <section>
+        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
+          Produits & services ({devis.lignes.length})
+        </h2>
+        <div className="rounded-lg border">
+          {devis.lignes.length === 0 ? (
+            <p className="text-muted-foreground p-3 text-sm italic">Aucune ligne</p>
+          ) : (
+            <div className="divide-y">
+              {devis.lignes.map((l) => {
+                const ligneHt = l.prixUnitaireHt * Number(l.quantite) - (l.remiseHtMontant ?? 0);
+                return (
+                  <div key={l.id} className="px-3 py-2.5 text-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-medium">{l.designation}</span>
+                      <span className="text-muted-foreground shrink-0 font-mono text-xs">
+                        {fmt(ligneHt)} HT
+                      </span>
+                    </div>
+                    {l.description && (
+                      <p className="text-muted-foreground mt-0.5 text-xs">{l.description}</p>
+                    )}
+                    <p className="text-muted-foreground mt-0.5 text-xs">
+                      {Number(l.quantite)} {l.unite} × {fmt(l.prixUnitaireHt)}
+                      {periodeLabel(l) && <span> {periodeLabel(l)}</span>}
+                      {" — "}TVA {l.tauxTva / 100}&nbsp;%
+                      {l.remiseHtMontant ? (
+                        <span className="text-orange-500"> — remise {fmt(l.remiseHtMontant)}</span>
+                      ) : null}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Totaux */}
+      <section>
+        <div className="rounded-lg border p-3 text-sm">
+          <div className="space-y-1">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Total HT brut</span>
+              <span className="font-mono">{fmt(totalHtBrut)}</span>
+            </div>
+            {totalRemiseLignes > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Remises lignes</span>
+                <span className="font-mono text-orange-500">− {fmt(totalRemiseLignes)}</span>
+              </div>
+            )}
+            {remiseGlobale > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Remise globale</span>
+                <span className="font-mono text-orange-500">− {fmt(remiseGlobale)}</span>
+              </div>
+            )}
+            <div className="flex justify-between border-t pt-1">
+              <span className="text-muted-foreground">Total HT net</span>
+              <span className="font-mono font-medium">{fmt(totalHtNet)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">TVA</span>
+              <span className="font-mono">{fmt(totalTva)}</span>
+            </div>
+            <div className="flex justify-between border-t pt-1 font-semibold">
+              <span>Total TTC</span>
+              <span className="font-mono">{fmt(totalTtc)}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Description */}
+      {devis.description && (
+        <section>
+          <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
+            Description
+          </h2>
+          <p className="rounded-lg border p-3 text-sm whitespace-pre-wrap">{devis.description}</p>
+        </section>
+      )}
+
+      {/* Note interne — visible seulement côté émetteur (pas canSigner = côté client) */}
+      {devis.noteInterne && !permissions.canSigner && (
+        <section>
+          <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
+            Note interne
+          </h2>
+          <p className="rounded-lg border border-dashed p-3 text-sm italic whitespace-pre-wrap">
+            {devis.noteInterne}
+          </p>
+        </section>
+      )}
+
+      {/* Actions */}
+      {(permissions.canSigner || permissions.canRefuser) && (
+        <div className="flex flex-col gap-2 pt-2">
+          {permissions.canSigner && (
+            <Button disabled={disabled} onClick={onSigner}>
+              <CheckCircle className="h-4 w-4" />
+              Signer le devis
+            </Button>
+          )}
+          {permissions.canRefuser && (
+            <Button variant="destructive" disabled={disabled} onClick={onRefuser}>
+              <XCircle className="h-4 w-4" />
+              Refuser le devis
+            </Button>
+          )}
         </div>
       )}
     </div>

@@ -100,6 +100,7 @@ export type RefuserDevisType = z.infer<typeof refuserDevisSchema>;
 // ============================= SAVE COMBINED (create or update) ==============================//
 
 const saveDevisLigneSchema = z.object({
+  serviceId: z.string().uuid().optional(),
   designation: z.string().min(1, "Désignation obligatoire").max(255),
   description: z.string().optional(),
   quantite: z.string().min(1, "Quantité obligatoire"),
@@ -135,6 +136,7 @@ export type SaveDevisWithLignesType = z.infer<typeof saveDevisWithLignesSchema>;
 // Schéma RHF (champs string pour les inputs) — distinct des schemas DB ci-dessus
 
 export const devisNouveauLigneSchema = z.object({
+  serviceId: z.string().optional(),
   designation: z.string().min(1, "Désignation obligatoire").max(255).transform(capitalizeFirstWord),
   description: z.string(),
   quantite: z.string().min(1, "Quantité obligatoire"),
@@ -168,6 +170,20 @@ export const devisNouveauSchema = z.object({
 });
 
 export type DevisNouveauFormType = z.infer<typeof devisNouveauSchema>;
+
+// ============================= FORM — EDIT DEVIS ==============================//
+// Réutilise devisNouveauLigneSchema pour les lignes (mêmes champs string pour les inputs)
+
+export const devisEditSchema = z.object({
+  titre: z.string().min(1, "Titre obligatoire").max(255).transform(capitalizeFirstWord),
+  validTo: z.string(),
+  description: z.string(),
+  noteInterne: z.string(),
+  remiseGlobaleHtEur: z.string(),
+  lignes: z.array(devisNouveauLigneSchema).min(1, "Ajoutez au moins une ligne"),
+});
+
+export type DevisEditFormType = z.infer<typeof devisEditSchema>;
 
 // ============================= QUERY ==============================//
 

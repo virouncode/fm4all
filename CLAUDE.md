@@ -493,7 +493,7 @@ export function SiteFormDialog({ mode, site }: Props) {
 **Composants RHF Disponibles**:
 
 - `RhfInput` - Input texte, number, email, etc.
-- `RhfControlledSelect` - Select avec Radix UI (prend des `<SelectItem>` en children)
+- `RhfControlledSelect` - Select avec Radix UI (prend des `<SelectItem>` en children) — **toujours ajouter `selectClassName="w-full"`** pour que le trigger occupe toute la largeur disponible
 - `RhfTextArea` - Textarea
 - `RhfCheckbox` - Checkbox booléen
 - `RhfDatePicker` - Sélecteur de date (stocke ISO `"YYYY-MM-DD"`, vide = `""`)
@@ -1296,25 +1296,26 @@ export const updateAction = actionClient
 ```typescript
 // Composants avec Select
 <Select
-  value={currentValue || ""} // ✅ "" au lieu de "none"
+  value={currentValue || "none"} // ✅ "none" comme sentinel (jamais "")
   onValueChange={handleChange}
 >
   <SelectTrigger>
     <SelectValue placeholder="Choisir..." />
   </SelectTrigger>
   <SelectContent>
-    <SelectItem value=""> {/* ✅ "" au lieu de "none" */}
+    <SelectItem value="none"> {/* ✅ JAMAIS value="" — Radix réserve "" pour le placeholder */}
       <span className="italic text-muted-foreground">Non assigné</span>
     </SelectItem>
     {/* ... autres options */}
   </SelectContent>
 </Select>
 
-// Dans handleChange - Pas de conversion manuelle
+// Dans handleChange - Convertir "none" → "" avant d'envoyer
 const handleChange = async (value: string) => {
-  // ✅ Envoyer directement, normalizeForSubmit le fera
+  const normalized = value === "none" ? "" : value;
+  // ✅ normalizeForSubmit côté serveur convertira "" → null
   await updateAction({
-    assigneEntrepriseId: value // "" sera converti en null côté serveur
+    assigneEntrepriseId: normalized
   });
 };
 ```

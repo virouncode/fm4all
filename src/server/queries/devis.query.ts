@@ -3,6 +3,7 @@ import "server-only";
 import { db } from "@/db";
 import { devis, devisLignes } from "@/db/schema/devis";
 import { entreprises } from "@/db/schema/entreprises";
+import { documents, documentsLinks } from "@/db/schema/documents";
 import { sites } from "@/db/schema/sites";
 import { user } from "@/db/schema/auth";
 import type {
@@ -10,7 +11,7 @@ import type {
   SelectDevisType,
   DevisQueryType,
 } from "@/zod-schemas/devis.schema";
-import { and, asc, count, desc, eq, ilike, or, SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNull, or, SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 // ============================= TYPES ENRICHIS ==============================//
@@ -35,6 +36,8 @@ export type DevisAvecLignes = SelectDevisType & {
   emetteurPhoneContact: string | null;
   emetteurPrenomContact: string | null;
   emetteurNomContact: string | null;
+  emetteurLogoStorageKey: string | null;
+  pdfStorageKey: string | null;
   siteNom: string;
   siteAdresse: string;
   siteCodePostal: string;
@@ -51,6 +54,7 @@ export async function getDevisById(
 ): Promise<DevisAvecLignes | null> {
   const proprietaire = alias(entreprises, "proprietaire");
   const emetteur = alias(entreprises, "emetteur");
+  const emetteurLogo = alias(documents, "emetteurLogo");
 
   const row = await db
     .select({
@@ -65,6 +69,7 @@ export async function getDevisById(
       emetteurPhoneContact: emetteur.phoneContact,
       emetteurPrenomContact: emetteur.prenomContact,
       emetteurNomContact: emetteur.nomContact,
+      emetteurLogoStorageKey: emetteurLogo.storageKey,
       siteNom: sites.nom,
       siteAdresse: sites.adresseLigne1,
       siteCodePostal: sites.codePostal,
@@ -74,6 +79,7 @@ export async function getDevisById(
     .innerJoin(proprietaire, eq(devis.proprietaireEntrepriseId, proprietaire.id))
     .innerJoin(emetteur, eq(devis.emetteurEntrepriseId, emetteur.id))
     .innerJoin(sites, eq(devis.siteId, sites.id))
+    .leftJoin(emetteurLogo, eq(emetteur.logoId, emetteurLogo.id))
     .where(eq(devis.id, devisId))
     .limit(1);
 
@@ -84,6 +90,20 @@ export async function getDevisById(
     .from(devisLignes)
     .where(eq(devisLignes.devisId, devisId))
     .orderBy(asc(devisLignes.ordre));
+
+  // Récupérer le PDF du devis si existant
+  const pdfDoc = await db
+    .select({ storageKey: documents.storageKey })
+    .from(documentsLinks)
+    .innerJoin(documents, eq(documentsLinks.documentId, documents.id))
+    .where(
+      and(
+        eq(documentsLinks.devisId, devisId),
+        eq(documents.categorie, "devis"),
+        isNull(documentsLinks.ticketId),
+      ),
+    )
+    .limit(1);
 
   const r = row[0];
   return {
@@ -98,6 +118,8 @@ export async function getDevisById(
     emetteurPhoneContact: r.emetteurPhoneContact,
     emetteurPrenomContact: r.emetteurPrenomContact,
     emetteurNomContact: r.emetteurNomContact,
+    emetteurLogoStorageKey: r.emetteurLogoStorageKey,
+    pdfStorageKey: pdfDoc[0]?.storageKey ?? null,
     siteNom: r.siteNom,
     siteAdresse: r.siteAdresse,
     siteCodePostal: r.siteCodePostal,
