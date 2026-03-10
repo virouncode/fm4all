@@ -53,6 +53,25 @@ export async function getUsersByEntrepriseId(entrepriseId: string) {
 }
 
 /**
+ * GET: All users for a prestataire entreprise (via userPrestataireAdhesions).
+ * À utiliser quand la posture est "prestataire" — getUsersByEntrepriseId ne retourne
+ * que les utilisateurs clients (innerJoin userClientAdhesions).
+ */
+export async function getUsersByPrestataireEntrepriseId(entrepriseId: string) {
+  const rows = await db
+    .select({
+      id: user.id,
+      prenom: user.prenom,
+      nom: user.nom,
+      email: user.email,
+    })
+    .from(user)
+    .innerJoin(userPrestataireAdhesions, eq(user.id, userPrestataireAdhesions.userId))
+    .where(eq(userPrestataireAdhesions.entrepriseId, entrepriseId));
+  return rows;
+}
+
+/**
  * GET: Single user by ID
  */
 export async function getUserById(userId: string) {

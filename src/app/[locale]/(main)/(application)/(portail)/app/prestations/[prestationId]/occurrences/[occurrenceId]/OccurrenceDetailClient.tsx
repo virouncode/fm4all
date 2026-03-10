@@ -615,7 +615,7 @@ export function OccurrenceDetailClient({
               </Button>
             )}
 
-            {canManage && occurrenceStatut === "en_cours" && (
+            {canManage && occurrenceStatut === "planifiee" && (
               <Button
                 size="sm"
                 variant="outline"

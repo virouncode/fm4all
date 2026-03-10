@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { sitesArborescence } from "@/db/schema/sites";
-import { userClientSiteAttributions } from "@/db/schema/users";
+import { userPrestataireAdhesions, userPrestataireSiteAttributions } from "@/db/schema/users";
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import {
@@ -28,10 +28,15 @@ import { OccurrenceDetailClient } from "./OccurrenceDetailClient";
 
 /**
  * Vérifie si le prestataire a au moins un utilisateur attribué (mode=inclure)
- * au site de l'occurrence ou à un ancêtre de ce site (scope=subtree).
+ * au site de l'occurrence ou à un ancêtre de ce site.
+ *
+ * userPrestataireSiteAttributions.entrepriseId = ID du client (pas du prestataire).
+ * On joint userPrestataireAdhesions pour s'assurer que l'utilisateur appartient
+ * bien à l'entreprise prestataire concernée.
  */
 async function hasPrestataireUsersOnSite(
   prestataireEntrepriseId: string,
+  clientEntrepriseId: string,
   siteId: string,
 ): Promise<boolean> {
   // Récupérer les ancêtres du site (y compris lui-même)
@@ -44,13 +49,20 @@ async function hasPrestataireUsersOnSite(
   if (ancestorIds.length === 0) return false;
 
   const rows = await db
-    .select({ id: userClientSiteAttributions.id })
-    .from(userClientSiteAttributions)
+    .select({ userId: userPrestataireSiteAttributions.userId })
+    .from(userPrestataireSiteAttributions)
+    .innerJoin(
+      userPrestataireAdhesions,
+      and(
+        eq(userPrestataireAdhesions.userId, userPrestataireSiteAttributions.userId),
+        eq(userPrestataireAdhesions.entrepriseId, prestataireEntrepriseId),
+      ),
+    )
     .where(
       and(
-        eq(userClientSiteAttributions.entrepriseId, prestataireEntrepriseId),
-        eq(userClientSiteAttributions.mode, "inclure"),
-        inArray(userClientSiteAttributions.siteId, ancestorIds),
+        eq(userPrestataireSiteAttributions.entrepriseId, clientEntrepriseId),
+        eq(userPrestataireSiteAttributions.mode, "inclure"),
+        inArray(userPrestataireSiteAttributions.siteId, ancestorIds),
       ),
     )
     .limit(1);
@@ -195,6 +207,7 @@ export default async function OccurrenceDetailPage({
   if (occurrence.prestataireEntrepriseId) {
     const hasPrestataireUsers = await hasPrestataireUsersOnSite(
       occurrence.prestataireEntrepriseId,
+      prestation.entrepriseId,
       occurrence.siteId,
     );
     if (hasPrestataireUsers) suiviMode = "prestataire";

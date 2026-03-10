@@ -31,7 +31,7 @@ import {
   resolvePostureAwareSiteRole,
 } from "@/server/utils/permissions.utils";
 import type { ModePilotageType } from "@/zod-schemas/clientServiceExecutions.schema";
-import { getUsersByEntrepriseId } from "@/server/queries/users.query";
+import { getUsersByEntrepriseId, getUsersByPrestataireEntrepriseId } from "@/server/queries/users.query";
 import { promoteS3Key, s3, S3_BUCKET } from "@/server/s3/s3";
 import {
   insertPrixAppliquesForOccurrence,
@@ -179,12 +179,15 @@ async function canExecuteOccurrence(
 }
 
 // Transitions autorisées par statut courant
+// Référence : docs/regles_metier.md — machine d'état occurrences
+// planifiee → en_cours (démarrage) | annulee | non_honoree (prestataire absent avant démarrage)
+// en_cours  → terminee uniquement
 const OCCURRENCE_TRANSITIONS: Record<
   string,
   readonly ("en_cours" | "terminee" | "non_honoree" | "annulee")[]
 > = {
-  planifiee: ["en_cours", "annulee"],
-  en_cours: ["terminee", "non_honoree", "annulee"],
+  planifiee: ["en_cours", "annulee", "non_honoree"],
+  en_cours: ["terminee"],
 };
 
 // ==================== UPDATE OCCURRENCE STATUT ====================
@@ -887,6 +890,12 @@ export const deleteTachePieceJointeAction = actionClient
 
     if (!tache) throw errors.notFound("Tâche");
 
+    if (tache.statut !== "en_cours") {
+      throw errors.conflict(
+        "Impossible de supprimer une pièce jointe : la tâche n'est plus en cours.",
+      );
+    }
+
     // Vérifier que le lien appartient bien à cette tâche et récupérer la clé S3
     const [link] = await db
       .select({
@@ -1233,12 +1242,20 @@ export const updateTacheAssigneeAction = actionClient
     // Vérifier accès entreprise
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId,
-      });
-      if (!adhesion) {
-        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      const postureTa = await getActivePosture();
+      if (postureTa === "prestataire") {
+        const prestataireAdhesionTa = await getUserPrestataireAdhesion({ userId: currentUser.id });
+        if (!prestataireAdhesionTa) {
+          throw errors.forbidden("Vous n'avez pas accès.");
+        }
+      } else {
+        const adhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        if (!adhesion) {
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        }
       }
     }
 
@@ -1334,21 +1351,25 @@ export const getAssignableUsersForOccurrenceAction = actionClient
 
     // En posture prestataire : retourner les utilisateurs du prestataire (pas du client)
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
+    const posture = await getActivePosture();
     let targetEntrepriseId = entrepriseId;
+    let isPrestatairePosture = false;
 
     if (!platformRole?.role) {
-      const posture = await getActivePosture();
       if (posture === "prestataire") {
         const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
         if (!prestataireAdhesion) throw errors.forbidden("Vous n'avez pas accès.");
         targetEntrepriseId = prestataireAdhesion.entrepriseId;
+        isPrestatairePosture = true;
       } else {
         const adhesion = await getUserClientAdhesion({ userId: currentUser.id, entrepriseId });
         if (!adhesion) throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
     }
 
-    const usersData = await getUsersByEntrepriseId(targetEntrepriseId);
+    const usersData = isPrestatairePosture
+      ? await getUsersByPrestataireEntrepriseId(targetEntrepriseId)
+      : await getUsersByEntrepriseId(targetEntrepriseId);
 
     return {
       users: usersData.map((u) => ({
@@ -1377,12 +1398,25 @@ export const linkTicketToOccurrenceAction = actionClient
 
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId,
-      });
-      if (!adhesion) {
-        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      const postureLinkTicket = await getActivePosture();
+      if (postureLinkTicket === "prestataire") {
+        const prestataireAdhesionLink = await getUserPrestataireAdhesion({ userId: currentUser.id });
+        if (!prestataireAdhesionLink) throw errors.forbidden("Vous n'avez pas accès.");
+        const occ = await getOccurrenceWithDetailsById(occurrenceId);
+        if (!occ) throw errors.notFound("Occurrence");
+        const canAccess = await prestataireHasExecutionOnPrestation({
+          prestationId: occ.clientServiceId,
+          prestataireEntrepriseId: prestataireAdhesionLink.entrepriseId,
+        });
+        if (!canAccess) throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
+      } else {
+        const adhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        if (!adhesion) {
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        }
       }
     }
 
@@ -1432,12 +1466,25 @@ export const unlinkTicketFromOccurrenceAction = actionClient
 
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId,
-      });
-      if (!adhesion) {
-        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      const postureUnlinkTicket = await getActivePosture();
+      if (postureUnlinkTicket === "prestataire") {
+        const prestataireAdhesionUnlink = await getUserPrestataireAdhesion({ userId: currentUser.id });
+        if (!prestataireAdhesionUnlink) throw errors.forbidden("Vous n'avez pas accès.");
+        const occ = await getOccurrenceWithDetailsById(occurrenceId);
+        if (!occ) throw errors.notFound("Occurrence");
+        const canAccess = await prestataireHasExecutionOnPrestation({
+          prestationId: occ.clientServiceId,
+          prestataireEntrepriseId: prestataireAdhesionUnlink.entrepriseId,
+        });
+        if (!canAccess) throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
+      } else {
+        const adhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        if (!adhesion) {
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        }
       }
     }
 
@@ -1479,12 +1526,25 @@ export const getAvailableTicketsForLinkingAction = actionClient
 
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId,
-      });
-      if (!adhesion) {
-        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      const postureGetAvail = await getActivePosture();
+      if (postureGetAvail === "prestataire") {
+        const prestataireAdhesionAvail = await getUserPrestataireAdhesion({ userId: currentUser.id });
+        if (!prestataireAdhesionAvail) throw errors.forbidden("Vous n'avez pas accès.");
+        const occ = await getOccurrenceWithDetailsById(occurrenceId);
+        if (!occ) throw errors.notFound("Occurrence");
+        const canAccess = await prestataireHasExecutionOnPrestation({
+          prestationId: occ.clientServiceId,
+          prestataireEntrepriseId: prestataireAdhesionAvail.entrepriseId,
+        });
+        if (!canAccess) throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
+      } else {
+        const adhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        if (!adhesion) {
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        }
       }
     }
 
@@ -1531,12 +1591,25 @@ export const getTicketsByOccurrenceAction = actionClient
 
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId,
-      });
-      if (!adhesion) {
-        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      const postureGetTickets = await getActivePosture();
+      if (postureGetTickets === "prestataire") {
+        const prestataireAdhesionTickets = await getUserPrestataireAdhesion({ userId: currentUser.id });
+        if (!prestataireAdhesionTickets) throw errors.forbidden("Vous n'avez pas accès.");
+        const occ = await getOccurrenceWithDetailsById(occurrenceId);
+        if (!occ) throw errors.notFound("Occurrence");
+        const canAccess = await prestataireHasExecutionOnPrestation({
+          prestationId: occ.clientServiceId,
+          prestataireEntrepriseId: prestataireAdhesionTickets.entrepriseId,
+        });
+        if (!canAccess) throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
+      } else {
+        const adhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        if (!adhesion) {
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        }
       }
     }
 
