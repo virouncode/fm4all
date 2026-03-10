@@ -314,8 +314,8 @@ export const updateOccurrenceStatutAction = actionClient
           ...(newStatut === "en_cours"
             ? {
                 dateDebutReelle: now,
-                // Auto-assignation : l'utilisateur qui démarre prend en charge l'intervention
-                assigneeUserId: occurrence.assigneeUserId ?? currentUser.id,
+                // BUG-3 fix: L'exécutant réel est toujours l'utilisateur courant, pas l'assigné précédent.
+                assigneeUserId: currentUser.id,
               }
             : {}),
           ...(newStatut === "terminee" || newStatut === "non_honoree"
@@ -632,8 +632,26 @@ export const updateOccurrenceTacheStatutAction = actionClient
         );
       }
     } else if (newStatut === "terminee") {
+      // BUG-2 fix: canExecute EST requis même si isAssignee.
+      // Spec : terminee → canExecute ET (isAssignee OU canManage)
+      const canExecute = await canExecuteOccurrence(
+        currentUser.id,
+        entrepriseId,
+        prestation.siteId,
+        modePilotage,
+      );
       const isAssignee = tache.assigneeUserId === currentUser.id;
+      if (isAssignee && !canExecute) {
+        throw errors.forbidden(
+          "Vous n'êtes pas autorisé à terminer cette tâche.",
+        );
+      }
       if (!isAssignee) {
+        if (!canExecute) {
+          throw errors.forbidden(
+            "Seul l'intervenant assigné ou un responsable peut terminer cette tâche.",
+          );
+        }
         const canManage = await canManageOccurrence(
           currentUser.id,
           entrepriseId,
@@ -688,7 +706,8 @@ export const updateOccurrenceTacheStatutAction = actionClient
     if (newStatut === "en_cours" && !tache.startedAt) {
       updateData.startedAt = now;
     }
-    if (newStatut === "terminee" || newStatut === "non_honoree") {
+    // BUG-4 fix: doneAt, completeeParUserId, tempsPasseSecondes réservés à "terminee" uniquement.
+    if (newStatut === "terminee") {
       updateData.doneAt = now;
       updateData.completeeParUserId = currentUser.id;
       if (tache.startedAt) {
@@ -745,13 +764,22 @@ export const addTachePieceJointeAction = actionClient
       .limit(1);
 
     const modePilotage = await getExecutionContext(occurrenceCtxPj?.executionId ?? null);
+    // BUG-8 fix: canManage est aussi autorisé à ajouter des PJ (spec §9).
     const canExecute = await canExecuteOccurrence(
       currentUser.id,
       entrepriseId,
       prestation.siteId,
       modePilotage,
     );
-    if (!canExecute) {
+    const canManagePj = canExecute
+      ? false
+      : await canManageOccurrence(
+          currentUser.id,
+          entrepriseId,
+          prestation.siteId,
+          modePilotage,
+        );
+    if (!canExecute && !canManagePj) {
       throw errors.forbidden(
         "Vous n'êtes pas autorisé à ajouter une pièce jointe à cette intervention.",
       );
@@ -864,13 +892,22 @@ export const deleteTachePieceJointeAction = actionClient
       .limit(1);
 
     const modePilotageDel = await getExecutionContext(occurrenceCtxDel?.executionId ?? null);
+    // BUG-8 fix: canManage est aussi autorisé à supprimer des PJ (spec §9).
     const canExecuteDel = await canExecuteOccurrence(
       currentUser.id,
       entrepriseId,
       prestation.siteId,
       modePilotageDel,
     );
-    if (!canExecuteDel) {
+    const canManageDel = canExecuteDel
+      ? false
+      : await canManageOccurrence(
+          currentUser.id,
+          entrepriseId,
+          prestation.siteId,
+          modePilotageDel,
+        );
+    if (!canExecuteDel && !canManageDel) {
       throw errors.forbidden(
         "Vous n'êtes pas autorisé à supprimer une pièce jointe de cette intervention.",
       );

@@ -276,19 +276,21 @@ export async function resolveUserEffectiveRoleOnSite({
 
   if (validAttributions.length === 0) return null;
 
-  // 3. Trier par profondeur ASC (plus proche = plus spécifique)
-  validAttributions.sort((a, b) => a.profondeur - b.profondeur);
+  // §8 — Exclusion prime TOUJOURS sur l'inclusion (quelle que soit la profondeur)
+  const hasExclusion = validAttributions.some((a) => a.mode === "exclure");
+  if (hasExclusion) return null;
 
-  // 4. Prendre la première attribution (la plus spécifique)
-  const mostSpecific = validAttributions[0];
+  // §9 — Retourner le rôle le plus permissif parmi les inclusions
+  const inclusions = validAttributions.filter((a) => a.mode === "inclure");
+  if (inclusions.length === 0) return null;
 
-  // 5. Si mode=exclure → Accès refusé
-  if (mostSpecific.mode === "exclure") {
-    return null;
-  }
-
-  // 6. Si mode=inclure → Retourner le rôle
-  return mostSpecific.role;
+  const roleOrder: Record<RoleClientAttributionType, number> = {
+    responsable_site: 3,
+    demandeur_site: 2,
+    observateur_site: 1,
+  };
+  inclusions.sort((a, b) => (roleOrder[b.role] ?? 0) - (roleOrder[a.role] ?? 0));
+  return inclusions[0].role;
 }
 
 /**
@@ -415,15 +417,26 @@ export async function resolveUserEffectiveRolesOnSites({
       continue;
     }
 
-    // Trier par profondeur ASC (plus spécifique en premier)
-    validAttrs.sort((a, b) => a.profondeur - b.profondeur);
-    const mostSpecific = validAttrs[0];
+    // §8 — Exclusion prime TOUJOURS (quelle que soit la profondeur)
+    const hasExcl = validAttrs.some((a) => a.mode === "exclure");
+    if (hasExcl) {
+      results.set(siteId, null);
+      continue;
+    }
 
-    // mode=exclure → null, mode=inclure → role
-    results.set(
-      siteId,
-      mostSpecific.mode === "exclure" ? null : mostSpecific.role,
-    );
+    // §9 — Rôle le plus permissif parmi les inclusions
+    const inclusions = validAttrs.filter((a) => a.mode === "inclure");
+    if (inclusions.length === 0) {
+      results.set(siteId, null);
+      continue;
+    }
+    const roleOrderBatch: Record<string, number> = {
+      responsable_site: 3,
+      demandeur_site: 2,
+      observateur_site: 1,
+    };
+    inclusions.sort((a, b) => (roleOrderBatch[b.role] ?? 0) - (roleOrderBatch[a.role] ?? 0));
+    results.set(siteId, inclusions[0].role as RoleClientAttributionType);
   }
 
   return results;

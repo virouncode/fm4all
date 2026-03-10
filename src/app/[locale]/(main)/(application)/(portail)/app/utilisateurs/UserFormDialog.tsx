@@ -385,10 +385,14 @@ function CreateUserFormInner({
   onSuccess?: () => void;
   onOpenChange: (open: boolean) => void;
 }) {
-  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
+  const roleClientAdhesion = useAppStore((state) => state.roleClientAdhesion);
+  const rolePrestataireAdhesion = useAppStore((state) => state.rolePrestataireAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
+
+  const currentUserRole =
+    posture === "prestataire" ? rolePrestataireAdhesion : roleClientAdhesion;
 
   const roleCT =
     posture === "prestataire" ? rolePrestataireAdhesionCT : roleClientAdhesionCT;
@@ -666,14 +670,25 @@ function EditUserForm({
   onSuccess?: () => void;
 }) {
   const currentUser = useAppStore((state) => state.user);
-  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
+  const postureActive = useAppStore((state) => state.postureActive);
+  const roleClientAdhesion = useAppStore((state) => state.roleClientAdhesion);
+  const rolePrestataireAdhesion = useAppStore((state) => state.rolePrestataireAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
 
+  const currentUserRole =
+    postureActive === "prestataire" ? rolePrestataireAdhesion : roleClientAdhesion;
+
+  const posture: "client" | "prestataire" =
+    postureActive === "prestataire" ? "prestataire" : "client";
+
   const isEditingSelf = currentUser?.id === userId;
 
-  const availableRoles = roleClientAdhesionCT.filter(() => {
+  const roleCT =
+    posture === "prestataire" ? rolePrestataireAdhesionCT : roleClientAdhesionCT;
+
+  const availableRoles = roleCT.filter(() => {
     if (!currentUserRole && !currentUserPlateformeRole) return false;
     if (currentUserPlateformeRole === "super_admin_plateforme") return true;
     if (currentUserRole === "admin") return true;
@@ -753,7 +768,7 @@ function EditUserForm({
   }, [open, defaultValues?.avatar, entrepriseId, form, refreshKey]);
 
   const onSubmit = async (data: UpdateUserFormType) => {
-    const result = await updateUserAction({ ...data, entrepriseId });
+    const result = await updateUserAction({ ...data, entrepriseId, posture });
 
     if (result?.serverError) {
       toast.error(result.serverError.message);

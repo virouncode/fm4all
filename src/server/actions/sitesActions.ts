@@ -895,6 +895,8 @@ export const permanentlyDeleteSiteAction = actionClient
       where: eq(entreprises.id, entrepriseId),
     });
 
+    // TODO(BUG-9): Cette vérification est fragile car elle repose sur le nom de l'entreprise.
+    // Préférer un identifiant stable (ex: variable d'env FM4ALL_ENTREPRISE_ID, ou colonne `isPlateforme`).
     if (!entreprise || entreprise.nom !== "FM4ALL") {
       throw errors.forbidden(
         "La suppression définitive est réservée à la plateforme FM4ALL.",

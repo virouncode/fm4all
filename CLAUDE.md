@@ -6,6 +6,80 @@
 
 ---
 
+## 🔴 PROTOCOLE D'AUDIT OBLIGATOIRE
+
+**À exécuter systématiquement avant de déclarer un audit ou une implémentation terminés. Aucune exception.**
+
+### Étape 1 — Lire tous les fichiers concernés EN ENTIER
+
+Ne pas scanner, ne pas supposer. Lire ligne par ligne :
+- Le schéma DB (`db/schema/`)
+- Le schéma Zod (`zod-schemas/`)
+- L'action serveur (`server/actions/`)
+- La query (`server/queries/`)
+- Le composant parent + tous les composants enfants consommateurs
+
+### Étape 2 — Tracer le flux complet dans les deux sens
+
+**Sens descendant** : requête → action → query → DB
+**Sens montant** : DB → type retourné → prop passée → rendu UI
+
+Pour chaque prop passée d'un parent à un enfant : vérifier qu'elle est bien utilisée et que son type est correct.
+
+### Étape 3 — Vérifier chaque posture séparément
+
+Pour chaque fichier modifié, simuler mentalement :
+- Posture **client** : quel `entrepriseId` ? quels droits ? quel rendu ?
+- Posture **prestataire** : idem — attention aux tables différentes (`userPrestataireSiteAttributions` ≠ `userClientSiteAttributions`)
+- Posture **plateforme** : bypass actif ? cookie vérifié ?
+
+### Étape 4 — Vérifier les états React
+
+- Tous les `useState` sont-ils réinitialisés quand l'entité change (ex: changement d'utilisateur sélectionné) ?
+- Les `useEffect` ont-ils toutes leurs dépendances ?
+- L'objet `searchParams` entier est-il dans le `useEffect` (pas les propriétés individuelles) ?
+
+### Étape 5 — TypeScript
+
+```bash
+pnpm tsc --noEmit
+```
+Zéro erreur. Zéro `any`. Zéro `@ts-ignore` sans justification.
+
+### Étape 6 — Audit frontend obligatoire
+
+Pour chaque composant modifié ou créé, vérifier ligne par ligne :
+
+**Rendu conditionnel**
+- Chaque `{condition && <Composant />}` : la condition est-elle correcte pour toutes les postures ?
+- Chaque `{condition ? <A /> : <B />}` : les deux branches sont-elles cohérentes avec les permissions réelles ?
+- Un composant jamais rendu parce que sa condition est toujours `false` = bug silencieux
+
+**Cohérence posture / permissions**
+- Chaque bouton d'action (Modifier, Supprimer, Attribuer...) : est-il conditionné par `canEdit` / `canManage` ?
+- `canEdit` est-il calculé avec le bon rôle selon la posture (`roleClientAdhesion` vs `rolePrestataireAdhesion`) ?
+- Un utilisateur en posture prestataire ne doit pas voir les contrôles basés sur `roleClientAdhesion`
+- Les permissions sont-elles vérifiées aussi côté serveur (action) et pas seulement côté UI ?
+
+**Données affichées**
+- Les données affichées correspondent-elles à l'entité sélectionnée (pas à l'utilisateur connecté) ?
+- Si l'utilisateur change d'entité sélectionnée (ex: autre utilisateur, autre client), le composant se vide-t-il et se recharge-t-il correctement ?
+- Une liste vide affiche-t-elle "Aucun X" alors que la DB contient des données = bug de fetch ou de condition
+
+**Props passées aux composants enfants**
+- Tracer chaque prop du parent vers l'enfant : est-elle bien reçue, bien utilisée, et du bon type ?
+- Une prop `undefined` ou `""` passée silencieusement à un enfant = comportement incorrect invisible
+
+### Étape 7 — Simulation parcours utilisateur
+
+Pour chaque rôle (admin, manager, collaborateur) et chaque posture :
+1. **Ouverture** : quels éléments sont visibles / masqués / désactivés / pré-remplis ?
+2. **Action** : que se passe-t-il quand l'utilisateur clique sur X ?
+3. **Erreur** : que voit-il si la requête échoue ?
+4. **Succès** : le store est-il mis à jour ? Le composant se rafraîchit-il ?
+
+---
+
 ## ⛔ RÈGLE ABSOLUE — NE JAMAIS RÉINVENTER LA ROUE
 
 **Cette règle prime sur tout le reste. Le non-respect de cette règle est la source principale des bugs et divergences.**

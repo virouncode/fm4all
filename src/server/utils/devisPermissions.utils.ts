@@ -3,7 +3,8 @@ import "server-only";
 import { db } from "@/db";
 import { devis } from "@/db/schema/devis";
 import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
-import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
+import { getUserPrestataireSiteRole } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { and, eq } from "drizzle-orm";
 
 type DevisPermissionsType = {
@@ -66,11 +67,55 @@ export async function getDevisPermissionsType({
   const isBrouillon = devisRow.statut === "brouillon";
   const isEmis = devisRow.statut === "emis";
 
+  // BUG-6 fix: Les rôles site observateur_site et intervenant_site ne peuvent pas modifier/émettre.
+  // Vérifier si l'utilisateur a un rôle site restreint sur le site du devis.
+  let hasRestrictedSiteRoleOnly = false;
+  if (isEmetteur) {
+    // Cas prestataire (emetteur) : vérifier via userPrestataireSiteAttributions
+    const prestataireAdh = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.entrepriseId, devisRow.emetteurEntrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    });
+    if (prestataireAdh && prestataireAdh.role !== "admin") {
+      const siteRole = await getUserPrestataireSiteRole({
+        userId,
+        siteId: devisRow.siteId,
+        clientEntrepriseId: devisRow.proprietaireEntrepriseId,
+      });
+      if (!siteRole || siteRole === "observateur_site" || siteRole === "intervenant_site") {
+        hasRestrictedSiteRoleOnly = true;
+      }
+    }
+  }
+  if (!hasRestrictedSiteRoleOnly && isProprietaire) {
+    // Cas client (peut aussi être émetteur si même entreprise) : vérifier via userClientSiteAttributions
+    const clientAdh = await db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, devisRow.emetteurEntrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+    });
+    if (clientAdh && clientAdh.role !== "admin" && clientAdh.role !== "manager") {
+      const siteRole = await resolvePostureAwareSiteRole({
+        userId,
+        siteId: devisRow.siteId,
+        entrepriseId: devisRow.emetteurEntrepriseId,
+      });
+      if (!siteRole || siteRole === "observateur_site" || siteRole === "intervenant_site") {
+        hasRestrictedSiteRoleOnly = true;
+      }
+    }
+  }
+
   return {
     canView: isEmetteur || isProprietaire,
     canCreate: isEmetteur,
-    canEdit: isEmetteur && isBrouillon,
-    canEmettre: isEmetteur && isBrouillon,
+    canEdit: isEmetteur && isBrouillon && !hasRestrictedSiteRoleOnly,
+    canEmettre: isEmetteur && isBrouillon && !hasRestrictedSiteRoleOnly,
     canSigner: isProprietaire && isEmis,
     canRefuser: isProprietaire && isEmis,
   };

@@ -115,6 +115,117 @@ async function prestataireUserHasResponsabiliteOnSite(
   return !exclusion;
 }
 
+// ==================== ACTION : SUPPRESSION ====================
+
+export const deleteUserPrestataireSiteAttributionAction = actionClient
+  .metadata({ actionName: "deleteUserPrestataireSiteAttributionAction" })
+  .inputSchema(
+    z.object({
+      id: z.uuid("ID attribution invalide"),
+      userId: z.uuid("ID utilisateur invalide"),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (!session?.user) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+    const currentUser = session.user;
+
+    // Récupérer l'attribution pour connaître son contexte
+    const attribution = await db.query.userPrestataireSiteAttributions.findFirst(
+      {
+        where: and(
+          eq(userPrestataireSiteAttributions.id, parsedInput.id),
+          eq(userPrestataireSiteAttributions.userId, parsedInput.userId),
+        ),
+      },
+    );
+    if (!attribution) {
+      throw errors.notFound("Attribution non trouvée.");
+    }
+
+    // Récupérer l'entreprise prestataire
+    const platformRole = await getEffectivePlateformeRole(currentUser.id);
+    let prestataireEntrepriseId: string;
+
+    if (platformRole?.role) {
+      const targetAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+        where: eq(userPrestataireAdhesions.userId, parsedInput.userId),
+      });
+      if (!targetAdhesion) {
+        throw errors.notFound(
+          "L'utilisateur cible n'est pas membre d'une entreprise prestataire.",
+        );
+      }
+      prestataireEntrepriseId = targetAdhesion.entrepriseId;
+    } else {
+      const prestataireAdhesion =
+        await db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        });
+      if (!prestataireAdhesion) {
+        throw errors.forbidden("Accès refusé.");
+      }
+      prestataireEntrepriseId = prestataireAdhesion.entrepriseId;
+
+      const relation = await db.query.clientPrestataireRelations.findFirst({
+        where: and(
+          eq(
+            clientPrestataireRelations.clientEntrepriseId,
+            attribution.entrepriseId,
+          ),
+          eq(
+            clientPrestataireRelations.prestataireEntrepriseId,
+            prestataireEntrepriseId,
+          ),
+        ),
+      });
+      if (!relation) {
+        throw errors.forbidden(
+          "Vous n'avez pas accès aux sites de ce client.",
+        );
+      }
+    }
+
+    const currentUserLevel = await getPrestatairRoleLevel(
+      currentUser.id,
+      prestataireEntrepriseId,
+    );
+
+    if (currentUserLevel < 2) {
+      throw errors.forbidden("Vous n'avez pas les permissions nécessaires.");
+    }
+
+    // Manager : ne peut supprimer que les attributions de ses subordonnés
+    if (currentUserLevel === 2 && parsedInput.userId !== currentUser.id) {
+      const isDescendant = await isUserDescendant({
+        entrepriseId: prestataireEntrepriseId,
+        ancetreId: currentUser.id,
+        descendantId: parsedInput.userId,
+      });
+      if (!isDescendant) {
+        throw errors.forbidden(
+          "Vous ne pouvez supprimer que les attributions de vos subordonnés.",
+        );
+      }
+    }
+
+    await db
+      .delete(userPrestataireSiteAttributions)
+      .where(
+        and(
+          eq(userPrestataireSiteAttributions.id, parsedInput.id),
+          eq(userPrestataireSiteAttributions.userId, parsedInput.userId),
+        ),
+      );
+
+    return { deleted: true };
+  });
+
 // ==================== ACTION : LECTURE ====================
 
 export const getUserPrestataireSiteAttributionsAction = actionClient
@@ -135,10 +246,13 @@ export const getUserPrestataireSiteAttributionsAction = actionClient
     // Plateforme → autorisé
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
-      // Vérifier adhésion prestataire
+      // Vérifier adhésion prestataire active (ATTR-04)
       const prestataireAdhesion =
         await db.query.userPrestataireAdhesions.findFirst({
-          where: eq(userPrestataireAdhesions.userId, currentUser.id),
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
         });
       if (!prestataireAdhesion) {
         throw errors.forbidden("Accès refusé.");
@@ -200,9 +314,13 @@ export const bulkInsertMixedPrestataireAttributionsAction = actionClient
       }
       prestataireEntrepriseId = targetAdhesion.entrepriseId;
     } else {
+      // ATTR-04 — vérifier adhésion prestataire active
       const prestataireAdhesion =
         await db.query.userPrestataireAdhesions.findFirst({
-          where: eq(userPrestataireAdhesions.userId, currentUser.id),
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
         });
       if (!prestataireAdhesion) {
         throw errors.forbidden("Accès refusé.");
@@ -255,7 +373,13 @@ export const bulkInsertMixedPrestataireAttributionsAction = actionClient
     if (currentUserLevel >= 3) {
       // Admin / plateforme → OK
     } else if (currentUserLevel === 2) {
-      // Manager prestataire
+      // Manager prestataire — ne peut pas attribuer responsable_site (réservé admin, §5)
+      if (roles.includes("responsable_site")) {
+        throw errors.forbidden(
+          "Seul un administrateur peut attribuer le rôle responsable_site.",
+        );
+      }
+
       if (parsedInput.userId === currentUser.id) {
         throw errors.forbidden(
           "Vous ne pouvez pas vous attribuer des rôles sur des sites. Demandez à un administrateur.",
@@ -327,16 +451,6 @@ export const bulkInsertMixedPrestataireAttributionsAction = actionClient
       }
     } else {
       throw errors.forbidden("Vous n'avez pas les permissions nécessaires.");
-    }
-
-    // Validation contrainte mode/scope
-    const invalidExclusions = parsedInput.attributions.filter(
-      (a) => a.mode === "exclure" && a.scope !== "self",
-    );
-    if (invalidExclusions.length > 0) {
-      throw errors.validation(
-        "Les exclusions (mode=exclure) doivent avoir scope=self.",
-      );
     }
 
     // Bulk insert en transaction

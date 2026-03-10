@@ -817,7 +817,7 @@ export const signerDevisAction = actionClient
       .where(and(eq(devis.id, parsedInput.devisId), eq(devis.statut, "emis")))
       .returning();
 
-    if (!updated) throw errors.conflict("Le devis n'est plus refusé.");
+    if (!updated) throw errors.conflict("Le devis n'est plus émis.");
     return { devis: updated };
   });
 

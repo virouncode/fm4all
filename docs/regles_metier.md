@@ -1893,3 +1893,487 @@ if (tache.listeItemId !== null) {
 ---
 
 *Dernière mise à jour : 2026-03-10*
+
+---
+
+# Règles Métier — Attribution des Sites (`userClientSiteAttributions` / `userPrestataireSiteAttributions`)
+
+> Référence unique pour toutes les permissions liées à l'attribution de sites à des utilisateurs.
+> À consulter systématiquement avant d'implémenter ou de modifier une logique d'attribution.
+
+---
+
+## 1. Principe fondamental
+
+Les attributions de sites définissent les **responsabilités opérationnelles** : qui est responsable d'un site, qui peut créer des sous-sites, qui peut interagir avec les modules opérationnels (tickets, devis, occurrences, etc.).
+
+Elles ne servent **pas** à filtrer la visibilité de base du référentiel côté client : tous les utilisateurs ayant une adhésion active voient les sites de leur entreprise. C'est l'attribution qui détermine ce qu'ils peuvent faire dessus.
+
+> **Règle d'or :**
+> - Adhésion entreprise → accès au module
+> - Attribution site → responsabilités opérationnelles
+
+---
+
+## 2. Tables concernées
+
+| Posture | Table d'attribution |
+|---------|---------------------|
+| Client | `userClientSiteAttributions` |
+| Prestataire | `userPrestataireSiteAttributions` |
+
+Les cibles d'attribution sont toujours des utilisateurs appartenant à la même entreprise :
+- Attribution client → `userClientAdhesions.userId` (statut actif)
+- Attribution prestataire → `userPrestataireAdhesions.userId` (statut actif)
+
+---
+
+## 3. Rôles d'attribution disponibles
+
+### Côté client (`userClientSiteAttributions`)
+
+| Rôle | Signification |
+|------|--------------|
+| `responsable_site` | Peut modifier le site, créer des sous-sites, attribuer des utilisateurs sur ce site |
+| `demandeur_site` | Peut créer des tickets, des demandes de devis, consulter les opérations |
+| `observateur_site` | Lecture seule |
+
+### Côté prestataire (`userPrestataireSiteAttributions`)
+
+| Rôle | Signification |
+|------|--------------|
+| `responsable_site` | Chef d'équipe : peut modifier le site (si proxy), attribuer des prestataires, organiser les opérations |
+| `demandeur_site` | Peut créer des tickets, des demandes d'intervention |
+| `observateur_site` | Lecture seule |
+| `intervenant_site` | Agent terrain : peut voir ses tâches, intervenir, clôturer des tâches. Ne peut pas attribuer. |
+
+---
+
+## 4. Qui peut attribuer un site ?
+
+### Posture CLIENT
+
+| Rôle de l'attributeur | Peut attribuer |
+|-----------------------|---------------|
+| `admin` (roleAdhesion) | ✅ Sur tous les sites |
+| `manager` + `responsable_site` du site concerné | ✅ Sur les sites de son périmètre uniquement |
+| `collaborateur` + `responsable_site` du site concerné | ✅ Sur les sites de son périmètre (délégation locale) |
+| `manager` sans `responsable_site` | ❌ |
+| `collaborateur` sans `responsable_site` | ❌ |
+
+> **Règle exacte :** un utilisateur peut attribuer un site si et seulement si `admin` (roleAdhesion) OU possède une attribution `responsable_site` (effective, i.e. `mode=inclure`) sur ce site. Le roleAdhesion `collaborateur` ne restreint pas ce droit : s'il est `responsable_site` sur un site, il peut déléguer les rôles `demandeur_site` et `observateur_site` sur ce site (mais jamais `responsable_site` — réservé aux admins, cf. §5).
+
+### Posture PRESTATAIRE
+
+**Cas 1 — Le client possède un admin actif :**
+Le prestataire est en lecture seule. Aucune attribution possible.
+
+**Cas 2 — Mode proxy (pas d'admin client actif) :**
+Mêmes règles que côté client :
+
+| Rôle du prestataire | Peut attribuer |
+|---------------------|---------------|
+| `admin` (roleAdhesion) | ✅ Sur tous les sites du client |
+| `responsable_site` du site concerné | ✅ Sur les sites de son périmètre |
+| Autres | ❌ |
+
+### Posture PLATEFORME
+
+Les utilisateurs plateforme peuvent attribuer n'importe quel site à n'importe quel utilisateur, sans restriction.
+
+---
+
+## 5. Qui peut attribuer quel rôle ?
+
+L'attributeur ne peut pas donner un rôle supérieur à son propre périmètre.
+
+### Attribution client
+
+| Rôle donné | Qui peut l'attribuer |
+|------------|----------------------|
+| `responsable_site` | `admin` uniquement |
+| `demandeur_site` | `admin` ou `responsable_site` |
+| `observateur_site` | `admin` ou `responsable_site` |
+
+### Attribution prestataire
+
+| Rôle donné | Qui peut l'attribuer |
+|------------|----------------------|
+| `responsable_site` | `admin` uniquement |
+| `demandeur_site` | `admin` ou `responsable_site` |
+| `observateur_site` | `admin` ou `responsable_site` |
+| `intervenant_site` | `admin` ou `responsable_site` |
+
+---
+
+## 6. Périmètre de l'attributeur
+
+Un utilisateur ne peut attribuer un site **que s'il a lui-même accès à ce site**.
+
+| Rôle | Peut attribuer quels sites |
+|------|---------------------------|
+| `admin` | Tous les sites de l'entreprise |
+| `responsable_site` | Uniquement les sites de son périmètre effectif (via closure table + scope) |
+
+> **Raison :** éviter qu'un responsable local étende son autorité à des sites hors de son périmètre.
+
+---
+
+## 7. Scope et mode d'attribution
+
+Chaque attribution dispose de deux dimensions complémentaires :
+
+### `scope` : étendue de l'attribution
+
+| Valeur | Signification |
+|--------|--------------|
+| `self` | S'applique uniquement au site désigné |
+| `subtree` | S'applique au site désigné et à tous ses descendants (via `sitesArborescence`) |
+
+### `mode` : type d'attribution
+
+| Valeur | Signification |
+|--------|--------------|
+| `inclure` | Accorde les droits sur ce site (et son sous-arbre si `scope=subtree`) |
+| `exclure` | Retire les droits sur ce site (et son sous-arbre si `scope=subtree`) |
+
+### Exemples
+
+**Exemple 1 — Réseau entier :**
+```
+inclure  siège   scope=subtree
+```
+→ L'utilisateur est responsable de tout le réseau sous le siège.
+
+**Exemple 2 — Réseau avec exception :**
+```
+inclure  siège         scope=subtree
+exclure  agence-paris  scope=subtree
+```
+→ L'utilisateur couvre tout le réseau sauf l'agence de Paris et ses sous-sites.
+
+---
+
+## 8. Règle de résolution des conflits (CRITIQUE)
+
+Quand plusieurs attributions s'appliquent à un même site (via le scope et la closure table), la règle de résolution est :
+
+> **L'exclusion prime toujours sur l'inclusion.**
+
+### Algorithme de résolution
+
+Pour un utilisateur U et un site S :
+
+1. Récupérer toutes les attributions actives de U dont le périmètre couvre S (via `sitesArborescence` pour le `scope=subtree`)
+2. Si au moins une attribution est `mode=exclure` → **accès refusé**
+3. Sinon, si au moins une attribution est `mode=inclure` → **accès autorisé**
+4. Sinon → **accès refusé**
+
+```
+exclure > inclure
+```
+
+### Pourquoi cette règle est impérative (sécurité)
+
+Sans règle explicite, un utilisateur pourrait :
+1. Être exclu d'un site via `exclure siège subtree`
+2. Se réattribuer une inclusion plus spécifique via `inclure siège self`
+3. Contourner l'exclusion
+
+La règle "exclusion gagne toujours" ferme cette faille : une exclusion posée sur un sous-arbre **ne peut pas être contournée** par une inclusion plus spécifique en dessous.
+
+### Implémentation SQL de référence
+
+```sql
+-- Pour vérifier l'accès de userId au site targetSiteId :
+SELECT mode
+FROM user_client_site_attributions uca
+JOIN sites_arborescence sa
+  ON sa.ancetre_id = uca.site_id
+  AND sa.descendant_id = :targetSiteId
+  AND sa.entreprise_id = :entrepriseId
+WHERE uca.user_id = :userId
+  AND (
+    (uca.scope = 'self'    AND sa.profondeur = 0)
+    OR uca.scope = 'subtree'
+  )
+ORDER BY (uca.mode = 'exclure') DESC  -- exclusions en premier
+LIMIT 1;
+-- Si la première ligne est 'exclure' → refus
+-- Si la première ligne est 'inclure' → accès autorisé
+-- Si aucune ligne → refus
+```
+
+---
+
+## 9. Résolution des droits effectifs
+
+Pour calculer si un utilisateur est `responsable_site`, `demandeur_site`, etc. sur un site donné, le système combine :
+
+1. **Attributions directes** — lignes dans `userClientSiteAttributions` ou `userPrestataireSiteAttributions`
+2. **Closure table** — `sitesArborescence` pour propager les attributions `scope=subtree`
+3. **Règle d'exclusion prioritaire** — mode `exclure` annule toujours le mode `inclure`
+
+Le résultat est un **rôle effectif par site** :
+- `estResponsableSite` — peut modifier le site, sous-sites, attributions
+- `estDemandeurSite` — peut créer tickets, devis, interventions
+- `estObservateurSite` — lecture seule
+- `estIntervenantSite` (prestataire uniquement) — peut exécuter les tâches
+
+> **Règle :** si un utilisateur a plusieurs attributions `inclure` avec des rôles différents sur un même site, le rôle le plus permissif s'applique — sauf si une exclusion annule l'ensemble.
+
+---
+
+## 10. Règles techniques d'implémentation
+
+### Toujours vérifier le périmètre de l'attributeur
+
+```typescript
+// Avant d'insérer une attribution, vérifier que l'attributeur a accès au site cible
+const canAttribute =
+  isAdmin ||
+  (await isResponsableSiteEffectif({ userId: attributeurId, siteId, entrepriseId }));
+
+if (!canAttribute) {
+  throw errors.forbidden("Vous n'avez pas accès à ce site.");
+}
+```
+
+### Toujours vérifier que la cible appartient à la bonne entreprise
+
+```typescript
+// Vérifier que la cible a bien une adhésion active dans l'entreprise
+const adhesion = await db.query.userClientAdhesions.findFirst({
+  where: and(
+    eq(userClientAdhesions.userId, targetUserId),
+    eq(userClientAdhesions.entrepriseId, entrepriseId),
+    eq(userClientAdhesions.statut, "actif"),
+  ),
+});
+if (!adhesion) throw errors.forbidden("Utilisateur non membre de cette entreprise.");
+```
+
+### Résolution via closure table (Drizzle ORM)
+
+```typescript
+// Récupérer toutes les attributions qui couvrent un site cible
+const attributions = await db
+  .select({ mode: uca.mode, role: uca.role })
+  .from(userClientSiteAttributions.as("uca"))
+  .innerJoin(sitesArborescence.as("sa"), and(
+    eq(sa.ancetreId, uca.siteId),
+    eq(sa.descendantId, targetSiteId),
+    eq(sa.entrepriseId, entrepriseId),
+  ))
+  .where(and(
+    eq(uca.userId, userId),
+    or(
+      and(eq(uca.scope, "self"), eq(sa.profondeur, 0)),
+      eq(uca.scope, "subtree"),
+    ),
+  ));
+
+const hasExclusion = attributions.some((a) => a.mode === "exclure");
+const hasInclusion = attributions.some((a) => a.mode === "inclure");
+
+if (hasExclusion) return null;   // accès refusé — exclusion prioritaire
+if (!hasInclusion) return null;  // pas d'attribution active
+// Retourner le rôle le plus permissif parmi les inclusions
+const roles = attributions.filter((a) => a.mode === "inclure").map((a) => a.role);
+return getMostPermissiveRole(roles); // responsable_site > demandeur_site > observateur_site
+```
+
+---
+
+## 11. Résumé rapide
+
+| Question | Réponse |
+|----------|---------|
+| Qui peut attribuer ? | `admin` (toujours) ou `responsable_site` (dans son périmètre) |
+| À qui peut-on attribuer ? | Utilisateurs avec adhésion active dans la même entreprise |
+| Côté client — rôles disponibles | `responsable_site`, `demandeur_site`, `observateur_site` |
+| Côté prestataire — rôles disponibles | `responsable_site`, `demandeur_site`, `observateur_site`, `intervenant_site` |
+| Qui peut donner `responsable_site` ? | `admin` uniquement |
+| Règle de conflit inclure/exclure | Exclusion prioritaire — `exclure` annule toujours `inclure` |
+| Scope `subtree` + exclusion | L'exclusion parent bloque tout le sous-arbre, même avec inclusion spécifique en dessous |
+
+---
+
+*Dernière mise à jour : 2026-03-10*
+
+---
+
+# Règles Métier — Module Utilisateurs (`app/utilisateurs`)
+
+> Référence unique pour toutes les permissions liées à la gestion des utilisateurs.
+> À consulter systématiquement avant d'implémenter ou de modifier une permission.
+
+---
+
+## 1. Modèle à deux arbres indépendants
+
+Le module gère **deux systèmes hiérarchiques distincts** qui ne se mélangent pas :
+
+| Système | Table | Rôle | Exemple |
+|---------|-------|------|---------|
+| **Arbre organisationnel** | `usersArborescence` | Gouvernance administrative (qui manage qui) | Manager A → Collaborateur B |
+| **Arbre attributions sites** | `userClientSiteAttributions` | Responsabilités opérationnelles (qui gère quel site) | B est `responsable_site` du Siège |
+
+**Règles de coexistence** :
+- Un utilisateur peut être subordonné dans l'arbre organisationnel ET responsable d'un site = indépendant
+- La suppression d'un utilisateur supprime ses deux types d'entrées
+- La suspension d'un manager **ne modifie pas** les subordonnés dans l'arbre (l'arbre reste intact)
+
+---
+
+## 2. Rôles d'adhésion par posture
+
+### Posture CLIENT (`userClientAdhesions.role`)
+| Niveau | Rôle | Capacités |
+|--------|------|-----------|
+| 3 | `admin` | Droits complets sur tous les utilisateurs de l'entreprise |
+| 2 | `manager` | Gestion de sa propre branche uniquement |
+| 1 | `collaborateur` | Aucun droit de gestion utilisateurs |
+
+### Posture PRESTATAIRE (`userPrestataireAdhesions.role`)
+Même 3 niveaux (`admin`, `manager`, `collaborateur`) avec les mêmes règles de hiérarchie.
+
+### Posture PLATEFORME (`userPlateformeAdhesions.role`)
+| Rôle | Capacités |
+|------|-----------|
+| `super_admin_plateforme` | Droits complets sur toutes les entreprises (niveau 4) |
+| `operateur_plateforme` | Droits opérationnels plateforme |
+
+---
+
+## 3. Matrice des permissions CRUD
+
+### 3.1 Voir la liste des utilisateurs
+
+Tout utilisateur avec une adhésion active dans l'entreprise peut consulter la liste.
+La liste est scopée selon la posture active :
+- **Client** → `userClientAdhesions` de cette `entrepriseId`
+- **Prestataire** → `userPrestataireAdhesions` de cette `entrepriseId`
+- **Plateforme** → `userPlateformeAdhesions` (liste cross-entreprises)
+
+### 3.2 Créer un utilisateur
+
+| Action | Admin | Manager | Collaborateur | Plateforme |
+|--------|-------|---------|---------------|------------|
+| Créer un utilisateur racine (sans parent) | ✅ | ❌ | ❌ | ✅ |
+| Créer un subordonné direct sous soi-même | ✅ | ✅ | ❌ | ✅ |
+| Créer un subordonné sous un collaborateur de sa branche | ✅ | ✅ | ❌ | ✅ |
+| Créer un subordonné sous un autre manager | ✅ | ❌ | ❌ | ✅ |
+| Créer un subordonné sous un admin | ✅ | ❌ | ❌ | ✅ |
+
+**Règle manager** : le manager peut créer uniquement sous lui-même OU sous un nœud `collaborateur` qui est dans SA branche (vérifié via `isUserDescendant()`).
+
+**`parentId`** : libre — un créateur peut rattacher le nouvel utilisateur à n'importe quel nœud de l'arbre de l'entreprise (dans les limites ci-dessus).
+
+### 3.3 Rattacher un utilisateur existant
+
+Réservé à `admin` et `super_admin_plateforme` uniquement.
+Les utilisateurs éligibles sont ceux présents dans l'arborescence de l'entreprise (entrée réflexive `profondeur=0`) mais sans adhésion pour la posture cible.
+
+| Action | Admin | Manager | Collaborateur | Plateforme |
+|--------|-------|---------|---------------|------------|
+| Rattacher un utilisateur existant | ✅ | ❌ | ❌ | ✅ |
+
+### 3.4 Modifier le profil d'un utilisateur
+
+| Qui modifie / Qui est modifié | Soi-même | Inférieur | Même niveau | Supérieur |
+|-------------------------------|----------|-----------|-------------|-----------|
+| `admin` (niveau 3) | ✅ | ✅ | ❌ (autre admin) | ❌ |
+| `manager` (niveau 2) | ✅ | ✅ (collaborateurs) | ❌ | ❌ |
+| `collaborateur` (niveau 1) | ✅ | N/A | ❌ | ❌ |
+| `super_admin_plateforme` | ✅ | ✅ | ✅ | ✅ |
+
+**Règle** : `canEdit = isViewingSelf || (currentLevel > targetLevel && currentLevel > 1)`
+
+### 3.5 Modifier le rôle ou le statut d'adhésion
+
+Même règle que 3.4 : niveau courant **strictement supérieur** au niveau cible.
+
+**Cas particulier** : un admin ne peut pas modifier le rôle d'un autre admin (même niveau = 3).
+
+### 3.6 Supprimer définitivement un utilisateur
+
+Réservé à `admin` et `super_admin_plateforme`.
+
+La suppression doit nettoyer toutes les adhésions de l'utilisateur :
+1. `userClientAdhesions` (si adhésion client existe)
+2. `userPrestataireAdhesions` (si adhésion prestataire existe)
+3. `userPlateformeAdhesions` (si adhésion plateforme existe)
+4. `usersArborescence` (toutes les entrées — ancêtres ET descendants)
+5. `userClientSiteAttributions` / `userPrestataireSiteAttributions`
+
+---
+
+## 4. Garde-fou "dernier administrateur actif"
+
+**Règle** : Il est interdit de laisser une entreprise sans aucun administrateur actif.
+
+**Actions bloquées** si l'utilisateur cible est le dernier admin actif :
+1. Changer son rôle (`admin` → `manager` ou `collaborateur`)
+2. Changer son statut (`actif` → `suspendu` ou `en_attente`)
+3. Le supprimer définitivement
+
+**Message d'erreur** : *"Impossible : cet utilisateur est le dernier administrateur actif de l'entreprise. Nommez un autre administrateur avant d'effectuer cette action."*
+
+**Implémentation** : `assertNotLastActiveAdmin({ entrepriseId, posture })` dans `usersActions.ts` — lève une erreur `forbidden` si le nombre d'admins actifs serait 0 après l'action.
+
+**Implication de sécurité FM4ALL** : l'absence d'admin actif chez un client active automatiquement les droits proxy prestataire (`canManageSiteAsProxy`). Ce garde-fou empêche un vecteur d'escalade de privilèges.
+
+---
+
+## 5. Gestion des attributions de sites
+
+### 5a. Posture client — `userClientSiteAttributions`
+
+Visible et modifiable en posture **client**. L'`entrepriseId` est celui de l'entreprise cliente.
+
+| Qui | Peut gérer les attributions |
+|-----|----------------------------|
+| `super_admin_plateforme` | ✅ (y compris sur soi-même) |
+| `admin` | ✅ (y compris sur soi-même) |
+| `manager` | ✅ mais uniquement sur les **subordonnés** (jamais sur soi-même) |
+| `collaborateur` | ❌ |
+
+**Règle** : `canManageSiteAttributions = isAdmin || isPlatformAdmin || (!isViewingSelf && currentLevel > targetLevel && currentLevel > 1)`
+
+### 5b. Posture prestataire — `userPrestataireSiteAttributions`
+
+Visible et modifiable en posture **prestataire**. Les attributions sont liées à un **client** (`clientEntrepriseId`), pas à l'entreprise prestataire. L'UI présente un sélecteur de client dans le dialog.
+
+| Qui | Peut gérer les attributions |
+|-----|----------------------------|
+| `super_admin_plateforme` | ✅ |
+| `admin` prestataire | ✅ (y compris sur soi-même) |
+| `manager` prestataire | ✅ uniquement sur les **subordonnés** (jamais sur soi-même) |
+| `collaborateur` prestataire | ❌ |
+
+**Règles complémentaires** :
+- Le backend vérifie la relation `clientPrestataireRelations` avant toute lecture ou écriture
+- Seul un admin prestataire peut attribuer le rôle `responsable_site`
+- La présence d'un admin actif chez le client est **sans effet** ici : `userPrestataireSiteAttributions` concerne l'organisation interne du prestataire (qui de son équipe est responsable de quel site client), et non la gestion des utilisateurs clients. La règle "proxy prestataire" (`canManageSiteAsProxy`) s'applique exclusivement à `userClientSiteAttributions` (§5a).
+
+**Implémentation** : `UserSiteAttributionDialog` gère les deux postures (client picker pour prestataire). `UserDetails` affiche la section attribution pour `postureActive !== "plateforme"`.
+
+### 5c. Posture plateforme
+
+Les attributions de sites ne sont **pas gérées** depuis la posture plateforme dans `app/utilisateurs`. La plateforme passe en posture client ou prestataire pour gérer les attributions de l'entreprise concernée.
+
+---
+
+## 6. Comportement multi-posture
+
+Un même compte peut avoir des adhésions dans plusieurs postures. La posture active (cookie `fm4all:postureActive`) détermine :
+- Quelle table d'adhésion est lue pour les permissions (`userClientAdhesions` vs `userPrestataireAdhesions`)
+- Quelle liste d'utilisateurs est affichée
+- Quelles actions sont disponibles
+
+**Règle critique** : En posture `prestataire`, les rôles viennent de `userPrestataireAdhesions.role`, **pas** de `userClientAdhesions.role`. Un utilisateur peut être `admin` prestataire et `collaborateur` client simultanément — ce sont deux contextes indépendants.
+
+---
+
+*Dernière mise à jour : 2026-03-10*

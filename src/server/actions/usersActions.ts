@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
 import { entreprises } from "@/db/schema/entreprises";
-import { userClientAdhesions, userPlateformeAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userClientSiteAttributions, userPlateformeAdhesions, userPrestataireAdhesions, userPrestataireSiteAttributions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -32,7 +32,7 @@ import {
   usersQueryBackendSchema,
 } from "@/zod-schemas/user.schema";
 import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { headers } from "next/headers";
 import { z } from "zod";
@@ -78,6 +78,43 @@ async function assertActiveEntrepriseAccess(
 
   if (!clientAdhesion && !prestataireAdhesion) {
     throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+  }
+}
+
+/**
+ * Vérifie que la cible N'EST PAS le dernier admin actif de l'entreprise.
+ * Doit être appelé avant toute action qui retirerait le statut admin actif
+ * (changement de rôle, suspension, suppression).
+ *
+ * ⚠️ Impact FM4ALL spécifique : l'absence d'admin client actif déclenche
+ * automatiquement le proxy prestataire (canManageSiteAsProxy). Ce garde-fou
+ * est donc une règle de sécurité majeure, pas seulement une bonne pratique.
+ */
+async function assertNotLastActiveAdmin({
+  entrepriseId,
+  posture = "client",
+}: {
+  entrepriseId: string;
+  posture?: "client" | "prestataire";
+}): Promise<void> {
+  const table =
+    posture === "prestataire" ? userPrestataireAdhesions : userClientAdhesions;
+
+  const [result] = await db
+    .select({ total: count() })
+    .from(table)
+    .where(
+      and(
+        eq(table.entrepriseId, entrepriseId),
+        eq(table.role, "admin"),
+        eq(table.statut, "actif"),
+      ),
+    );
+
+  if ((result?.total ?? 0) <= 1) {
+    throw errors.forbidden(
+      "Impossible : cet utilisateur est le dernier administrateur actif de l'entreprise. Nommez un autre administrateur avant d'effectuer cette action.",
+    );
   }
 }
 
@@ -776,6 +813,18 @@ export const updateUserAction = actionClient
       // Pas de restriction supplémentaire pour le statut pour les managers
     }
 
+    // 7. Garde-fou : dernier admin actif
+    // Une action qui retirerait le statut "admin actif" à la cible est bloquée
+    // si c'est le seul admin actif de l'entreprise.
+    // ⚠️ Impact FM4ALL : l'absence d'admin client actif active le proxy prestataire.
+    const wouldLoseAdminStatus =
+      (isRoleChanging && targetUserRole === "admin" && roleAdhesion !== "admin") ||
+      (isStatutChanging && targetUserRole === "admin" && statut !== "actif");
+
+    if (wouldLoseAdminStatus) {
+      await assertNotLastActiveAdmin({ entrepriseId, posture });
+    }
+
     // 0. Récupérer l'ancien user pour comparer l'email
     const oldUser = await getUserById(userId);
 
@@ -992,6 +1041,7 @@ export const updateUserAction = actionClient
             email: adminEmailChangeNewEmail,
             emailVerified: false,
             updatedAt: new Date(),
+            updatedById: currentUser.id,
           })
           .where(eq(user.id, userId));
       }
@@ -1095,23 +1145,43 @@ export const permanentlyDeleteUserAction = actionClient
       );
     }
 
+    // 4. Garde-fou : dernier admin actif
+    const targetAdhesionForDelete = await db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
+      ),
+    });
+    if (targetAdhesionForDelete?.role === "admin") {
+      await assertNotLastActiveAdmin({ entrepriseId, posture: "client" });
+    }
+
     // ===== HARD DELETE (IRREVERSIBLE) =====
-    // Transaction: DELETE arborescence + adhesion + user
+    // Transaction: DELETE arborescence + toutes les adhésions + attributions de sites + user
     await db.transaction(async (tx) => {
       // 1. Delete arborescence (closure table)
       await deleteUserArborescence({ entrepriseId, userId, tx });
 
-      // 2. Delete adhesion
+      // 2. Delete site attributions
+      await tx
+        .delete(userClientSiteAttributions)
+        .where(eq(userClientSiteAttributions.userId, userId));
+      await tx
+        .delete(userPrestataireSiteAttributions)
+        .where(eq(userPrestataireSiteAttributions.userId, userId));
+
+      // 3. Delete all adhesions
       await tx
         .delete(userClientAdhesions)
-        .where(
-          and(
-            eq(userClientAdhesions.userId, userId),
-            eq(userClientAdhesions.entrepriseId, entrepriseId),
-          ),
-        );
+        .where(eq(userClientAdhesions.userId, userId));
+      await tx
+        .delete(userPrestataireAdhesions)
+        .where(eq(userPrestataireAdhesions.userId, userId));
+      await tx
+        .delete(userPlateformeAdhesions)
+        .where(eq(userPlateformeAdhesions.userId, userId));
 
-      // 3. Delete user
+      // 4. Delete user
       await tx.delete(user).where(eq(user.id, userId));
     });
 

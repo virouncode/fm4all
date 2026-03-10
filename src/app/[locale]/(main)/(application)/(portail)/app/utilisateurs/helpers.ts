@@ -182,13 +182,17 @@ export function getAvailableRolesByPostureAndLevel(
   const rolesByPosture = getAvailableRolesByPosture(posture);
 
   // Étape 2 : Filtrer par niveau de roleAdhesion
-  // Platform super admin, Admin et Manager : Aucune restriction supplémentaire
+  // Platform super admin et Admin : tous les rôles (inclus responsable_site)
   if (
     rolePlateformeAdhesion === "super_admin_plateforme" ||
-    roleAdhesion === "admin" ||
-    roleAdhesion === "manager"
+    roleAdhesion === "admin"
   ) {
     return rolesByPosture;
+  }
+
+  // Manager : tous les rôles SAUF responsable_site (réservé admin, §5)
+  if (roleAdhesion === "manager") {
+    return rolesByPosture.filter((role) => role !== "responsable_site");
   }
 
   // Collaborateur : UNIQUEMENT demandeur_site et observateur_site (délégation locale)
@@ -218,13 +222,17 @@ export function getAvailableRolesByPosturePrestataire(
     "intervenant_site",
   ];
 
-  // Plateforme, admin, manager → tous les rôles
+  // Plateforme, admin → tous les rôles
   if (
     rolePlateformeAdhesion === "super_admin_plateforme" ||
-    roleAdhesion === "admin" ||
-    roleAdhesion === "manager"
+    roleAdhesion === "admin"
   ) {
     return allPrestataireRoles;
+  }
+
+  // Manager → tous les rôles sauf responsable_site (réservé admin, §5)
+  if (roleAdhesion === "manager") {
+    return allPrestataireRoles.filter((role) => role !== "responsable_site");
   }
 
   // Collaborateur → pas de responsable_site (délégation locale uniquement)
@@ -272,4 +280,5 @@ export const roleColors: Record<string, string> = {
   responsable_site: "bg-purple-100 text-purple-800",
   demandeur_site: "bg-green-100 text-green-800",
   observateur_site: "bg-gray-100 text-gray-800",
+  intervenant_site: "bg-blue-100 text-blue-800",
 };

@@ -102,6 +102,13 @@ export const insertUserSiteAttributionAction = actionClient
     else if (currentUserLevel === 2) {
       assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas vous attribuer un rôle sur un site.");
 
+      // Le manager ne peut pas attribuer responsable_site (réservé admin, §5)
+      if (parsedInput.role === "responsable_site") {
+        throw errors.forbidden(
+          "Seul un administrateur peut attribuer le rôle responsable_site.",
+        );
+      }
+
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
         entrepriseId: parsedInput.entrepriseId,
@@ -169,6 +176,20 @@ export const insertUserSiteAttributionAction = actionClient
       throw errors.unauthorized("Vous n'avez pas les permissions nécessaires");
     }
 
+    // §10 — Vérifier que la cible a une adhésion active dans l'entreprise
+    const targetAdhesion = await db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, parsedInput.userId),
+        eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+    });
+    if (!targetAdhesion) {
+      throw errors.forbidden(
+        "L'utilisateur cible n'est pas membre actif de cette entreprise.",
+      );
+    }
+
     // Vérifier qu'aucun autre rôle n'existe déjà pour ce site (contrainte: un rôle par site)
     const existingAttribution = await db.query.userClientSiteAttributions.findFirst({
       where: and(
@@ -190,6 +211,7 @@ export const insertUserSiteAttributionAction = actionClient
       .values({
         userId: parsedInput.userId,
         siteId: parsedInput.siteId,
+        mode: parsedInput.mode,
         role: parsedInput.role,
         scope: parsedInput.scope,
         entrepriseId: parsedInput.entrepriseId,
@@ -237,6 +259,13 @@ export const bulkInsertUserSiteAttributionsAction = actionClient
     // Voie 2: Manager → Validations strictes
     else if (currentUserLevel === 2) {
       assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas vous attribuer des rôles sur des sites.");
+
+      // Le manager ne peut pas attribuer responsable_site (réservé admin, §5)
+      if (parsedInput.role === "responsable_site") {
+        throw errors.forbidden(
+          "Seul un administrateur peut attribuer le rôle responsable_site.",
+        );
+      }
 
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
@@ -307,6 +336,20 @@ export const bulkInsertUserSiteAttributionsAction = actionClient
       }
     } else {
       throw errors.unauthorized("Vous n'avez pas les permissions nécessaires");
+    }
+
+    // §10 — Vérifier que la cible a une adhésion active dans l'entreprise
+    const targetAdhesionBulk = await db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, parsedInput.userId),
+        eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+    });
+    if (!targetAdhesionBulk) {
+      throw errors.forbidden(
+        "L'utilisateur cible n'est pas membre actif de cette entreprise.",
+      );
     }
 
     // Bulk insert
@@ -406,6 +449,13 @@ export const bulkInsertMixedAttributionsAction = actionClient
     else if (currentUserLevel === 2) {
       assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas vous attribuer des rôles sur des sites.");
 
+      // Le manager ne peut pas attribuer responsable_site (réservé admin, §5)
+      if (roles.includes("responsable_site")) {
+        throw errors.forbidden(
+          "Seul un administrateur peut attribuer le rôle responsable_site.",
+        );
+      }
+
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
         entrepriseId: parsedInput.entrepriseId,
@@ -480,13 +530,17 @@ export const bulkInsertMixedAttributionsAction = actionClient
       throw errors.unauthorized("Vous n'avez pas les permissions nécessaires");
     }
 
-    // Validation contrainte mode/scope : mode=exclure MUST avoir scope=self
-    const invalidExclusions = parsedInput.attributions.filter(
-      (a) => a.mode === "exclure" && a.scope !== "self",
-    );
-    if (invalidExclusions.length > 0) {
-      throw errors.validation(
-        "Les exclusions (mode=exclure) doivent avoir scope=self.",
+    // §10 — Vérifier que la cible a une adhésion active dans l'entreprise
+    const targetAdhesionMixed = await db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, parsedInput.userId),
+        eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+    });
+    if (!targetAdhesionMixed) {
+      throw errors.forbidden(
+        "L'utilisateur cible n'est pas membre actif de cette entreprise.",
       );
     }
 
@@ -929,6 +983,13 @@ export const updateUserSiteAttributionAction = actionClient
     else if (currentUserLevel === 2) {
       assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas modifier vos propres attributions.");
 
+      // Le manager ne peut pas attribuer responsable_site (réservé admin, §5)
+      if (parsedInput.role === "responsable_site") {
+        throw errors.forbidden(
+          "Seul un administrateur peut attribuer le rôle responsable_site.",
+        );
+      }
+
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
         entrepriseId: attribution.entrepriseId,
@@ -1014,13 +1075,6 @@ export const updateUserSiteAttributionAction = actionClient
           "Impossible de modifier ce rôle : le site doit toujours avoir au moins un responsable. Ajoutez un autre responsable avant de modifier ce rôle.",
         );
       }
-    }
-
-    // Validation contrainte mode/scope : mode=exclure MUST avoir scope=self
-    if (parsedInput.mode === "exclure" && parsedInput.scope !== "self") {
-      throw errors.validation(
-        "Les exclusions (mode=exclure) doivent avoir scope=self.",
-      );
     }
 
     // Update

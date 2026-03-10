@@ -35,11 +35,15 @@ import { UsersTree } from "./UsersTree";
 export function UsersClient() {
   const entreprise = useAppStore((state) => state.entreprise);
   const currentUser = useAppStore((state) => state.user);
-  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
+  const roleClientAdhesion = useAppStore((state) => state.roleClientAdhesion);
+  const rolePrestataireAdhesion = useAppStore((state) => state.rolePrestataireAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
   const postureActive = useAppStore((state) => state.postureActive);
+
+  const currentUserRole =
+    postureActive === "prestataire" ? rolePrestataireAdhesion : roleClientAdhesion;
   const searchParams = useSearchParams();
 
   // Déterminer si l'utilisateur peut créer des utilisateurs RACINE

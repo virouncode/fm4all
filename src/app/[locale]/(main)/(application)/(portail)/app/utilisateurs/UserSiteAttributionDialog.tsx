@@ -42,7 +42,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm, useFormState } from "react-hook-form";
+import { useForm, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { AttributionSitesTree } from "./AttributionSitesTree";
@@ -60,6 +60,7 @@ type UserSiteAttributionDialogProps = {
   userId: string;
   entrepriseId: string;
   onSuccess: () => void;
+  defaultClientId?: string;
 };
 
 export function UserSiteAttributionDialog({
@@ -68,6 +69,7 @@ export function UserSiteAttributionDialog({
   userId,
   entrepriseId,
   onSuccess,
+  defaultClientId,
 }: UserSiteAttributionDialogProps) {
   const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
   const [allSites, setAllSites] = useState<SelectSiteType[]>([]);
@@ -79,9 +81,7 @@ export function UserSiteAttributionDialog({
   const [tree, setTree] = useState<SiteTreeNode[]>([]);
 
   // Pour posture prestataire : liste de clients + client sélectionné
-  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>(
-    [],
-  );
+  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>([]);
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [loadingClients, setLoadingClients] = useState(false);
 
@@ -142,7 +142,15 @@ export function UserSiteAttributionDialog({
   });
 
   const { isSubmitting } = useFormState({ control: form.control });
-  const selectedScope = form.watch("scope");
+  const selectedScope = useWatch({ control: form.control, name: "scope" });
+
+  // Pré-sélectionner le client si fourni à l'ouverture
+  useEffect(() => {
+    if (open && isPrestataire && defaultClientId) {
+      setSelectedClientId(defaultClientId);
+      form.setValue("clientId", defaultClientId);
+    }
+  }, [open, isPrestataire, defaultClientId, form]);
 
   // Charger les clients (posture prestataire uniquement)
   useEffect(() => {
@@ -152,7 +160,10 @@ export function UserSiteAttributionDialog({
       const result = await getMesClientsAction({ entrepriseId });
       if (result?.data?.clients) {
         setClients(
-          result.data.clients.map((c) => ({ id: c.id, nom: c.nom })),
+          result.data.clients.map((c) => ({
+            id: c.id,
+            nom: c.nom,
+          })),
         );
       }
       setLoadingClients(false);
@@ -467,6 +478,7 @@ export function UserSiteAttributionDialog({
               </RhfControlledSelect>
             )}
 
+
             {/* Role Select */}
             <RhfControlledSelect
               name="role"
@@ -509,6 +521,11 @@ export function UserSiteAttributionDialog({
                     {isPrestataire
                       ? "Ce client n'a pas encore de sites."
                       : "Aucun site disponible"}
+                  </p>
+                ) : allSites.length > 0 &&
+                  allSites.every((s) => getSiteState(s.id) === "disabled") ? (
+                  <p className="text-muted-foreground text-sm">
+                    Tous les sites disponibles sont déjà attribués à cet utilisateur.
                   </p>
                 ) : (
                   <AttributionSitesTree

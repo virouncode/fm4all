@@ -6,12 +6,17 @@ import { Button } from "@/components/ui/button";
 import { roleClientAdhesionCT, rolePlateformeAdhesionCT } from "@/constants/codeTables";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { cn } from "@/lib/utils";
+import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
+import { getUserPrestataireSiteAttributionsAction } from "@/server/actions/userPrestataireSiteAttributionsActions";
 import { getUserClientSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { UserWithAdhesionType } from "@/zod-schemas/user.schema";
 import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
-import { SelectUserSiteAttributionWithInheritanceType } from "@/zod-schemas/userSiteAttribution.schema";
+import {
+  SelectUserPrestataireSiteAttributionWithInheritanceType,
+  SelectUserSiteAttributionWithInheritanceType,
+} from "@/zod-schemas/userSiteAttribution.schema";
 import {
   Calendar,
   Mail,
@@ -25,6 +30,7 @@ import {
 import { useEffect, useState } from "react";
 import { UserSiteAttributionDialog } from "./UserSiteAttributionDialog";
 import { UserSiteAttributionsList } from "./UserSiteAttributionsList";
+import { UserPrestataireSiteAttributionsList } from "./UserPrestataireSiteAttributionsList";
 
 type UserDetailsProps = {
   user: UserWithAdhesionType;
@@ -48,12 +54,25 @@ export function UserDetails({
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Site attributions state
+  // Site attributions state (posture client)
   const [attributions, setAttributions] = useState<
     SelectUserSiteAttributionWithInheritanceType[]
   >([]);
-  const [allSites, setAllSites] = useState<SelectSiteType[]>([]); // Tous les sites pour construire l'arbre
+  const [allSites, setAllSites] = useState<SelectSiteType[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Site attributions state (posture prestataire)
+  const [prestataireClients, setPrestataireClients] = useState<
+    Array<{ id: string; nom: string }>
+  >([]);
+  const [selectedPrestataireClientId, setSelectedPrestataireClientId] =
+    useState<string>("");
+  const [prestataireAttributions, setPrestataireAttributions] = useState<
+    SelectUserPrestataireSiteAttributionWithInheritanceType[]
+  >([]);
+  const [prestataireAllSites, setPrestataireAllSites] = useState<
+    SelectSiteType[]
+  >([]);
 
   // Déterminer si on regarde son propre profil
   const isViewingSelf = currentUser?.id === user.id;
@@ -124,9 +143,9 @@ export function UserDetails({
     }
   }, [user.avatar?.storageKey, entreprise?.id, refreshKey]);
 
-  // Fetch attributions on user change
+  // Fetch attributions on user change (posture client uniquement — prestataire gère via dialog par client)
   useEffect(() => {
-    if (!entreprise?.id) return;
+    if (!entreprise?.id || postureActive !== "client") return;
 
     const fetchAttributions = async () => {
       try {
@@ -148,11 +167,11 @@ export function UserDetails({
     };
 
     fetchAttributions();
-  }, [user.id, entreprise?.id]);
+  }, [user.id, entreprise?.id, postureActive]);
 
-  // Refresh callback
+  // Refresh callback (posture client uniquement)
   const handleAttributionChange = async () => {
-    if (!entreprise?.id) return;
+    if (!entreprise?.id || postureActive !== "client") return;
 
     try {
       const result = await getUserClientSiteAttributionsAction({
@@ -170,6 +189,73 @@ export function UserDetails({
     } catch {
       // silently ignore
     }
+  };
+
+  // Fetch clients prestataire (posture prestataire uniquement)
+  useEffect(() => {
+    if (!entreprise?.id || postureActive !== "prestataire") return;
+
+    getMesClientsAction({ entrepriseId: entreprise.id })
+      .then((result) => {
+        if (result?.data?.clients) {
+          setPrestataireClients(
+            result.data.clients.map((c) => ({ id: c.id, nom: c.nom })),
+          );
+        }
+      })
+      .catch(() => setPrestataireClients([]));
+  }, [entreprise?.id, postureActive]);
+
+  // Reset client sélectionné quand l'utilisateur change
+  useEffect(() => {
+    setSelectedPrestataireClientId("");
+    setPrestataireAttributions([]);
+    setPrestataireAllSites([]);
+  }, [user.id]);
+
+  // Fetch attributions prestataire quand le client sélectionné change
+  useEffect(() => {
+    if (!selectedPrestataireClientId || postureActive !== "prestataire") return;
+
+    getUserPrestataireSiteAttributionsAction({
+      userId: user.id,
+      clientEntrepriseId: selectedPrestataireClientId,
+    })
+      .then((result) => {
+        if (result?.data) {
+          setPrestataireAttributions(result.data.attributions);
+          setPrestataireAllSites(result.data.allSites);
+        } else {
+          setPrestataireAttributions([]);
+          setPrestataireAllSites([]);
+        }
+      })
+      .catch(() => {
+        setPrestataireAttributions([]);
+        setPrestataireAllSites([]);
+      });
+  }, [user.id, selectedPrestataireClientId, postureActive]);
+
+  const handlePrestataireAttributionChange = () => {
+    if (!selectedPrestataireClientId) return;
+
+    getUserPrestataireSiteAttributionsAction({
+      userId: user.id,
+      clientEntrepriseId: selectedPrestataireClientId,
+    })
+      .then((result) => {
+        if (result?.data) {
+          setPrestataireAttributions(result.data.attributions);
+          setPrestataireAllSites(result.data.allSites);
+        } else {
+          setPrestataireAttributions([]);
+          setPrestataireAllSites([]);
+        }
+      })
+      .catch(() => {
+        setPrestataireAttributions([]);
+        setPrestataireAllSites([]);
+      });
   };
 
   return (
@@ -217,7 +303,7 @@ export function UserDetails({
               )}
             </div>
 
-            {postureActive !== "plateforme" && (
+            {postureActive === "client" && (
               <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
                 <MapPin className="h-3 w-3 shrink-0" />
                 <span>
@@ -309,25 +395,53 @@ export function UserDetails({
         </div>
       </div>
 
-      {/* Site Attributions — masqué en posture plateforme */}
+      {/* Site Attributions — visible en posture client et prestataire (§5a/5b regles_metier) */}
       {entreprise?.id && postureActive !== "plateforme" && (
         <>
-          <UserSiteAttributionsList
-            attributions={attributions}
-            allSites={allSites}
-            userId={user.id}
-            canEdit={canManageSiteAttributions}
-            onAttributionDeleted={handleAttributionChange}
-            onAddClick={() => setDialogOpen(true)}
-          />
+          {postureActive === "client" ? (
+            <>
+              <UserSiteAttributionsList
+                attributions={attributions}
+                allSites={allSites}
+                userId={user.id}
+                canEdit={canManageSiteAttributions}
+                onAttributionDeleted={handleAttributionChange}
+                onAddClick={() => setDialogOpen(true)}
+              />
+              <UserSiteAttributionDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                userId={user.id}
+                entrepriseId={entreprise.id}
+                onSuccess={handleAttributionChange}
+              />
+            </>
+          ) : (
+            /* Posture prestataire : sélecteur de client intégré dans la card */
+            <>
+              <UserPrestataireSiteAttributionsList
+                attributions={prestataireAttributions}
+                allSites={prestataireAllSites}
+                userId={user.id}
+                clientEntrepriseId={selectedPrestataireClientId}
+                canEdit={canManageSiteAttributions}
+                onAttributionDeleted={handlePrestataireAttributionChange}
+                onAddClick={() => setDialogOpen(true)}
+                clients={prestataireClients}
+                selectedClientId={selectedPrestataireClientId}
+                onClientChange={setSelectedPrestataireClientId}
+              />
 
-          <UserSiteAttributionDialog
-            open={dialogOpen}
-            onOpenChange={setDialogOpen}
-            userId={user.id}
-            entrepriseId={entreprise.id}
-            onSuccess={handleAttributionChange}
-          />
+              <UserSiteAttributionDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                userId={user.id}
+                entrepriseId={entreprise.id}
+                onSuccess={handlePrestataireAttributionChange}
+                defaultClientId={selectedPrestataireClientId}
+              />
+            </>
+          )}
         </>
       )}
     </div>

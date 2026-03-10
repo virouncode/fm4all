@@ -86,7 +86,7 @@ export async function getUserById(userId: string) {
 }
 
 /**
- * CHECK: User belongs to entreprise (via adhesion)
+ * CHECK: User belongs to entreprise (via any adhesion — client OR prestataire)
  */
 export async function userBelongsToEntreprise({
   userId,
@@ -95,18 +95,30 @@ export async function userBelongsToEntreprise({
   userId: string;
   entrepriseId: string;
 }): Promise<boolean> {
-  const [row] = await db
-    .select()
-    .from(userClientAdhesions)
-    .where(
-      and(
-        eq(userClientAdhesions.userId, userId),
-        eq(userClientAdhesions.entrepriseId, entrepriseId),
-      ),
-    )
-    .limit(1);
+  const [[clientRow], [prestataireRow]] = await Promise.all([
+    db
+      .select({ id: userClientAdhesions.userId })
+      .from(userClientAdhesions)
+      .where(
+        and(
+          eq(userClientAdhesions.userId, userId),
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+        ),
+      )
+      .limit(1),
+    db
+      .select({ id: userPrestataireAdhesions.userId })
+      .from(userPrestataireAdhesions)
+      .where(
+        and(
+          eq(userPrestataireAdhesions.userId, userId),
+          eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        ),
+      )
+      .limit(1),
+  ]);
 
-  return !!row;
+  return !!clientRow || !!prestataireRow;
 }
 
 /**

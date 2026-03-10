@@ -5,9 +5,10 @@ import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { adhesionStatutCT, roleClientAdhesionCT } from "@/constants/codeTables";
+import { adhesionStatutCT, roleClientAdhesionCT, rolePrestataireAdhesionCT, rolePlateformeAdhesionCT } from "@/constants/codeTables";
 import { useDebounce } from "@/hooks/use-debounce";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { useAppStore } from "@/stores/application/appStore";
 import {
   usersQueryFrontendSchema,
   type UsersQueryFrontendType,
@@ -22,6 +23,17 @@ export function UsersFiltersForm() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const postureActive = useAppStore((state) => state.postureActive);
+
+  // En posture plateforme le backend ignore roleAdhesion — cacher ce filtre
+  const showRoleFilter = postureActive !== "plateforme";
+
+  const roleCT =
+    postureActive === "prestataire"
+      ? rolePrestataireAdhesionCT
+      : postureActive === "plateforme"
+        ? rolePlateformeAdhesionCT
+        : roleClientAdhesionCT;
 
   // Initialize form from URL
   const form = useForm<UsersQueryFrontendType>({
@@ -95,7 +107,7 @@ export function UsersFiltersForm() {
   return (
     <div className="space-y-6">
       <Form {...form}>
-        <form className="grid grid-cols-3 gap-4">
+        <form className={`grid gap-4 ${showRoleFilter ? "grid-cols-3" : "grid-cols-2"}`}>
           <RhfInput
             label="Recherche"
             name="search"
@@ -104,20 +116,22 @@ export function UsersFiltersForm() {
             withError={false}
           />
 
-          <RhfControlledSelect
-            label="Rôle"
-            name="roleAdhesion"
-            className="col-span-1"
-            selectClassName="w-full"
-            withError={false}
-          >
-            <SelectItem value="all">Tous</SelectItem>
-            {roleClientAdhesionCT.map((r) => (
-              <SelectItem key={r.code} value={r.code}>
-                {r.name}
-              </SelectItem>
-            ))}
-          </RhfControlledSelect>
+          {showRoleFilter && (
+            <RhfControlledSelect
+              label="Rôle"
+              name="roleAdhesion"
+              className="col-span-1"
+              selectClassName="w-full"
+              withError={false}
+            >
+              <SelectItem value="all">Tous</SelectItem>
+              {roleCT.map((r) => (
+                <SelectItem key={r.code} value={r.code}>
+                  {r.name}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
+          )}
 
           <RhfControlledSelect
             label="Statut"
