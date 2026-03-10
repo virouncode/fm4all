@@ -7,7 +7,7 @@ import {
   type RolePrestataireAttributionSiteType,
   selectUserPrestataireSiteAttributionSchema,
 } from "@/zod-schemas/userSiteAttribution.schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, ne } from "drizzle-orm";
 import { z } from "zod";
 
 /**
@@ -351,6 +351,88 @@ export async function getAllPrestataireSiteIds({
   }
 
   // Retirer les exclusions explicites
+  if (siteIds.size > 0) {
+    const excludeConditions = clientEntrepriseId
+      ? and(
+          eq(userPrestataireSiteAttributions.userId, userId),
+          eq(userPrestataireSiteAttributions.mode, "exclure"),
+          eq(userPrestataireSiteAttributions.entrepriseId, clientEntrepriseId),
+        )
+      : and(
+          eq(userPrestataireSiteAttributions.userId, userId),
+          eq(userPrestataireSiteAttributions.mode, "exclure"),
+        );
+
+    const excludeRows = await db
+      .select({ siteId: userPrestataireSiteAttributions.siteId })
+      .from(userPrestataireSiteAttributions)
+      .where(excludeConditions);
+
+    for (const e of excludeRows) siteIds.delete(e.siteId);
+  }
+
+  return Array.from(siteIds);
+}
+
+/**
+ * Retourne tous les siteIds effectivement attribués à un utilisateur prestataire,
+ * en excluant les sites où le rôle est "intervenant_site".
+ * Utilisé pour les permissions devis/devisDemandes (intervenant_site → ❌).
+ */
+export async function getNonIntervenantPrestataireSiteIds({
+  userId,
+  clientEntrepriseId,
+}: {
+  userId: string;
+  clientEntrepriseId?: string;
+}): Promise<string[]> {
+  const inclureConditions = clientEntrepriseId
+    ? and(
+        eq(userPrestataireSiteAttributions.userId, userId),
+        eq(userPrestataireSiteAttributions.mode, "inclure"),
+        eq(userPrestataireSiteAttributions.entrepriseId, clientEntrepriseId),
+        ne(userPrestataireSiteAttributions.role, "intervenant_site"),
+      )
+    : and(
+        eq(userPrestataireSiteAttributions.userId, userId),
+        eq(userPrestataireSiteAttributions.mode, "inclure"),
+        ne(userPrestataireSiteAttributions.role, "intervenant_site"),
+      );
+
+  const inclureRows = await db
+    .select({
+      siteId: userPrestataireSiteAttributions.siteId,
+      scope: userPrestataireSiteAttributions.scope,
+      entrepriseId: userPrestataireSiteAttributions.entrepriseId,
+    })
+    .from(userPrestataireSiteAttributions)
+    .where(inclureConditions);
+
+  const siteIds = new Set(inclureRows.map((r) => r.siteId));
+
+  const subtreeRows = inclureRows.filter((r) => r.scope === "subtree");
+  if (subtreeRows.length > 0) {
+    const byClient = new Map<string, string[]>();
+    for (const row of subtreeRows) {
+      if (!byClient.has(row.entrepriseId)) byClient.set(row.entrepriseId, []);
+      byClient.get(row.entrepriseId)!.push(row.siteId);
+    }
+    for (const [ceid, ancestorIds] of byClient) {
+      const descendants = await db
+        .select({ descendantId: sitesArborescence.descendantId })
+        .from(sitesArborescence)
+        .where(
+          and(
+            inArray(sitesArborescence.ancetreId, ancestorIds),
+            eq(sitesArborescence.entrepriseId, ceid),
+          ),
+        );
+      for (const d of descendants) {
+        if (d.descendantId) siteIds.add(d.descendantId);
+      }
+    }
+  }
+
   if (siteIds.size > 0) {
     const excludeConditions = clientEntrepriseId
       ? and(

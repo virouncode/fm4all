@@ -22,7 +22,7 @@ import {
   getActivePosture,
   getEffectivePlateformeRole,
 } from "@/server/utils/permissions.utils";
-import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
+import { getNonIntervenantPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import {
   assertDevisDemandeOwnership,
   canUserCreateDevisDemande,
@@ -99,7 +99,7 @@ export const getDevisDemandesAction = actionClient
       // Scope sites : admin prestataire → undefined (aucune restriction), sinon attribués
       let scopeSiteIds: string[] | undefined = undefined;
       if (prestataireAdhesion.role !== "admin") {
-        scopeSiteIds = await getAllPrestataireSiteIds({ userId: currentUser.id });
+        scopeSiteIds = await getNonIntervenantPrestataireSiteIds({ userId: currentUser.id });
       }
 
       return getDevisDemandesPaginatedForPrestataire({

@@ -1,8 +1,5 @@
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
-import { db } from "@/db";
-import { devis } from "@/db/schema/devis";
-import { eq } from "drizzle-orm";
 import { getMesClients } from "@/server/queries/clientServiceExecutions.query";
 import {
   getDevisDemandeAttachments,
@@ -65,8 +62,14 @@ export default async function DevisDemandeDetailPage({
       const myClients = await getMesClients(prestataireAdhesion.entrepriseId);
       const clientIds = myClients.map((c) => c.id);
       if (clientIds.includes(demande.demandeurEntrepriseId)) {
-        entrepriseId = prestataireAdhesion.entrepriseId;
-        posture = "prestataire";
+        // D07: vérifier que le serviceId de la demande correspond aux services du prestataire
+        const { getServicesByPrestataire } = await import("@/server/queries/services.query");
+        const prestataireServices = await getServicesByPrestataire(prestataireAdhesion.entrepriseId);
+        const prestataireServiceIds = prestataireServices.map((s) => s.id);
+        if (demande.serviceId && prestataireServiceIds.includes(demande.serviceId)) {
+          entrepriseId = prestataireAdhesion.entrepriseId;
+          posture = "prestataire";
+        }
       }
     }
   } else {
@@ -87,17 +90,12 @@ export default async function DevisDemandeDetailPage({
   let permissions: DevisDemandePermissionsType;
 
   if (posture === "plateforme") {
-    const [linkedDevis] = await db
-      .select({ id: devis.id })
-      .from(devis)
-      .where(eq(devis.devisDemandeId, demandeId))
-      .limit(1);
     permissions = {
       canView: true,
-      canCreate: true,
-      canEdit: true,
-      canDelete: !linkedDevis,
-      canChangeStatut: true,
+      canCreate: false,
+      canEdit: false,
+      canDelete: false,
+      canChangeStatut: false,
     };
   } else if (posture === "prestataire") {
     permissions = {

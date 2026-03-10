@@ -5,18 +5,20 @@ import { user } from "@/db/schema/auth";
 import { devis, devisLignes, devisNumeroSeq } from "@/db/schema/devis";
 import { documents, documentsLinks } from "@/db/schema/documents";
 import { sitesArborescence } from "@/db/schema/sites";
-import { userClientSiteAttributions } from "@/db/schema/users";
+import { userClientSiteAttributions, userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import { getDevisById, getDevisPaginated } from "@/server/queries/devis.query";
-import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion, hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
 import { promoteS3Key } from "@/server/s3/s3";
 import {
   canUserEditDevis,
   canUserEmettreDevis,
 } from "@/server/utils/devisPermissions.utils";
-import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { getNonIntervenantPrestataireSiteIds, getUserPrestataireSiteRole } from "@/server/queries/userPrestataireSiteAttributions.query";
+import { getAccessibleSiteIdsForUser } from "@/server/utils/devisDemandesPermissions.utils";
+import { getActivePosture, getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   devisQuerySchema,
@@ -30,7 +32,7 @@ import {
   updateDevisLigneSchema,
   updateDevisSchema,
 } from "@/zod-schemas/devis.schema";
-import { and, asc, eq, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { entreprises } from "@/db/schema/entreprises";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
@@ -58,7 +60,40 @@ export const getDevisAction = actionClient
         entrepriseId,
       );
       if (!adhesion) throw errors.forbidden("Accès refusé.");
-      scopeCondition = sql`(${devis.emetteurEntrepriseId} = ${entrepriseId} OR ${devis.proprietaireEntrepriseId} = ${entrepriseId})`;
+
+      const baseScope = sql`(${devis.emetteurEntrepriseId} = ${entrepriseId} OR ${devis.proprietaireEntrepriseId} = ${entrepriseId})`;
+      const posture = await getActivePosture();
+
+      if (posture === "prestataire") {
+        const prestataireAdh = await db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        });
+        if (prestataireAdh?.role !== "admin") {
+          const siteIds = await getNonIntervenantPrestataireSiteIds({ userId: currentUser.id });
+          if (siteIds.length === 0) return { items: [], total: 0 };
+          scopeCondition = and(baseScope, inArray(devis.siteId, siteIds));
+        } else {
+          scopeCondition = baseScope;
+        }
+      } else {
+        // client ou défaut
+        const clientAdh = await getUserClientAdhesion({ userId: currentUser.id, entrepriseId });
+        if (clientAdh?.role !== "admin") {
+          const siteIds = await getAccessibleSiteIdsForUser({ userId: currentUser.id, entrepriseId });
+          if (siteIds !== null && siteIds.length === 0) return { items: [], total: 0 };
+          if (siteIds !== null) {
+            scopeCondition = and(baseScope, inArray(devis.siteId, siteIds));
+          } else {
+            scopeCondition = baseScope;
+          }
+        } else {
+          scopeCondition = baseScope;
+        }
+      }
     }
 
     return getDevisPaginated(
@@ -154,6 +189,25 @@ export const insertDevisAction = actionClient
       throw errors.forbidden(
         "La plateforme ne peut pas créer de devis directement.",
       );
+
+    // D08: vérification rôle prestataire (observateur_site/intervenant_site → ❌)
+    const prestataireAdhCreate = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, currentUser.id),
+        eq(userPrestataireAdhesions.entrepriseId, parsedInput.emetteurEntrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    });
+    if (prestataireAdhCreate && prestataireAdhCreate.role !== "admin") {
+      const siteRoleCreate = await getUserPrestataireSiteRole({
+        userId: currentUser.id,
+        siteId: parsedInput.siteId,
+        clientEntrepriseId: parsedInput.proprietaireEntrepriseId,
+      });
+      if (!siteRoleCreate || siteRoleCreate === "observateur_site" || siteRoleCreate === "intervenant_site") {
+        throw errors.forbidden("Vous n'avez pas les droits pour créer un devis sur ce site.");
+      }
+    }
 
     // L'utilisateur doit être dans l'entreprise émettrice
     const hasAccess = await hasAccessToEntreprise(
@@ -258,6 +312,41 @@ export const deleteDevisAction = actionClient
       throw errors.forbidden(
         "Suppression impossible : le devis est émis ou vous n'avez pas les droits.",
       );
+
+    // D09: demandeur_site ne peut supprimer que ses propres devis
+    const [devisForDelete] = await db
+      .select({
+        createdById: devis.createdById,
+        emetteurEntrepriseId: devis.emetteurEntrepriseId,
+        siteId: devis.siteId,
+        proprietaireEntrepriseId: devis.proprietaireEntrepriseId,
+      })
+      .from(devis)
+      .where(eq(devis.id, parsedInput.devisId))
+      .limit(1);
+
+    if (devisForDelete) {
+      const prestataireAdhDelete = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, devisForDelete.emetteurEntrepriseId),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
+      if (prestataireAdhDelete && prestataireAdhDelete.role !== "admin") {
+        const siteRoleDelete = await getUserPrestataireSiteRole({
+          userId: currentUser.id,
+          siteId: devisForDelete.siteId,
+          clientEntrepriseId: devisForDelete.proprietaireEntrepriseId,
+        });
+        if (siteRoleDelete === "demandeur_site" && devisForDelete.createdById !== currentUser.id) {
+          throw errors.forbidden("En tant que demandeur, vous ne pouvez supprimer que vos propres devis.");
+        }
+        if (!siteRoleDelete || siteRoleDelete === "observateur_site" || siteRoleDelete === "intervenant_site") {
+          throw errors.forbidden("Vous n'avez pas les droits pour supprimer ce devis.");
+        }
+      }
+    }
 
     await db.delete(devis).where(eq(devis.id, parsedInput.devisId));
     return { success: true };
@@ -456,6 +545,25 @@ export const saveDevisWithLignesAction = actionClient
         );
         if (!hasAccess) throw errors.forbidden("Accès refusé.");
 
+        // D08: vérification rôle prestataire pour modification
+        const prestataireAdhUpdate = await db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.entrepriseId, existing.emetteurEntrepriseId),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        });
+        if (prestataireAdhUpdate && prestataireAdhUpdate.role !== "admin") {
+          const siteRoleUpdate = await getUserPrestataireSiteRole({
+            userId: currentUser.id,
+            siteId: existing.siteId,
+            clientEntrepriseId: existing.proprietaireEntrepriseId,
+          });
+          if (!siteRoleUpdate || siteRoleUpdate === "observateur_site" || siteRoleUpdate === "intervenant_site") {
+            throw errors.forbidden("Vous n'avez pas les droits pour modifier ce devis.");
+          }
+        }
+
         const [updated] = await tx
           .update(devis)
           .set({
@@ -506,6 +614,25 @@ export const saveDevisWithLignesAction = actionClient
           throw errors.forbidden(
             "Vous ne pouvez pas créer un devis au nom de cette entreprise.",
           );
+
+        // D08: vérification rôle prestataire pour création
+        const prestataireAdhCreate2 = await db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.entrepriseId, parsedInput.emetteurEntrepriseId),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        });
+        if (prestataireAdhCreate2 && prestataireAdhCreate2.role !== "admin") {
+          const siteRoleCreate2 = await getUserPrestataireSiteRole({
+            userId: currentUser.id,
+            siteId: parsedInput.siteId,
+            clientEntrepriseId: parsedInput.proprietaireEntrepriseId,
+          });
+          if (!siteRoleCreate2 || siteRoleCreate2 === "observateur_site" || siteRoleCreate2 === "intervenant_site") {
+            throw errors.forbidden("Vous n'avez pas les droits pour créer un devis sur ce site.");
+          }
+        }
 
         const [inserted] = await tx
           .insert(devis)
@@ -576,6 +703,37 @@ export const emettreDevisAction = actionClient
     if (!canEmettre)
       throw errors.forbidden("Vous ne pouvez pas émettre ce devis.");
 
+    // D08b: vérification rôle prestataire pour émettre
+    const [devisForEmettre] = await db
+      .select({
+        emetteurEntrepriseId: devis.emetteurEntrepriseId,
+        siteId: devis.siteId,
+        proprietaireEntrepriseId: devis.proprietaireEntrepriseId,
+      })
+      .from(devis)
+      .where(eq(devis.id, parsedInput.devisId))
+      .limit(1);
+
+    if (devisForEmettre) {
+      const prestataireAdhEmettre = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, devisForEmettre.emetteurEntrepriseId),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
+      if (prestataireAdhEmettre && prestataireAdhEmettre.role !== "admin") {
+        const siteRoleEmettre = await getUserPrestataireSiteRole({
+          userId: currentUser.id,
+          siteId: devisForEmettre.siteId,
+          clientEntrepriseId: devisForEmettre.proprietaireEntrepriseId,
+        });
+        if (!siteRoleEmettre || siteRoleEmettre === "observateur_site" || siteRoleEmettre === "intervenant_site") {
+          throw errors.forbidden("Vous n'avez pas les droits pour émettre ce devis.");
+        }
+      }
+    }
+
     const updated = await db.transaction(async (tx) => {
       // Générer le numéro unique via la séquence PostgreSQL
       const seqResult = await tx.execute(
@@ -626,11 +784,32 @@ export const signerDevisAction = actionClient
     if (devisRow.statut !== "emis")
       throw errors.conflict("Le devis n'est pas émis.");
 
+    // D01: vérification expiration
+    if (devisRow.validTo && new Date() > devisRow.validTo)
+      throw errors.conflict("Ce devis est expiré et ne peut plus être signé.");
+
     const hasAccess = await hasAccessToEntreprise(
       currentUser.id,
       devisRow.proprietaireEntrepriseId,
     );
     if (!hasAccess) throw errors.forbidden("Accès refusé.");
+
+    // D02: vérification rôle (admin ou responsable_site uniquement)
+    const signerAdhesion = await getUserClientAdhesion({
+      userId: currentUser.id,
+      entrepriseId: devisRow.proprietaireEntrepriseId,
+    });
+    let canSign = signerAdhesion?.role === "admin";
+    if (!canSign) {
+      const signerSiteRole = await resolvePostureAwareSiteRole({
+        userId: currentUser.id,
+        siteId: devisRow.siteId,
+        entrepriseId: devisRow.proprietaireEntrepriseId,
+      });
+      canSign = signerSiteRole === "responsable_site";
+    }
+    if (!canSign)
+      throw errors.forbidden("Seuls les administrateurs ou responsables de site peuvent signer un devis.");
 
     const [updated] = await db
       .update(devis)
@@ -728,11 +907,32 @@ export const refuserDevisAction = actionClient
     if (devisRow.statut !== "emis")
       throw errors.conflict("Le devis n'est pas émis.");
 
+    // D01: vérification expiration
+    if (devisRow.validTo && new Date() > devisRow.validTo)
+      throw errors.conflict("Ce devis est expiré et ne peut plus être refusé.");
+
     const hasAccess = await hasAccessToEntreprise(
       currentUser.id,
       devisRow.proprietaireEntrepriseId,
     );
     if (!hasAccess) throw errors.forbidden("Accès refusé.");
+
+    // D02: vérification rôle (admin ou responsable_site uniquement)
+    const refuserAdhesion = await getUserClientAdhesion({
+      userId: currentUser.id,
+      entrepriseId: devisRow.proprietaireEntrepriseId,
+    });
+    let canRefuse = refuserAdhesion?.role === "admin";
+    if (!canRefuse) {
+      const refuserSiteRole = await resolvePostureAwareSiteRole({
+        userId: currentUser.id,
+        siteId: devisRow.siteId,
+        entrepriseId: devisRow.proprietaireEntrepriseId,
+      });
+      canRefuse = refuserSiteRole === "responsable_site";
+    }
+    if (!canRefuse)
+      throw errors.forbidden("Seuls les administrateurs ou responsables de site peuvent refuser un devis.");
 
     const [updated] = await db
       .update(devis)
