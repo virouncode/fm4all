@@ -560,7 +560,7 @@ const TACHE_TRANSITIONS: Record<
     | "annulee"
   )[]
 > = {
-  a_faire: ["en_cours", "non_applicable", "annulee"],
+  a_faire: ["en_cours", "non_honoree", "non_applicable", "annulee"],
   en_cours: ["terminee", "non_honoree", "non_applicable", "annulee"],
 };
 
@@ -1098,9 +1098,11 @@ export const updateAdHocTacheAction = actionClient
       );
     }
 
-    // Verrouiller si terminée
-    if (tache.statut === "terminee") {
-      throw errors.conflict("Impossible de modifier une tâche déjà terminée.");
+    // Verrouiller si statut final (terminee, annulee, non_honoree, non_applicable)
+    if (tache.statut !== "a_faire" && tache.statut !== "en_cours") {
+      throw errors.conflict(
+        "Impossible de modifier une tâche dont le statut est final (doit être à faire ou en cours).",
+      );
     }
 
     const [updated] = await db
@@ -1165,6 +1167,7 @@ export const deleteAdHocTacheAction = actionClient
       .select({
         id: occurrenceTaches.id,
         listeItemId: occurrenceTaches.listeItemId,
+        statut: occurrenceTaches.statut,
       })
       .from(occurrenceTaches)
       .where(
@@ -1180,48 +1183,27 @@ export const deleteAdHocTacheAction = actionClient
     // 4. Guard : uniquement les tâches ad-hoc
     if (tache.listeItemId !== null) {
       throw errors.conflict(
-        "Seules les tâches ad-hoc peuvent être supprimées. Utilisez \"non applicable\" pour les tâches de la checklist.",
+        "Seules les tâches ad-hoc peuvent être annulées. Utilisez \"non applicable\" pour les tâches de la checklist.",
       );
     }
 
-    // 5. Charger les documents liés (pour cleanup S3 + suppression orphelins)
-    const linkedDocs = await db
-      .select({
-        documentId: documentsLinks.documentId,
-        storageKey: documents.storageKey,
-      })
-      .from(documentsLinks)
-      .innerJoin(documents, eq(documents.id, documentsLinks.documentId))
-      .where(eq(documentsLinks.occurrenceTacheId, tacheId));
-
-    const documentIds = linkedDocs.map((d) => d.documentId);
-    const storageKeys = linkedDocs.map((d) => d.storageKey);
-
-    // 6. Transaction : supprimer la tâche (cascade FK → documentsLinks) + documents orphelins
-    await db.transaction(async (tx) => {
-      // Supprime la tâche (les documentsLinks sont cascade-supprimés par la FK)
-      await tx
-        .delete(occurrenceTaches)
-        .where(eq(occurrenceTaches.id, tacheId));
-
-      // Supprimer les documents orphelins
-      if (documentIds.length > 0) {
-        await tx
-          .delete(documents)
-          .where(inArray(documents.id, documentIds));
-      }
-    });
-
-    // 7. Cleanup S3 best-effort
-    for (const key of storageKeys) {
-      s3.send(
-        new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: key }),
-      ).catch(() => {
-        // Fichiers orphelins nettoyés par tâche de fond
-      });
+    // 5. Guard : uniquement si la tâche est encore active (a_faire ou en_cours)
+    if (tache.statut !== "a_faire" && tache.statut !== "en_cours") {
+      throw errors.conflict(
+        "Impossible d'annuler cette tâche : elle est déjà dans un état final.",
+      );
     }
 
-    return { tacheId };
+    // 6. Annulation logique — jamais de DELETE (règle doctrine)
+    const [updated] = await db
+      .update(occurrenceTaches)
+      .set({ statut: "annulee", updatedById: currentUser.id, updatedAt: new Date() })
+      .where(eq(occurrenceTaches.id, tacheId))
+      .returning();
+
+    if (!updated) throw errors.internal("Échec de l'annulation de la tâche.");
+
+    return { tache: updated };
   });
 
 // ==================== UPDATE TACHE ASSIGNEE ====================

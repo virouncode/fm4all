@@ -1102,7 +1102,7 @@ function TacheRow({
                 </span>
                 {isAdHoc &&
                   canManage &&
-                  tache.statut !== "terminee" &&
+                  (tache.statut === "a_faire" || tache.statut === "en_cours") &&
                   (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
                     <Button
                       variant="outline"
@@ -1117,13 +1117,14 @@ function TacheRow({
                 {isAdHoc &&
                   canManage &&
                   !isEditingAdHoc &&
+                  (tache.statut === "a_faire" || tache.statut === "en_cours") &&
                   (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setDeleteConfirmOpen(true)}
                       className="ml-1 h-5 w-5 flex-shrink-0 p-0 text-red-500 hover:text-red-600"
-                      title="Supprimer"
+                      title="Annuler la tâche"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
@@ -1345,6 +1346,16 @@ function TacheRow({
                     size="sm"
                     variant="outline"
                     className="h-6 px-2 text-xs"
+                    onClick={() => handleTransition("non_honoree")}
+                    disabled={buttonsDisabled}
+                    title={disabledTitle}
+                  >
+                    Non honorée
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 px-2 text-xs"
                     onClick={() => handleTransition("non_applicable")}
                     disabled={buttonsDisabled}
                     title={disabledTitle}
@@ -1367,6 +1378,16 @@ function TacheRow({
                       Terminer
                     </Button>
                   )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => handleTransition("non_honoree")}
+                    disabled={buttonsDisabled}
+                    title={disabledTitle}
+                  >
+                    Non honorée
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
@@ -1409,17 +1430,17 @@ function TacheRow({
         </div>
       )}
 
-      {/* AlertDialog suppression tâche ad-hoc */}
+      {/* AlertDialog annulation tâche ad-hoc */}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cette tâche ?</AlertDialogTitle>
+            <AlertDialogTitle>Annuler cette tâche ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action est irréversible. La tâche et ses pièces jointes seront définitivement supprimées.
+              La tâche sera marquée comme annulée. Elle restera visible dans la liste avec le statut &quot;annulée&quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Retour</AlertDialogCancel>
             <AlertDialogAction
               disabled={isDeleting}
               onClick={async (e) => {
@@ -1436,13 +1457,15 @@ function TacheRow({
                   toast.error(result.serverError.message);
                   return;
                 }
-                toast.success("Tâche supprimée.");
-                setDeleteConfirmOpen(false);
-                onAdHocDeleted(tache.id);
+                if (result?.data?.tache) {
+                  toast.success("Tâche annulée.");
+                  setDeleteConfirmOpen(false);
+                  onAdHocUpdated({ ...tache, ...result.data.tache });
+                }
               }}
               className="bg-red-600 hover:bg-red-700"
             >
-              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Supprimer"}
+              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Annuler la tâche"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
