@@ -2,6 +2,53 @@
 
 > **Note Importante**: Ce projet est en refonte. Les anciens fichiers (ex: providers de services individuels) ne doivent PAS être pris comme référence. Utilisez uniquement la nouvelle architecture décrite ci-dessous.
 
+> **RÈGLES MÉTIER DEVIS** : Toujours consulter [`docs/regles_metier.md`](docs/regles_metier.md) avant d'implémenter ou de modifier une permission sur les devis ou demandes de devis.
+
+---
+
+## ⛔ RÈGLE ABSOLUE — NE JAMAIS RÉINVENTER LA ROUE
+
+**Cette règle prime sur tout le reste. Le non-respect de cette règle est la source principale des bugs et divergences.**
+
+Avant d'écrire **la moindre ligne de code**, pour toute nouvelle feature ou sous-composant :
+
+1. **Identifier le module existant le plus proche** (ex: `/app/devis` ressemble à `/app/tickets`)
+2. **Lire le code de ce module** — table, dialogs de filtres, dialog de tri, colonnes, actions
+3. **Copier-coller le pattern exact**, adapter uniquement ce qui est strictement nécessaire
+4. **Ne rien inventer** : pas d'objet intermédiaire, pas de logique alternative, pas de "ça devrait marcher aussi"
+
+### Modules de référence par type de feature
+
+| Feature | Module de référence à lire EN PREMIER |
+|---------|---------------------------------------|
+| Table avec filtres + tri + infinite scroll | `/app/tickets` |
+| Formulaire create/edit en dialog | `/app/sites` |
+| Gestion hiérarchique | `/app/sites` (closure table) |
+| Permissions posture-aware | `/app/tickets` |
+| Upload fichiers / S3 | `/app/tickets/[ticketId]` |
+
+### Exemples de divergences à ne JAMAIS faire
+
+- ❌ Construire un objet `sortSearchParams = { serviceId: searchParams.serviceId }` au lieu de passer `searchParams` directement → bug string `"undefined"` dans l'URL
+- ❌ Utiliser `form.watch()` dans le render body au lieu de `useWatch()` → "Maximum update depth exceeded"
+- ❌ Construire un `<div relative>` autour d'un bouton pour un badge au lieu d'un `<span>` inline → badge mal positionné
+- ❌ Utiliser `Badge` en absolu au lieu de `<span className="... ml-1 rounded-full px-1.5 text-xs">` → idem
+- ❌ Créer un dialog de PJ avec deux sections séparées (existants en liste + section "ajouter") au lieu de copier exactement `EditAttachmentsDialog` (tickets) : `DialogTrigger asChild` + un seul `useFieldArray` + `RhfFileInput` pour TOUS les items + `useEffect → form.reset()` pour les URLs
+
+**En cas de doute** : demander "comment est-ce fait dans `/app/tickets` ?" et recopier exactement.
+
+### ⚠️ IMITER = COPIER-COLLER, PAS "S'INSPIRER"
+
+Quand on dit "imite `EditAttachmentsDialog`", cela signifie :
+1. **Ouvrir le fichier** et le lire entièrement
+2. **Copier la structure JSX exacte** : même `DialogTrigger asChild`, mêmes hooks dans le même ordre, même layout
+3. **Adapter uniquement** : le nom de l'action serveur appelée dans `onSubmit`, les props spécifiques
+4. **Ne rien ajouter** : pas de sections supplémentaires, pas d'états alternatifs, pas de logique "améliorée"
+
+"S'inspirer" = ré-inventer. Ce n'est pas acceptable. **Copier-coller puis adapter.**
+
+---
+
 ## Vue d'Ensemble du Projet
 
 ### Contexte Métier
@@ -1614,6 +1661,29 @@ useEffect(() => {
 ```
 
 **Symptôme** : Page bloquée en chargement lors de la navigation client-side (fonctionne au refresh)
+
+### ❌ JAMAIS construire un objet intermédiaire avec des propriétés `undefined` pour router.replace
+
+**BUG RÉEL** : Les valeurs `undefined` spreads dans un objet query `router.replace` sont sérialisées en la **string `"undefined"`** dans l'URL par next-intl. Ce string passe ensuite les gardes `if (value)` (truthy !) et atteint la DB.
+
+```typescript
+// ❌ FAUX — sortSearchParams avec des propriétés undefined explicites
+const sortSearchParams = {
+  statut: searchParams.statut,  // peut être undefined
+  serviceId: searchParams.serviceId,  // ❌ undefined → spreade comme clé explicite
+  search: searchParams.search,  // ❌ undefined → spreade comme clé explicite
+};
+router.replace({ query: { ...sortSearchParams, orderBy } });
+// → URL finale : ?serviceId=undefined&search=undefined  ← CORROMPU
+
+// ✅ CORRECT — Passer searchParams directement (comme dans /app/tickets)
+// Les clés absentes de l'URL ne sont simplement pas présentes dans l'objet
+router.replace({ query: { ...searchParams, orderBy } });
+```
+
+**Règle** : Pour les dialogs de tri, **toujours** passer `searchParams` directement depuis les props (comme `/app/tickets` le fait), sans construire d'objet intermédiaire. Si un cast TypeScript est nécessaire, utiliser `searchParams as Record<string, string | undefined>`.
+
+**Symptôme** : Erreur Drizzle `invalid input syntax for type uuid: "undefined"` — la string `"undefined"` est passée à une colonne UUID.
 
 ---
 

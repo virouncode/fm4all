@@ -13,6 +13,7 @@ import {
   getDevisDemandeAttachments,
   getDevisDemandeById,
   getDevisDemandesPaginated,
+  getDevisDemandesPaginatedForPlateforme,
   getDevisDemandesPaginatedForPrestataire,
 } from "@/server/queries/devisDemandes.query";
 import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
@@ -58,7 +59,17 @@ export const getDevisDemandesAction = actionClient
     // Branche plateforme
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (plateformeRole?.role) {
-      return getDevisDemandesPaginated(parsedInput);
+      return getDevisDemandesPaginatedForPlateforme({
+        clientId: parsedInput.clientId,
+        statut: parsedInput.statut,
+        siteId: parsedInput.siteId,
+        serviceId: parsedInput.serviceId,
+        search: parsedInput.search,
+        orderBy: parsedInput.orderBy,
+        orderDir: parsedInput.orderDir,
+        page: parsedInput.page,
+        pageSize: parsedInput.pageSize,
+      });
     }
 
     // Branche prestataire

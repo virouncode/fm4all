@@ -3,12 +3,8 @@
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import {
-  getDevisDemandesAction,
-  getDevisDemandeByIdAction,
-} from "@/server/actions/devisDemandesActions";
+import { getDevisDemandesAction } from "@/server/actions/devisDemandesActions";
 import type { DevisDemandeAvecDetails } from "@/server/queries/devisDemandes.query";
-import type { DevisDemandePermissionsType } from "@/server/utils/devisDemandesPermissions.utils";
 import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
 import type { DevisDemandeStatutType } from "@/zod-schemas/enums";
@@ -19,7 +15,6 @@ import {
   createDevisDemandesColumns,
   devisDemandesIdLabelMap,
 } from "./createDevisDemandesColumns";
-import { DevisDemandeDetailDialog } from "./DevisDemandeDetailDialog";
 import { DevisDemandeFiltersDialog } from "./DevisDemandeFiltersDialog";
 import { DevisDemandeFormDialog } from "./DevisDemandeFormDialog";
 import { DevisDemandeGrid } from "./DevisDemandeGrid";
@@ -123,16 +118,8 @@ export function DevisDemandesTable({
   const [isError, setIsError] = useState(false);
 
   const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
-  const [editingDemande, setEditingDemande] =
-    useState<DevisDemandeAvecDetails | null>(null);
-  const [selectedDemande, setSelectedDemande] =
-    useState<DevisDemandeAvecDetails | null>(null);
-  const [selectedPermissions, setSelectedPermissions] =
-    useState<DevisDemandePermissionsType | null>(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
 
   const pageSize = 30;
 
@@ -253,52 +240,17 @@ export function DevisDemandesTable({
     serviceId: searchParams.serviceId,
   };
 
-  const handleRowClick = async (row: DevisDemandeAvecDetails) => {
-    setLoadingDetail(true);
-    try {
-      const result = await getDevisDemandeByIdAction({ id: row.id });
-      if (result?.serverError) {
-        toast.error(result.serverError.message);
-        return;
-      }
-      if (result?.data) {
-        setSelectedDemande(result.data.demande);
-        setSelectedPermissions(result.data.permissions);
-        setDetailDialogOpen(true);
-      }
-    } catch {
-      toast.error("Erreur lors du chargement de la demande");
-    } finally {
-      setLoadingDetail(false);
-    }
+  const handleRowClick = (row: DevisDemandeAvecDetails) => {
+    router.push({
+      pathname: "/app/devis/demandes/[demandeId]",
+      params: { demandeId: row.id },
+      query: { tab: "demandes" },
+    });
   };
 
   const handleFormSuccess = (demande: DevisDemandeAvecDetails) => {
-    if (editingDemande) {
-      setItems((prev) => prev.map((d) => (d.id === demande.id ? demande : d)));
-    } else {
-      setItems((prev) => [demande, ...prev]);
-      setTotal((prev) => prev + 1);
-    }
-    setEditingDemande(null);
-  };
-
-  const handleDeleted = (id: string) => {
-    setItems((prev) => prev.filter((d) => d.id !== id));
-    setTotal((prev) => prev - 1);
-    setSelectedDemande(null);
-  };
-
-  const handleStatutChanged = (updated: DevisDemandeAvecDetails) => {
-    setItems((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
-    setSelectedDemande(updated);
-  };
-
-  const handleEdit = () => {
-    if (selectedDemande) {
-      setEditingDemande(selectedDemande);
-      setFormDialogOpen(true);
-    }
+    setItems((prev) => [demande, ...prev]);
+    setTotal((prev) => prev + 1);
   };
 
   const columns = createDevisDemandesColumns({ showClient: showClientColumn, showDevisCount });
@@ -355,10 +307,7 @@ export function DevisDemandesTable({
           {showNewButton && (
             <Button
               size="sm"
-              onClick={() => {
-                setEditingDemande(null);
-                setFormDialogOpen(true);
-              }}
+              onClick={() => setFormDialogOpen(true)}
             >
               <Plus className="h-4 w-4" />
               Nouvelle demande
@@ -372,7 +321,7 @@ export function DevisDemandesTable({
         {devisDemandeView === "grid" ? (
           <DevisDemandeGrid
             items={items}
-            isLoading={loading || loadingDetail}
+            isLoading={loading}
             isLoadingMore={isLoadingMore}
             isError={isError}
             hasMore={hasMore}
@@ -385,7 +334,7 @@ export function DevisDemandesTable({
           <InfiniteDataTable<DevisDemandeAvecDetails>
             columns={columns}
             items={items}
-            isLoading={loading || loadingDetail}
+            isLoading={loading}
             isError={isError}
             isLoadingMore={isLoadingMore}
             hasMore={hasMore}
@@ -400,26 +349,10 @@ export function DevisDemandesTable({
       {/* Dialogs */}
       <DevisDemandeFormDialog
         open={formDialogOpen}
-        onOpenChange={(open) => {
-          setFormDialogOpen(open);
-          if (!open) setEditingDemande(null);
-        }}
-        mode={editingDemande ? "edit" : "create"}
-        demande={editingDemande ?? undefined}
+        onOpenChange={setFormDialogOpen}
+        mode="create"
         onSuccess={handleFormSuccess}
       />
-
-      {selectedDemande && selectedPermissions && (
-        <DevisDemandeDetailDialog
-          open={detailDialogOpen}
-          onOpenChange={setDetailDialogOpen}
-          demande={selectedDemande}
-          permissions={selectedPermissions}
-          onEdit={handleEdit}
-          onDeleted={handleDeleted}
-          onStatutChanged={handleStatutChanged}
-        />
-      )}
 
       <DevisDemandeFiltersDialog
         open={filtersDialogOpen}

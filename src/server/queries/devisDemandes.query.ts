@@ -210,6 +210,131 @@ export async function getDevisDemandesPaginated(
 }
 
 /**
+ * Liste paginée des demandes de devis pour la plateforme (toutes les entreprises).
+ *
+ * Pas de filtre obligatoire sur entrepriseId — la plateforme voit tout.
+ * clientId (optionnel) filtre par demandeurEntrepriseId.
+ */
+export async function getDevisDemandesPaginatedForPlateforme(params: {
+  clientId?: string;
+  statut?: DevisDemandeQueryType["statut"];
+  siteId?: string;
+  serviceId?: string;
+  search?: string;
+  orderBy: DevisDemandeQueryType["orderBy"];
+  orderDir: "asc" | "desc";
+  page: number;
+  pageSize: number;
+}): Promise<{ items: DevisDemandeAvecDetails[]; total: number }> {
+  const { clientId, statut, siteId, serviceId, search, orderBy, orderDir, page, pageSize } =
+    params;
+
+  const conditions: SQL[] = [];
+
+  if (clientId) {
+    conditions.push(eq(devisDemandes.demandeurEntrepriseId, clientId));
+  }
+
+  if (statut) {
+    conditions.push(eq(devisDemandes.statut, statut));
+  }
+
+  if (siteId) {
+    conditions.push(eq(devisDemandes.siteId, siteId));
+  }
+
+  if (serviceId) {
+    conditions.push(eq(devisDemandes.serviceId, serviceId));
+  }
+
+  if (search) {
+    conditions.push(
+      or(
+        ilike(devisDemandes.titre, `%${search}%`),
+        ilike(devisDemandes.description, `%${search}%`),
+      ) as SQL,
+    );
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const orderColumn = (() => {
+    switch (orderBy) {
+      case "titre":
+        return devisDemandes.titre;
+      case "statut":
+        return devisDemandes.statut;
+      case "updatedAt":
+        return devisDemandes.updatedAt;
+      case "siteNom":
+        return sites.nom;
+      case "serviceNom":
+        return services.nom;
+      case "proprietaireEntrepriseNom":
+        return entreprises.nom;
+      case "createdAt":
+      default:
+        return devisDemandes.createdAt;
+    }
+  })();
+
+  const orderFn = orderDir === "asc" ? asc : desc;
+
+  const [rows, [{ value: total }]] = await Promise.all([
+    db
+      .select({
+        demande: devisDemandes,
+        siteNom: sites.nom,
+        serviceNom: services.nom,
+        createdByPrenom: user.prenom,
+        createdByNom: user.nom,
+        proprietaireEntrepriseNom: entreprises.nom,
+      })
+      .from(devisDemandes)
+      .leftJoin(sites, eq(sites.id, devisDemandes.siteId))
+      .leftJoin(services, eq(services.id, devisDemandes.serviceId))
+      .leftJoin(user, eq(user.id, devisDemandes.createdById))
+      .leftJoin(entreprises, eq(entreprises.id, devisDemandes.demandeurEntrepriseId))
+      .where(whereClause)
+      .orderBy(orderFn(orderColumn))
+      .limit(pageSize)
+      .offset((page - 1) * pageSize),
+    db.select({ value: count() }).from(devisDemandes).where(whereClause),
+  ]);
+
+  const demandeIds = rows.map((r) => r.demande.id);
+  const devisCounts =
+    demandeIds.length > 0
+      ? await db
+          .select({ devisDemandeId: devis.devisDemandeId, value: count() })
+          .from(devis)
+          .where(
+            and(
+              inArray(devis.devisDemandeId, demandeIds),
+              isNotNull(devis.devisDemandeId),
+            ),
+          )
+          .groupBy(devis.devisDemandeId)
+      : [];
+
+  const devisCountMap = new Map(
+    devisCounts.map((r) => [r.devisDemandeId, Number(r.value)]),
+  );
+
+  const items: DevisDemandeAvecDetails[] = rows.map((row) => ({
+    ...row.demande,
+    siteNom: row.siteNom ?? "",
+    serviceNom: row.serviceNom ?? "",
+    createdByPrenom: row.createdByPrenom ?? null,
+    createdByNom: row.createdByNom ?? null,
+    devisCount: devisCountMap.get(row.demande.id) ?? 0,
+    proprietaireEntrepriseNom: row.proprietaireEntrepriseNom ?? null,
+  }));
+
+  return { items, total: Number(total) };
+}
+
+/**
  * Liste paginée des demandes de devis pour un prestataire.
  *
  * Règles (regles_metier.md §B) :
