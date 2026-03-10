@@ -34,8 +34,8 @@ const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
           },
         },
       });
-    } catch (err) {
-      console.error("Erreur lors de la deconnexion:", err);
+    } catch {
+      // Déconnexion silencieuse
     }
   };
 

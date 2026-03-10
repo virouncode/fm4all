@@ -14,7 +14,7 @@ const EmailOkCard = () => {
   const router = useRouter();
   useEffect(() => {
     // Redirection après 5 secondes (5000 ms)
-    const timer = setTimeout(async () => {
+    const timer = setTimeout(() => {
       router.push("/auth/login");
     }, 5000);
 

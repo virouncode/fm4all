@@ -2582,4 +2582,181 @@ Pour toute mise à jour, le prestataire doit créer son compte ou contacter FM4A
 
 ---
 
+# Règles Métier — Module Checklists (`app/checklists`)
+
+## 1. Concepts fondamentaux
+
+### Pack / checklist
+Un **pack** (`tacheListesTemplates`) est un modèle de liste de tâches rattaché à un service FM4ALL (nettoyage, maintenance, etc.). Il contient des **items** (`tacheListeItems`) ordonnés.
+
+### Deux types de packs
+| Type | `proprietaireEntrepriseId` | Visibilité | Modifiable par |
+|------|---------------------------|------------|----------------|
+| **Système** | `NULL` | Tous les utilisateurs authentifiés (lecture) | Plateforme uniquement |
+| **Entreprise** | UUID de l'entreprise | Propriétaire uniquement | Admin/Manager de l'entreprise |
+
+### Snapshot d'occurrence
+Quand une occurrence est créée, les items du pack sélectionné sont **copiés** dans `occurrenceTaches` (snapshot). Modifier le pack d'origine n'affecte pas les occurrences déjà créées.
+
+---
+
+## 2. Accès à la page `/app/checklists`
+
+La page est accessible à toutes les postures (client, prestataire, plateforme). Aucun guard posture n'est requis — les server actions scopent les données par entreprise.
+
+---
+
+## 3. Périmètre des packs affichés par posture
+
+| Posture | Packs système | Packs propres | Packs autres entreprises |
+|---------|:---:|:---:|:---:|
+| **Client** | ✅ (lecture seule, actifs uniquement) | ✅ (actifs + inactifs) | ❌ |
+| **Prestataire** | ✅ (lecture seule, actifs uniquement, filtrés sur services proposés) | ✅ (actifs + inactifs) | ❌ |
+| **Plateforme** | ✅ (tous, éditables) | ✅ (toutes entreprises) | ✅ (tous) |
+
+**Filtrage prestataire** : seuls les services que l'entreprise propose (`serviceEntreprises`) sont affichés dans les filtres et les packs.
+
+---
+
+## 4. Matrice de permissions
+
+| Action | collaborateur | manager | admin | plateforme |
+|--------|:---:|:---:|:---:|:---:|
+| Voir packs système | ✅ | ✅ | ✅ | ✅ |
+| Voir ses propres packs | ✅ | ✅ | ✅ | ✅ |
+| Créer un pack entreprise | ❌ | ✅ | ✅ | ✅ |
+| Renommer / activer-désactiver un pack | ❌ | ✅ | ✅ | ✅ |
+| Supprimer un pack entreprise | ❌ | ✅ | ✅ | ✅ |
+| Ajouter / modifier / supprimer un item | ❌ | ✅ | ✅ | ✅ |
+| Réordonner les items (drag-drop) | ❌ | ✅ | ✅ | ✅ |
+| Créer / modifier / supprimer un pack système | ❌ | ❌ | ❌ | ✅ |
+
+**Règle posture-aware** : le rôle est évalué selon la **posture active** (cookie `fm4all:postureActive`) :
+- posture `prestataire` → vérifie `userPrestataireAdhesions` uniquement
+- posture `client` ou absente → vérifie `userClientAdhesions` uniquement
+
+Cela empêche qu'un utilisateur admin client (double casquette) bypasse ses droits limités en posture prestataire.
+
+---
+
+## 5. Règles de création d'un pack
+
+1. **Pack système** (`proprietaireEntrepriseId = null`) : la posture cookie doit être `"plateforme"` ET l'utilisateur doit avoir un `rolePlateformeAdhesion`.
+2. **Pack entreprise** : l'utilisateur doit être au minimum `manager` actif de cette entreprise (vérifié de façon posture-aware).
+3. **Mode plateforme filtré "client" ou "prestataire" sans entreprise sélectionnée** : le bouton "Nouvelle checklist" est masqué — évite la création d'un pack système par mégarde.
+
+---
+
+## 6. Règles de mutation (update / delete / reorder)
+
+Pour toute mutation, deux vérifications cumulatives côté serveur :
+1. **`canManageChecklists`** : admin/manager actif de l'entreprise (posture-aware via cookie).
+2. **Ownership** : `pack.proprietaireEntrepriseId === entrepriseId` passé en input. Un utilisateur ne peut modifier que les packs de son entreprise, jamais ceux d'une autre ni les packs système.
+
+Si le pack est système (`proprietaireEntrepriseId = null`) et l'utilisateur n'est pas plateforme → `403 Forbidden`.
+
+---
+
+## 7. Suppression d'un pack
+
+- Les items sont supprimés en cascade (`ON DELETE CASCADE` sur `tache_liste_items.liste_template_id`).
+- Les références dans `clientServices.tacheListeTemplateId` et `clientServiceExecutions.tacheListeTemplateId` passent à `NULL` (`ON DELETE SET NULL`).
+- Les `occurrenceTaches` déjà créés (snapshots) **ne sont pas affectés** — ils sont des copies indépendantes.
+
+---
+
+## 8. Réordonnancement des items
+
+Utilise une **double passe** avec offset intermédiaire (`10000 + i`) pour contourner la contrainte unique `(listeTemplateId, ordre)` lors des swaps :
+1. Passe 1 : `ordre = 10000 + i` (évite les collisions temporaires)
+2. Passe 2 : `ordre = i + 1` (ordre final)
+
+---
+
+## 9. Intégration avec les prestations et occurrences
+
+- Dans `/app/prestations/[prestationId]`, `TacheListeManagerDialog` permet à un admin/manager de gérer les packs. Il n'est affiché que si `canManage = true` ET que la prestation a un prestataire associé (`execution.prestataireEntrepriseId`).
+- Le pack sélectionné pour une exécution est stocké dans `clientServiceExecutions.tacheListeTemplateId`. Un prestataire peut substituer le pack du client avec le sien propre.
+- À la création d'une occurrence, les items actifs du pack choisi sont copiés en `occurrenceTaches` (snapshot immuable vis-à-vis des modifications ultérieures du template).
+
+---
+
+*Dernière mise à jour : 2026-03-10*
+
+---
+
+# Règles Métier — Module Auth
+
+> Référence pour les flows d'inscription, d'activation et de réinitialisation de mot de passe.
+
+---
+
+## 1. Flows d'accès
+
+### 1a. Inscription admin via invitation
+
+1. Acteur ayant les droits invoque `inviterEntrepriseAdminAction` (ou `inviterClientAdminAction`)
+2. Un token UUID + TTL 7 jours est inséré dans `entrepriseInvitations`
+3. Un email est envoyé à l'adresse cible avec le lien `APP_URL/auth/inscription-admin?token=<token>`
+4. L'invité arrive sur la page `/auth/inscription-admin` qui lit `?token=` et valide le token en base (expiry + unicité)
+5. À la soumission du formulaire (`accepterInvitationAdminAction`) :
+   - Création du compte Better Auth
+   - Insertion des adhésions (client ou prestataire selon `typeAdhesion`)
+   - Insertion dans `usersArborescence`
+   - Marquage du token comme utilisé (`usedAt = now()`)
+   - Envoi d'un email de reset password pour définir le mot de passe (non bloquant : le compte est déjà créé)
+
+### 1b. Reset password (mot de passe oublié)
+
+1. L'utilisateur soumet son email depuis `/auth/forgot-password`
+2. Better Auth envoie un email avec un lien `BETTER_AUTH_URL/api/auth/reset-password?token=<token>&redirectTo=APP_URL/auth/reset-password`
+3. L'utilisateur arrive sur `/auth/reset-password?token=<token>` et saisit son nouveau mot de passe
+4. Validation Zod : min 8 chars, 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial
+5. `authClient.resetPassword({ newPassword, token })` est appelé
+
+### 1c. Activation du compte (premier mot de passe)
+
+Identique au reset password mais le lien inclut `?type=activation`. La page `/auth/reset-password` affiche un message adapté selon ce paramètre.
+
+### 1d. Vérification email
+
+Better Auth envoie un email de vérification via `sendVerificationEmail`. Le callback renvoie vers `APP_URL/auth/email-ok` qui affiche une confirmation et redirige vers `/auth/login` après 5 secondes.
+
+---
+
+## 2. Règles de sécurité
+
+| Règle | Détail |
+|-------|--------|
+| Token invitation | UUID v4, TTL 7 jours, usage unique (`usedAt` doit être `null`) |
+| Token reset | Géré par Better Auth, opaque |
+| Mot de passe | Min 8 chars + majuscule + minuscule + chiffre + caractère spécial |
+| Email BCC | Optionnel via `MAILGUN_BCC_EMAIL` (env) — jamais hardcodé |
+| Erreur email d'activation | Non bloquante — le compte est déjà créé, l'utilisateur peut re-demander un lien |
+| Page `/auth/unauthorized` | Déconnecte l'utilisateur et redirige vers `/auth/login` |
+
+---
+
+## 3. Variables d'environnement requises
+
+| Variable | Rôle | Requis |
+|----------|------|--------|
+| `APP_URL` | Base des liens envoyés par email (ex: invitation, activation) | ✅ |
+| `BETTER_AUTH_URL` | Base des liens Better Auth (ex: vérification email) | ✅ |
+| `MAILGUN_API_KEY` | Envoi des emails transactionnels | ✅ |
+| `MAILGUN_BCC_EMAIL` | BCC optionnel sur tous les emails | ❌ optionnel |
+
+**Règle :** ne jamais appeler `process.env.XXX` directement. Toujours passer par `env.XXX` depuis `src/lib/env.ts`.
+
+---
+
+## 4. Guards de page
+
+- `/auth/login` → redirect vers `/app` si session active (évite la double connexion)
+- `/auth/unauthorized` → accessible à tous (redirige après déconnexion)
+- `/auth/inscription-admin` → vérifie le token en base avant d'afficher le formulaire
+- `/auth/reset-password` → vérifie la présence du `?token=` avant d'afficher le formulaire
+
+---
+
 *Dernière mise à jour : 2026-03-10*

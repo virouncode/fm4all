@@ -1,5 +1,6 @@
 "use server";
 
+import { env } from "@/lib/env";
 import { db } from "@/db";
 import { user as userTable } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
@@ -1067,7 +1068,7 @@ export const inviterEntrepriseAdminAction = actionClient
     });
 
     // 5. Envoyer l'email d'invitation
-    const lien = `${process.env.APP_URL}/auth/inscription-admin?token=${token}`;
+    const lien = `${env.APP_URL}/auth/inscription-admin?token=${token}`;
     await sendEmailDirect({
       to: parsedInput.email,
       subject: "Invitation à rejoindre FM4ALL",
@@ -1213,17 +1214,12 @@ export const accepterInvitationAdminAction = actionClient
       await auth.api.requestPasswordReset({
         body: {
           email: invitation.email,
-          redirectTo: `${process.env.APP_URL}/auth/reset-password?type=activation`,
+          redirectTo: `${env.APP_URL}/auth/reset-password?type=activation`,
         },
         headers: await headers(),
       });
-    } catch (emailError) {
+    } catch {
       // Email non bloquant — le compte est créé, l'utilisateur peut réinitialiser son mdp
-      console.error(
-        "[accepterInvitationAdminAction] Échec envoi email reset password:",
-        invitation.email,
-        emailError,
-      );
     }
 
     return {

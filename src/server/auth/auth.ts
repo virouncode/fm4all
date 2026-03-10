@@ -1,3 +1,4 @@
+import { env } from "@/lib/env";
 import { db } from "@/db";
 import {
   account,
@@ -136,7 +137,7 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, token }) => {
       // Ce hook ne sera plus appelé pour les nouveaux users
       // Garder l'implémentation pour d'autres cas potentiels
-      const verificationUrl = `${process.env.BETTER_AUTH_URL}/api/auth/verify-email?token=${token}&callbackURL=${process.env.APP_URL}/auth/email-ok`;
+      const verificationUrl = `${env.BETTER_AUTH_URL}/api/auth/verify-email?token=${token}&callbackURL=${env.APP_URL}/auth/email-ok`;
       await sendEmailDirect({
         to: user.email,
         from: "noreply@mg.fm4all.com",

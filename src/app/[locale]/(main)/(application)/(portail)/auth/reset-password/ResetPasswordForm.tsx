@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 type ResetPasswordProps = {
@@ -35,10 +35,6 @@ const ResetPasswordForm = ({ token }: ResetPasswordProps) => {
   });
 
   const submitForm = async (data: ResetPasswordType) => {
-    if (data.password !== data.passwordConfirmation) {
-      toast.error("Les mots de passe ne correspondent pas.");
-      return;
-    }
     setLoading(true);
     const { error } = await authClient.resetPassword({
       newPassword: data.password,
@@ -56,7 +52,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordProps) => {
     }
     setLoading(false);
   };
-  const passwordValue = form.watch("password");
+  const passwordValue = useWatch({ control: form.control, name: "password" });
 
   return (
     <Form {...form}>
