@@ -161,11 +161,11 @@ export async function getAccessibleSitesByUser({
   filterRole?: string;
 }): Promise<SelectSiteType[]> {
 
-  // Vérifier si plateforme
-  const { getUserPlateformeAdhesion } = await import(
-    "@/server/queries/userPlateformeAdhesions.query"
+  // Vérifier si plateforme (posture-aware : vérifie le cookie)
+  const { getEffectivePlateformeRole } = await import(
+    "@/server/utils/permissions.utils"
   );
-  const plateformeRole = await getUserPlateformeAdhesion(userId);
+  const plateformeRole = await getEffectivePlateformeRole(userId);
 
   // Si plateforme → retourner TOUS les sites
   if (plateformeRole) {

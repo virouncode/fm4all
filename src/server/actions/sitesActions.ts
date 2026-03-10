@@ -292,11 +292,12 @@ export const getAccessibleSitesAction = actionClient
       return sites;
     }
 
-    // Branche client : vérifier adhésion client
+    // Branche client : vérifier adhésion client active
     const clientAdhesion = await db.query.userClientAdhesions.findFirst({
       where: and(
         eq(userClientAdhesions.userId, currentUser.id),
         eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
       ),
     });
 
@@ -383,11 +384,12 @@ export const getSitesForPrestationAction = actionClient
       }
     }
 
-    // Branche client → vérifier adhésion
+    // Branche client → vérifier adhésion active
     const clientAdhesion = await db.query.userClientAdhesions.findFirst({
       where: and(
         eq(userClientAdhesions.userId, currentUser.id),
         eq(userClientAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
       ),
     });
 
@@ -423,10 +425,13 @@ export const getSitesForPrestationAction = actionClient
       };
     }
 
-    // Branche prestataire → vérifier adhésion prestataire + relation client
+    // Branche prestataire → vérifier adhésion prestataire active + relation client
     const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst(
       {
-        where: eq(userPrestataireAdhesions.userId, currentUser.id),
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
       },
     );
 

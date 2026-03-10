@@ -245,7 +245,7 @@ export function SitesClient() {
     }
 
     loadData();
-  }, [entreprise, currentUser]);
+  }, [entreprise, currentUser, posture]);
 
   // Load responsables when selected site changes
   useEffect(() => {

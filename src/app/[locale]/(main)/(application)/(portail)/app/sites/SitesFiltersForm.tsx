@@ -65,7 +65,7 @@ export function SitesFiltersForm() {
     if (debouncedEffectifMin) query.effectifMin = debouncedEffectifMin;
     if (debouncedEffectifMax) query.effectifMax = debouncedEffectifMax;
 
-    router.replace({ pathname: "/app/sites", query }, { scroll: false });
+    router.replace({ pathname: pathname as "/app/sites", query }, { scroll: false });
   }, [
     debouncedNom,
     debouncedVille,
