@@ -930,6 +930,159 @@ if (modePilotage === "collaboration" && isAdmin) { delete(); } // l'un ou l'autr
 
 ---
 
+# Règles Métier — Module Sites (`sites`)
+
+> Référence unique pour toutes les permissions liées aux sites.
+> À consulter systématiquement avant d'implémenter ou de modifier une permission.
+
+---
+
+## A) Posture CLIENT (`/app/sites`)
+
+### 1. Voir les sites de l'entreprise
+
+Peuvent voir toute l'arborescence des sites de leur entreprise :
+
+- tous les utilisateurs ayant une ligne dans `userClientAdhesions`
+- avec `statut = actif`
+
+Aucune restriction par site à ce stade.
+
+### 2. Créer un site racine (`parentId = null`)
+
+| Rôle | Peut créer |
+|------|-----------|
+| `admin` | ✅ |
+| `manager`, `collaborateur` | ❌ |
+
+### 3. Créer un sous-site (`parentId ≠ null`)
+
+| Rôle | Peut créer |
+|------|-----------|
+| `admin` | ✅ Sur n'importe quel parent |
+| `manager` | ✅ Uniquement si `responsable_site` du site parent |
+| `collaborateur` | ❌ |
+
+### 4. Modifier un site
+
+| Rôle | Peut modifier |
+|------|--------------|
+| `admin` | ✅ Tous les sites |
+| `responsable_site` (attribution) | ✅ Ce site uniquement |
+| Autres | ❌ |
+
+> **Règle importante :** seul l'`admin` peut modifier le `parentId` d'un site (déplacer un site dans l'arborescence). Un `responsable_site` non-admin ne peut pas déplacer un site.
+
+### 5. Archiver un site
+
+| Rôle | Peut archiver |
+|------|--------------|
+| `admin` | ✅ |
+| Autres | ❌ |
+
+> Bloqué si le site possède des **sous-sites actifs**. Il faut d'abord archiver les enfants.
+
+### 6. Règles de cascade sur `actif`
+
+- **Désactivation** → tous les descendants passent à `actif = false` (transaction atomique).
+- **Réactivation** → bloquée si le parent direct est inactif. Les descendants **ne sont pas** réactivés automatiquement.
+
+---
+
+## B) Posture PRESTATAIRE (`/app/mes-sites-clients`)
+
+**Relation préalable obligatoire :** le client doit être lié à l'entreprise prestataire via `clientPrestataireRelations`.
+
+### Cas 1 — Le client possède au moins un admin actif
+
+**Condition :**
+```
+userClientAdhesions.role = "admin"
+userClientAdhesions.statut = "actif"
+```
+
+**Conséquences :**
+
+Tous les utilisateurs du prestataire ayant une adhésion active (`userPrestataireAdhesions.statut = actif`) peuvent :
+- **voir** tous les sites de ce client
+
+Mais aucune mutation n'est autorisée :
+- création interdite
+- modification interdite
+
+L'interface doit afficher un bandeau informatif :
+> Ce client possède désormais un administrateur actif. Les modifications doivent être effectuées par l'équipe cliente.
+
+### Cas 2 — Aucun admin client actif (mode proxy)
+
+Le prestataire agit alors en proxy du client.
+
+#### Voir les sites
+
+Tous les utilisateurs ayant une adhésion active dans `userPrestataireAdhesions` peuvent voir les sites du client.
+
+#### Créer un site racine
+
+| Rôle prestataire | Peut créer |
+|------------------|-----------|
+| `admin` | ✅ |
+| `manager`, autres | ❌ |
+
+#### Créer un sous-site
+
+| Rôle prestataire | Peut créer |
+|------------------|-----------|
+| `admin` | ✅ Sur n'importe quel parent |
+| `manager` | ✅ Uniquement si `responsable_site` du site parent |
+| Autres | ❌ |
+
+#### Modifier un site
+
+| Rôle prestataire | Peut modifier |
+|------------------|--------------|
+| `admin` | ✅ |
+| `responsable_site` (attribution) | ✅ Ce site uniquement |
+| Autres | ❌ |
+
+> **Règle importante :** lorsqu'un prestataire crée un site en mode proxy, aucune attribution `responsable_site` automatique n'est créée. Les responsables sont définis explicitement via le système d'attributions.
+
+---
+
+## C) Posture PLATEFORME (`/app/sites-clients`)
+
+Tous les utilisateurs ayant `userPlateformeAdhesions.statut = actif` peuvent sur n'importe quel site de n'importe quel client :
+
+| Action | Autorisé |
+|--------|----------|
+| Voir | ✅ |
+| Créer un site racine | ✅ |
+| Créer un sous-site | ✅ |
+| Modifier | ✅ |
+| Archiver | ✅ |
+| Supprimer définitivement | ✅ `super_admin_plateforme` uniquement |
+
+---
+
+## Résumé conceptuel
+
+Le module Sites repose sur 3 principes simples :
+
+**1. Les sites appartiennent toujours au client**
+Les prestataires n'ont jamais de droit natif.
+
+**2. Le prestataire agit seulement dans deux cas**
+- lecture : si `clientPrestataireRelations` existe
+- mutation : uniquement en l'absence d'admin client actif (proxy)
+
+**3. La plateforme a un contrôle total**
+Les utilisateurs plateforme peuvent intervenir sur tous les sites de tous les clients.
+
+---
+
+*Dernière mise à jour : 2026-03-10*
+
+---
+
 # Règles Métier — Module Occurrences (`clientServiceOccurrences`)
 
 > Référence unique pour toutes les permissions liées aux occurrences d'une prestation.
