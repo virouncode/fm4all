@@ -109,6 +109,10 @@ import { TacheListePickerDialog } from "./TacheListePickerDialog";
 type PrestationDetailsClientProps = {
   prestation: PrestationListItem;
   canManage: boolean;
+  /** Opérations fortes : supprimer + terminer — admin uniquement (client/prestataire) + plateforme */
+  canAdmin: boolean;
+  /** Données financières : onglet Exécution & Tarifs */
+  canSeeFinancials: boolean;
   isPlateforme: boolean;
   canChangeModePilotage: boolean;
   clientHasActiveAdmin: boolean;
@@ -133,6 +137,8 @@ const JOUR_LABELS: Record<number, string> = {
 export function PrestationDetailsClient({
   prestation,
   canManage,
+  canAdmin,
+  canSeeFinancials,
   isPlateforme,
   canChangeModePilotage,
   clientHasActiveAdmin,
@@ -302,14 +308,16 @@ export function PrestationDetailsClient({
                   "Mettre en pause"
                 )}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => doStatutTransition("termine")}
-                disabled={isUpdatingStatut}
-              >
-                Terminer
-              </Button>
+              {canAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => doStatutTransition("termine")}
+                  disabled={isUpdatingStatut}
+                >
+                  Terminer
+                </Button>
+              )}
             </div>
           )}
           {canManage && prestation.statut === "en_pause" && (
@@ -325,14 +333,16 @@ export function PrestationDetailsClient({
                   "Reprendre"
                 )}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => doStatutTransition("termine")}
-                disabled={isUpdatingStatut}
-              >
-                Terminer
-              </Button>
+              {canAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => doStatutTransition("termine")}
+                  disabled={isUpdatingStatut}
+                >
+                  Terminer
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -346,8 +356,12 @@ export function PrestationDetailsClient({
                 ? hasActiveExecution
                   ? "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Vous pouvez l'activer dès maintenant."
                   : executions.length === 0
-                    ? "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Définissez d'abord une exécution dans l'onglet « Exécution & Tarifs », puis activez la prestation."
-                    : "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Activez d'abord une exécution dans l'onglet « Exécution & Tarifs », puis activez la prestation."
+                    ? canSeeFinancials
+                      ? "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Définissez d'abord une exécution dans l'onglet « Exécution & Tarifs », puis activez la prestation."
+                      : "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Définissez d'abord une exécution, puis activez la prestation."
+                    : canSeeFinancials
+                      ? "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Activez d'abord une exécution dans l'onglet « Exécution & Tarifs », puis activez la prestation."
+                      : "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Activez d'abord une exécution, puis activez la prestation."
                 : "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Contactez un administrateur pour l'activer.")}
             {prestation.statut === "actif" &&
               "Cette prestation est active. Les interventions sont planifiées selon la fréquence configurée."}
@@ -384,9 +398,10 @@ export function PrestationDetailsClient({
                       </p>
                       <p className="mt-0.5 text-orange-700">
                         Les interventions seront créées avec le statut{" "}
-                        <strong>À attribuer</strong>. Vous pourrez ajouter un
-                        prestataire dans l&apos;onglet &quot;Exécution &amp;
-                        Tarifs&quot; pour les assigner automatiquement.
+                        <strong>À attribuer</strong>.{" "}
+                        {canSeeFinancials
+                          ? "Vous pourrez ajouter un prestataire dans l'onglet « Exécution & Tarifs » pour les assigner automatiquement."
+                          : "Contactez un administrateur pour assigner un prestataire."}
                       </p>
                     </div>
                   )}
@@ -443,20 +458,22 @@ export function PrestationDetailsClient({
         }}
         className="flex min-h-0 flex-1 flex-col"
       >
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className={`grid w-full ${canSeeFinancials ? "grid-cols-3" : "grid-cols-2"}`}>
           <TabsTrigger value="parametres" className="gap-2">
             <Settings className="h-4 w-4" />
             Paramètres
           </TabsTrigger>
-          <TabsTrigger value="execution" className="gap-2">
-            <Zap className="h-4 w-4" />
-            Exécution & Tarifs
-            {executions.length > 0 && (
-              <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
-                {executions.length}
-              </span>
-            )}
-          </TabsTrigger>
+          {canSeeFinancials && (
+            <TabsTrigger value="execution" className="gap-2">
+              <Zap className="h-4 w-4" />
+              Exécution & Tarifs
+              {executions.length > 0 && (
+                <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
+                  {executions.length}
+                </span>
+              )}
+            </TabsTrigger>
+          )}
           <TabsTrigger value="interventions" className="gap-2">
             <Calendar className="h-4 w-4" />
             Interventions
@@ -656,8 +673,8 @@ export function PrestationDetailsClient({
             </Card>
           )}
 
-          {/* Zone dangereuse — brouillon uniquement */}
-          {canManage && prestation.statut === "brouillon" && (
+          {/* Zone dangereuse — brouillon uniquement, admin uniquement */}
+          {canAdmin && prestation.statut === "brouillon" && (
             <Card className="border-destructive/40">
               <CardHeader className="pb-3">
                 <CardTitle className="text-destructive text-base font-medium">
@@ -695,20 +712,23 @@ export function PrestationDetailsClient({
         </TabsContent>
 
         {/* ============ TAB: EXÉCUTION & TARIFS ============ */}
-        <TabsContent
-          value="execution"
-          className="mt-6 min-h-0 flex-1 overflow-y-auto pb-6"
-        >
-          <ExecutionTab
-            executions={executions}
-            canManage={canManage}
-            isPlateforme={isPlateforme}
-            canChangeModePilotage={canChangeModePilotage}
-            clientHasActiveAdmin={clientHasActiveAdmin}
-            prestation={prestation}
-            onExecutionsChange={setExecutions}
-          />
-        </TabsContent>
+        {canSeeFinancials && (
+          <TabsContent
+            value="execution"
+            className="mt-6 min-h-0 flex-1 overflow-y-auto pb-6"
+          >
+            <ExecutionTab
+              executions={executions}
+              canManage={canManage}
+              canAdmin={canAdmin}
+              isPlateforme={isPlateforme}
+              canChangeModePilotage={canChangeModePilotage}
+              clientHasActiveAdmin={clientHasActiveAdmin}
+              prestation={prestation}
+              onExecutionsChange={setExecutions}
+            />
+          </TabsContent>
+        )}
 
         {/* ============ TAB: INTERVENTIONS ============ */}
         <TabsContent
@@ -789,6 +809,7 @@ function InfoRow({
 function ExecutionTab({
   executions,
   canManage,
+  canAdmin,
   isPlateforme,
   canChangeModePilotage,
   clientHasActiveAdmin,
@@ -797,6 +818,7 @@ function ExecutionTab({
 }: {
   executions: ExecutionWithPrix[];
   canManage: boolean;
+  canAdmin: boolean;
   isPlateforme: boolean;
   canChangeModePilotage: boolean;
   clientHasActiveAdmin: boolean;
@@ -963,6 +985,7 @@ function ExecutionTab({
             key={execution.id}
             execution={execution}
             canManage={canManage}
+            canAdmin={canAdmin}
             isPlateforme={isPlateforme}
             canChangeModePilotage={canChangeModePilotage}
             clientHasActiveAdmin={clientHasActiveAdmin}
@@ -999,6 +1022,7 @@ function ExecutionTab({
 function ExecutionCard({
   execution,
   canManage,
+  canAdmin,
   isPlateforme,
   canChangeModePilotage,
   clientHasActiveAdmin,
@@ -1007,6 +1031,7 @@ function ExecutionCard({
 }: {
   execution: ExecutionWithPrix;
   canManage: boolean;
+  canAdmin: boolean;
   isPlateforme: boolean;
   canChangeModePilotage: boolean;
   clientHasActiveAdmin: boolean;
@@ -1102,17 +1127,19 @@ function ExecutionCard({
                 Priorité {execution.priorite}
               </Badge>
               {canManage && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setEditOpen(true)}
+                  aria-label="Modifier l'exécution"
+                  title="Modifier dates, priorité et tarifs"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
+              {canAdmin && (
                 <>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => setEditOpen(true)}
-                    aria-label="Modifier l'exécution"
-                    title="Modifier dates, priorité et tarifs"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
                   <Button
                     variant="outline"
                     size="icon"

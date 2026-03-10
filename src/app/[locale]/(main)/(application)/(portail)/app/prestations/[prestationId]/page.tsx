@@ -16,6 +16,7 @@ import {
   getUserClientAdhesion,
   getUserPrestataireAdhesion,
 } from "@/server/queries/userAdhesions.query";
+import { getUserClientSiteAttributions } from "@/server/queries/userSiteAttributions.query";
 import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import {
   getEffectivePlateformeRole,
@@ -36,7 +37,6 @@ export default async function PrestationDetailPage({
   const resolvedParams = await params;
   const { prestationId } = resolvedParams;
   const resolvedSearchParams = await searchParams;
-  const defaultTab = resolvedSearchParams.tab ?? "parametres";
 
   // 1. Auth
   const session = await getSession();
@@ -64,6 +64,8 @@ export default async function PrestationDetailPage({
   const isPlateforme = !!platformRole?.role;
 
   let prestataireEntrepriseId: string | null = null;
+  // Hoisted pour usage dans le calcul des permissions (step 5)
+  let prestataireAdhesionRole: string | null = null;
 
   if (!isPlateforme) {
     if (posture === "prestataire") {
@@ -73,6 +75,7 @@ export default async function PrestationDetailPage({
       });
       if (!prestataireAdhesion) notFound();
       prestataireEntrepriseId = prestataireAdhesion.entrepriseId;
+      prestataireAdhesionRole = prestataireAdhesion.role;
 
       const canAccess = await prestataireHasExecutionOnPrestation({
         prestationId,
@@ -80,7 +83,7 @@ export default async function PrestationDetailPage({
       });
       if (!canAccess) notFound();
 
-      // Non-admin : vérifier que le site de la prestation est dans les sites attribués
+      // Non-admin (manager inclus) : vérifier que le site est dans les sites attribués
       if (prestataireAdhesion.role !== "admin") {
         const attributedSiteIds = await getAllPrestataireSiteIds({
           userId: currentUser.id,
@@ -94,6 +97,18 @@ export default async function PrestationDetailPage({
         entrepriseId: prestation.entrepriseId,
       });
       if (!clientAdhesion) notFound();
+
+      // BUG-P02 : non-admin → vérifier que le site est dans les sites attribués
+      if (clientAdhesion!.role !== "admin") {
+        const { attributions } = await getUserClientSiteAttributions({
+          userId: currentUser.id,
+          entrepriseId: prestation.entrepriseId,
+        });
+        const hasAttribution = attributions.some(
+          (a) => a.siteId === prestation.siteId && a.mode === "inclure",
+        );
+        if (!hasAttribution) notFound();
+      }
     }
   }
 
@@ -110,6 +125,8 @@ export default async function PrestationDetailPage({
   let canManage = isPlateforme;
   if (!isPlateforme) {
     if (clientAdhesion?.role === "admin") {
+      canManage = true;
+    } else if (posture === "prestataire" && prestataireAdhesionRole === "admin") {
       canManage = true;
     } else {
       const siteRole = await resolvePostureAwareSiteRole({
@@ -130,8 +147,38 @@ export default async function PrestationDetailPage({
     isClientAdmin ||
     (canManage && !isPlateforme && !isClientManager);
 
-  // 6. Charger les exécutions et leurs prix
-  const executions = await getExecutionsWithPrixByPrestationId(prestationId);
+  // canAdmin : opérations fortes (supprimer, terminer) — admin seulement + plateforme
+  // responsable_site n'a PAS ces droits
+  const isPrestataireAdmin = prestataireAdhesionRole === "admin";
+  const canAdmin =
+    isPlateforme ||
+    isClientAdmin ||
+    (posture === "prestataire" && isPrestataireAdmin);
+
+  // canSeeFinancials : données financières (onglet Exécution & Tarifs)
+  // - Posture client   : admin + responsable_site (= canManage)
+  // - Posture prestataire : admin uniquement
+  // - Plateforme       : toujours
+  let canSeeFinancials = isPlateforme;
+  if (!isPlateforme) {
+    if (posture === "prestataire") {
+      canSeeFinancials = isPrestataireAdmin;
+    } else {
+      // client : admin || responsable_site
+      canSeeFinancials = canManage;
+    }
+  }
+
+  // defaultTab : si l'utilisateur n'a pas accès aux données financières, redirect vers "parametres"
+  const defaultTab =
+    resolvedSearchParams.tab === "execution" && !canSeeFinancials
+      ? "parametres"
+      : (resolvedSearchParams.tab ?? "parametres");
+
+  // 6. Charger les exécutions et leurs prix (uniquement si accès aux données financières)
+  const executions = canSeeFinancials
+    ? await getExecutionsWithPrixByPrestationId(prestationId)
+    : [];
 
   // 7. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin
   const [
@@ -152,6 +199,8 @@ export default async function PrestationDetailPage({
     <PrestationDetailsClient
       prestation={prestation}
       canManage={canManage}
+      canAdmin={canAdmin}
+      canSeeFinancials={canSeeFinancials}
       isPlateforme={isPlateforme}
       canChangeModePilotage={canChangeModePilotage}
       clientHasActiveAdmin={clientHasActiveAdmin}

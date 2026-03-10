@@ -29,6 +29,7 @@ import {
   getAllPrestataireSiteIds,
   getResponsableSiteIdsByPrestataire,
 } from "@/server/queries/userPrestataireSiteAttributions.query";
+import { getAllClientSiteIds } from "@/server/queries/userSiteAttributions.query";
 import {
   getActivePosture,
   getEffectivePlateformeRole,
@@ -189,9 +190,9 @@ export const getPrestationsAction = actionClient
         throw errors.forbidden("Vous n'avez pas accès à ce prestataire.");
       }
 
-      // Gate N2 : non-admin → restreindre aux sites attribués via userPrestataireSiteAttributions
+      // Gate N2 : non-admin (manager inclus) → restreindre aux sites attribués via userPrestataireSiteAttributions
       let attributedSiteIds: string[] | undefined;
-      if (!plateformeRole?.role && adhesion?.role !== "admin") {
+      if (!plateformeRole?.role && adhesion?.role !== "admin") { // manager = même règle que non-admin
         const siteIds = await getAllPrestataireSiteIds({
           userId: currentUser.id,
           clientEntrepriseId: entrepriseId,
@@ -232,6 +233,18 @@ export const getPrestationsAction = actionClient
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
+    // Gate N2 client : non-admin → restreindre aux sites attribués
+    const posture = await getActivePosture();
+    let attributedClientSiteIds: string[] | undefined;
+    if (posture !== "plateforme") {
+      const clientAdhesion = await getUserClientAdhesion({ userId: currentUser.id, entrepriseId });
+      if (!clientAdhesion || clientAdhesion.role !== "admin") {
+        const siteIds = await getAllClientSiteIds({ userId: currentUser.id, entrepriseId });
+        if (siteIds.length === 0) return { prestations: [] };
+        attributedClientSiteIds = siteIds;
+      }
+    }
+
     const prestations = await getPrestationsByEntreprise(entrepriseId, {
       statut,
       serviceId,
@@ -239,6 +252,7 @@ export const getPrestationsAction = actionClient
       modeCommercial,
       orderBy,
       orderDir,
+      attributedClientSiteIds,
     });
 
     return { prestations };

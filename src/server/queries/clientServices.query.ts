@@ -97,6 +97,8 @@ export async function getPrestationsByEntreprise(
     modeCommercial?: ModeCommercialType;
     orderBy?: PrestationsOrderByType;
     orderDir?: "asc" | "desc";
+    /** Gate N2 client : si fourni, restreint aux prestations dont le site est dans cette liste */
+    attributedClientSiteIds?: string[];
   },
 ): Promise<PrestationListItem[]> {
   const conditions = [eq(clientServices.entrepriseId, entrepriseId)];
@@ -112,6 +114,10 @@ export async function getPrestationsByEntreprise(
   }
   if (options?.modeCommercial) {
     conditions.push(eq(clientServices.modeCommercial, options.modeCommercial));
+  }
+  // Gate N2 client : filtre par sites attribués (posture client non-admin)
+  if (options?.attributedClientSiteIds && options.attributedClientSiteIds.length > 0) {
+    conditions.push(inArray(clientServices.siteId, options.attributedClientSiteIds));
   }
 
   const rows = await db

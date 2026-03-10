@@ -228,13 +228,11 @@ export const getPrestatairesForServiceAction = actionClient
     const isPlateforme = !!platformRole?.role;
 
     if (!isPlateforme) {
-      const adhesion = await db.query.userClientAdhesions.findFirst({
-        where: and(
-          eq(userClientAdhesions.userId, currentUser.id),
-          eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
-        ),
-      });
-      if (!adhesion)
+      const canAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        parsedInput.entrepriseId,
+      );
+      if (!canAccess)
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
@@ -819,22 +817,12 @@ export const deleteExecutionAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    // Vérifier les permissions (admin uniquement pour supprimer)
-    const canDelete = await canDisableOrDeleteExecution(
-      currentUser.id,
-      entrepriseId,
-    );
-    if (!canDelete) {
-      throw errors.forbidden(
-        "Seul un administrateur peut supprimer une exécution.",
-      );
-    }
-
-    // Vérifier que l'exécution appartient à la prestation
+    // Charger l'exécution AVANT le check de permission (besoin de modePilotage)
     const [execution] = await db
       .select({
         id: clientServiceExecutions.id,
         serviceEntrepriseId: clientServiceExecutions.serviceEntrepriseId,
+        modePilotage: clientServiceExecutions.modePilotage,
       })
       .from(clientServiceExecutions)
       .where(
@@ -849,26 +837,48 @@ export const deleteExecutionAction = actionClient
       throw errors.notFound("Exécution");
     }
 
-    // Prestataire : vérifier que cette exécution appartient à leur entreprise
-    const activePostureDelete = await getActivePosture();
-    if (
-      activePostureDelete === "prestataire" &&
-      execution.serviceEntrepriseId
-    ) {
-      const prestataireAdhesion = await getUserPrestataireAdhesion({
-        userId: currentUser.id,
-      });
-      if (prestataireAdhesion) {
-        const [se] = await db
-          .select({ entrepriseId: serviceEntreprises.entrepriseId })
-          .from(serviceEntreprises)
-          .where(eq(serviceEntreprises.id, execution.serviceEntrepriseId))
-          .limit(1);
-        if (!se || se.entrepriseId !== prestataireAdhesion.entrepriseId) {
-          throw errors.forbidden(
-            "Vous ne pouvez supprimer que les exécutions de votre entreprise.",
-          );
+    // Vérifier les permissions : plateforme toujours, sinon admin du côté qui pilote
+    // - modePilotage "client"        → client admin uniquement
+    // - modePilotage "prestataire"   → prestataire admin uniquement (+ ownership check)
+    // - modePilotage "collaboration" → client admin OU prestataire admin
+    const platformRoleDelete = await getEffectivePlateformeRole(currentUser.id);
+    const isPlateformeDelete = !!platformRoleDelete?.role;
+
+    if (!isPlateformeDelete) {
+      const activePostureDelete = await getActivePosture();
+      let canDelete = false;
+
+      const clientCanDelete =
+        execution.modePilotage === "client" ||
+        execution.modePilotage === "collaboration";
+      const prestataireCanDelete =
+        execution.modePilotage === "prestataire" ||
+        execution.modePilotage === "collaboration";
+
+      if (activePostureDelete === "client" && clientCanDelete) {
+        const clientAdhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        canDelete = clientAdhesion?.role === "admin";
+      } else if (activePostureDelete === "prestataire" && prestataireCanDelete) {
+        const prestataireAdhesion = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
+        if (prestataireAdhesion?.role === "admin" && execution.serviceEntrepriseId) {
+          const [se] = await db
+            .select({ entrepriseId: serviceEntreprises.entrepriseId })
+            .from(serviceEntreprises)
+            .where(eq(serviceEntreprises.id, execution.serviceEntrepriseId))
+            .limit(1);
+          canDelete = !!se && se.entrepriseId === prestataireAdhesion.entrepriseId;
         }
+      }
+
+      if (!canDelete) {
+        throw errors.forbidden(
+          "Seul l'administrateur du côté qui pilote cette exécution peut la supprimer.",
+        );
       }
     }
 
@@ -902,6 +912,13 @@ export const getExecutionsAction = actionClient
     if (!prestation || prestation.entrepriseId !== parsedInput.entrepriseId) {
       throw errors.notFound("Prestation");
     }
+
+    const canAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
+    if (!canAccess)
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
 
     const executions = await getExecutionsWithPrixByPrestationId(
       parsedInput.prestationId,

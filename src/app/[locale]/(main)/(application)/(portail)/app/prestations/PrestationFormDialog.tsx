@@ -75,6 +75,7 @@ import {
   useFieldArray,
   useForm,
   useFormState,
+  useWatch,
 } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -435,9 +436,9 @@ export function PrestationFormDialog({
     name: "prix",
   });
 
-  const frequenceValue = form.watch("frequence");
-  const modePlanningValue = form.watch("modePlanning");
-  const watchedPrix = execForm.watch("prix");
+  const frequenceValue = useWatch({ control: form.control, name: "frequence" });
+  const modePlanningValue = useWatch({ control: form.control, name: "modePlanning" });
+  const watchedPrix = useWatch({ control: execForm.control, name: "prix" });
 
   const showFrequenceParPeriode =
     frequenceValue !== undefined &&

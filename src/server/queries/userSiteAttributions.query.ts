@@ -235,6 +235,24 @@ export async function getAvailableSitesForAttribution(
 }
 
 /**
+ * Retourne tous les siteIds effectivement attribués à un utilisateur client.
+ * Utilisé pour le filtrage de la liste des prestations (posture client non-admin).
+ * Prend en compte le scope "subtree" via getUserClientSiteAttributions.
+ */
+export async function getAllClientSiteIds({
+  userId,
+  entrepriseId,
+}: {
+  userId: string;
+  entrepriseId: string;
+}): Promise<string[]> {
+  const { attributions } = await getUserClientSiteAttributions({ userId, entrepriseId });
+  return attributions
+    .filter((a) => a.mode === "inclure")
+    .map((a) => a.siteId);
+}
+
+/**
  * Récupère les ancêtres d'un site via la closure table sitesArborescence
  * @returns Array d'objets { ancetreId, profondeur } triés par profondeur ASC (plus proche en premier)
  */
