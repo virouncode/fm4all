@@ -458,22 +458,20 @@ export function PrestationDetailsClient({
         }}
         className="flex min-h-0 flex-1 flex-col"
       >
-        <TabsList className={`grid w-full ${canSeeFinancials ? "grid-cols-3" : "grid-cols-2"}`}>
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="parametres" className="gap-2">
             <Settings className="h-4 w-4" />
             Paramètres
           </TabsTrigger>
-          {canSeeFinancials && (
-            <TabsTrigger value="execution" className="gap-2">
-              <Zap className="h-4 w-4" />
-              Exécution & Tarifs
-              {executions.length > 0 && (
-                <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
-                  {executions.length}
-                </span>
-              )}
-            </TabsTrigger>
-          )}
+          <TabsTrigger value="execution" className="gap-2">
+            <Zap className="h-4 w-4" />
+            Exécution & Tarifs
+            {executions.length > 0 && (
+              <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
+                {executions.length}
+              </span>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="interventions" className="gap-2">
             <Calendar className="h-4 w-4" />
             Interventions
@@ -712,23 +710,21 @@ export function PrestationDetailsClient({
         </TabsContent>
 
         {/* ============ TAB: EXÉCUTION & TARIFS ============ */}
-        {canSeeFinancials && (
-          <TabsContent
-            value="execution"
-            className="mt-6 min-h-0 flex-1 overflow-y-auto pb-6"
-          >
-            <ExecutionTab
-              executions={executions}
-              canManage={canManage}
-              canAdmin={canAdmin}
-              isPlateforme={isPlateforme}
-              canChangeModePilotage={canChangeModePilotage}
-              clientHasActiveAdmin={clientHasActiveAdmin}
-              prestation={prestation}
-              onExecutionsChange={setExecutions}
-            />
-          </TabsContent>
-        )}
+        <TabsContent
+          value="execution"
+          className="mt-6 min-h-0 flex-1 overflow-y-auto pb-6"
+        >
+          <ExecutionTab
+            executions={executions}
+            canManage={canManage}
+            canAdmin={canAdmin}
+            isPlateforme={isPlateforme}
+            canChangeModePilotage={canChangeModePilotage}
+            clientHasActiveAdmin={clientHasActiveAdmin}
+            prestation={prestation}
+            onExecutionsChange={setExecutions}
+          />
+        </TabsContent>
 
         {/* ============ TAB: INTERVENTIONS ============ */}
         <TabsContent

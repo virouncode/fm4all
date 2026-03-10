@@ -169,16 +169,15 @@ export default async function PrestationDetailPage({
     }
   }
 
-  // defaultTab : si l'utilisateur n'a pas accès aux données financières, redirect vers "parametres"
-  const defaultTab =
-    resolvedSearchParams.tab === "execution" && !canSeeFinancials
-      ? "parametres"
-      : (resolvedSearchParams.tab ?? "parametres");
+  const defaultTab = resolvedSearchParams.tab ?? "parametres";
 
-  // 6. Charger les exécutions et leurs prix (uniquement si accès aux données financières)
+  // 6. Charger les exécutions (toujours visible) ; prix inclus uniquement si accès financier
+  // Tous les rôles ayant accès à la prestation peuvent voir les infos fonctionnelles (§3a, §4a).
+  // Les prix/montants sont strippés côté serveur pour les non-financiers (§3b, §4b).
+  const rawExecutions = await getExecutionsWithPrixByPrestationId(prestationId);
   const executions = canSeeFinancials
-    ? await getExecutionsWithPrixByPrestationId(prestationId)
-    : [];
+    ? rawExecutions
+    : rawExecutions.map((e) => ({ ...e, prix: [] }));
 
   // 7. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin
   const [

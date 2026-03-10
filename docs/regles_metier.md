@@ -642,6 +642,8 @@ if (!isAdmin) {
 >
 > ⚠️ Ne pas confondre avec les **occurrences** (`clientServiceOccurrences`) qui représentent les interventions terrain réelles. Les exécutions définissent **qui fait quoi et comment** ; les occurrences correspondent aux **passages effectifs**.
 
+> **Règle fondamentale sur le rôle `manager` :** Le rôle d'adhésion `manager` ne confère **aucune permission opérationnelle** sur les exécutions (ni création, ni modification, ni désactivation, ni changement de `modePilotage`). Pour tout utilisateur non-`admin`, c'est exclusivement l'**attribution de site** qui détermine les droits. Un utilisateur `manager` possédant également une attribution `responsable_site` sur le site concerné obtient les droits correspondants **via son attribution de site**, non via son rôle d'adhésion.
+
 ---
 
 ## 1. Définition d'une exécution
@@ -698,6 +700,8 @@ Changer `modePilotage` change qui crée les occurrences, qui les planifie, qui l
 | Client | `admin`, `responsable_site` |
 | Prestataire | `admin`, `responsable_site` |
 | Plateforme | Toujours |
+
+> **Rappel manager :** Le rôle `manager` (adhésion) ne donne pas accès à la modification de `modePilotage`. Seul le rôle `admin` (adhésion) ou une attribution `responsable_site` sur le site concerné confèrent ce droit — quel que soit le rôle d'adhésion par ailleurs.
 
 ---
 
