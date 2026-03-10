@@ -26,9 +26,11 @@ import { cookies } from "next/headers";
  * - pris_en_charge → en_attente_client     : PRESTATAIRE responsable + plateforme
  * - pris_en_charge → a_valider             : PRESTATAIRE responsable + plateforme
  * - pris_en_charge → annule                : responsable (les deux côtés) + plateforme
+ * - en_attente_prestataire → pris_en_charge    : responsable (les deux côtés) + plateforme
  * - en_attente_prestataire → en_attente_client : PRESTATAIRE responsable + plateforme
  * - en_attente_prestataire → a_valider         : PRESTATAIRE responsable + plateforme
  * - en_attente_prestataire → annule            : responsable + plateforme
+ * - en_attente_client → pris_en_charge         : responsable (les deux côtés) + plateforme
  * - en_attente_client → en_attente_prestataire : CLIENT responsable + plateforme
  * - en_attente_client → a_valider              : PRESTATAIRE responsable + plateforme
  * - en_attente_client → annule                 : responsable + plateforme
@@ -61,13 +63,11 @@ export async function isStatusTransitionAllowed({
   const cookieStore = await cookies();
   const posture = cookieStore.get("fm4all:postureActive")?.value;
 
-  // Déterminer le côté de l'utilisateur
-  const isClientSide =
-    posture === "client" || ticket.proprietaireEntrepriseId === entrepriseId;
-  const isPrestataireSide =
-    posture === "prestataire" ||
-    ticket.assigneEntrepriseId === entrepriseId ||
-    ticket.demandeurEntrepriseId === entrepriseId;
+  // Déterminer le côté de l'utilisateur uniquement depuis le cookie (BUG-01 fix)
+  // Ne jamais inférer la posture depuis les IDs du ticket — une entreprise peut
+  // être à la fois client et prestataire, ce qui créerait des bypasses de permission.
+  const isClientSide = posture !== "prestataire"; // client ou absent → côté client
+  const isPrestataireSide = posture === "prestataire";
 
   // Rôle effectif sur le site (posture-aware)
   // Toujours utiliser ticket.proprietaireEntrepriseId pour la lookup
@@ -136,22 +136,36 @@ export async function isStatusTransitionAllowed({
     }
 
     case "en_attente_prestataire": {
+      if (newStatut === "pris_en_charge") {
+        // Retour en traitement (les deux côtés peuvent reprendre)
+        return isResponsable;
+      }
       if (newStatut === "en_attente_client") {
         return isPrestataireSide && isResponsable;
       }
       if (newStatut === "a_valider") {
         return isPrestataireSide && isResponsable;
       }
+      if (newStatut === "annule") {
+        return isResponsable;
+      }
       return false;
     }
 
     case "en_attente_client": {
+      if (newStatut === "pris_en_charge") {
+        // Retour en traitement (les deux côtés peuvent reprendre)
+        return isResponsable;
+      }
       if (newStatut === "en_attente_prestataire") {
         // Client répond, balle retourne chez prestataire
         return isClientSide && isResponsable;
       }
       if (newStatut === "a_valider") {
         return isPrestataireSide && isResponsable;
+      }
+      if (newStatut === "annule") {
+        return isResponsable;
       }
       return false;
     }
@@ -160,6 +174,9 @@ export async function isStatusTransitionAllowed({
       if (newStatut === "clos") {
         // Seul le client valide et clôt
         return isClientSide && isResponsable;
+      }
+      if (newStatut === "annule") {
+        return isResponsable;
       }
       return false;
     }

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/db";
-import { userPrestataireAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { getUserClientSiteAttributions } from "@/server/queries/userSiteAttributions.query";
 import {
   getAllPrestataireSiteIds,
@@ -129,7 +129,19 @@ export async function canUserAccessTicket({
   // Vérifier que le ticket appartient à l'entreprise cliente
   if (ticket.proprietaireEntrepriseId !== entrepriseId) return false;
 
-  // Vérifier que le site est dans le périmètre effectif du client
+  // Admin client → accès à tous les tickets de l'entreprise (sans restriction de site)
+  const clientAdhesion = await db.query.userClientAdhesions.findFirst({
+    where: and(
+      eq(userClientAdhesions.userId, userId),
+      eq(userClientAdhesions.entrepriseId, entrepriseId),
+      eq(userClientAdhesions.statut, "actif"),
+    ),
+    columns: { role: true },
+  });
+
+  if (clientAdhesion?.role === "admin") return true;
+
+  // Non-admin: vérifier que le site est dans le périmètre effectif du client
   const accessibleSiteIds = await getUserAccessibleSiteIdsForTickets({
     userId,
     entrepriseId,

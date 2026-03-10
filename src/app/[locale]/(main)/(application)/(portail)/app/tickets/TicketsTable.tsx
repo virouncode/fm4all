@@ -55,6 +55,7 @@ type FiltersType = {
   type?: string;
   siteId?: string;
   proprietaireEntrepriseId?: string;
+  demandeurEntrepriseId?: string;
   assigneEntrepriseId?: string;
 };
 
@@ -138,6 +139,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     type: searchParams.type,
     siteId: searchParams.siteId,
     proprietaireEntrepriseId: searchParams.proprietaireEntrepriseId,
+    demandeurEntrepriseId: searchParams.demandeurEntrepriseId,
     assigneEntrepriseId: searchParams.assigneEntrepriseId,
   });
 
@@ -164,6 +166,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
       type: searchParams.type,
       siteId: searchParams.siteId,
       proprietaireEntrepriseId: searchParams.proprietaireEntrepriseId,
+      demandeurEntrepriseId: searchParams.demandeurEntrepriseId,
       assigneEntrepriseId: searchParams.assigneEntrepriseId,
     });
   }, [
@@ -173,6 +176,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     searchParams.type,
     searchParams.siteId,
     searchParams.proprietaireEntrepriseId,
+    searchParams.demandeurEntrepriseId,
     searchParams.assigneEntrepriseId,
   ]);
 
@@ -384,6 +388,9 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     if (newFilters.siteId) query.siteId = newFilters.siteId;
     if (newFilters.proprietaireEntrepriseId) {
       query.proprietaireEntrepriseId = newFilters.proprietaireEntrepriseId;
+    }
+    if (newFilters.demandeurEntrepriseId) {
+      query.demandeurEntrepriseId = newFilters.demandeurEntrepriseId;
     }
     if (newFilters.assigneEntrepriseId) {
       query.assigneEntrepriseId = newFilters.assigneEntrepriseId;

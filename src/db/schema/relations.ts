@@ -644,11 +644,11 @@ export const occurrenceTachesRelations = relations(
 
 export const ticketsRelations = relations(tickets, ({ one, many }) => ({
   occurrence: one(clientServiceOccurrences, {
-    fields: [tickets.occurenceId],
+    fields: [tickets.occurrenceId],
     references: [clientServiceOccurrences.id],
   }),
   occurrenceTache: one(occurrenceTaches, {
-    fields: [tickets.occurenceTacheId],
+    fields: [tickets.occurrenceTacheId],
     references: [occurrenceTaches.id],
   }),
   proprietaireEntreprise: one(entreprises, {

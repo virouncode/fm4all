@@ -1,53 +1,53 @@
 import "server-only";
 
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { TicketMessageVisibiliteType } from "@/zod-schemas/enums";
+import { cookies } from "next/headers";
 
 /**
  * Vérifie si un utilisateur peut écrire avec une visibilité donnée
  *
  * Règles métier:
- * - Plateforme: ✅ Peut tout écrire
+ * - Plateforme (posture-aware): ✅ Peut tout écrire
  * - Client: ❌ Ne peut PAS écrire prestataire_only
  * - Prestataire: ❌ Ne peut PAS écrire client_only
  * - public et fm4all_only: Tous peuvent écrire (filtrage lecture géré ailleurs)
  *
+ * La posture est lue exclusivement depuis le cookie `fm4all:postureActive`.
+ * Ne pas inférer la posture depuis les rôles DB de l'entreprise — une entreprise
+ * peut être à la fois cliente et prestataire.
+ *
  * @param userId - ID de l'utilisateur
- * @param entrepriseId - ID de l'entreprise active
  * @param visibilite - Visibilité souhaitée pour le message
  * @returns true si l'utilisateur peut écrire avec cette visibilité
  */
 export async function canUserWriteVisibility({
   userId,
-  entrepriseId,
   visibilite,
 }: {
   userId: string;
-  entrepriseId: string;
+  entrepriseId?: string; // conservé pour compatibilité, non utilisé
   visibilite: TicketMessageVisibiliteType;
 }): Promise<boolean> {
-  // Plateforme peut tout écrire
-  const platformRole = await getUserPlateformeAdhesion(userId);
+  // Plateforme (posture cookie = "plateforme") → bypass total
+  const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) {
     return true;
   }
 
-  // Déterminer posture (client/prestataire)
-  const { getEntrepriseById } = await import(
-    "@/server/queries/entreprise.query"
-  );
-  const entreprise = await getEntrepriseById(entrepriseId);
+  // Déterminer posture depuis cookie uniquement
+  const cookieStore = await cookies();
+  const posture = cookieStore.get("fm4all:postureActive")?.value;
 
-  const isClient = entreprise?.roles.includes("client");
-  const isFournisseur = entreprise?.roles.includes("prestataire");
+  const isPrestataire = posture === "prestataire";
 
   // Client ne peut pas écrire prestataire_only
-  if (isClient && visibilite === "prestataire_only") {
+  if (!isPrestataire && visibilite === "prestataire_only") {
     return false;
   }
 
-  // Fournisseur ne peut pas écrire client_only
-  if (isFournisseur && visibilite === "client_only") {
+  // Prestataire ne peut pas écrire client_only
+  if (isPrestataire && visibilite === "client_only") {
     return false;
   }
 

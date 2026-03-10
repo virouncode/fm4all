@@ -27,7 +27,7 @@ import { fr } from "date-fns/locale";
 import { FileText, Paperclip, Send } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useFieldArray, useForm, useFormState } from "react-hook-form";
+import { useFieldArray, useForm, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 type MessageAttachmentType = {
@@ -190,7 +190,7 @@ export function TicketMessagesSection({
   const { isSubmitting, isDirty } = useFormState({ control: form.control });
 
   // Vérifier si un attachement est en cours d'upload
-  const attachments = form.watch("attachments");
+  const attachments = useWatch({ control: form.control, name: "attachments" });
   const hasPendingAttachment = attachments?.some(
     (att) => !att || !att.storageKey,
   );

@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@/db";
 import { tickets, ticketMessages } from "@/db/schema/tickets";
 import { sites } from "@/db/schema/sites";
-import { userPrestataireAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { user } from "@/db/schema/auth";
 import { documents, documentsLinks } from "@/db/schema/documents";
@@ -64,13 +64,27 @@ export async function getTicketsByPerimetre({
   // 1. Calculer le périmètre accessible selon posture
   let accessibleSiteIds: string[] = [];
   let prestataireIsAdmin = false;
+  let clientIsAdmin = false;
 
   if (posture === "client") {
-    // Client: sites du périmètre effectif
-    accessibleSiteIds = await getUserAccessibleSiteIdsForTickets({
-      userId,
-      entrepriseId,
+    // Admin client → voit tous les tickets de l'entreprise (sans restriction de site)
+    const clientAdhesion = await db.query.userClientAdhesions.findFirst({
+      where: and(
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+      columns: { role: true },
     });
+    clientIsAdmin = clientAdhesion?.role === "admin";
+
+    if (!clientIsAdmin) {
+      // Non-admin: sites du périmètre effectif
+      accessibleSiteIds = await getUserAccessibleSiteIdsForTickets({
+        userId,
+        entrepriseId,
+      });
+    }
   } else if (posture === "prestataire") {
     // Prestataire: tickets assignés à son entreprise
     // Admin → tous les tickets assignés, sinon filtrer par sites attribués
@@ -101,10 +115,15 @@ export async function getTicketsByPerimetre({
   if (posture === "plateforme") {
     // Plateforme: aucun filtre de périmètre, voit TOUS les tickets
   } else if (posture === "client") {
-    if (accessibleSiteIds.length === 0) {
-      return { items: [], total: 0, page: filters.page, pageSize: filters.pageSize };
+    // Filtre sur l'entreprise propriétaire (toujours)
+    conditions.push(eq(tickets.proprietaireEntrepriseId, entrepriseId));
+    if (!clientIsAdmin) {
+      // Non-admin: restreindre aux sites attribués
+      if (accessibleSiteIds.length === 0) {
+        return { items: [], total: 0, page: filters.page, pageSize: filters.pageSize };
+      }
+      conditions.push(inArray(tickets.siteId, accessibleSiteIds));
     }
-    conditions.push(inArray(tickets.siteId, accessibleSiteIds));
   } else if (posture === "prestataire") {
     if (!prestataireIsAdmin && accessibleSiteIds.length === 0) {
       return { items: [], total: 0, page: filters.page, pageSize: filters.pageSize };
@@ -222,8 +241,8 @@ export async function getTicketsByPerimetre({
   const queryBuilder = db
     .select({
       id: tickets.id,
-      occurenceId: tickets.occurenceId,
-      occurenceTacheId: tickets.occurenceTacheId,
+      occurrenceId: tickets.occurrenceId,
+      occurrenceTacheId: tickets.occurrenceTacheId,
       proprietaireEntrepriseId: tickets.proprietaireEntrepriseId,
       demandeurEntrepriseId: tickets.demandeurEntrepriseId,
       assigneEntrepriseId: tickets.assigneEntrepriseId,

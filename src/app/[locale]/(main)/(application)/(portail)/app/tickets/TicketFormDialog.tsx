@@ -27,7 +27,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useFieldArray, useForm, useFormState } from "react-hook-form";
+import { useFieldArray, useForm, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 type TicketFormDialogProps = {
@@ -82,7 +82,7 @@ export function TicketFormDialog({
   const { isSubmitting, isDirty } = useFormState({ control: form.control });
 
   // Vérifier si un attachement est en cours d'upload (pas encore de storageKey)
-  const attachments = form.watch("attachments");
+  const attachments = useWatch({ control: form.control, name: "attachments" });
   const hasPendingAttachment = attachments?.some(
     (att) => !att || !att.storageKey,
   );

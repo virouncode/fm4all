@@ -1404,12 +1404,12 @@ export const linkTicketToOccurrenceAction = actionClient
     const [updatedTicket] = await db
       .update(tickets)
       .set({
-        occurenceId: occurrenceId,
+        occurrenceId: occurrenceId,
         updatedById: currentUser.id,
         updatedAt: new Date(),
       })
       .where(eq(tickets.id, ticketId))
-      .returning({ id: tickets.id, occurenceId: tickets.occurenceId });
+      .returning({ id: tickets.id, occurrenceId: tickets.occurrenceId });
 
     if (!updatedTicket)
       throw errors.internal("Échec de la liaison ticket ↔ occurrence.");
@@ -1446,7 +1446,7 @@ export const unlinkTicketFromOccurrenceAction = actionClient
       .select({ id: tickets.id })
       .from(tickets)
       .where(
-        and(eq(tickets.id, ticketId), eq(tickets.occurenceId, occurrenceId)),
+        and(eq(tickets.id, ticketId), eq(tickets.occurrenceId, occurrenceId)),
       )
       .limit(1);
 
@@ -1455,7 +1455,7 @@ export const unlinkTicketFromOccurrenceAction = actionClient
     await db
       .update(tickets)
       .set({
-        occurenceId: null,
+        occurrenceId: null,
         updatedById: currentUser.id,
         updatedAt: new Date(),
       })
@@ -1496,7 +1496,7 @@ export const getAvailableTicketsForLinkingAction = actionClient
         statut: tickets.statut,
         priorite: tickets.priorite,
         type: tickets.type,
-        occurenceId: tickets.occurenceId,
+        occurrenceId: tickets.occurrenceId,
         createdAt: tickets.createdAt,
       })
       .from(tickets)
@@ -1504,8 +1504,8 @@ export const getAvailableTicketsForLinkingAction = actionClient
         and(
           eq(tickets.proprietaireEntrepriseId, entrepriseId),
           or(
-            isNull(tickets.occurenceId),
-            eq(tickets.occurenceId, occurrenceId),
+            isNull(tickets.occurrenceId),
+            eq(tickets.occurrenceId, occurrenceId),
           ),
         ),
       )
@@ -1550,7 +1550,7 @@ export const getTicketsByOccurrenceAction = actionClient
         createdAt: tickets.createdAt,
       })
       .from(tickets)
-      .where(eq(tickets.occurenceId, occurrenceId))
+      .where(eq(tickets.occurrenceId, occurrenceId))
       .orderBy(tickets.createdAt);
 
     return { tickets: linkedTickets };

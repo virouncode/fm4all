@@ -47,8 +47,8 @@ export const getEffectivePlateformeRole = cache(async (userId: string) => {
  *   (entrepriseId = entreprise CLIENTE propriétaire du site)
  * - posture "client" ou défaut → vérifie userClientSiteAttributions
  *
- * Note : pour la posture prestataire, seul "responsable_site" est retourné
- * (les rôles intervenant_site/demandeur_site/observateur_site sont en TODO).
+ * Note : pour la posture prestataire, tous les rôles sont retournés
+ * (responsable_site, intervenant_site, demandeur_site, observateur_site).
  */
 export async function resolvePostureAwareSiteRole({
   userId,

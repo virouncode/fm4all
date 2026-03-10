@@ -23,13 +23,13 @@ export const tickets = pgTable(
   "tickets",
   {
     id: id(),
-    occurenceId: uuid("occurence_id").references(
+    occurrenceId: uuid("occurence_id").references(
       () => clientServiceOccurrences.id,
       {
         onDelete: "set null",
       },
     ),
-    occurenceTacheId: uuid("occurence_tache_id").references(
+    occurrenceTacheId: uuid("occurence_tache_id").references(
       () => occurrenceTaches.id,
       {
         onDelete: "set null",
@@ -74,8 +74,8 @@ export const tickets = pgTable(
     index("tickets_proprietaire_idx").on(t.proprietaireEntrepriseId),
     index("tickets_demandeur_idx").on(t.demandeurEntrepriseId),
     index("tickets_assigne_entreprise_idx").on(t.assigneEntrepriseId),
-    index("tickets_occurence_idx").on(t.occurenceId),
-    index("tickets_occurence_tache_idx").on(t.occurenceTacheId),
+    index("tickets_occurence_idx").on(t.occurrenceId),
+    index("tickets_occurence_tache_idx").on(t.occurrenceTacheId),
     index("tickets_statut_idx").on(t.statut),
     index("tickets_priorite_idx").on(t.priorite),
     index("tickets_type_idx").on(t.type),

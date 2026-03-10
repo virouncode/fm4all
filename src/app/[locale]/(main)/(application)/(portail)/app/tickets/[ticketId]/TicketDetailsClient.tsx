@@ -124,6 +124,7 @@ export function TicketDetailsClient({
   site,
   siteResponsables,
   proprietaireEntreprise,
+  demandeurEntreprise,
   assigneEntreprise,
   attachments,
   messages,
@@ -538,6 +539,73 @@ export function TicketDetailsClient({
             )}
           </CardContent>
         </Card>
+
+        {/* Entreprise demandeur (affiché si différente du propriétaire) */}
+        {ticket.demandeurEntrepriseId !== ticket.proprietaireEntrepriseId && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base font-medium">
+                <Building2 className="text-primary h-4 w-4" />
+                Demandeur
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {demandeurEntreprise ? (
+                <>
+                  <div>
+                    <p className="text-foreground text-sm font-semibold">
+                      {demandeurEntreprise.nom}
+                    </p>
+                    <p className="text-muted-foreground mt-0.5 text-xs">
+                      SIRET: {demandeurEntreprise.siret}
+                    </p>
+                  </div>
+                  {(demandeurEntreprise.prenomContact ||
+                    demandeurEntreprise.nomContact ||
+                    demandeurEntreprise.phoneContact ||
+                    demandeurEntreprise.emailContact) && (
+                    <div className="space-y-2">
+                      {(demandeurEntreprise.prenomContact ||
+                        demandeurEntreprise.nomContact) && (
+                        <div className="flex items-center gap-2">
+                          <User className="text-primary h-4 w-4 shrink-0" />
+                          <span className="text-sm font-medium">
+                            {demandeurEntreprise.prenomContact}{" "}
+                            {demandeurEntreprise.nomContact}
+                          </span>
+                        </div>
+                      )}
+                      {demandeurEntreprise.phoneContact && (
+                        <a
+                          href={`tel:${demandeurEntreprise.phoneContact}`}
+                          className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
+                        >
+                          <Phone className="text-primary h-4 w-4 shrink-0" />
+                          <span>{demandeurEntreprise.phoneContact}</span>
+                        </a>
+                      )}
+                      {demandeurEntreprise.emailContact && (
+                        <a
+                          href={`mailto:${demandeurEntreprise.emailContact}`}
+                          className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
+                        >
+                          <Mail className="text-primary h-4 w-4 shrink-0" />
+                          <span className="truncate">
+                            {demandeurEntreprise.emailContact}
+                          </span>
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-muted-foreground text-sm italic">
+                  Entreprise inconnue
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Prestataire assigné */}
         <Card>

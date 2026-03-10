@@ -486,15 +486,9 @@ export const changeTicketStatusAction = actionClient
       updates.priseEnChargeAt = now;
     }
 
-    if (parsedInput.newStatut === "a_valider") {
-      updates.resolvedAt = now;
-    }
-
     if (parsedInput.newStatut === "clos") {
+      updates.resolvedAt = now;
       updates.closedAt = now;
-      if (!ticket.resolvedAt) {
-        updates.resolvedAt = now;
-      }
     }
 
     if (
@@ -925,12 +919,12 @@ export const updateTicketStatutAction = actionClient
       updates.priseEnChargeAt = now;
     }
 
-    if (parsedInput.statut === "a_valider" && !ticket.resolvedAt) {
+    if (parsedInput.statut === "clos") {
       updates.resolvedAt = now;
+      updates.closedAt = now;
     }
 
     if (
-      parsedInput.statut === "clos" ||
       parsedInput.statut === "annule" ||
       parsedInput.statut === "rejete"
     ) {
