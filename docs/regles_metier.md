@@ -1317,3 +1317,422 @@ await db.delete(clientServiceOccurrences).where(...);
 ---
 
 *Dernière mise à jour : 2026-03-10*
+
+---
+
+# Règles Métier — Module Tâches (`occurrenceTaches`)
+
+> Référence unique pour toutes les permissions liées aux tâches d'une occurrence.
+> À consulter systématiquement avant d'implémenter ou de modifier une permission.
+>
+> ⚠️ Ne pas confondre avec les **checklists** (`tacheListeTemplates` / `tacheListeItems`) qui définissent les modèles de tâches. Les tâches sont les **instances concrètes**, créées par snapshot lors de l'affectation d'une checklist à une occurrence.
+
+---
+
+## 1. Définition d'une tâche
+
+Une tâche (`occurrenceTache`) représente une action à réaliser dans le cadre d'une occurrence. Elle peut être :
+
+- **Issue d'un template** — snapshot d'un `tacheListeItem` au moment de l'affectation de la checklist à l'occurrence
+- **Ad hoc** — créée manuellement par un utilisateur autorisé (`listeItemId = null`)
+
+| Champ | Rôle |
+|-------|------|
+| `occurrenceId` | L'occurrence parente |
+| `listeItemId` | Référence au template d'origine (nullable si ad hoc) |
+| `titre` | Snapshot du titre au moment de la création (immuable si issu d'un template) |
+| `description` | Snapshot de la description (immuable si issu d'un template) |
+| `statut` | État courant de la tâche |
+| `assigneeUserId` | L'utilisateur assigné (souvent renseigné au démarrage) |
+| `startedAt` | Renseigné automatiquement au démarrage |
+| `doneAt` | Renseigné automatiquement à la terminaison |
+| `completeeParUserId` | L'utilisateur qui a terminé la tâche |
+| `tempsPasseSecondes` | Calculé automatiquement (`doneAt - startedAt`), corrigeable par admin/responsable_site |
+
+> **Doctrine :** le snapshot `titre + description` garantit que les occurrences passées restent intactes même si le template évolue. Une tâche ne peut jamais être supprimée — on change son statut.
+
+---
+
+## 2. Statuts et machine d'état
+
+### Valeurs
+
+- `a_faire` — tâche créée, non démarrée
+- `en_cours` — tâche démarrée (assignée et en cours d'exécution)
+- `terminee` — tâche accomplie (état final sauf correction superviseur)
+- `non_honoree` — prévue mais impossible à réaliser (ex : accès impossible)
+- `annulee` — annulée avant ou pendant l'exécution
+- `non_applicable` — non pertinente dans le contexte réel (ex : terrasse inaccessible)
+
+### Transitions autorisées
+
+```
+a_faire
+  │
+  ├──→ en_cours ──→ terminee
+  │
+  ├──→ non_honoree
+  │
+  ├──→ non_applicable
+  │
+  └──→ annulee
+```
+
+> **Note :** `terminee` est un état final sauf correction manuelle explicite du `tempsPasseSecondes` par un superviseur (admin ou responsable_site). Aucune transition de statut n'est autorisée depuis `terminee`.
+
+### Règle fondamentale
+
+**Jamais de DELETE.** Seul le statut change. Cela préserve l'historique, la traçabilité et l'intégrité des données de facturation.
+
+---
+
+## 3. Deux capacités distinctes
+
+Comme pour les occurrences, les permissions sur les tâches se décomposent en deux capacités orthogonales :
+
+| Capacité | Actions couvertes |
+|----------|------------------|
+| `canManage` | Créer des tâches ad hoc, modifier les tâches ad hoc, annuler, corriger `tempsPasseSecondes` |
+| `canExecute` | Démarrer (auto-assignation), terminer, marquer `non_honoree`, marquer `non_applicable`, ajouter des PJ |
+
+> **Principe :** gérer c'est gouverner les tâches (création, suppression logique, correction). Exécuter c'est réaliser le travail terrain. Ce ne sont pas les mêmes personnes ni les mêmes droits.
+
+---
+
+## 4. Visibilité des tâches
+
+La visibilité d'une tâche suit exactement la visibilité de son occurrence parente.
+
+### Posture CLIENT
+
+| Rôle | Voit les tâches |
+|------|----------------|
+| `admin` | Toutes les tâches des occurrences de l'entreprise |
+| `responsable_site` (attribution) | Tâches des occurrences des sites attribués |
+| `demandeur_site` (attribution) | Tâches des occurrences des sites attribués |
+| `observateur_site` (attribution) | Tâches des occurrences des sites attribués (lecture seule) |
+
+### Posture PRESTATAIRE
+
+**Condition préalable :** `execution.prestataireEntrepriseId = sonEntrepriseId`
+
+| Rôle | Voit les tâches |
+|------|----------------|
+| `admin` | Toutes les tâches des occurrences liées à ses exécutions |
+| `manager` | Tâches des occurrences des sites clients attribués |
+| `responsable_site` (attribution) | Tâches des occurrences des sites clients attribués |
+| `intervenant_site` (attribution) | Tâches des occurrences des sites clients attribués |
+| `observateur_site` (attribution) | Tâches des occurrences des sites clients attribués (lecture seule) |
+
+### Posture PLATEFORME
+
+Toutes les tâches sans filtre.
+
+---
+
+## 5. Création de tâches
+
+### Tâches issues d'un template (snapshot)
+
+Créées automatiquement lors de l'affectation d'une checklist à une occurrence. Aucune permission utilisateur requise — c'est le moteur qui les crée.
+
+### Tâches ad hoc (création manuelle)
+
+La création manuelle est restreinte pour ne pas contourner les checklists définies.
+
+| Posture | Rôle | Peut créer une tâche ad hoc |
+|---------|------|-----------------------------|
+| CLIENT | `admin` | ✅ Sur toutes les occurrences de l'entreprise |
+| CLIENT | `responsable_site` | ✅ Sur les occurrences de ses sites attribués |
+| CLIENT | `demandeur_site`, `observateur_site` | ❌ |
+| PRESTATAIRE | `admin` | ✅ Sur toutes les occurrences de ses exécutions |
+| PRESTATAIRE | `responsable_site` | ✅ Sur les occurrences de ses sites clients attribués |
+| PRESTATAIRE | `intervenant_site`, `observateur_site`, `manager` | ❌ |
+| PLATEFORME | Tous | ✅ |
+
+> **Rationale :** les intervenants terrain ne peuvent pas créer de tâches ad hoc — cela risquerait de casser la structure des checklists validées. Seuls les superviseurs (admin, responsable_site) ont ce droit.
+
+---
+
+## 6. Démarrage d'une tâche
+
+### Condition de statut
+
+Le démarrage n'est autorisé que depuis le statut `a_faire` :
+
+| Statut | Démarrage |
+|--------|-----------|
+| `a_faire` | ✅ |
+| `en_cours` | ❌ (déjà démarrée) |
+| `terminee` | ❌ |
+| `non_honoree` | ❌ |
+| `non_applicable` | ❌ |
+| `annulee` | ❌ |
+
+### Effets automatiques du démarrage
+
+```
+statut         → en_cours
+startedAt      → now()
+assigneeUserId → currentUser.id
+```
+
+### Qui peut démarrer ?
+
+Le droit de démarrer suit `canExecute`, conditionné par le `modePilotage` de l'exécution parente.
+
+| Posture | Rôle | Mode `client` | Mode `prestataire` | Mode `collaboration` |
+|---------|------|:---:|:---:|:---:|
+| CLIENT | `admin` | ✅ | ❌ | ✅ |
+| CLIENT | `responsable_site` | ✅ | ❌ | ✅ |
+| CLIENT | `demandeur_site` | ✅ | ❌ | ✅ |
+| CLIENT | `observateur_site` | ❌ | ❌ | ❌ |
+| PRESTATAIRE | `admin` | ❌ | ✅ | ✅ |
+| PRESTATAIRE | `responsable_site` | ❌ | ✅ | ✅ |
+| PRESTATAIRE | `intervenant_site` | ❌ | ✅ | ✅ |
+| PRESTATAIRE | `observateur_site` | ❌ | ❌ | ❌ |
+| PLATEFORME | Tous | ✅ | ✅ | ✅ |
+
+---
+
+## 7. Terminaison d'une tâche
+
+### Condition
+
+Une tâche peut être terminée uniquement si `statut = en_cours`.
+
+### Effets automatiques
+
+```
+statut               → terminee
+doneAt               → now()
+completeeParUserId   → currentUser.id
+tempsPasseSecondes   → (doneAt - startedAt) en secondes
+```
+
+### Qui peut terminer ?
+
+Même droits que le démarrage, avec une restriction supplémentaire : seul l'utilisateur **assigné** à la tâche peut la terminer, sauf si `canManage` est vrai (admin ou responsable_site peuvent terminer n'importe quelle tâche de leur périmètre).
+
+| Condition | Peut terminer |
+|-----------|:---:|
+| `canManage` (admin ou responsable_site) | ✅ |
+| `canExecute` ET `assigneeUserId = currentUser.id` | ✅ |
+| `canExecute` mais pas assigné | ❌ |
+
+> **Rationale :** un intervenant non assigné ne doit pas pouvoir fermer la tâche d'un collègue. Le superviseur peut le faire pour débloquer une situation.
+
+---
+
+## 8. Statuts spéciaux
+
+### Non applicable (`non_applicable`)
+
+Indique que la tâche n'est pas pertinente dans le contexte réel (ex : nettoyer la terrasse → terrasse inaccessible pour travaux).
+
+- Statut source autorisé : `a_faire` ou `en_cours`
+- Qui peut marquer : utilisateurs ayant `canExecute` ou `canManage` selon `modePilotage`
+
+### Non honorée (`non_honoree`)
+
+Indique que la tâche était prévue mais n'a pas pu être réalisée (ex : vider les poubelles → accès refusé).
+
+- Statut source autorisé : `a_faire` ou `en_cours`
+- Qui peut marquer : utilisateurs ayant `canExecute` ou `canManage` selon `modePilotage`
+
+### Annulation (`annulee`)
+
+Acte fort — la tâche ne sera pas réalisée et ne doit pas figurer dans les statistiques de réalisation.
+
+- Statut source autorisé : `a_faire` ou `en_cours`
+- Qui peut annuler : `canManage` uniquement (admin ou responsable_site)
+
+> **Rationale :** l'annulation est une décision de gouvernance, pas une décision terrain. Un intervenant peut marquer une tâche non applicable ou non honorée, mais seul un superviseur peut l'annuler.
+
+---
+
+## 9. Pièces jointes (preuves)
+
+Les pièces jointes sur une tâche servent de **preuves d'exécution** (photo avant/après, bon de livraison, etc.).
+
+- Stockage via `documents` + `documentsLinks` (`occurrenceTacheId` renseigné)
+- Maximum recommandé : 2 PJ par tâche
+- Format : images et PDFs uniquement
+
+### Qui peut ajouter des PJ ?
+
+| Condition | Peut ajouter |
+|-----------|:---:|
+| `canExecute` ET tâche `en_cours` | ✅ |
+| `canManage` ET tâche `en_cours` | ✅ |
+| Tâche dans un autre statut | ❌ |
+
+### Qui peut voir les PJ ?
+
+Tout utilisateur pouvant voir la tâche peut voir ses pièces jointes.
+
+---
+
+## 10. Temps passé (`tempsPasseSecondes`)
+
+### Calcul automatique
+
+Lors de la terminaison d'une tâche :
+
+```
+tempsPasseSecondes = (doneAt - startedAt) en secondes
+```
+
+### Correction manuelle
+
+Le temps calculé automatiquement peut être incorrect (pause, oubli de démarrage…). Un superviseur peut le corriger manuellement.
+
+| Condition | Peut corriger |
+|-----------|:---:|
+| `canManage` (admin ou responsable_site) ET tâche `terminee` | ✅ |
+| Tous les autres cas | ❌ |
+
+- Valeur minimale : 0 seconde
+- Valeur maximale : 604 800 secondes (7 jours)
+
+> **Rationale :** la correction est réservée aux superviseurs pour éviter que les intervenants manipulent leurs temps de travail. La tâche doit être `terminee` — on ne corrige pas un temps en cours d'exécution.
+
+---
+
+## 11. Modification et suppression des tâches ad hoc
+
+Les tâches issues d'un template (snapshot) ne peuvent pas être modifiées ni supprimées — le snapshot est immuable.
+
+Les tâches ad hoc peuvent être modifiées ou supprimées logiquement (via `annulee`) par les utilisateurs ayant `canManage`.
+
+| Action | Condition |
+|--------|-----------|
+| Modifier une tâche ad hoc | `canManage` + tâche `a_faire` ou `en_cours` |
+| Annuler une tâche ad hoc | `canManage` + tâche `a_faire` ou `en_cours` |
+| Modifier une tâche template | ❌ Jamais (snapshot immuable) |
+| Supprimer physiquement une tâche | ❌ Jamais |
+
+---
+
+## 12. Résumé matriciel complet
+
+### Actions par rôle (toutes postures)
+
+| Action | `admin` | `responsable_site` | `demandeur_site` / `intervenant_site` | `observateur_site` |
+|--------|---------|--------------------|---------------------------------------|-------------------|
+| **Voir** | ✅ | ✅ (sites attribués) | ✅ (sites attribués) | ✅ (RO) |
+| **Créer ad hoc** | ✅ | ✅ | ❌ | ❌ |
+| **Modifier ad hoc** | ✅ | ✅ | ❌ | ❌ |
+| **Annuler** | ✅ | ✅ | ❌ | ❌ |
+| **Démarrer** | ✅ (selon modePilotage) | ✅ (selon modePilotage) | ✅ (selon modePilotage) | ❌ |
+| **Terminer** | ✅ | ✅ | ✅ si assigné | ❌ |
+| **Non applicable** | ✅ | ✅ | ✅ | ❌ |
+| **Non honorée** | ✅ | ✅ | ✅ | ❌ |
+| **Ajouter PJ** | ✅ si en_cours | ✅ si en_cours | ✅ si en_cours | ❌ |
+| **Corriger tempsPassé** | ✅ si terminee | ✅ si terminee | ❌ | ❌ |
+
+> **Note :** le `modePilotage` de l'exécution parente contraint les actions Démarrer/Terminer/Non applicable/Non honorée — voir §6 et §7.
+
+---
+
+## 13. Règles techniques d'implémentation
+
+### Fetch de la tâche avant le check de permission
+
+Pour vérifier `isAssignée`, la tâche doit être récupérée AVANT de calculer les permissions :
+
+```typescript
+// ✅ CORRECT — fetch d'abord, check après
+const tache = await getTacheById(tacheId);
+const isAssignee = tache.assigneeUserId === currentUser.id;
+const canTerminer = canManage || (canExecute && isAssignee);
+
+if (!canTerminer) throw errors.forbidden("...");
+```
+
+### Terminaison — transaction atomique avec calcul du temps
+
+```typescript
+await db.transaction(async (tx) => {
+  const now = new Date();
+  const tempsPasseSecondes = tache.startedAt
+    ? Math.floor((now.getTime() - tache.startedAt.getTime()) / 1000)
+    : 0;
+
+  await tx.update(occurrenceTaches)
+    .set({
+      statut: "terminee",
+      doneAt: now,
+      completeeParUserId: currentUser.id,
+      tempsPasseSecondes,
+      updatedById: currentUser.id,
+    })
+    .where(eq(occurrenceTaches.id, tacheId));
+});
+```
+
+### Correction du temps passé — validation des bornes
+
+```typescript
+// ✅ CORRECT — validation 0 à 604800 secondes (7 jours max)
+const MAX_TEMPS_PASSE = 7 * 24 * 60 * 60; // 604800
+
+if (tempsPasseSecondes < 0 || tempsPasseSecondes > MAX_TEMPS_PASSE) {
+  throw errors.badRequest("Temps passé invalide (0 à 604800 secondes).");
+}
+
+if (tache.statut !== "terminee") {
+  throw errors.forbidden("Seule une tâche terminée peut être corrigée.");
+}
+```
+
+### Jamais de DELETE — toujours un statut
+
+```typescript
+// ✅ CORRECT
+await db.update(occurrenceTaches)
+  .set({ statut: "annulee", updatedById: currentUser.id })
+  .where(eq(occurrenceTaches.id, tacheId));
+
+// ❌ JAMAIS
+await db.delete(occurrenceTaches).where(...);
+```
+
+### Snapshot immuable pour les tâches issues d'un template
+
+```typescript
+// À la création (snapshot)
+await tx.insert(occurrenceTaches).values({
+  occurrenceId,
+  listeItemId: item.id,          // Référence au template
+  titre: item.titre,             // Snapshot — copie au moment T
+  description: item.description, // Snapshot — copie au moment T
+  statut: "a_faire",
+  // ...
+});
+
+// Lors d'une tentative de modification du titre d'une tâche template
+if (tache.listeItemId !== null) {
+  throw errors.forbidden("Les tâches issues d'un template ne peuvent pas être modifiées.");
+}
+```
+
+---
+
+## 14. Résumé rapide
+
+| Règle | Valeur |
+|-------|--------|
+| Suppression physique | ❌ Jamais — statut uniquement |
+| Démarrage | `a_faire` + `canExecute` (selon `modePilotage`) → auto-assignation |
+| Terminaison | `en_cours` + (`canManage` OU assigné + `canExecute`) |
+| Non applicable / Non honorée | `a_faire` ou `en_cours` + `canExecute` ou `canManage` |
+| Annulation | `a_faire` ou `en_cours` + `canManage` uniquement |
+| Création ad hoc | `canManage` uniquement (admin + responsable_site) |
+| Tâche template | Snapshot immuable — aucune modification de contenu |
+| PJ preuves | `canExecute` ou `canManage` + tâche `en_cours` |
+| Correction temps passé | `canManage` + tâche `terminee` + 0–604 800 s |
+
+---
+
+*Dernière mise à jour : 2026-03-10*
