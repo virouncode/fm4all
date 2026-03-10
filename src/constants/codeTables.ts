@@ -399,6 +399,18 @@ export const roleEntrepriseCodes = roleEntrepriseCT.map(
   ...(typeof roleEntrepriseCT)[number]["code"][],
 ];
 
+export const invitationTypeAdhesionCT = [
+  { code: "client", name: "Client" },
+  { code: "prestataire", name: "Prestataire" },
+] as const;
+
+export const invitationTypeAdhesionCodes = invitationTypeAdhesionCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof invitationTypeAdhesionCT)[number]["code"],
+  ...(typeof invitationTypeAdhesionCT)[number]["code"][],
+];
+
 export const roleClientAdhesionCT = [
   //Droits globaux, indépendants des sites (posture client)
   { code: "admin", name: "Administrateur" },

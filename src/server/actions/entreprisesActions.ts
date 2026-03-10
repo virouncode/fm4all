@@ -1020,7 +1020,7 @@ export const inviterEntrepriseAdminAction = actionClient
       );
     }
 
-    // 3. Récupérer le nom de l'entreprise pour l'email
+    // 3. Récupérer le nom et les rôles de l'entreprise pour l'email et le type d'adhésion
     const [entreprise] = await db
       .select({ nom: entreprises.nom })
       .from(entreprises)
@@ -1029,7 +1029,19 @@ export const inviterEntrepriseAdminAction = actionClient
 
     if (!entreprise) throw errors.notFound("Entreprise introuvable.");
 
-    // 3. Annuler les invitations en attente existantes
+    const companyRoles = await db
+      .select({ role: entrepriseRoles.role })
+      .from(entrepriseRoles)
+      .where(eq(entrepriseRoles.entrepriseId, parsedInput.entrepriseId));
+    const roles = companyRoles.map((r) => r.role);
+
+    // Déterminer le type d'adhésion à créer selon les rôles de l'entreprise.
+    // Si double-rôle (client + prestataire), on prioritise "client".
+    const typeAdhesion: "client" | "prestataire" = roles.includes("client")
+      ? "client"
+      : "prestataire";
+
+    // 4. Annuler les invitations en attente existantes
     await db
       .delete(entrepriseInvitations)
       .where(
@@ -1039,7 +1051,7 @@ export const inviterEntrepriseAdminAction = actionClient
         ),
       );
 
-    // 4. Créer la nouvelle invitation
+    // 5. Créer la nouvelle invitation
     const token = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const sentAt = new Date();
@@ -1048,6 +1060,7 @@ export const inviterEntrepriseAdminAction = actionClient
       entrepriseId: parsedInput.entrepriseId,
       email: parsedInput.email,
       token,
+      typeAdhesion,
       expiresAt,
       createdById: currentUser.id,
       updatedById: currentUser.id,
@@ -1087,6 +1100,7 @@ export const accepterInvitationAdminAction = actionClient
         id: entrepriseInvitations.id,
         entrepriseId: entrepriseInvitations.entrepriseId,
         email: entrepriseInvitations.email,
+        typeAdhesion: entrepriseInvitations.typeAdhesion,
         createdById: entrepriseInvitations.createdById,
       })
       .from(entrepriseInvitations)
@@ -1102,15 +1116,7 @@ export const accepterInvitationAdminAction = actionClient
     if (!invitation)
       throw errors.notFound("Lien d'invitation invalide ou expiré.");
 
-    // 2. Récupérer les rôles de l'entreprise
-    const companyRoles = await db
-      .select({ role: entrepriseRoles.role })
-      .from(entrepriseRoles)
-      .where(eq(entrepriseRoles.entrepriseId, invitation.entrepriseId));
-
-    const roles = companyRoles.map((r) => r.role);
-
-    // 3. Normaliser les données
+    // 2. Normaliser les données
     const normalized = normalizeForSubmit(parsedInput, {
       optionalStrings: ["phone"] as const,
     });
@@ -1149,7 +1155,7 @@ export const accepterInvitationAdminAction = actionClient
     // Si la transaction échoue, supprimer l'utilisateur Better Auth pour éviter un compte orphelin
     try {
       await db.transaction(async (tx) => {
-        if (roles.includes("client")) {
+        if (invitation.typeAdhesion === "client") {
           await tx
             .insert(userClientAdhesions)
             .values({
@@ -1161,9 +1167,7 @@ export const accepterInvitationAdminAction = actionClient
               updatedById: invitation.createdById,
             })
             .onConflictDoNothing();
-        }
-
-        if (roles.includes("prestataire")) {
+        } else {
           await tx
             .insert(userPrestataireAdhesions)
             .values({

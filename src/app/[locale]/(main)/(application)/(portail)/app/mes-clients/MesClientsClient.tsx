@@ -163,12 +163,8 @@ export function MesClientsClient() {
           clientNom={inviteTarget.nom}
           defaultEmail={inviteTarget.emailContact}
           onSuccess={() => {
-            setClients((prev) =>
-              prev.map((c) =>
-                c.id === inviteTarget.id ? { ...c, hasActiveAdmin: true } : c,
-              ),
-            );
             setInviteTarget(null);
+            loadClients();
           }}
         />
       )}

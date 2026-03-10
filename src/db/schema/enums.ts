@@ -22,6 +22,7 @@ import {
   factureLigneTypeCodes,
   factureStatutCodes,
   frequenceCodes,
+  invitationTypeAdhesionCodes,
   occurrenceStatutCodes,
   occurrenceTacheStatutCodes,
   paiementMethodeCodes,
@@ -179,6 +180,11 @@ export const adhesionStatutEnum = pgEnum(
 );
 
 export const frequenceEnum = pgEnum("frequence", frequenceCodes);
+
+export const invitationTypeAdhesionEnum = pgEnum(
+  "invitation_type_adhesion",
+  invitationTypeAdhesionCodes,
+);
 
 export const documentCategorieEnum = pgEnum(
   "document_categorie",

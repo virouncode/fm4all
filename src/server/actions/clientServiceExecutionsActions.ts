@@ -23,7 +23,6 @@ import {
 } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
-import { auth } from "@/server/auth/auth";
 import { getSession } from "@/server/auth/get-session";
 import { sendEmailDirect } from "@/server/email/mailgunDirect";
 import {
@@ -69,7 +68,6 @@ import {
 } from "@/zod-schemas/clientServiceExecutions.schema";
 import { and, count, eq, gt, isNull, lt, ne } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
-import { headers } from "next/headers";
 import { z } from "zod";
 
 // ==================== HELPERS ====================
@@ -1487,11 +1485,6 @@ export const getMesClientsAction = actionClient
     if (!adhesion) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
-    if (adhesion.role === "collaborateur") {
-      throw errors.forbidden(
-        "Vous devez être au moins manager pour accéder à la liste des clients.",
-      );
-    }
 
     const rolePrest = await db.query.entrepriseRoles.findFirst({
       where: and(
@@ -1520,13 +1513,19 @@ export const createOrLinkClientAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    // Vérifier que l'utilisateur a accès à l'entreprise prestataire
-    const hasAccess = await hasAccessToEntreprise(
-      currentUser.id,
-      parsedInput.prestataireEntrepriseId,
-    );
-    if (!hasAccess) {
+    // Vérifier que l'utilisateur a accès à l'entreprise prestataire avec au moins le rôle manager
+    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.userId, currentUser.id),
+        eq(userPrestataireAdhesions.entrepriseId, parsedInput.prestataireEntrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    });
+    if (!prestataireAdhesion) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+    if (prestataireAdhesion.role === "collaborateur") {
+      throw errors.forbidden("Vous devez être au moins manager pour ajouter un client.");
     }
 
     const { nom, prenomContact, nomContact, emailContact, phoneContact } =
@@ -1729,7 +1728,7 @@ export const inviterPrestataireAdminAction = actionClient
       );
     }
 
-    // 3. Vérifier qu'il n'y a pas déjà un admin actif
+    // 3. Vérifier qu'il n'y a pas déjà un admin actif côté prestataire
     const existingAdmin = await db.query.userPrestataireAdhesions.findFirst({
       where: and(
         eq(
@@ -1744,47 +1743,73 @@ export const inviterPrestataireAdminAction = actionClient
       throw errors.conflict("Ce prestataire a déjà un administrateur actif.");
     }
 
-    // 4. Créer le compte utilisateur avec mot de passe temporaire
-    const tempPassword = crypto.randomUUID();
-    let newUserId: string;
-    try {
-      const authResult = await auth.api.signUpEmail({
-        body: {
-          email: parsedInput.email,
-          password: tempPassword,
-          name: parsedInput.email,
-          prenom: "",
-          nom: "",
-        },
-      });
-      newUserId = authResult.user.id;
-    } catch {
+    // 4. Vérifier que l'email n'est pas déjà utilisé par un compte existant
+    const existingUser = await db
+      .select({ id: userTable.id })
+      .from(userTable)
+      .where(eq(userTable.email, parsedInput.email))
+      .limit(1);
+    if (existingUser.length > 0) {
       throw errors.conflict(
-        "Un compte existe déjà avec cet email. Demandez au prestataire de se connecter directement.",
+        `Un compte existe déjà avec l'adresse "${parsedInput.email}".`,
       );
     }
 
-    // 5. Créer l'adhésion admin dans l'entreprise prestataire
-    await db.insert(userPrestataireAdhesions).values({
-      userId: newUserId,
+    // 5. Récupérer le nom de l'entreprise prestataire pour l'email
+    const [prestataireEntreprise] = await db
+      .select({ nom: entreprises.nom })
+      .from(entreprises)
+      .where(eq(entreprises.id, parsedInput.prestataireEntrepriseId))
+      .limit(1);
+    if (!prestataireEntreprise)
+      throw errors.notFound("Entreprise prestataire introuvable.");
+
+    // 6. Annuler les invitations en attente existantes pour ce prestataire
+    await db
+      .delete(entrepriseInvitations)
+      .where(
+        and(
+          eq(
+            entrepriseInvitations.entrepriseId,
+            parsedInput.prestataireEntrepriseId,
+          ),
+          isNull(entrepriseInvitations.acceptedAt),
+        ),
+      );
+
+    // 7. Créer la nouvelle invitation (même flow que inviterClientAdminAction)
+    const token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const sentAt = new Date();
+
+    await db.insert(entrepriseInvitations).values({
       entrepriseId: parsedInput.prestataireEntrepriseId,
-      role: "admin",
-      statut: "actif",
+      email: parsedInput.email,
+      token,
+      typeAdhesion: "prestataire",
+      expiresAt,
       createdById: currentUser.id,
       updatedById: currentUser.id,
     });
 
-    // 6. Envoyer l'email d'activation (même pattern que insertUserAction)
-    const reqHeaders = await headers();
-    await auth.api.requestPasswordReset({
-      body: {
-        email: parsedInput.email,
-        redirectTo: `${process.env.APP_URL}/auth/reset-password`,
-      },
-      headers: reqHeaders,
+    // 8. Envoyer l'email d'invitation
+    const lien = `${process.env.APP_URL}/auth/inscription-admin?token=${token}`;
+    await sendEmailDirect({
+      to: parsedInput.email,
+      subject: "Invitation à rejoindre FM4ALL",
+      text: `
+        <h2>Vous avez été invité à rejoindre FM4ALL</h2>
+        <p>Vous avez été invité à créer votre compte administrateur pour l'entreprise <strong>${prestataireEntreprise.nom}</strong>.</p>
+        <p>Cliquez sur le lien ci-dessous pour créer votre compte :</p>
+        <p><a href="${lien}">Créer mon compte</a></p>
+        <p><small>Ce lien est valable 7 jours.</small></p>
+      `,
+      useTemplate: false,
     });
 
-    return { message: "Invitation envoyée avec succès." };
+    return {
+      pendingInvitation: { email: parsedInput.email, sentAt },
+    };
   });
 
 // ==================== INVITER ADMIN CLIENT (Posture Prestataire) ====================
@@ -1903,6 +1928,7 @@ export const inviterClientAdminAction = actionClient
       entrepriseId: parsedInput.clientEntrepriseId,
       email: parsedInput.email,
       token,
+      typeAdhesion: "client",
       expiresAt,
       createdById: currentUser.id,
       updatedById: currentUser.id,

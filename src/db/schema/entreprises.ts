@@ -17,7 +17,7 @@ import {
 } from "../schema-helper";
 import { user } from "./auth";
 import { documents } from "./documents";
-import { roleEntrepriseEnum } from "./enums";
+import { invitationTypeAdhesionEnum, roleEntrepriseEnum } from "./enums";
 import { prospects } from "./prospects";
 import { services } from "./services";
 
@@ -112,6 +112,7 @@ export const entrepriseInvitations = pgTable(
       .references(() => entreprises.id, { onDelete: "cascade" }),
     email: text("email").notNull(),
     token: text("token").notNull().unique(),
+    typeAdhesion: invitationTypeAdhesionEnum("type_adhesion").notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     acceptedAt: timestamp("accepted_at", { withTimezone: true }),
     createdById: createdById(() => user),

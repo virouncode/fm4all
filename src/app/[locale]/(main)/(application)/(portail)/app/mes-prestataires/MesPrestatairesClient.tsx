@@ -101,7 +101,8 @@ export function MesPrestatairesClient() {
         <span>
           Les informations de vos prestataires sont consultables mais non
           modifiables depuis votre espace. Pour mettre à jour leurs données,
-          invitez-les à créer leur compte ou{" "}
+          invitez-les à créer leur compte s&apos;ils n&apos;en ont pas encore un
+          ou{" "}
           <a
             href="mailto:contact@fm4all.com"
             className="underline underline-offset-2"
@@ -119,11 +120,13 @@ export function MesPrestatairesClient() {
         </div>
       ) : prestataires.length === 0 ? (
         <div className="flex flex-1 items-center justify-center">
-          <p className="text-muted-foreground text-sm">Aucun prestataire enregistré.</p>
+          <p className="text-muted-foreground text-sm">
+            Aucun prestataire enregistré.
+          </p>
         </div>
       ) : (
         <div className="flex-1 overflow-auto">
-          <div className="auto-rows-fr grid grid-cols-1 items-stretch gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
             {prestataires.map((p) => (
               <EntrepriseCard
                 key={p.id}
@@ -161,12 +164,8 @@ export function MesPrestatairesClient() {
           prestataireNom={inviteTarget.nom}
           defaultEmail={inviteTarget.emailContact}
           onSuccess={() => {
-            setPrestataires((prev) =>
-              prev.map((p) =>
-                p.id === inviteTarget.id ? { ...p, hasActiveAdmin: true } : p,
-              ),
-            );
             setInviteTarget(null);
+            loadPrestataires();
           }}
         />
       )}

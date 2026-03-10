@@ -2413,4 +2413,173 @@ Accessibles uniquement aux utilisateurs ayant un rôle plateforme actif.
 
 ---
 
+# Règles Métier — Module Mes Clients (`app/mes-clients`)
+
+> Référence unique pour les permissions liées à la gestion des clients d'un prestataire.
+> Accessible uniquement en posture **prestataire**.
+
+---
+
+## 1. Accès à la page
+
+Guard serveur (`page.tsx`) : l'utilisateur doit avoir une adhésion prestataire active.
+
+```
+userPrestataireAdhesions.userId   = currentUser.id
+userPrestataireAdhesions.statut   = "actif"
+```
+
+Sinon → redirect `/auth/unauthorized`.
+
+---
+
+## 2. Périmètre des clients affichés
+
+Un client apparaît dans la liste si au moins l'une des deux conditions est vraie :
+
+1. Une relation explicite existe dans `clientPrestataireRelations` (prestataire a ajouté ce client manuellement)
+2. Le prestataire a au moins une exécution active (`clientServiceExecutions`) liée à ce client
+
+---
+
+## 3. Matrice de permissions
+
+| Action | `admin` | `manager` | `collaborateur` |
+|--------|---------|-----------|-----------------|
+| Voir la liste des clients | ✅ | ✅ | ✅ |
+| Lier/créer un client (`AjouterClientDialog`) | ✅ | ✅ | ❌ |
+| Inviter l'admin d'un client (`InviterClientDialog`) | ✅ | ✅ | ❌ |
+
+---
+
+## 4. Lier un client — règles métier
+
+L'action `createOrLinkClientAction` fonctionne en deux cas :
+
+- **SIRET connu en DB** : aucune création d'entreprise — seul le lien `clientPrestataireRelations` est créé
+- **SIRET inconnu** : création de l'entreprise + attribution du rôle `"client"` + création du lien
+
+**Contraintes :**
+- Un prestataire ne peut pas s'ajouter lui-même comme client (`clientId ≠ prestataireEntrepriseId`)
+- Si la relation existe déjà (`clientPrestataireRelations`), le lien n'est pas recréé (`onConflictDoNothing`)
+- Requiert au minimum le rôle `manager`
+
+---
+
+## 5. Inviter l'admin d'un client — règles métier
+
+L'action `inviterClientAdminAction` envoie une invitation par email pour que le client crée son compte administrateur.
+
+**Conditions pour pouvoir inviter :**
+1. L'utilisateur prestataire est au moins `manager`
+2. La relation `clientPrestataireRelations` existe entre les deux entreprises
+3. Le client n'a pas encore d'admin actif (`userClientAdhesions.role = "admin"` et `statut = "actif"`)
+4. L'email cible n'est pas déjà utilisé par un compte existant
+
+**Effets :**
+1. Les invitations en attente existantes pour ce client sont annulées (`DELETE` sur `entrepriseInvitations` non acceptées)
+2. Une nouvelle invitation est créée (token UUID, expiration 7 jours, `typeAdhesion = "client"`)
+3. Un email est envoyé avec un lien `/auth/inscription-admin?token=…`
+
+**Note UI** : après l'envoi, la liste est rechargée depuis le serveur (`loadClients()`). Le bouton "Inviter" ne disparaît qu'une fois qu'un admin actif existe réellement en base — une invitation en attente ne suffit pas.
+
+---
+
+## 6. Lecture seule des infos client
+
+Un prestataire peut **consulter** les informations d'un client (nom, SIRET, contact) mais ne peut **pas les modifier**.
+
+> Rationale : un client peut être partagé entre plusieurs prestataires. Permettre à un prestataire de modifier les données partagées risquerait de créer des incohérences pour les autres.
+
+Pour toute mise à jour, le client doit créer son compte ou contacter FM4ALL.
+
+---
+
+# Règles Métier — Module Mes Prestataires (`app/mes-prestataires`)
+
+> Référence unique pour les permissions liées à la gestion des prestataires d'un client.
+> Accessible uniquement en posture **client**.
+
+---
+
+## 1. Accès à la page
+
+Guard serveur (`page.tsx`) : l'utilisateur doit avoir une adhésion client active.
+
+```
+userClientAdhesions.userId  = currentUser.id
+userClientAdhesions.statut  = "actif"
+```
+
+Sinon → redirect `/auth/unauthorized`.
+
+---
+
+## 2. Périmètre des prestataires affichés
+
+Un prestataire apparaît dans la liste si au moins l'une des deux conditions est vraie :
+
+1. Une relation explicite existe dans `clientPrestataireRelations` (le client a ajouté ce prestataire manuellement)
+2. Le prestataire a au moins une exécution active (`clientServiceExecutions`) liée à ce client
+
+---
+
+## 3. Matrice de permissions
+
+| Action | `admin` | `manager` | `collaborateur` |
+|--------|---------|-----------|-----------------|
+| Voir la liste des prestataires | ✅ | ✅ | ✅ |
+| Ajouter un prestataire (`AjouterPrestataireDialog`) | ✅ | ✅ | ❌ |
+| Inviter l'admin d'un prestataire (`InviterPrestataireDialog`) | ✅ | ✅ | ❌ |
+
+---
+
+## 4. Ajouter un prestataire — règles métier
+
+L'action `createOrLinkPrestataireAction` fonctionne en deux cas :
+
+- **SIRET connu en DB** : aucune création d'entreprise — seul le lien `clientPrestataireRelations` est créé
+- **SIRET inconnu** : création de l'entreprise + attribution du rôle `"prestataire"` + création du lien
+
+**Contraintes :**
+- Un client ne peut pas s'ajouter lui-même comme prestataire (`prestataireId ≠ clientEntrepriseId`)
+- Si la relation existe déjà (`clientPrestataireRelations`), le lien n'est pas recréé (`onConflictDoNothing`)
+- Requiert au minimum le rôle `manager`
+
+---
+
+## 5. Inviter l'admin d'un prestataire — règles métier
+
+L'action `inviterPrestataireAdminAction` envoie une invitation par email pour que le prestataire crée son compte administrateur.
+
+**Conditions pour pouvoir inviter :**
+1. L'utilisateur client est au moins `manager`
+2. La relation `clientPrestataireRelations` existe entre les deux entreprises
+3. Le prestataire n'a pas encore d'admin actif (`userPrestataireAdhesions.role = "admin"` et `statut = "actif"`)
+4. L'email cible n'est pas déjà utilisé par un compte existant
+
+**Effets :**
+1. Les invitations en attente existantes pour ce prestataire sont annulées (`DELETE` sur `entrepriseInvitations` non acceptées, filtrées par `typeAdhesion = "prestataire"`)
+2. Une nouvelle invitation est créée (token UUID, expiration 7 jours, `typeAdhesion = "prestataire"`)
+3. Un email est envoyé avec un lien `/auth/inscription-admin?token=…`
+
+**Important — `typeAdhesion` sur l'invitation** :
+Lors de l'acceptation (`accepterInvitationAdminAction`), le champ `typeAdhesion` détermine quelle adhésion est créée :
+- `"prestataire"` → insert dans `userPrestataireAdhesions`
+- `"client"` → insert dans `userClientAdhesions`
+
+Cela évite qu'une invitation prestataire crée accidentellement une adhésion client (risque pour les entreprises ayant les deux rôles simultanément).
+
+---
+
+## 6. Lecture seule des infos prestataire
+
+Un client peut **consulter** les informations d'un prestataire (nom, SIRET, contact) mais ne peut **pas les modifier**.
+
+> Rationale : un prestataire peut être partagé entre plusieurs clients. Permettre à un client de modifier les données partagées risquerait de créer des incohérences pour les autres.
+
+Pour toute mise à jour, le prestataire doit créer son compte ou contacter FM4ALL.
+
+---
+
 *Dernière mise à jour : 2026-03-10*
