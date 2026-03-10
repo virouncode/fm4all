@@ -3,11 +3,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { roleClientAdhesionCT, rolePlateformeAdhesionCT } from "@/constants/codeTables";
+import {
+  roleClientAdhesionCT,
+  rolePlateformeAdhesionCT,
+} from "@/constants/codeTables";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { cn } from "@/lib/utils";
 import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
 import { getUserPrestataireSiteAttributionsAction } from "@/server/actions/userPrestataireSiteAttributionsActions";
+import { resendVerificationEmailAction } from "@/server/actions/usersActions";
 import { getUserClientSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
@@ -24,13 +28,15 @@ import {
   Pencil,
   Phone,
   Plus,
+  Send,
   Shield,
   User as UserIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { UserPrestataireSiteAttributionsList } from "./UserPrestataireSiteAttributionsList";
 import { UserSiteAttributionDialog } from "./UserSiteAttributionDialog";
 import { UserSiteAttributionsList } from "./UserSiteAttributionsList";
-import { UserPrestataireSiteAttributionsList } from "./UserPrestataireSiteAttributionsList";
 
 type UserDetailsProps = {
   user: UserWithAdhesionType;
@@ -53,6 +59,7 @@ export function UserDetails({
   const postureActive = useAppStore((state) => state.postureActive);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isSendingEmail, startSendingEmail] = useTransition();
 
   // Site attributions state (posture client)
   const [attributions, setAttributions] = useState<
@@ -318,7 +325,33 @@ export function UserDetails({
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {postureActive === "plateforme" && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isSendingEmail}
+              onClick={() =>
+                startSendingEmail(async () => {
+                  const result = await resendVerificationEmailAction({
+                    userId: user.id,
+                  });
+                  if (result?.serverError) {
+                    toast.error(
+                      result.serverError.message ?? "Une erreur est survenue.",
+                    );
+                  } else {
+                    toast.success(
+                      `Email d'activation envoyé à ${user.email}.`,
+                    );
+                  }
+                })
+              }
+            >
+              <Send className="h-4 w-4" />
+              Renvoyer l&apos;email d&apos;activation
+            </Button>
+          )}
           {canEdit && (
             <Button variant="outline" size="sm" onClick={onEdit}>
               <Pencil className="h-4 w-4" />

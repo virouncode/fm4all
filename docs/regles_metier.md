@@ -2376,4 +2376,41 @@ Un même compte peut avoir des adhésions dans plusieurs postures. La posture ac
 
 ---
 
+## 7. Module Entreprises
+
+### 7a. Page `app/mon-entreprise` (postures client / prestataire / plateforme)
+
+Accessible à tout utilisateur ayant une adhésion active (client ou prestataire) dans l'entreprise.
+
+| Action | Condition |
+|--------|-----------|
+| Voir les informations | Toute adhésion active (client OU prestataire) |
+| Modifier infos (nom, SIRET, TVA) | `role === "admin"` dans l'adhésion active |
+| Modifier contact | idem |
+| Modifier logo | idem |
+| Modifier rôles / services | idem |
+| Inviter un administrateur | idem (seulement si `!hasActiveAdmin`) |
+
+**Règle plateforme** : un utilisateur en posture plateforme a accès à tout (bypass admin check).
+
+**Implémentation** :
+- UI : `canEdit = roleClientAdhesion === "admin" || rolePrestataireAdhesion === "admin"` dans `MonEntrepriseClient`
+- Serveur : vérifier `plateformeRole` OU `clientAdhesion.role === "admin"` OU `prestataireAdhesion.role === "admin"` (même entreprise)
+
+### 7b. Pages `app/entreprises` et `app/entreprises/[entrepriseId]` (posture plateforme uniquement)
+
+Accessibles uniquement aux utilisateurs ayant un rôle plateforme actif.
+
+| Action | Condition |
+|--------|-----------|
+| Voir la liste des entreprises | Rôle plateforme actif |
+| Voir le détail d'une entreprise | Rôle plateforme actif |
+| Créer une entreprise | Rôle plateforme actif |
+| Modifier infos / contact / logo / rôles | Rôle plateforme actif |
+| Inviter un administrateur | Rôle plateforme actif |
+
+**Note** : Ces pages utilisent le même composant `EntrepriseDetailsClient` que `app/mon-entreprise`, avec `canEdit = true` passé depuis la page plateforme (après guard serveur).
+
+---
+
 *Dernière mise à jour : 2026-03-10*

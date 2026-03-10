@@ -14,12 +14,15 @@ import { useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 
-type Props = {
+type InscriptionAdminFormProps = {
   token: string;
   email: string;
 };
 
-export default function InscriptionAdminForm({ token, email }: Props) {
+export default function InscriptionAdminForm({
+  token,
+  email,
+}: InscriptionAdminFormProps) {
   const [success, setSuccess] = useState(false);
 
   const form = useForm<InscriptionAdminFormType>({
@@ -59,6 +62,10 @@ export default function InscriptionAdminForm({ token, email }: Props) {
           Un email a été envoyé à <strong>{email}</strong> pour définir votre
           mot de passe. Vous pourrez ensuite ajouter une photo de profil depuis
           vos paramètres.
+        </p>
+        <p className="text-muted-foreground text-xs">
+          Si vous ne recevez pas l&apos;email, contactez un administrateur
+          FM4ALL qui pourra vous renvoyer l&apos;email d&apos;activation.
         </p>
       </div>
     );

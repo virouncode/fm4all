@@ -1352,3 +1352,42 @@ export const addAdhesionToExistingUserAction = actionClient
       message: `Adhésion ${posture} ajoutée avec succès à ${targetUser.prenom} ${targetUser.nom}.`,
     };
   });
+
+/**
+ * Renvoie l'email de vérification / définition de mot de passe à un utilisateur.
+ * Réservé à la posture plateforme.
+ */
+export const resendVerificationEmailAction = actionClient
+  .metadata({ actionName: "resendVerificationEmailAction" })
+  .inputSchema(z.object({ userId: z.string().uuid() }), {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!plateformeRole)
+      throw errors.forbidden(
+        "Seule la plateforme peut renvoyer un email de vérification.",
+      );
+
+    const targetUser = await db.query.user.findFirst({
+      where: eq(user.id, parsedInput.userId),
+      columns: { email: true },
+    });
+
+    if (!targetUser) throw errors.notFound("Utilisateur introuvable.");
+
+    await auth.api.requestPasswordReset({
+      body: {
+        email: targetUser.email,
+        redirectTo: `${process.env.APP_URL}/auth/reset-password?type=activation`,
+      },
+      headers: await headers(),
+    });
+
+    return { success: true };
+  });

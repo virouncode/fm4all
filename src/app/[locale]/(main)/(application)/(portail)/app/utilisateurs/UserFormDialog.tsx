@@ -792,7 +792,9 @@ function EditUserForm({
 
     if (result?.data?.emailChanged) {
       toast.warning(
-        "Utilisateur mis à jour. Un email de vérification a été envoyé au nouvel email.",
+        isEditingSelf
+          ? "Votre email a été modifié. Un email de vérification vous a été envoyé."
+          : `Utilisateur mis à jour. Un email de vérification a été envoyé à ${result.data.user?.email}.`,
         { duration: 8000 },
       );
     } else {

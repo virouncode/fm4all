@@ -37,7 +37,10 @@ import {
   getProspectsPaginated,
 } from "@/server/queries/prospects.query";
 import { getAllServices } from "@/server/queries/services.query";
-import { getUserPrestataireAdhesion } from "@/server/queries/userAdhesions.query";
+import {
+  getUserClientAdhesion,
+  getUserPrestataireAdhesion,
+} from "@/server/queries/userAdhesions.query";
 import {
   deleteS3Object as deleteS3ObjectFromServer,
   promoteS3Key,
@@ -354,7 +357,8 @@ export const getProspectsAction = actionClient
 
 /**
  * Récupère la liste de tous les services du catalogue
- * Utilisé dans le formulaire de création d'une entreprise prestataire
+ * Utilisé dans le formulaire de création/modification d'une entreprise prestataire
+ * Accessible à tout utilisateur authentifié (catalogue non sensible)
  */
 export const getAllServicesAction = actionClient
   .metadata({ actionName: "getAllServicesAction" })
@@ -364,13 +368,6 @@ export const getAllServicesAction = actionClient
 
     if (!currentUser) {
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
-    }
-
-    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (!plateformeRole) {
-      throw errors.forbidden(
-        "Seule la plateforme peut accéder à cette ressource.",
-      );
     }
 
     const servicesData = await getAllServices();
@@ -547,13 +544,23 @@ export const updateEntrepriseInfosAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (!plateformeRole)
-      throw errors.forbidden(
-        "Seule la plateforme peut modifier les entreprises.",
-      );
-
     const { entrepriseId, nom, siret, numeroTva } = parsedInput;
+
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!plateformeRole) {
+      const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+        getUserClientAdhesion({ userId: currentUser.id, entrepriseId }),
+        getUserPrestataireAdhesion({ userId: currentUser.id }),
+      ]);
+      const isOwnEnterpriseAdmin =
+        clientAdhesion?.role === "admin" ||
+        (prestataireAdhesion?.entrepriseId === entrepriseId &&
+          prestataireAdhesion?.role === "admin");
+      if (!isOwnEnterpriseAdmin)
+        throw errors.forbidden(
+          "Vous n'avez pas les droits pour modifier cette entreprise.",
+        );
+    }
     const nomClean = upper(nom);
     const siretClean = siret.trim().replace(/\s/g, "");
     const numeroTvaClean =
@@ -608,12 +615,6 @@ export const updateEntrepriseContactAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (!plateformeRole)
-      throw errors.forbidden(
-        "Seule la plateforme peut modifier les entreprises.",
-      );
-
     const {
       entrepriseId,
       prenomContact,
@@ -621,6 +622,22 @@ export const updateEntrepriseContactAction = actionClient
       emailContact,
       phoneContact,
     } = parsedInput;
+
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!plateformeRole) {
+      const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+        getUserClientAdhesion({ userId: currentUser.id, entrepriseId }),
+        getUserPrestataireAdhesion({ userId: currentUser.id }),
+      ]);
+      const isOwnEnterpriseAdmin =
+        clientAdhesion?.role === "admin" ||
+        (prestataireAdhesion?.entrepriseId === entrepriseId &&
+          prestataireAdhesion?.role === "admin");
+      if (!isOwnEnterpriseAdmin)
+        throw errors.forbidden(
+          "Vous n'avez pas les droits pour modifier cette entreprise.",
+        );
+    }
 
     const normalized = normalizeForSubmit(
       { prenomContact, nomContact, emailContact, phoneContact },
@@ -669,14 +686,33 @@ export const updateEntrepriseRolesAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (!plateformeRole)
-      throw errors.forbidden(
-        "Seule la plateforme peut modifier les entreprises.",
-      );
-
     const { entrepriseId, roles, serviceIds } = parsedInput;
     const isPrestataire = roles.includes("prestataire");
+
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!plateformeRole) {
+      // Vérifier que l'utilisateur est admin de sa propre entreprise
+      const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+        getUserClientAdhesion({ userId: currentUser.id, entrepriseId }),
+        getUserPrestataireAdhesion({ userId: currentUser.id }),
+      ]);
+
+      const isOwnEnterpriseAdmin =
+        clientAdhesion?.role === "admin" ||
+        (prestataireAdhesion?.entrepriseId === entrepriseId &&
+          prestataireAdhesion?.role === "admin");
+
+      if (!isOwnEnterpriseAdmin) {
+        throw errors.forbidden(
+          "Vous n'avez pas les droits pour modifier les rôles de cette entreprise.",
+        );
+      }
+
+      // Garde serveur : le rôle "plateforme" est réservé à FM4ALL
+      if (roles.includes("plateforme")) {
+        throw errors.forbidden("Le rôle Plateforme est réservé à FM4ALL.");
+      }
+    }
 
     // --- Récupérer l'état actuel en DB ---
     const currentRolesRows = await db
@@ -827,13 +863,23 @@ export const updateEntrepriseLogoAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (!plateformeRole)
-      throw errors.forbidden(
-        "Seule la plateforme peut modifier les entreprises.",
-      );
-
     const { entrepriseId, logo } = parsedInput;
+
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!plateformeRole) {
+      const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+        getUserClientAdhesion({ userId: currentUser.id, entrepriseId }),
+        getUserPrestataireAdhesion({ userId: currentUser.id }),
+      ]);
+      const isOwnEnterpriseAdmin =
+        clientAdhesion?.role === "admin" ||
+        (prestataireAdhesion?.entrepriseId === entrepriseId &&
+          prestataireAdhesion?.role === "admin");
+      if (!isOwnEnterpriseAdmin)
+        throw errors.forbidden(
+          "Vous n'avez pas les droits pour modifier cette entreprise.",
+        );
+    }
 
     // Si la clé n'est pas temp, le logo n'a pas changé
     if (!logo.storageKey.startsWith("temp/")) {
@@ -899,7 +945,8 @@ export const updateEntrepriseLogoAction = actionClient
   });
 
 /**
- * Enregistre une invitation administrateur pour une entreprise (posture plateforme).
+ * Enregistre une invitation administrateur pour une entreprise.
+ * Accessible à la plateforme ou à un admin actif de l'entreprise (si pas encore d'admin actif).
  * Ne crée PAS de compte utilisateur — envoie uniquement un email avec un lien d'onboarding.
  */
 export const inviterEntrepriseAdminAction = actionClient
@@ -911,10 +958,23 @@ export const inviterEntrepriseAdminAction = actionClient
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (!plateformeRole)
-      throw errors.forbidden(
-        "Seule la plateforme peut inviter des administrateurs.",
-      );
+    if (!plateformeRole) {
+      const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+        getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId: parsedInput.entrepriseId,
+        }),
+        getUserPrestataireAdhesion({ userId: currentUser.id }),
+      ]);
+      const isOwnEnterpriseAdmin =
+        clientAdhesion?.role === "admin" ||
+        (prestataireAdhesion?.entrepriseId === parsedInput.entrepriseId &&
+          prestataireAdhesion?.role === "admin");
+      if (!isOwnEnterpriseAdmin)
+        throw errors.forbidden(
+          "Vous n'avez pas les droits pour inviter un administrateur.",
+        );
+    }
 
     // 1. Vérifier qu'il n'y a pas déjà un admin actif
     const existingClientAdmin = await db
@@ -1153,8 +1213,13 @@ export const accepterInvitationAdminAction = actionClient
         },
         headers: await headers(),
       });
-    } catch {
+    } catch (emailError) {
       // Email non bloquant — le compte est créé, l'utilisateur peut réinitialiser son mdp
+      console.error(
+        "[accepterInvitationAdminAction] Échec envoi email reset password:",
+        invitation.email,
+        emailError,
+      );
     }
 
     return {
