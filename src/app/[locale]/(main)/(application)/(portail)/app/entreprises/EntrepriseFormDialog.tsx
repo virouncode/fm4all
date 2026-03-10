@@ -17,11 +17,11 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { roleEntrepriseCodes } from "@/constants/codeTables";
 import { isValidSIRET } from "@/lib/utils/isValidSIRET";
+import { findEntrepriseBySiretAction } from "@/server/actions/clientServiceExecutionsActions";
 import {
   createEntrepriseAction,
   getAllServicesAction,
 } from "@/server/actions/entreprisesActions";
-import { findEntrepriseBySiretAction } from "@/server/actions/clientServiceExecutionsActions";
 import {
   type RoleEntrepriseType,
   type SelectProspectType,
@@ -72,13 +72,10 @@ const dialogFormSchema = z
     roles: z
       .array(z.enum(roleEntrepriseCodes))
       .min(1, "Sélectionnez au moins un rôle"),
-    serviceIds: z.array(z.string().uuid()),
+    serviceIds: z.array(z.uuid()),
   })
   .superRefine((data, ctx) => {
-    if (
-      data.roles.includes("prestataire") &&
-      data.serviceIds.length === 0
-    ) {
+    if (data.roles.includes("prestataire") && data.serviceIds.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Sélectionnez au moins un service pour ce prestataire",
@@ -121,7 +118,9 @@ export function EntrepriseFormDialog({
 }: EntrepriseFormDialogProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [siretInput, setSiretInput] = useState("");
-  const [siretState, setSiretState] = useState<SiretStateType>({ status: "idle" });
+  const [siretState, setSiretState] = useState<SiretStateType>({
+    status: "idle",
+  });
   const [services, setServices] = useState<ServiceItemType[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
   const [prospectPickerOpen, setProspectPickerOpen] = useState(false);
@@ -337,7 +336,7 @@ export function EntrepriseFormDialog({
                       <div className="flex gap-2">
                         <div className="relative flex-1">
                           <Input
-                            className={`font-mono pr-8 ${siretResolved ? "bg-muted cursor-default" : ""}`}
+                            className={`pr-8 font-mono ${siretResolved ? "bg-muted cursor-default" : ""}`}
                             placeholder="14 chiffres"
                             maxLength={14}
                             value={siretInput}
@@ -379,8 +378,7 @@ export function EntrepriseFormDialog({
                             size="sm"
                             className="shrink-0"
                             disabled={
-                              !siretValide ||
-                              siretState.status === "searching"
+                              !siretValide || siretState.status === "searching"
                             }
                             onClick={() => searchSiret(siretInput)}
                           >
@@ -574,9 +572,7 @@ export function EntrepriseFormDialog({
                     </Button>
                     <Button
                       type="button"
-                      disabled={
-                        !siretResolved || siretState.status === "found"
-                      }
+                      disabled={!siretResolved || siretState.status === "found"}
                       onClick={handleNext}
                     >
                       Suivant

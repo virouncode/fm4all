@@ -20,7 +20,7 @@ export type InsertServiceFormType = z.infer<typeof insertServiceFormSchema>;
 // ==================== UPDATE SCHEMAS ====================
 
 export const updateServiceFormSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   nom: z
     .string()
     .min(1, "Nom du service obligatoire")

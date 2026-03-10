@@ -107,6 +107,21 @@ export const devisStatutCodes = devisStatutCT.map((i) => i.code) as unknown as [
   ...(typeof devisStatutCT)[number]["code"][],
 ];
 
+export const devisDemandeStatutCT = [
+  { code: "ouverte", name: "Ouverte" },
+  { code: "en_cours", name: "En cours" },
+  { code: "cloturee", name: "Clôturée" },
+  { code: "annulee", name: "Annulée" },
+  { code: "archivee", name: "Archivée" },
+] as const;
+
+export const devisDemandeStatutCodes = devisDemandeStatutCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof devisDemandeStatutCT)[number]["code"],
+  ...(typeof devisDemandeStatutCT)[number]["code"][],
+];
+
 export const devisTypePrixCT = [
   { code: "abonnement", name: "Abonnement" },
   { code: "one_shot", name: "One-shot" },
@@ -485,6 +500,7 @@ export const documentCategorieCT = [
   { code: "contrat", name: "Contrat" },
   { code: "avenant", name: "Avenant" },
   { code: "devis", name: "Devis" },
+  { code: "devis_demande", name: "Demande de devis" },
   { code: "facture", name: "Facture" },
   { code: "bon_commande", name: "Bon de commande" },
 

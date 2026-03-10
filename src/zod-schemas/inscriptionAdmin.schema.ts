@@ -15,15 +15,20 @@ export const inscriptionAdminFormSchema = z.object({
   phone: phoneNumberSchemaEmpty("Numéro de téléphone invalide").optional(),
 });
 
-export type InscriptionAdminFormType = z.infer<typeof inscriptionAdminFormSchema>;
+export type InscriptionAdminFormType = z.infer<
+  typeof inscriptionAdminFormSchema
+>;
 
 /**
  * Schema pour inviterEntrepriseAdminAction
  * Email normalisé en lowercase pour cohérence avec Better Auth
  */
 export const inviterEntrepriseAdminSchema = z.object({
-  entrepriseId: z.string().uuid("ID entreprise invalide"),
-  email: z.string().email("Email invalide").transform((v) => lower(v)),
+  entrepriseId: z.uuid("ID entreprise invalide"),
+  email: z
+    .string()
+    .email("Email invalide")
+    .transform((v) => lower(v)),
 });
 
 export type InviterEntrepriseAdminType = z.infer<

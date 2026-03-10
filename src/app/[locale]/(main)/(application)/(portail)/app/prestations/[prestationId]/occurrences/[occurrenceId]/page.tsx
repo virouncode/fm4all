@@ -1,22 +1,25 @@
-import { redirect } from "@/i18n/navigation";
 import { db } from "@/db";
-import { userClientSiteAttributions } from "@/db/schema/users";
 import { sitesArborescence } from "@/db/schema/sites";
+import { userClientSiteAttributions } from "@/db/schema/users";
+import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import {
   getOccurrenceTaches,
   getOccurrenceWithDetailsById,
 } from "@/server/queries/clientServiceExecutions.query";
-import { getPrestationWithJoinsById, prestataireHasExecutionOnPrestation } from "@/server/queries/clientServices.query";
+import {
+  getPrestationWithJoinsById,
+  prestataireHasExecutionOnPrestation,
+} from "@/server/queries/clientServices.query";
 import {
   getUserClientAdhesion,
   getUserPrestataireAdhesion,
 } from "@/server/queries/userAdhesions.query";
+import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import {
   getEffectivePlateformeRole,
   resolvePostureAwareSiteRole,
 } from "@/server/utils/permissions.utils";
-import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { and, eq, inArray } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -71,7 +74,7 @@ export default async function OccurrenceDetailPage({
   const currentUser = session!.user;
 
   // 2. Valider les UUID avant les queries (évite une erreur DB si les IDs sont invalides)
-  const uuidSchema = z.string().uuid();
+  const uuidSchema = z.uuid();
   if (
     !uuidSchema.safeParse(prestationId).success ||
     !uuidSchema.safeParse(occurrenceId).success
@@ -96,7 +99,9 @@ export default async function OccurrenceDetailPage({
 
   if (!isPlateforme) {
     if (posture === "prestataire") {
-      const pAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+      const pAdhesion = await getUserPrestataireAdhesion({
+        userId: currentUser.id,
+      });
       if (!pAdhesion) notFound();
       prestataireEntrepriseId = pAdhesion.entrepriseId;
       prestataireAdhesionRole = pAdhesion.role;
@@ -109,7 +114,9 @@ export default async function OccurrenceDetailPage({
 
       // Non-admin : vérifier que le site de la prestation est dans les sites attribués
       if (pAdhesion.role !== "admin") {
-        const attributedSiteIds = await getAllPrestataireSiteIds({ userId: currentUser.id });
+        const attributedSiteIds = await getAllPrestataireSiteIds({
+          userId: currentUser.id,
+        });
         if (!attributedSiteIds.includes(prestation.siteId)) notFound();
       }
     } else {
@@ -180,7 +187,8 @@ export default async function OccurrenceDetailPage({
 
   // 7. canAssignOccurrence : assigner les intervenants prestataires (posture prestataire ou plateforme seulement)
   // Un client peut gérer l'occurrence (annuler, reprogrammer) mais ne choisit pas les employés prestataires.
-  const canAssignOccurrence = isPlateforme || (posture === "prestataire" && canManage);
+  const canAssignOccurrence =
+    isPlateforme || (posture === "prestataire" && canManage);
 
   // 8. Déterminer le mode de suivi (interne vs prestataire)
   let suiviMode: "interne" | "prestataire" = "interne";

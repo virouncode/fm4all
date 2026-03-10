@@ -16,11 +16,11 @@ import {
   getUserClientAdhesion,
   getUserPrestataireAdhesion,
 } from "@/server/queries/userAdhesions.query";
+import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import {
   getEffectivePlateformeRole,
   resolvePostureAwareSiteRole,
 } from "@/server/utils/permissions.utils";
-import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -46,7 +46,7 @@ export default async function PrestationDetailPage({
   const currentUser = session!.user;
 
   // 2. Valider UUID avant la query (évite une erreur DB si l'ID est invalide)
-  if (!z.string().uuid().safeParse(prestationId).success) {
+  if (!z.uuid().safeParse(prestationId).success) {
     notFound();
   }
 
@@ -82,7 +82,9 @@ export default async function PrestationDetailPage({
 
       // Non-admin : vérifier que le site de la prestation est dans les sites attribués
       if (prestataireAdhesion.role !== "admin") {
-        const attributedSiteIds = await getAllPrestataireSiteIds({ userId: currentUser.id });
+        const attributedSiteIds = await getAllPrestataireSiteIds({
+          userId: currentUser.id,
+        });
         if (!attributedSiteIds.includes(prestation.siteId)) notFound();
       }
     } else {
@@ -132,14 +134,19 @@ export default async function PrestationDetailPage({
   const executions = await getExecutionsWithPrixByPrestationId(prestationId);
 
   // 7. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin
-  const [occurrences, totalOccurrences, totalNonAssigned, availableSites, clientHasActiveAdmin] =
-    await Promise.all([
-      getOccurrencesByPrestationId(prestationId, { limit: 50, sortDir: "asc" }),
-      countOccurrencesByPrestationId(prestationId),
-      countNonAssignedOccurrencesByPrestationId(prestationId),
-      getDistinctSitesForPrestation(prestationId),
-      hasClientActiveAdmin(prestation.entrepriseId),
-    ]);
+  const [
+    occurrences,
+    totalOccurrences,
+    totalNonAssigned,
+    availableSites,
+    clientHasActiveAdmin,
+  ] = await Promise.all([
+    getOccurrencesByPrestationId(prestationId, { limit: 50, sortDir: "asc" }),
+    countOccurrencesByPrestationId(prestationId),
+    countNonAssignedOccurrencesByPrestationId(prestationId),
+    getDistinctSitesForPrestation(prestationId),
+    hasClientActiveAdmin(prestation.entrepriseId),
+  ]);
 
   return (
     <PrestationDetailsClient

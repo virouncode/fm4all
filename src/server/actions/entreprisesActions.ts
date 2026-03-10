@@ -1,52 +1,71 @@
 "use server";
 
 import { db } from "@/db";
-import { entreprises, entrepriseRoles, serviceEntreprises, entrepriseInvitations } from "@/db/schema/entreprises";
-import { clientServices, clientServiceExecutions } from "@/db/schema/services";
-import { documents } from "@/db/schema/documents";
-import { count, ilike, eq, ne, and, inArray, isNull, gt } from "drizzle-orm";
-import { promoteS3Key, deleteS3Object as deleteS3ObjectFromServer } from "@/server/s3/s3";
 import { user as userTable } from "@/db/schema/auth";
-import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
+import { documents } from "@/db/schema/documents";
+import {
+  entrepriseInvitations,
+  entrepriseRoles,
+  entreprises,
+  serviceEntreprises,
+} from "@/db/schema/entreprises";
+import { clientServiceExecutions, clientServices } from "@/db/schema/services";
+import {
+  userClientAdhesions,
+  userPrestataireAdhesions,
+} from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { auth } from "@/server/auth/auth";
 import { getSession } from "@/server/auth/get-session";
+import { sendEmailDirect } from "@/server/email/mailgunDirect";
 import {
+  getClientPrestataires,
+  getMesClients,
+} from "@/server/queries/clientServiceExecutions.query";
+import {
+  countEntreprises,
   getAllEntreprises,
   getEntreprisesClientes,
-  getEntreprisesPrestataires,
   getEntreprisesPaginated,
-  countEntreprises,
+  getEntreprisesPrestataires,
   getEntrepriseWithDetailsById,
   getServicesByEntrepriseId,
 } from "@/server/queries/entreprises.query";
-import { getMesClients, getClientPrestataires } from "@/server/queries/clientServiceExecutions.query";
-import { getUserClientAdhesion, getUserPrestataireAdhesion } from "@/server/queries/userAdhesions.query";
 import {
-  getProspectsPaginated,
   countProspects,
+  getProspectsPaginated,
 } from "@/server/queries/prospects.query";
 import { getAllServices } from "@/server/queries/services.query";
+import { getUserPrestataireAdhesion } from "@/server/queries/userAdhesions.query";
+import {
+  deleteS3Object as deleteS3ObjectFromServer,
+  promoteS3Key,
+} from "@/server/s3/s3";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { insertUserArborescence } from "@/server/utils/usersArborescence.utils";
 import {
+  capitalizeWords,
+  lower,
+  normalizeForSubmit,
+  upper,
+} from "@/zod-helpers/normalize";
+import {
   insertEntrepriseFormSchema,
-  updateEntrepriseInfosSchema,
   updateEntrepriseContactSchema,
-  updateEntrepriseRolesSchema,
+  updateEntrepriseInfosSchema,
   updateEntrepriseLogoSchema,
+  updateEntrepriseRolesSchema,
   type RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
-import { flattenValidationErrors } from "next-safe-action";
-import { headers, cookies } from "next/headers";
-import { z } from "zod";
-import { capitalizeWords, lower, normalizeForSubmit, upper } from "@/zod-helpers/normalize";
-import { sendEmailDirect } from "@/server/email/mailgunDirect";
 import {
   accepterInvitationAdminSchema,
   inviterEntrepriseAdminSchema,
 } from "@/zod-schemas/inscriptionAdmin.schema";
+import { and, count, eq, gt, ilike, inArray, isNull, ne } from "drizzle-orm";
+import { flattenValidationErrors } from "next-safe-action";
+import { cookies, headers } from "next/headers";
+import { z } from "zod";
 
 /**
  * Récupère la liste de toutes les entreprises
@@ -56,7 +75,8 @@ export const getEntreprisesAction = actionClient
   .metadata({ actionName: "getEntreprisesAction" })
   .action(async () => {
     const session = await getSession();
-    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    if (!session?.user)
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     const entreprisesData = await getAllEntreprises();
     return { entreprises: entreprisesData };
@@ -85,12 +105,13 @@ export const getEntreprisesClientesAction = actionClient
     }
 
     // Branche prestataire : ses clients via getMesClients (même logique que /app/mes-clients)
-    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
-      where: and(
-        eq(userPrestataireAdhesions.userId, currentUser.id),
-        eq(userPrestataireAdhesions.statut, "actif"),
-      ),
-    });
+    const prestataireAdhesion =
+      await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
     if (prestataireAdhesion) {
       const mesClients = await getMesClients(prestataireAdhesion.entrepriseId);
       const clients = mesClients.map((c) => ({ id: c.id, nom: c.nom }));
@@ -108,7 +129,8 @@ export const getEntreprisesPrestatairesAction = actionClient
   .metadata({ actionName: "getEntreprisesPrestatairesAction" })
   .action(async () => {
     const session = await getSession();
-    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    if (!session?.user)
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     const userId = session.user.id;
 
@@ -142,7 +164,9 @@ export const getEntreprisesPrestatairesAction = actionClient
       ),
     });
     if (!clientAdhesion) return { prestataires: [] };
-    const prestataires = await getClientPrestataires(clientAdhesion.entrepriseId);
+    const prestataires = await getClientPrestataires(
+      clientAdhesion.entrepriseId,
+    );
     return { prestataires };
   });
 
@@ -193,7 +217,10 @@ export const getEntreprisesPaginatedAction = actionClient
         page,
         pageSize,
       }),
-      countEntreprises({ search, role: role as RoleEntrepriseType | undefined }),
+      countEntreprises({
+        search,
+        role: role as RoleEntrepriseType | undefined,
+      }),
     ]);
 
     return {
@@ -213,13 +240,10 @@ export const getEntreprisesPaginatedAction = actionClient
  */
 export const getMonEntrepriseDetailsAction = actionClient
   .metadata({ actionName: "getMonEntrepriseDetailsAction" })
-  .inputSchema(
-    z.object({ entrepriseId: z.string().uuid() }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(z.object({ entrepriseId: z.uuid() }), {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -248,7 +272,10 @@ export const getMonEntrepriseDetailsAction = actionClient
           .where(
             and(
               eq(userPrestataireAdhesions.userId, currentUser.id),
-              eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+              eq(
+                userPrestataireAdhesions.entrepriseId,
+                parsedInput.entrepriseId,
+              ),
               eq(userPrestataireAdhesions.statut, "actif"),
             ),
           )
@@ -260,7 +287,9 @@ export const getMonEntrepriseDetailsAction = actionClient
       }
     }
 
-    const entreprise = await getEntrepriseWithDetailsById(parsedInput.entrepriseId);
+    const entreprise = await getEntrepriseWithDetailsById(
+      parsedInput.entrepriseId,
+    );
     if (!entreprise) throw errors.notFound("Entreprise introuvable.");
 
     const services = entreprise.roles.includes("prestataire")
@@ -377,9 +406,7 @@ export const createEntrepriseAction = actionClient
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole) {
-      throw errors.forbidden(
-        "Seule la plateforme peut créer des entreprises.",
-      );
+      throw errors.forbidden("Seule la plateforme peut créer des entreprises.");
     }
 
     const {
@@ -396,7 +423,13 @@ export const createEntrepriseAction = actionClient
 
     // Normaliser les champs optionnels: "" → null + appliquer la casse
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalStrings: ["prenomContact", "nomContact", "emailContact", "phoneContact", "numeroTva"] as const,
+      optionalStrings: [
+        "prenomContact",
+        "nomContact",
+        "emailContact",
+        "phoneContact",
+        "numeroTva",
+      ] as const,
     });
 
     // Nettoyer le nom (capitalisation) et le SIRET (supprimer espaces éventuels)
@@ -427,11 +460,19 @@ export const createEntrepriseAction = actionClient
           .values({
             nom: nomClean,
             siret: siretClean,
-            prenomContact: normalized.prenomContact ? capitalizeWords(normalized.prenomContact) : null,
-            nomContact: normalized.nomContact ? capitalizeWords(normalized.nomContact) : null,
-            emailContact: normalized.emailContact ? lower(normalized.emailContact) : null,
+            prenomContact: normalized.prenomContact
+              ? capitalizeWords(normalized.prenomContact)
+              : null,
+            nomContact: normalized.nomContact
+              ? capitalizeWords(normalized.nomContact)
+              : null,
+            emailContact: normalized.emailContact
+              ? lower(normalized.emailContact)
+              : null,
             phoneContact: normalized.phoneContact,
-            numeroTva: normalized.numeroTva ? normalized.numeroTva.toUpperCase() : null,
+            numeroTva: normalized.numeroTva
+              ? normalized.numeroTva.toUpperCase()
+              : null,
             createdById: currentUser.id,
             updatedById: currentUser.id,
           })
@@ -508,31 +549,45 @@ export const updateEntrepriseInfosAction = actionClient
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
-      throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
+      throw errors.forbidden(
+        "Seule la plateforme peut modifier les entreprises.",
+      );
 
     const { entrepriseId, nom, siret, numeroTva } = parsedInput;
     const nomClean = upper(nom);
     const siretClean = siret.trim().replace(/\s/g, "");
-    const numeroTvaClean = numeroTva && numeroTva !== "" ? numeroTva.toUpperCase() : null;
+    const numeroTvaClean =
+      numeroTva && numeroTva !== "" ? numeroTva.toUpperCase() : null;
 
     // Unicité nom (hors l'entreprise elle-même)
     const existingByNom = await db
       .select({ id: entreprises.id })
       .from(entreprises)
-      .where(and(ilike(entreprises.nom, nomClean), ne(entreprises.id, entrepriseId)))
+      .where(
+        and(ilike(entreprises.nom, nomClean), ne(entreprises.id, entrepriseId)),
+      )
       .limit(1);
     if (existingByNom.length > 0)
-      throw errors.conflict(`Une entreprise avec le nom "${nomClean}" existe déjà.`);
+      throw errors.conflict(
+        `Une entreprise avec le nom "${nomClean}" existe déjà.`,
+      );
 
     try {
       await db
         .update(entreprises)
-        .set({ nom: nomClean, siret: siretClean, numeroTva: numeroTvaClean, updatedById: currentUser.id })
+        .set({
+          nom: nomClean,
+          siret: siretClean,
+          numeroTva: numeroTvaClean,
+          updatedById: currentUser.id,
+        })
         .where(eq(entreprises.id, entrepriseId));
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       if (msg.toLowerCase().includes("entreprises_siret_key"))
-        throw errors.conflict(`Une entreprise avec le SIRET "${siretClean}" existe déjà.`);
+        throw errors.conflict(
+          `Une entreprise avec le SIRET "${siretClean}" existe déjà.`,
+        );
       throw errors.internal(`Erreur lors de la mise à jour: ${msg}`);
     }
 
@@ -555,21 +610,42 @@ export const updateEntrepriseContactAction = actionClient
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
-      throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
+      throw errors.forbidden(
+        "Seule la plateforme peut modifier les entreprises.",
+      );
 
-    const { entrepriseId, prenomContact, nomContact, emailContact, phoneContact } = parsedInput;
+    const {
+      entrepriseId,
+      prenomContact,
+      nomContact,
+      emailContact,
+      phoneContact,
+    } = parsedInput;
 
     const normalized = normalizeForSubmit(
       { prenomContact, nomContact, emailContact, phoneContact },
-      { optionalStrings: ["prenomContact", "nomContact", "emailContact", "phoneContact"] as const },
+      {
+        optionalStrings: [
+          "prenomContact",
+          "nomContact",
+          "emailContact",
+          "phoneContact",
+        ] as const,
+      },
     );
 
     await db
       .update(entreprises)
       .set({
-        prenomContact: normalized.prenomContact ? capitalizeWords(normalized.prenomContact) : null,
-        nomContact: normalized.nomContact ? capitalizeWords(normalized.nomContact) : null,
-        emailContact: normalized.emailContact ? lower(normalized.emailContact) : null,
+        prenomContact: normalized.prenomContact
+          ? capitalizeWords(normalized.prenomContact)
+          : null,
+        nomContact: normalized.nomContact
+          ? capitalizeWords(normalized.nomContact)
+          : null,
+        emailContact: normalized.emailContact
+          ? lower(normalized.emailContact)
+          : null,
         phoneContact: normalized.phoneContact,
         updatedById: currentUser.id,
       })
@@ -595,7 +671,9 @@ export const updateEntrepriseRolesAction = actionClient
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
-      throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
+      throw errors.forbidden(
+        "Seule la plateforme peut modifier les entreprises.",
+      );
 
     const { entrepriseId, roles, serviceIds } = parsedInput;
     const isPrestataire = roles.includes("prestataire");
@@ -608,7 +686,10 @@ export const updateEntrepriseRolesAction = actionClient
     const currentRoles = currentRolesRows.map((r) => r.role);
 
     const currentServiceRows = await db
-      .select({ id: serviceEntreprises.id, serviceId: serviceEntreprises.serviceId })
+      .select({
+        id: serviceEntreprises.id,
+        serviceId: serviceEntreprises.serviceId,
+      })
       .from(serviceEntreprises)
       .where(eq(serviceEntreprises.entrepriseId, entrepriseId));
     const currentServiceIds = currentServiceRows.map((r) => r.serviceId);
@@ -651,7 +732,12 @@ export const updateEntrepriseRolesAction = actionClient
       const [{ value: nbExecutions }] = await db
         .select({ value: count() })
         .from(clientServiceExecutions)
-        .where(inArray(clientServiceExecutions.serviceEntrepriseId, serviceEntrepriseIdsToCheck));
+        .where(
+          inArray(
+            clientServiceExecutions.serviceEntrepriseId,
+            serviceEntrepriseIdsToCheck,
+          ),
+        );
 
       if (nbExecutions > 0) {
         const what = removedRoles.includes("prestataire")
@@ -666,7 +752,9 @@ export const updateEntrepriseRolesAction = actionClient
     // --- Appliquer les modifications ---
     await db.transaction(async (tx) => {
       // 1. Remplacer les rôles
-      await tx.delete(entrepriseRoles).where(eq(entrepriseRoles.entrepriseId, entrepriseId));
+      await tx
+        .delete(entrepriseRoles)
+        .where(eq(entrepriseRoles.entrepriseId, entrepriseId));
       await tx.insert(entrepriseRoles).values(
         roles.map((role) => ({
           entrepriseId,
@@ -677,7 +765,9 @@ export const updateEntrepriseRolesAction = actionClient
       );
 
       // 2. Remplacer les services
-      await tx.delete(serviceEntreprises).where(eq(serviceEntreprises.entrepriseId, entrepriseId));
+      await tx
+        .delete(serviceEntreprises)
+        .where(eq(serviceEntreprises.entrepriseId, entrepriseId));
       if (isPrestataire && serviceIds && serviceIds.length > 0) {
         await tx.insert(serviceEntreprises).values(
           serviceIds.map((serviceId) => ({
@@ -700,7 +790,7 @@ export const updateEntrepriseRolesAction = actionClient
  */
 export const getEntrepriseServicesAction = actionClient
   .metadata({ actionName: "getEntrepriseServicesAction" })
-  .inputSchema(z.object({ entrepriseId: z.string().uuid() }), {
+  .inputSchema(z.object({ entrepriseId: z.uuid() }), {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -711,9 +801,13 @@ export const getEntrepriseServicesAction = actionClient
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
-      throw errors.forbidden("Seule la plateforme peut accéder à cette ressource.");
+      throw errors.forbidden(
+        "Seule la plateforme peut accéder à cette ressource.",
+      );
 
-    const servicesData = await getServicesByEntrepriseId(parsedInput.entrepriseId);
+    const servicesData = await getServicesByEntrepriseId(
+      parsedInput.entrepriseId,
+    );
     return { services: servicesData };
   });
 
@@ -735,7 +829,9 @@ export const updateEntrepriseLogoAction = actionClient
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole)
-      throw errors.forbidden("Seule la plateforme peut modifier les entreprises.");
+      throw errors.forbidden(
+        "Seule la plateforme peut modifier les entreprises.",
+      );
 
     const { entrepriseId, logo } = parsedInput;
 
@@ -985,7 +1081,8 @@ export const accepterInvitationAdminAction = actionClient
       throw errors.internal(`Erreur lors de la création du compte : ${msg}`);
     }
 
-    if (!authResult?.user) throw errors.internal("Échec de la création du compte.");
+    if (!authResult?.user)
+      throw errors.internal("Échec de la création du compte.");
     const newUserId = authResult.user.id;
 
     // 6. Transaction : adhésions + marquer invitation acceptée

@@ -15,7 +15,7 @@ import {
 } from "../schema-helper";
 import { user } from "./auth";
 import { contrats } from "./contrats";
-import { devis } from "./devis";
+import { devis, devisDemandes } from "./devis";
 import { entreprises } from "./entreprises";
 import {
   documentCategorieEnum,
@@ -96,6 +96,10 @@ export const documentsLinks = pgTable(
     devisId: uuid("devis_id").references(() => devis.id, {
       onDelete: "cascade",
     }),
+    devisDemandeId: uuid("devis_demande_id").references(
+      () => devisDemandes.id,
+      { onDelete: "cascade" },
+    ),
     contratId: uuid("contrat_id").references(() => contrats.id, {
       onDelete: "cascade",
     }),
@@ -133,6 +137,7 @@ export const documentsLinks = pgTable(
     index("documents_links_site_idx").on(t.siteId),
     index("documents_links_occurrence_idx").on(t.occurrenceId),
     index("documents_links_devis_idx").on(t.devisId),
+    index("documents_links_devis_demande_idx").on(t.devisDemandeId),
     index("documents_links_contrat_idx").on(t.contratId),
     index("documents_links_facture_idx").on(t.factureId),
 

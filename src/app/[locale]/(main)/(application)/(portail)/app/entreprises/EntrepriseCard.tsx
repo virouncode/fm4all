@@ -155,7 +155,7 @@ export function EntrepriseCard({
             {services.map((s) => (
               <span
                 key={s.id}
-                className="bg-primary/10 text-primary border-primary/40 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs"
+                className="bg-primary/10 dark:bg-primary/40 text-primary dark:text-primary-foreground border-primary/30 dark:border-primary/70 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs"
               >
                 <HandPlatter className="h-3 w-3" />
                 {s.nom}

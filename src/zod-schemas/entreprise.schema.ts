@@ -1,6 +1,5 @@
 import { roleEntrepriseCodes } from "@/constants/codeTables";
 import { isValidSIRET } from "@/lib/utils/isValidSIRET";
-import { capitalizeWords, lower } from "@/zod-helpers/normalize";
 import { phoneNumberSchemaEmpty } from "@/zod-schemas/phone.schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -34,38 +33,40 @@ export type RoleEntrepriseSelectType = z.infer<
 /**
  * Step 1 — Informations entreprise
  */
-export const insertEntrepriseStep1Schema = z.object({
-  nom: z.string().min(1, "Nom de l'entreprise obligatoire"),
-  siret: z
-    .string()
-    .min(1, "Le SIRET est obligatoire")
-    .refine(isValidSIRET, "Le SIRET est invalide"),
-  prenomContact: z.string().optional(),
-  nomContact: z.string().optional(),
-  // Accepte "" (vide) ou un email valide — normalisation "" → null faite dans l'action
-  emailContact: z
-    .string()
-    .email("Email de contact invalide")
-    .or(z.literal(""))
-    .optional(),
-  phoneContact: phoneNumberSchemaEmpty("Numéro de téléphone invalide"),
-  numeroTva: numeroTvaSchema,
-  roles: z
-    .array(roleEntrepriseSchema)
-    .min(1, "Au moins un rôle est obligatoire"),
-  serviceIds: z.array(z.string().uuid()).optional(),
-}).superRefine((data, ctx) => {
-  if (
-    data.roles.includes("prestataire") &&
-    (!data.serviceIds || data.serviceIds.length === 0)
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Sélectionnez au moins un service pour ce prestataire",
-      path: ["serviceIds"],
-    });
-  }
-});
+export const insertEntrepriseStep1Schema = z
+  .object({
+    nom: z.string().min(1, "Nom de l'entreprise obligatoire"),
+    siret: z
+      .string()
+      .min(1, "Le SIRET est obligatoire")
+      .refine(isValidSIRET, "Le SIRET est invalide"),
+    prenomContact: z.string().optional(),
+    nomContact: z.string().optional(),
+    // Accepte "" (vide) ou un email valide — normalisation "" → null faite dans l'action
+    emailContact: z
+      .string()
+      .email("Email de contact invalide")
+      .or(z.literal(""))
+      .optional(),
+    phoneContact: phoneNumberSchemaEmpty("Numéro de téléphone invalide"),
+    numeroTva: numeroTvaSchema,
+    roles: z
+      .array(roleEntrepriseSchema)
+      .min(1, "Au moins un rôle est obligatoire"),
+    serviceIds: z.array(z.uuid()).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.roles.includes("prestataire") &&
+      (!data.serviceIds || data.serviceIds.length === 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Sélectionnez au moins un service pour ce prestataire",
+        path: ["serviceIds"],
+      });
+    }
+  });
 
 export type InsertEntrepriseStep1Type = z.infer<
   typeof insertEntrepriseStep1Schema
@@ -80,7 +81,7 @@ export type InsertEntrepriseFormType = z.infer<
 // ==================== UPDATE SCHEMAS ====================
 
 export const updateEntrepriseInfosSchema = z.object({
-  entrepriseId: z.string().uuid(),
+  entrepriseId: z.uuid(),
   nom: z.string().min(1, "Nom de l'entreprise obligatoire"),
   siret: z
     .string()
@@ -93,7 +94,7 @@ export type UpdateEntrepriseInfosType = z.infer<
 >;
 
 export const updateEntrepriseContactSchema = z.object({
-  entrepriseId: z.string().uuid(),
+  entrepriseId: z.uuid(),
   prenomContact: z.string().optional(),
   nomContact: z.string().optional(),
   emailContact: z
@@ -101,7 +102,9 @@ export const updateEntrepriseContactSchema = z.object({
     .email("Email de contact invalide")
     .or(z.literal(""))
     .optional(),
-  phoneContact: phoneNumberSchemaEmpty("Numéro de téléphone invalide").optional(),
+  phoneContact: phoneNumberSchemaEmpty(
+    "Numéro de téléphone invalide",
+  ).optional(),
 });
 export type UpdateEntrepriseContactType = z.infer<
   typeof updateEntrepriseContactSchema
@@ -109,11 +112,11 @@ export type UpdateEntrepriseContactType = z.infer<
 
 export const updateEntrepriseRolesSchema = z
   .object({
-    entrepriseId: z.string().uuid(),
+    entrepriseId: z.uuid(),
     roles: z
       .array(roleEntrepriseSchema)
       .min(1, "Au moins un rôle est obligatoire"),
-    serviceIds: z.array(z.string().uuid()).optional(),
+    serviceIds: z.array(z.uuid()).optional(),
   })
   .superRefine((data, ctx) => {
     if (
@@ -132,7 +135,7 @@ export type UpdateEntrepriseRolesType = z.infer<
 >;
 
 export const updateEntrepriseLogoSchema = z.object({
-  entrepriseId: z.string().uuid(),
+  entrepriseId: z.uuid(),
   logo: z.object({
     storageKey: z.string().min(1),
     filename: z.string().min(1),

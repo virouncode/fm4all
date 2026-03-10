@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/db";
+import { user as userTable } from "@/db/schema/auth";
 import {
   clientPrestataireRelations,
   entrepriseInvitations,
@@ -8,7 +9,6 @@ import {
   entreprises,
   serviceEntreprises,
 } from "@/db/schema/entreprises";
-import { user as userTable } from "@/db/schema/auth";
 import {
   clientServiceExecutionPrix,
   clientServiceExecutions,
@@ -17,12 +17,15 @@ import {
   services,
   tacheListesTemplates,
 } from "@/db/schema/services";
-import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
-import { auth } from "@/server/auth/auth";
-import { headers } from "next/headers";
+import {
+  userClientAdhesions,
+  userPrestataireAdhesions,
+} from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
+import { auth } from "@/server/auth/auth";
 import { getSession } from "@/server/auth/get-session";
+import { sendEmailDirect } from "@/server/email/mailgunDirect";
 import {
   findEntrepriseBySiret,
   getClientPrestataires,
@@ -34,14 +37,17 @@ import {
 } from "@/server/queries/clientServiceExecutions.query";
 import { getPrestationById } from "@/server/queries/clientServices.query";
 import { getAllServices } from "@/server/queries/services.query";
-import { sendEmailDirect } from "@/server/email/mailgunDirect";
 import {
   getUserClientAdhesion,
   getUserPrestataireAdhesion,
   hasAccessToEntreprise,
 } from "@/server/queries/userAdhesions.query";
-import { getActivePosture, getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
+import {
+  getActivePosture,
+  getEffectivePlateformeRole,
+  resolvePostureAwareSiteRole,
+} from "@/server/utils/permissions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createOrLinkClientSchema,
@@ -63,6 +69,7 @@ import {
 } from "@/zod-schemas/clientServiceExecutions.schema";
 import { and, count, eq, gt, isNull, lt, ne } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
+import { headers } from "next/headers";
 import { z } from "zod";
 
 // ==================== HELPERS ====================
@@ -78,12 +85,16 @@ async function canManageExecution(
   siteId: string,
 ): Promise<{ allowed: boolean; isPlateforme: boolean; isAdmin: boolean }> {
   const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) return { allowed: true, isPlateforme: true, isAdmin: false };
+  if (platformRole?.role)
+    return { allowed: true, isPlateforme: true, isAdmin: false };
 
   const posture = await getActivePosture();
 
   if (posture === "client") {
-    const clientAdhesion = await getUserClientAdhesion({ userId, entrepriseId });
+    const clientAdhesion = await getUserClientAdhesion({
+      userId,
+      entrepriseId,
+    });
     if (clientAdhesion?.role === "admin") {
       return { allowed: true, isPlateforme: false, isAdmin: true };
     }
@@ -94,8 +105,16 @@ async function canManageExecution(
     }
   }
 
-  const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
-  return { allowed: siteRole === "responsable_site", isPlateforme: false, isAdmin: false };
+  const siteRole = await resolvePostureAwareSiteRole({
+    userId,
+    siteId,
+    entrepriseId,
+  });
+  return {
+    allowed: siteRole === "responsable_site",
+    isPlateforme: false,
+    isAdmin: false,
+  };
 }
 
 /**
@@ -113,7 +132,10 @@ async function canDisableOrDeleteExecution(
   const posture = await getActivePosture();
 
   if (posture === "client") {
-    const clientAdhesion = await getUserClientAdhesion({ userId, entrepriseId });
+    const clientAdhesion = await getUserClientAdhesion({
+      userId,
+      entrepriseId,
+    });
     return clientAdhesion?.role === "admin";
   }
 
@@ -160,13 +182,14 @@ async function validateModePilotage(
     const seEntrepriseId = seRow[0]?.entrepriseId;
 
     if (seEntrepriseId) {
-      const prestataireAdminRows = await db.query.userPrestataireAdhesions.findFirst({
-        where: and(
-          eq(userPrestataireAdhesions.entrepriseId, seEntrepriseId),
-          eq(userPrestataireAdhesions.role, "admin"),
-          eq(userPrestataireAdhesions.statut, "actif"),
-        ),
-      });
+      const prestataireAdminRows =
+        await db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.entrepriseId, seEntrepriseId),
+            eq(userPrestataireAdhesions.role, "admin"),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        });
       prestataireGhost = !prestataireAdminRows;
     }
   } else {
@@ -186,7 +209,6 @@ async function validateModePilotage(
     );
   }
 }
-
 
 // ==================== GET PRESTATAIRES FOR SERVICE ====================
 
@@ -272,10 +294,7 @@ export const findEntrepriseBySiretAction = actionClient
             clientPrestataireRelations.clientEntrepriseId,
             parsedInput.clientEntrepriseId,
           ),
-          eq(
-            clientPrestataireRelations.prestataireEntrepriseId,
-            entreprise.id,
-          ),
+          eq(clientPrestataireRelations.prestataireEntrepriseId, entreprise.id),
         ),
       });
       alreadyLinked = !!existing;
@@ -365,8 +384,8 @@ export const createOrLinkPrestataireAction = actionClient
     // siretSchema formate en "xxx xxx xxx xxxxx" — on normalise en digits purs pour la DB
     const siret = parsedInput.siret.replace(/\s/g, "");
 
-    const { prestataireEntrepriseId, prestataireNom } =
-      await db.transaction(async (tx) => {
+    const { prestataireEntrepriseId, prestataireNom } = await db.transaction(
+      async (tx) => {
         // 1. Trouver ou créer l'entreprise
         let entrepriseId: string;
         let entrepriseNom: string;
@@ -421,13 +440,14 @@ export const createOrLinkPrestataireAction = actionClient
           if (existingRole) {
             // Prestataire géré par le client (pas d'admin actif) : remplacer les services
             // Guard serveur : ne jamais modifier les services d'un prestataire avec admin actif
-            const activeAdmin = await tx.query.userPrestataireAdhesions.findFirst({
-              where: and(
-                eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
-                eq(userPrestataireAdhesions.role, "admin"),
-                eq(userPrestataireAdhesions.statut, "actif"),
-              ),
-            });
+            const activeAdmin =
+              await tx.query.userPrestataireAdhesions.findFirst({
+                where: and(
+                  eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+                  eq(userPrestataireAdhesions.role, "admin"),
+                  eq(userPrestataireAdhesions.statut, "actif"),
+                ),
+              });
             if (!activeAdmin) {
               await tx
                 .delete(serviceEntreprises)
@@ -480,7 +500,8 @@ export const createOrLinkPrestataireAction = actionClient
           prestataireEntrepriseId: entrepriseId,
           prestataireNom: entrepriseNom,
         };
-      });
+      },
+    );
 
     return { entrepriseId: prestataireEntrepriseId, nom: prestataireNom };
   });
@@ -530,7 +551,9 @@ export const insertExecutionWithPrixAction = actionClient
     if (!isPlateforme) {
       const activePosture = await getActivePosture();
       if (activePosture === "prestataire") {
-        const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+        const prestataireAdhesion = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
         if (prestataireAdhesion) {
           const [se] = await db
             .select({ entrepriseId: serviceEntreprises.entrepriseId })
@@ -708,8 +731,13 @@ export const toggleExecutionActifAction = actionClient
 
     // Prestataire : vérifier que cette exécution appartient à leur entreprise
     const activePostureToggle = await getActivePosture();
-    if (activePostureToggle === "prestataire" && execution.serviceEntrepriseId) {
-      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+    if (
+      activePostureToggle === "prestataire" &&
+      execution.serviceEntrepriseId
+    ) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({
+        userId: currentUser.id,
+      });
       if (prestataireAdhesion) {
         const [se] = await db
           .select({ entrepriseId: serviceEntreprises.entrepriseId })
@@ -823,8 +851,13 @@ export const deleteExecutionAction = actionClient
 
     // Prestataire : vérifier que cette exécution appartient à leur entreprise
     const activePostureDelete = await getActivePosture();
-    if (activePostureDelete === "prestataire" && execution.serviceEntrepriseId) {
-      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+    if (
+      activePostureDelete === "prestataire" &&
+      execution.serviceEntrepriseId
+    ) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({
+        userId: currentUser.id,
+      });
       if (prestataireAdhesion) {
         const [se] = await db
           .select({ entrepriseId: serviceEntreprises.entrepriseId })
@@ -928,8 +961,13 @@ export const updateExecutionTacheListeAction = actionClient
 
     // Prestataire : vérifier que cette exécution appartient à leur entreprise
     const activePostureChecklist = await getActivePosture();
-    if (activePostureChecklist === "prestataire" && execution.serviceEntrepriseId) {
-      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+    if (
+      activePostureChecklist === "prestataire" &&
+      execution.serviceEntrepriseId
+    ) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({
+        userId: currentUser.id,
+      });
       if (prestataireAdhesion) {
         const [se] = await db
           .select({ entrepriseId: serviceEntreprises.entrepriseId })
@@ -1035,13 +1073,21 @@ export const updateExecutionAction = actionClient
 
     // Prestataire : vérifier que cette exécution appartient à leur entreprise
     const activePostureUpdate = await getActivePosture();
-    if (activePostureUpdate === "prestataire" && !canManage.isPlateforme && existingExecution.serviceEntrepriseId) {
-      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+    if (
+      activePostureUpdate === "prestataire" &&
+      !canManage.isPlateforme &&
+      existingExecution.serviceEntrepriseId
+    ) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({
+        userId: currentUser.id,
+      });
       if (prestataireAdhesion) {
         const [se] = await db
           .select({ entrepriseId: serviceEntreprises.entrepriseId })
           .from(serviceEntreprises)
-          .where(eq(serviceEntreprises.id, existingExecution.serviceEntrepriseId))
+          .where(
+            eq(serviceEntreprises.id, existingExecution.serviceEntrepriseId),
+          )
           .limit(1);
         if (!se || se.entrepriseId !== prestataireAdhesion.entrepriseId) {
           throw errors.forbidden(
@@ -1139,9 +1185,7 @@ export const updateExecutionAction = actionClient
         const [ref] = await tx
           .select({ count: count() })
           .from(clientServicePrixAppliques)
-          .where(
-            eq(clientServicePrixAppliques.executionPrixId, existing.id),
-          );
+          .where(eq(clientServicePrixAppliques.executionPrixId, existing.id));
         if (ref && ref.count > 0) {
           await tx
             .update(clientServiceExecutionPrix)
@@ -1330,8 +1374,13 @@ export const updateExecutionModePilotageAction = actionClient
 
     // Prestataire : vérifier que cette exécution appartient à leur entreprise
     const activePostureModePilotage = await getActivePosture();
-    if (activePostureModePilotage === "prestataire" && execution.serviceEntrepriseId) {
-      const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
+    if (
+      activePostureModePilotage === "prestataire" &&
+      execution.serviceEntrepriseId
+    ) {
+      const prestataireAdhesion = await getUserPrestataireAdhesion({
+        userId: currentUser.id,
+      });
       if (prestataireAdhesion) {
         const [se] = await db
           .select({ entrepriseId: serviceEntreprises.entrepriseId })
@@ -1347,7 +1396,11 @@ export const updateExecutionModePilotageAction = actionClient
     }
 
     // Valider modePilotage selon le statut fantôme des entreprises
-    await validateModePilotage(modePilotage, entrepriseId, execution.serviceEntrepriseId);
+    await validateModePilotage(
+      modePilotage,
+      entrepriseId,
+      execution.serviceEntrepriseId,
+    );
 
     const [updated] = await db
       .update(clientServiceExecutions)
@@ -1601,7 +1654,8 @@ export const getServicesForPickerAction = actionClient
   .metadata({ actionName: "getServicesForPickerAction" })
   .action(async () => {
     const session = await getSession();
-    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    if (!session?.user)
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
     const services = await getAllServices();
     return { services };
   });
@@ -1612,14 +1666,15 @@ export const inviterPrestataireAdminAction = actionClient
   .metadata({ actionName: "inviterPrestataireAdminAction" })
   .inputSchema(
     z.object({
-      clientEntrepriseId: z.string().uuid("ID client invalide"),
-      prestataireEntrepriseId: z.string().uuid("ID prestataire invalide"),
+      clientEntrepriseId: z.uuid("ID client invalide"),
+      prestataireEntrepriseId: z.uuid("ID prestataire invalide"),
       email: z.string().email("Email invalide"),
     }),
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
-    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    if (!session?.user)
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
     const currentUser = session.user;
 
     // 1. Vérifier que l'utilisateur est client de clientEntrepriseId avec au moins rôle manager
@@ -1628,7 +1683,9 @@ export const inviterPrestataireAdminAction = actionClient
       entrepriseId: parsedInput.clientEntrepriseId,
     });
     if (!clientAdhesion) {
-      throw errors.forbidden("Vous n'avez pas accès à cette entreprise cliente.");
+      throw errors.forbidden(
+        "Vous n'avez pas accès à cette entreprise cliente.",
+      );
     }
     if (clientAdhesion.role === "collaborateur") {
       throw errors.forbidden(
@@ -1639,18 +1696,29 @@ export const inviterPrestataireAdminAction = actionClient
     // 2. Vérifier que la relation client-prestataire existe
     const relation = await db.query.clientPrestataireRelations.findFirst({
       where: and(
-        eq(clientPrestataireRelations.clientEntrepriseId, parsedInput.clientEntrepriseId),
-        eq(clientPrestataireRelations.prestataireEntrepriseId, parsedInput.prestataireEntrepriseId),
+        eq(
+          clientPrestataireRelations.clientEntrepriseId,
+          parsedInput.clientEntrepriseId,
+        ),
+        eq(
+          clientPrestataireRelations.prestataireEntrepriseId,
+          parsedInput.prestataireEntrepriseId,
+        ),
       ),
     });
     if (!relation) {
-      throw errors.forbidden("Ce prestataire n'est pas lié à votre entreprise.");
+      throw errors.forbidden(
+        "Ce prestataire n'est pas lié à votre entreprise.",
+      );
     }
 
     // 3. Vérifier qu'il n'y a pas déjà un admin actif
     const existingAdmin = await db.query.userPrestataireAdhesions.findFirst({
       where: and(
-        eq(userPrestataireAdhesions.entrepriseId, parsedInput.prestataireEntrepriseId),
+        eq(
+          userPrestataireAdhesions.entrepriseId,
+          parsedInput.prestataireEntrepriseId,
+        ),
         eq(userPrestataireAdhesions.role, "admin"),
         eq(userPrestataireAdhesions.statut, "actif"),
       ),
@@ -1712,26 +1780,33 @@ export const inviterClientAdminAction = actionClient
   .metadata({ actionName: "inviterClientAdminAction" })
   .inputSchema(
     z.object({
-      prestataireEntrepriseId: z.string().uuid("ID prestataire invalide"),
-      clientEntrepriseId: z.string().uuid("ID client invalide"),
+      prestataireEntrepriseId: z.uuid("ID prestataire invalide"),
+      clientEntrepriseId: z.uuid("ID client invalide"),
       email: z.string().email("Email invalide"),
     }),
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
-    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    if (!session?.user)
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
     const currentUser = session.user;
 
     // 1. Vérifier que l'utilisateur est prestataire actif avec au moins rôle manager
-    const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
-      where: and(
-        eq(userPrestataireAdhesions.userId, currentUser.id),
-        eq(userPrestataireAdhesions.entrepriseId, parsedInput.prestataireEntrepriseId),
-        eq(userPrestataireAdhesions.statut, "actif"),
-      ),
-    });
+    const prestataireAdhesion =
+      await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(
+            userPrestataireAdhesions.entrepriseId,
+            parsedInput.prestataireEntrepriseId,
+          ),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
+      });
     if (!prestataireAdhesion) {
-      throw errors.forbidden("Vous n'avez pas accès à cette entreprise prestataire.");
+      throw errors.forbidden(
+        "Vous n'avez pas accès à cette entreprise prestataire.",
+      );
     }
     if (prestataireAdhesion.role === "collaborateur") {
       throw errors.forbidden(
@@ -1742,8 +1817,14 @@ export const inviterClientAdminAction = actionClient
     // 2. Vérifier que la relation prestataire-client existe
     const relation = await db.query.clientPrestataireRelations.findFirst({
       where: and(
-        eq(clientPrestataireRelations.clientEntrepriseId, parsedInput.clientEntrepriseId),
-        eq(clientPrestataireRelations.prestataireEntrepriseId, parsedInput.prestataireEntrepriseId),
+        eq(
+          clientPrestataireRelations.clientEntrepriseId,
+          parsedInput.clientEntrepriseId,
+        ),
+        eq(
+          clientPrestataireRelations.prestataireEntrepriseId,
+          parsedInput.prestataireEntrepriseId,
+        ),
       ),
     });
     if (!relation) {
@@ -1780,14 +1861,18 @@ export const inviterClientAdminAction = actionClient
       .from(entreprises)
       .where(eq(entreprises.id, parsedInput.clientEntrepriseId))
       .limit(1);
-    if (!clientEntreprise) throw errors.notFound("Entreprise cliente introuvable.");
+    if (!clientEntreprise)
+      throw errors.notFound("Entreprise cliente introuvable.");
 
     // 6. Annuler les invitations en attente existantes pour ce client
     await db
       .delete(entrepriseInvitations)
       .where(
         and(
-          eq(entrepriseInvitations.entrepriseId, parsedInput.clientEntrepriseId),
+          eq(
+            entrepriseInvitations.entrepriseId,
+            parsedInput.clientEntrepriseId,
+          ),
           isNull(entrepriseInvitations.acceptedAt),
         ),
       );
