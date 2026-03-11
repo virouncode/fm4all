@@ -619,8 +619,6 @@ export const contratStatutCodes = contratStatutCT.map(
 export const factureStatutCT = [
   { code: "brouillon", name: "Brouillon" },
   { code: "emise", name: "Émise" },
-  { code: "payee", name: "Payée" },
-  { code: "en_retard", name: "En retard" },
   { code: "litige", name: "En litige" },
   { code: "annulee", name: "Annulée" },
 ] as const;
@@ -632,18 +630,32 @@ export const factureStatutCodes = factureStatutCT.map(
   ...(typeof factureStatutCT)[number]["code"][],
 ];
 
-export const factureLigneTypeCT = [
-  { code: "ponctuel", name: "Ponctuel" },
-  { code: "recurrent", name: "Récurrent" },
-  { code: "ajustement", name: "Ajustement" },
+export const factureLigneTypeSourceCT = [
+  { code: "manuel", name: "Manuel" },
+  { code: "prix_applique", name: "Prix appliqué" },
 ] as const;
 
-export const factureLigneTypeCodes = factureLigneTypeCT.map(
+export const factureLigneTypeSourceCodes = factureLigneTypeSourceCT.map(
   (i) => i.code,
 ) as unknown as [
-  (typeof factureLigneTypeCT)[number]["code"],
-  ...(typeof factureLigneTypeCT)[number]["code"][],
+  (typeof factureLigneTypeSourceCT)[number]["code"],
+  ...(typeof factureLigneTypeSourceCT)[number]["code"][],
 ];
+
+// Snapshot du contexte commercial au moment de l'émission de la facture.
+// Permet de distinguer FM4ALL prestataire direct vs FM4ALL en mode intermédiaire.
+export const factureModeCommercialSnapshotCT = [
+  { code: "direct", name: "Prestation directe" },
+  { code: "intermediaire", name: "Intermédiation" },
+] as const;
+
+export const factureModeCommercialSnapshotCodes =
+  factureModeCommercialSnapshotCT.map(
+    (i) => i.code,
+  ) as unknown as [
+    (typeof factureModeCommercialSnapshotCT)[number]["code"],
+    ...(typeof factureModeCommercialSnapshotCT)[number]["code"][],
+  ];
 
 export const paiementStatutCT = [
   { code: "en_attente", name: "En attente" },

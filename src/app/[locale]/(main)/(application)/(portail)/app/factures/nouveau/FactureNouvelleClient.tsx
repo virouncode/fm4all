@@ -10,30 +10,24 @@ import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectItem } from "@/components/ui/select";
-import {
-  devisLigneUniteCT,
-  devisPeriodeFacturationCT,
-  devisTypePrixCT,
-} from "@/constants/codeTables";
+import { devisLigneUniteCT } from "@/constants/codeTables";
 import { useRouter } from "@/i18n/navigation";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
+import {
+  getEntreprisesClientesAction,
+  getMonEntrepriseDetailsAction,
+} from "@/server/actions/entreprisesActions";
 import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
-import { getEntreprisesClientesAction, getMonEntrepriseDetailsAction } from "@/server/actions/entreprisesActions";
-import { getSiteResponsableAction, saveDevisWithLignesAction } from "@/server/actions/devisActions";
-import { getSitesAction } from "@/server/actions/sitesActions";
-import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions.query";
+import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
+import { saveFactureWithLignesAction } from "@/server/actions/facturesActions";
+import type { FactureAvecLignes } from "@/server/queries/factures.query";
 import {
-  devisNouveauSchema,
-  type DevisNouveauFormType,
-} from "@/zod-schemas/devis.schema";
-import {
-  type DevisPeriodeFacturationType,
-  type DevisTypePrixType,
-} from "@/zod-schemas/enums";
+  factureNouvelleSchema,
+  type FactureNouvelleFormType,
+} from "@/zod-schemas/factures.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addDays, format } from "date-fns";
 import { ArrowLeft, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useFieldArray,
   useForm,
@@ -42,25 +36,10 @@ import {
   type Path,
 } from "react-hook-form";
 import { toast } from "sonner";
-import type { DevisPreviewData, DevisPreviewLigne } from "../DevisPreviewCard";
-import { DevisPreviewCard } from "../DevisPreviewCard";
+import type { FacturePreviewData, FacturePreviewLigne } from "../FacturePreviewCard";
+import { FacturePreviewCard } from "../FacturePreviewCard";
 
 // ============================= TYPES ==============================//
-
-type SiteResponsableType = {
-  prenom: string;
-  nom: string;
-  email: string;
-  phone: string | null;
-};
-
-type SiteOptionType = {
-  id: string;
-  nom: string;
-  adresse: string;
-  codePostal: string;
-  ville: string;
-};
 
 export type EmetteurInfoType = {
   id: string;
@@ -74,15 +53,31 @@ export type EmetteurInfoType = {
   logoStorageKey?: string | null;
 };
 
+type SiteOptionType = {
+  id: string;
+  nom: string;
+  adresseLigne1: string | null;
+  codePostal: string | null;
+  ville: string | null;
+};
+
+type ClientOptionType = {
+  id: string;
+  nom: string;
+  siret?: string;
+  numeroTva?: string | null;
+};
+
 type ServiceOptionType = {
   id: string;
   nom: string;
 };
 
-type DevisNouveauClientProps = {
-  emetteur: EmetteurInfoType;
-  services: ServiceOptionType[];
+type FactureNouvelleClientProps = {
+  emetteur: EmetteurInfoType | null;
+  factureExistante: FactureAvecLignes | null;
   posture: "prestataire" | "plateforme";
+  services: ServiceOptionType[];
 };
 
 // ============================= CONSTANTES ==============================//
@@ -94,7 +89,7 @@ const TVA_OPTIONS = [
   { value: "0", label: "0 %" },
 ] as const;
 
-const DEFAULT_LIGNE: DevisNouveauFormType["lignes"][0] = {
+const DEFAULT_LIGNE: FactureNouvelleFormType["lignes"][0] = {
   serviceId: "",
   designation: "",
   description: "",
@@ -104,8 +99,6 @@ const DEFAULT_LIGNE: DevisNouveauFormType["lignes"][0] = {
   tauxTva: "2000",
   hasRemise: false,
   remiseHtMontantEur: "",
-  typePrix: "one_shot",
-  periodeFacturation: "",
 };
 
 // ============================= HELPERS ==============================//
@@ -115,6 +108,10 @@ function eurToCentimes(eur: string): number {
   return isNaN(v) ? 0 : Math.round(v * 100);
 }
 
+function centimesToEur(centimes: number): string {
+  return (centimes / 100).toFixed(2);
+}
+
 function calcTtcStr(prixHtEur: string, tauxTva: string): string {
   const ht = parseFloat(prixHtEur.replace(",", ".") || "0");
   if (isNaN(ht)) return "0,00";
@@ -122,11 +119,15 @@ function calcTtcStr(prixHtEur: string, tauxTva: string): string {
   return ttc.toFixed(2);
 }
 
-// Type permissif pour useWatch (tous les champs sont optionnels y compris dans les objets imbriqués)
+// ============================= PREVIEW ==============================//
+
 type PreviewValuesType = {
   titre?: string;
   description?: string;
-  validTo?: string;
+  notesClient?: string;
+  dateEcheance?: string;
+  periodeDebut?: string;
+  periodeFin?: string;
   remiseGlobaleHtEur?: string;
   lignes?: Array<{
     designation?: string;
@@ -137,107 +138,138 @@ type PreviewValuesType = {
     tauxTva?: string;
     hasRemise?: boolean;
     remiseHtMontantEur?: string;
-    typePrix?: string;
-    periodeFacturation?: string;
   }>;
 };
 
 function buildPreview(
-  emetteur: EmetteurInfoType,
-  selectedClient: ClientAvecDetails | null,
+  emetteur: EmetteurInfoType | null,
+  selectedClient: ClientOptionType | null,
   selectedSite: SiteOptionType | null,
   values: PreviewValuesType,
   emetteurLogoUrl: string | null,
-  siteResponsable: SiteResponsableType | null,
-): DevisPreviewData {
+): FacturePreviewData {
   const lignes = values.lignes ?? [];
-  const previewLignes: DevisPreviewLigne[] = lignes.map((l) => ({
+  const previewLignes: FacturePreviewLigne[] = lignes.map((l) => ({
     designation: l.designation || "—",
     description: l.description || null,
     quantite: l.quantite || "0",
     unite: String(l.unite ?? ""),
     prixUnitaireHt: eurToCentimes(l.prixUnitaireHtEur ?? ""),
     tauxTva: Number(l.tauxTva ?? "2000"),
-    remiseHtMontant: l.hasRemise
-      ? eurToCentimes(l.remiseHtMontantEur ?? "")
-      : 0,
-    typePrix: l.typePrix || "one_shot",
-    periodeFacturation: l.periodeFacturation || null,
+    remiseHtMontant: l.hasRemise ? eurToCentimes(l.remiseHtMontantEur ?? "") : 0,
   }));
 
   return {
     numero: null,
-    titre: values.titre || "Nouveau devis",
+    titre: values.titre || "Nouvelle facture",
     description: values.description || null,
+    notesClient: values.notesClient || null,
     statut: "brouillon",
     remiseGlobaleHt: eurToCentimes(values.remiseGlobaleHtEur ?? ""),
     dateEmission: null,
-    validTo: values.validTo ? new Date(values.validTo) : null,
-    updatedAt: null,
-    emetteurEntrepriseNom: emetteur.nom,
-    emetteurEntrepriseSiret: emetteur.siret,
-    emetteurEntrepriseNumeroTva: emetteur.numeroTva,
-    emetteurEmailContact: emetteur.emailContact,
-    emetteurPhoneContact: emetteur.phoneContact,
-    emetteurPrenomContact: emetteur.prenomContact,
-    emetteurNomContact: emetteur.nomContact,
+    dateEcheance: values.dateEcheance ? new Date(values.dateEcheance) : null,
+    periodeDebut: values.periodeDebut || null,
+    periodeFin: values.periodeFin || null,
+    emetteurEntrepriseNom: emetteur?.nom ?? "",
+    emetteurEntrepriseSiret: emetteur?.siret ?? "",
+    emetteurEntrepriseNumeroTva: emetteur?.numeroTva ?? null,
+    emetteurEmailContact: emetteur?.emailContact ?? null,
+    emetteurPhoneContact: emetteur?.phoneContact ?? null,
+    emetteurPrenomContact: emetteur?.prenomContact ?? null,
+    emetteurNomContact: emetteur?.nomContact ?? null,
     emetteurLogoUrl,
-    proprietaireEntrepriseNom: selectedClient?.nom ?? "",
-    proprietaireEntrepriseSiret: selectedClient?.siret ?? "",
-    proprietaireEntrepriseNumeroTva: selectedClient?.numeroTva ?? null,
-    siteNom: selectedSite?.nom ?? "",
-    siteAdresse: selectedSite?.adresse ?? "",
+    destinataireEntrepriseNom: selectedClient?.nom ?? "—",
+    destinataireEntrepriseSiret: selectedClient?.siret ?? null,
+    destinataireEntrepriseNumeroTva: selectedClient?.numeroTva ?? null,
+    siteNom: selectedSite?.nom ?? null,
+    siteAdresseLigne1: selectedSite?.adresseLigne1 ?? null,
     siteCodePostal: selectedSite?.codePostal ?? null,
     siteVille: selectedSite?.ville ?? null,
-    siteContactPrenom: siteResponsable?.prenom ?? null,
-    siteContactNom: siteResponsable?.nom ?? null,
-    siteContactEmail: siteResponsable?.email ?? null,
-    siteContactPhone: siteResponsable?.phone ?? null,
     lignes: previewLignes,
   };
 }
 
 // ============================= COMPOSANT ==============================//
 
-export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveauClientProps) {
+export function FactureNouvelleClient({
+  emetteur,
+  factureExistante,
+  posture,
+  services,
+}: FactureNouvelleClientProps) {
   const router = useRouter();
 
+  const isEdit = !!factureExistante;
+
   const [step, setStep] = useState<1 | 2>(1);
-  const [clients, setClients] = useState<ClientAvecDetails[]>([]);
+  const [clients, setClients] = useState<ClientOptionType[]>([]);
   const [sites, setSites] = useState<SiteOptionType[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
   const [loadingSites, setLoadingSites] = useState(false);
-  const [selectedClient, setSelectedClient] =
-    useState<ClientAvecDetails | null>(null);
+  const [selectedClient, setSelectedClient] = useState<ClientOptionType | null>(null);
   const [selectedSite, setSelectedSite] = useState<SiteOptionType | null>(null);
-  const [siteResponsable, setSiteResponsable] = useState<SiteResponsableType | null>(null);
   const [openLines, setOpenLines] = useState<Set<number>>(new Set([0]));
   const [emetteurLogoUrl, setEmetteurLogoUrl] = useState<string | null>(null);
 
   // Charger l'URL du logo de l'émetteur
   useEffect(() => {
-    if (!emetteur.logoStorageKey) return;
+    if (!emetteur?.logoStorageKey) return;
     getPresignedReadUrl({
       key: emetteur.logoStorageKey,
       proprietaireEntrepriseId: emetteur.id,
     })
       .then(setEmetteurLogoUrl)
       .catch(() => null);
-  }, [emetteur.logoStorageKey, emetteur.id]);
+  }, [emetteur?.logoStorageKey, emetteur?.id]);
 
-  const form = useForm<DevisNouveauFormType>({
-    resolver: zodResolver(devisNouveauSchema),
+  const form = useForm<FactureNouvelleFormType>({
+    resolver: zodResolver(factureNouvelleSchema),
     mode: "onTouched",
-    defaultValues: {
-      proprietaireEntrepriseId: "",
-      siteId: "",
-      titre: "",
-      validTo: "",
-      lignes: [{ ...DEFAULT_LIGNE }],
-      remiseGlobaleHtEur: "",
-      description: "",
-      noteInterne: "",
-    },
+    defaultValues: isEdit && factureExistante
+      ? {
+          emetteurEntrepriseId: factureExistante.emetteurEntrepriseId,
+          destinataireEntrepriseId: factureExistante.destinataireEntrepriseId,
+          proprietaireEntrepriseId: factureExistante.proprietaireEntrepriseId,
+          siteId: factureExistante.siteId ?? "",
+          modeCommercialSnapshot: factureExistante.modeCommercialSnapshot ?? (posture === "plateforme" ? "intermediaire" : "direct"),
+          titre: factureExistante.titre,
+          description: factureExistante.description ?? "",
+          noteInterne: factureExistante.noteInterne ?? "",
+          notesClient: factureExistante.notesClient ?? "",
+          dateEcheance: factureExistante.dateEcheance
+            ? new Date(factureExistante.dateEcheance).toISOString().split("T")[0]
+            : "",
+          periodeDebut: factureExistante.periodeDebut ?? "",
+          periodeFin: factureExistante.periodeFin ?? "",
+          remiseGlobaleHtEur: centimesToEur(factureExistante.remiseGlobaleHt ?? 0),
+          lignes: factureExistante.lignes.map((l) => ({
+            serviceId: l.serviceId ?? "",
+            designation: l.designation,
+            description: l.description ?? "",
+            quantite: l.quantite,
+            unite: l.unite,
+            prixUnitaireHtEur: centimesToEur(l.prixUnitaireHt),
+            tauxTva: String(l.tauxTva ?? 2000),
+            hasRemise: (l.remiseHtMontant ?? 0) > 0,
+            remiseHtMontantEur: centimesToEur(l.remiseHtMontant ?? 0),
+          })),
+        }
+      : {
+          emetteurEntrepriseId: emetteur?.id ?? "",
+          destinataireEntrepriseId: "",
+          proprietaireEntrepriseId: "",
+          siteId: "",
+          modeCommercialSnapshot: posture === "plateforme" ? "intermediaire" : "direct",
+          titre: "",
+          description: "",
+          noteInterne: "",
+          notesClient: "",
+          dateEcheance: "",
+          periodeDebut: "",
+          periodeFin: "",
+          remiseGlobaleHtEur: "",
+          lignes: [{ ...DEFAULT_LIGNE }],
+        },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -245,7 +277,6 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
     name: "lignes",
   });
 
-  // useWatch pour la preview live (évite form.watch() dans le render)
   const watchedValues = useWatch({ control: form.control });
 
   // ─── Chargement des clients ──────────────────────────────────────
@@ -253,34 +284,20 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
     async function load() {
       setLoadingClients(true);
       try {
-        if (posture === "plateforme") {
-          const result = await getEntreprisesClientesAction();
+        if (posture === "prestataire") {
+          const result = await getMesClientsAction({ entrepriseId: emetteur?.id ?? "" });
           if (result?.data?.clients) {
-            // Pour la plateforme, clients est { id, nom }[] — on construit un ClientAvecDetails minimal
-            setClients(
-              result.data.clients.map((c) => ({
-                id: c.id,
-                nom: c.nom,
-                siret: "",
-                numeroTva: null,
-                prenomContact: null,
-                nomContact: null,
-                emailContact: null,
-                phoneContact: null,
-                createdAt: new Date(),
-                logoStorageKey: null,
-                roles: [],
-                hasActiveAdmin: false,
-                adminEmail: null,
-                nbSites: 0,
-                services: [],
-              })),
-            );
+            setClients(result.data.clients.map((c) => ({
+              id: c.id,
+              nom: c.nom,
+              siret: c.siret,
+              numeroTva: c.numeroTva,
+            })));
           }
         } else {
-          const result = await getMesClientsAction({ entrepriseId: emetteur.id });
+          const result = await getEntreprisesClientesAction();
           if (result?.data?.clients) {
-            setClients(result.data.clients);
+            setClients(result.data.clients.map((c) => ({ id: c.id, nom: c.nom })));
           }
         }
       } catch {
@@ -290,58 +307,27 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
       }
     }
     void load();
-  }, [emetteur.id, posture]);
-
-  // ─── Chargement du responsable_site ─────────────────────────────
-  async function loadResponsableForSite(siteId: string, entrepriseId: string) {
-    const result = await getSiteResponsableAction({ siteId, entrepriseId });
-    setSiteResponsable(result?.data?.responsable ?? null);
-  }
-
-  // ─── Enrichissement client (plateforme) ─────────────────────────
-  async function enrichClientForPlateforme(clientId: string) {
-    const result = await getMonEntrepriseDetailsAction({ entrepriseId: clientId });
-    if (result?.data?.entreprise) {
-      const e = result.data.entreprise;
-      const enriched = {
-        siret: e.siret ?? "",
-        numeroTva: e.numeroTva ?? null,
-        prenomContact: e.prenomContact ?? null,
-        nomContact: e.nomContact ?? null,
-        emailContact: e.emailContact ?? null,
-        phoneContact: e.phoneContact ?? null,
-      };
-      setClients((prev) =>
-        prev.map((c) => (c.id === clientId ? { ...c, ...enriched } : c)),
-      );
-      setSelectedClient((prev) =>
-        prev?.id === clientId ? { ...prev, ...enriched } : prev,
-      );
-    }
-  }
+  }, [posture, emetteur?.id]);
 
   // ─── Chargement des sites pour un client ────────────────────────
   async function loadSitesForClient(clientId: string) {
     if (!clientId) {
       setSites([]);
       setSelectedSite(null);
-      setSiteResponsable(null);
       form.setValue("siteId", "");
       return;
     }
     setLoadingSites(true);
     try {
-      const result = await getSitesAction({ entrepriseId: clientId });
+      const result = await getAccessibleSitesAction({ entrepriseId: clientId });
       if (result?.data) {
-        setSites(
-          result.data.map((s) => ({
-            id: s.id,
-            nom: s.nom,
-            adresse: s.adresseLigne1 ?? "",
-            codePostal: s.codePostal ?? "",
-            ville: s.ville ?? "",
-          })),
-        );
+        setSites(result.data.map((s) => ({
+          id: s.id,
+          nom: s.nom,
+          adresseLigne1: s.adresseLigne1 ?? null,
+          codePostal: s.codePostal ?? null,
+          ville: s.ville ?? null,
+        })));
       }
     } catch {
       toast.error("Erreur lors du chargement des sites");
@@ -350,13 +336,40 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
     }
   }
 
+  // ─── Changement de client ─────────────────────────────────────────
+  // Pour prestataire : clients ont déjà siret/tva (getMesClientsAction)
+  // Pour plateforme : enrichissement via getMonEntrepriseDetailsAction
+  async function handleClientChange(clientId: string) {
+    const clientFromList = clients.find((c) => c.id === clientId) ?? null;
+    setSelectedClient(clientFromList);
+    setSelectedSite(null);
+    form.setValue("siteId", "");
+    void loadSitesForClient(clientId);
+
+    // Enrichir avec siret/TVA si absent (posture plateforme)
+    if (clientFromList && clientFromList.siret === undefined) {
+      try {
+        const result = await getMonEntrepriseDetailsAction({ entrepriseId: clientId });
+        if (result?.data?.entreprise) {
+          setSelectedClient({
+            id: clientId,
+            nom: result.data.entreprise.nom,
+            siret: result.data.entreprise.siret,
+            numeroTva: result.data.entreprise.numeroTva ?? null,
+          });
+        }
+      } catch {
+        // On garde clientFromList sans siret
+      }
+    }
+  }
+
+  // ─── Skip first mount pour le reset siteId en mode edit ──────────
+  const isFirstMount = useRef(true);
+
   // ─── Step 1 → 2 ──────────────────────────────────────────────────
   async function handleContinuer() {
-    const valid = await form.trigger([
-      "proprietaireEntrepriseId",
-      "siteId",
-      "titre",
-    ]);
+    const valid = await form.trigger(["destinataireEntrepriseId", "titre"]);
     if (!valid) return;
     setStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -390,24 +403,27 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
   }
 
   // ─── Soumission ──────────────────────────────────────────────────
-  async function onSubmit(data: DevisNouveauFormType) {
-    if (!selectedClient || !selectedSite) return;
-
+  async function onSubmit(data: FactureNouvelleFormType) {
+    if (!data.destinataireEntrepriseId) {
+      toast.error("Veuillez sélectionner un client");
+      return;
+    }
     try {
-      const modeCommercialSnapshot =
-        posture === "plateforme" ? "intermediaire" : "direct";
-
-      const result = await saveDevisWithLignesAction({
-        proprietaireEntrepriseId: selectedClient.id,
-        emetteurEntrepriseId: emetteur.id,
-        demandeurEntrepriseId: selectedClient.id,
-        siteId: selectedSite.id,
-        modeCommercialSnapshot,
+      const result = await saveFactureWithLignesAction({
+        ...(isEdit && factureExistante ? { id: factureExistante.id } : {}),
+        emetteurEntrepriseId: data.emetteurEntrepriseId,
+        destinataireEntrepriseId: data.destinataireEntrepriseId,
+        proprietaireEntrepriseId: data.destinataireEntrepriseId,
+        siteId: data.siteId || undefined,
         titre: data.titre.trim(),
         description: data.description.trim() || undefined,
         noteInterne: data.noteInterne.trim() || undefined,
+        notesClient: data.notesClient.trim() || undefined,
+        dateEcheance: data.dateEcheance ? new Date(data.dateEcheance) : undefined,
+        periodeDebut: data.periodeDebut || undefined,
+        periodeFin: data.periodeFin || undefined,
         remiseGlobaleHt: eurToCentimes(data.remiseGlobaleHtEur),
-        validTo: data.validTo ? new Date(data.validTo) : undefined,
+        modeCommercialSnapshot: (data.modeCommercialSnapshot as "direct" | "intermediaire") || "direct",
         lignes: data.lignes.map((l, i) => ({
           serviceId: l.serviceId || undefined,
           designation: l.designation.trim() || "—",
@@ -416,14 +432,7 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
           unite: l.unite,
           prixUnitaireHt: eurToCentimes(l.prixUnitaireHtEur),
           tauxTva: Number(l.tauxTva),
-          remiseHtMontant: l.hasRemise
-            ? eurToCentimes(l.remiseHtMontantEur)
-            : 0,
-          typePrix: l.typePrix as DevisTypePrixType,
-          periodeFacturation:
-            l.typePrix === "abonnement" && l.periodeFacturation
-              ? (l.periodeFacturation as DevisPeriodeFacturationType)
-              : undefined,
+          remiseHtMontant: l.hasRemise ? eurToCentimes(l.remiseHtMontantEur) : 0,
           ordre: i,
         })),
       });
@@ -433,9 +442,12 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
         return;
       }
 
-      if (result?.data?.devis) {
-        toast.success("Devis enregistré");
-        router.push("/app/devis");
+      if (result?.data) {
+        toast.success(isEdit ? "Facture mise à jour" : "Facture enregistrée");
+        router.push({
+          pathname: "/app/factures/[factureId]",
+          params: { factureId: result.data.facture.id },
+        });
       }
     } catch {
       toast.error("Erreur lors de l'enregistrement");
@@ -449,7 +461,6 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
     selectedSite,
     watchedValues,
     emetteurLogoUrl,
-    siteResponsable,
   );
 
   const { isSubmitting } = form.formState;
@@ -467,14 +478,14 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
             size="sm"
             type="button"
             onClick={() =>
-              step === 2 ? setStep(1) : router.push("/app/devis")
+              step === 2 ? setStep(1) : router.push("/app/factures")
             }
           >
             <ArrowLeft className="h-4 w-4" />
             {step === 2 ? "Retour" : "Annuler"}
           </Button>
           <span className="text-muted-foreground text-sm">
-            Nouveau devis — étape {step}/2
+            {isEdit ? "Modifier la facture" : "Nouvelle facture"} — étape {step}/2
           </span>
         </div>
 
@@ -484,38 +495,13 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
             <form onSubmit={form.handleSubmit(onSubmit)}>
               {step === 1 ? (
                 <Step1
+                  emetteur={emetteur}
+                  posture={posture}
                   clients={clients}
                   loadingClients={loadingClients}
                   sites={sites}
                   loadingSites={loadingSites}
-                  posture={posture}
-                  onClientChange={(clientId) => {
-                    const client =
-                      clients.find((c) => c.id === clientId) ?? null;
-                    setSelectedClient(client);
-                    setSelectedSite(null);
-                    form.setValue("siteId", "");
-                    void loadSitesForClient(clientId);
-                    if (posture === "plateforme") {
-                      void enrichClientForPlateforme(clientId);
-                    }
-                  }}
-                  onSiteChange={(siteId) => {
-                    const site = sites.find((s) => s.id === siteId) ?? null;
-                    setSelectedSite(site);
-                    if (site && selectedClient) {
-                      void loadResponsableForSite(site.id, selectedClient.id);
-                    } else {
-                      setSiteResponsable(null);
-                    }
-                  }}
-                  onSetValidToRelative={(days) => {
-                    const target = format(
-                      addDays(new Date(), days),
-                      "yyyy-MM-dd",
-                    );
-                    form.setValue("validTo", target);
-                  }}
+                  onClientChange={(clientId) => void handleClientChange(clientId)}
                   onContinuer={handleContinuer}
                 />
               ) : (
@@ -526,6 +512,7 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
                   onAddLigne={handleAddLigne}
                   onRemoveLigne={handleRemoveLigne}
                   isSubmitting={isSubmitting}
+                  isEdit={isEdit}
                   services={services}
                 />
               )}
@@ -536,7 +523,6 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
 
       {/* ── Preview A4 ── */}
       <div className="flex flex-1 items-start justify-center overflow-auto bg-gray-100 p-16 dark:bg-gray-950">
-        {/* Wrapper aux dimensions scalées — évite que transform réserve l'espace A4 complet */}
         <div
           className="shrink-0"
           style={{
@@ -545,10 +531,8 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
             overflow: "hidden",
           }}
         >
-          <div
-            style={{ transform: "scale(0.75)", transformOrigin: "top left" }}
-          >
-            <DevisPreviewCard devis={preview} />
+          <div style={{ transform: "scale(0.75)", transformOrigin: "top left" }}>
+            <FacturePreviewCard facture={preview} />
           </div>
         </div>
       </div>
@@ -559,35 +543,49 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
 // ============================= ÉTAPE 1 ==============================//
 
 type Step1Props = {
-  clients: ClientAvecDetails[];
+  emetteur: EmetteurInfoType | null;
+  posture: "prestataire" | "plateforme";
+  clients: ClientOptionType[];
   loadingClients: boolean;
   sites: SiteOptionType[];
   loadingSites: boolean;
-  posture: "prestataire" | "plateforme";
   onClientChange: (id: string) => void;
-  onSiteChange: (id: string) => void;
-  onSetValidToRelative: (days: number) => void;
   onContinuer: () => void;
 };
 
 function Step1({
+  emetteur,
+  posture,
   clients,
   loadingClients,
   sites,
   loadingSites,
-  posture,
   onClientChange,
-  onSiteChange,
-  onSetValidToRelative,
   onContinuer,
 }: Step1Props) {
-  const proprietaireId = useWatch<DevisNouveauFormType, "proprietaireEntrepriseId">({
-    name: "proprietaireEntrepriseId",
+  const destinataireId = useWatch<FactureNouvelleFormType, "destinataireEntrepriseId">({
+    name: "destinataireEntrepriseId",
   });
-  const validTo = useWatch<DevisNouveauFormType, "validTo">({ name: "validTo" });
 
   return (
     <div className="space-y-8">
+      {/* Émetteur */}
+      {emetteur && (
+        <section>
+          <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wide uppercase">
+            Émetteur
+          </h2>
+          <div className="space-y-1 rounded-lg border p-4">
+            <p className="font-semibold">{emetteur.nom}</p>
+            <p className="text-muted-foreground text-sm">SIRET : {emetteur.siret}</p>
+            <p className="text-muted-foreground text-sm">
+              Mode commercial :{" "}
+              {posture === "plateforme" ? "Intermédiation FM4ALL" : "Prestation directe"}
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* Coordonnées du client */}
       <section>
         <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wide uppercase">
@@ -595,13 +593,11 @@ function Step1({
         </h2>
 
         <div className="space-y-4">
-          <RhfControlledSelect<DevisNouveauFormType>
-            name="proprietaireEntrepriseId"
-            label="Client"
+          <RhfControlledSelect<FactureNouvelleFormType>
+            name="destinataireEntrepriseId"
+            label="Client (destinataire)"
             requiredMark
-            placeholder={
-              loadingClients ? "Chargement…" : "Sélectionnez un client"
-            }
+            placeholder={loadingClients ? "Chargement…" : "Sélectionnez un client"}
             disabled={loadingClients}
             onChange={(v) => onClientChange(String(v))}
             selectClassName="w-full"
@@ -613,21 +609,19 @@ function Step1({
             ))}
           </RhfControlledSelect>
 
-          <RhfControlledSelect<DevisNouveauFormType>
+          <RhfControlledSelect<FactureNouvelleFormType>
             name="siteId"
             label="Site"
-            requiredMark
             placeholder={
-              !proprietaireId
+              !destinataireId
                 ? "Choisissez d'abord un client"
                 : loadingSites
                   ? "Chargement…"
                   : sites.length === 0
                     ? "Aucun site disponible"
-                    : "Sélectionnez un site"
+                    : "Sélectionnez un site (optionnel)"
             }
-            disabled={!proprietaireId || loadingSites || sites.length === 0}
-            onChange={(v) => onSiteChange(String(v))}
+            disabled={!destinataireId || loadingSites}
             selectClassName="w-full"
           >
             {sites.map((s) => (
@@ -639,57 +633,39 @@ function Step1({
         </div>
       </section>
 
-      {/* Détails du devis */}
+      {/* Détails de la facture */}
       <section>
         <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wide uppercase">
-          Détails du devis
+          Détails de la facture
         </h2>
 
         <div className="space-y-4 rounded-lg border p-4">
-          {/* Numéro automatique */}
           <div className="text-muted-foreground flex items-center justify-between text-sm">
-            <span>Numéro de devis</span>
-            <span className="font-mono text-xs italic">
-              Attribué à l&apos;émission
-            </span>
+            <span>Numéro de facture</span>
+            <span className="font-mono text-xs italic">Attribué à l&apos;émission</span>
           </div>
 
-          {/* Mode commercial (lecture seule, forcé par la posture) */}
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Mode commercial</span>
-            <span className="bg-muted rounded px-2 py-0.5 text-xs font-medium">
-              {posture === "plateforme" ? "Intermédiation" : "Prestation directe"}
-            </span>
-          </div>
-
-          {/* Titre */}
-          <RhfInput<DevisNouveauFormType>
+          <RhfInput<FactureNouvelleFormType>
             name="titre"
-            label="Titre du devis"
+            label="Titre de la facture"
             requiredMark
-            placeholder="ex : Nettoyage locaux Q1 2026"
+            placeholder="ex : Prestations de nettoyage – Mars 2026"
           />
 
-          {/* Date d'expiration */}
-          <div className="flex flex-col gap-2">
-            <Label className="text-sm">Date d&apos;expiration</Label>
-            <div className="mb-1 flex flex-wrap gap-2">
-              {([15, 30, 90] as const).map((days) => {
-                const target = format(addDays(new Date(), days), "yyyy-MM-dd");
-                return (
-                  <Button
-                    key={days}
-                    type="button"
-                    size="sm"
-                    variant={validTo === target ? "default" : "outline"}
-                    onClick={() => onSetValidToRelative(days)}
-                  >
-                    Dans {days} jours
-                  </Button>
-                );
-              })}
-            </div>
-            <RhfDatePicker<DevisNouveauFormType> name="validTo" />
+          <RhfDatePicker<FactureNouvelleFormType>
+            name="dateEcheance"
+            label="Date d'échéance"
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <RhfDatePicker<FactureNouvelleFormType>
+              name="periodeDebut"
+              label="Période début"
+            />
+            <RhfDatePicker<FactureNouvelleFormType>
+              name="periodeFin"
+              label="Période fin"
+            />
           </div>
         </div>
       </section>
@@ -704,12 +680,13 @@ function Step1({
 // ============================= ÉTAPE 2 ==============================//
 
 type Step2Props = {
-  fields: ReturnType<typeof useFieldArray<DevisNouveauFormType, "lignes">>["fields"];
+  fields: ReturnType<typeof useFieldArray<FactureNouvelleFormType, "lignes">>["fields"];
   openLines: Set<number>;
   onToggleLine: (index: number) => void;
   onAddLigne: () => void;
   onRemoveLigne: (index: number) => void;
   isSubmitting: boolean;
+  isEdit: boolean;
   services: ServiceOptionType[];
 };
 
@@ -720,6 +697,7 @@ function Step2({
   onAddLigne,
   onRemoveLigne,
   isSubmitting,
+  isEdit,
   services,
 }: Step2Props) {
   return (
@@ -727,7 +705,7 @@ function Step2({
       {/* Produits et services */}
       <section>
         <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wide uppercase">
-          Produits et services
+          Lignes de facturation
         </h2>
 
         <div className="space-y-2">
@@ -752,7 +730,7 @@ function Step2({
           onClick={onAddLigne}
         >
           <Plus className="mr-1 h-4 w-4" />
-          Ajouter un élément
+          Ajouter une ligne
         </Button>
       </section>
 
@@ -762,7 +740,7 @@ function Step2({
           Remise sur le total
         </h2>
         <div className="flex items-center gap-2">
-          <RhfInput<DevisNouveauFormType>
+          <RhfInput<FactureNouvelleFormType>
             name="remiseGlobaleHtEur"
             type="number"
             min="0"
@@ -774,17 +752,28 @@ function Step2({
         </div>
       </section>
 
-      {/* Description (visible PDF) */}
+      {/* Description (visible client) */}
       <section>
         <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
           Description{" "}
-          <span className="font-normal normal-case">
-            (visible par le client)
-          </span>
+          <span className="font-normal normal-case">(visible par le client)</span>
         </h2>
-        <RhfTextArea<DevisNouveauFormType>
+        <RhfTextArea<FactureNouvelleFormType>
           name="description"
-          placeholder="Ajoutez des précisions sur le devis, conditions particulières…"
+          placeholder="Ajoutez des précisions sur la facture, conditions particulières…"
+          rows={3}
+        />
+      </section>
+
+      {/* Notes client */}
+      <section>
+        <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
+          Notes client{" "}
+          <span className="font-normal normal-case">(visible par le client)</span>
+        </h2>
+        <RhfTextArea<FactureNouvelleFormType>
+          name="notesClient"
+          placeholder="Conditions de paiement, coordonnées bancaires…"
           rows={3}
         />
       </section>
@@ -795,7 +784,7 @@ function Step2({
           Note interne{" "}
           <span className="font-normal normal-case">(non imprimée)</span>
         </h2>
-        <RhfTextArea<DevisNouveauFormType>
+        <RhfTextArea<FactureNouvelleFormType>
           name="noteInterne"
           placeholder="Note visible uniquement par votre équipe…"
           rows={2}
@@ -809,7 +798,11 @@ function Step2({
         type="submit"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Enregistrement…" : "Enregistrer le brouillon"}
+        {isSubmitting
+          ? "Enregistrement…"
+          : isEdit
+            ? "Enregistrer les modifications"
+            : "Enregistrer le brouillon"}
       </Button>
     </div>
   );
@@ -834,42 +827,24 @@ function LigneAccordion({
   onRemove,
   services,
 }: LigneAccordionProps) {
-  const { control, setValue } = useFormContext<DevisNouveauFormType>();
+  const { control, setValue } = useFormContext<FactureNouvelleFormType>();
 
-  // useWatch pour affichage accordion header + calcul TTC
-  const designation = useWatch<DevisNouveauFormType>({
+  const designation = useWatch<FactureNouvelleFormType>({
     control,
-    name: `lignes.${index}.designation` as Path<DevisNouveauFormType>,
+    name: `lignes.${index}.designation` as Path<FactureNouvelleFormType>,
   });
-  const prixHtEur = useWatch<DevisNouveauFormType>({
+  const prixHtEur = useWatch<FactureNouvelleFormType>({
     control,
-    name: `lignes.${index}.prixUnitaireHtEur` as Path<DevisNouveauFormType>,
+    name: `lignes.${index}.prixUnitaireHtEur` as Path<FactureNouvelleFormType>,
   });
-  const tauxTva = useWatch<DevisNouveauFormType>({
+  const tauxTva = useWatch<FactureNouvelleFormType>({
     control,
-    name: `lignes.${index}.tauxTva` as Path<DevisNouveauFormType>,
+    name: `lignes.${index}.tauxTva` as Path<FactureNouvelleFormType>,
   });
-  const hasRemise = useWatch<DevisNouveauFormType>({
+  const hasRemise = useWatch<FactureNouvelleFormType>({
     control,
-    name: `lignes.${index}.hasRemise` as Path<DevisNouveauFormType>,
+    name: `lignes.${index}.hasRemise` as Path<FactureNouvelleFormType>,
   });
-  const typePrix = useWatch<DevisNouveauFormType>({
-    control,
-    name: `lignes.${index}.typePrix` as Path<DevisNouveauFormType>,
-  });
-  const periodeFacturation = useWatch<DevisNouveauFormType>({
-    control,
-    name: `lignes.${index}.periodeFacturation` as Path<DevisNouveauFormType>,
-  });
-
-  const periodeLabel =
-    String(typePrix) === "abonnement" && periodeFacturation
-      ? ({
-          semaine: " /semaine",
-          mois: " /mois",
-          annee: " /an",
-        }[String(periodeFacturation)] ?? "")
-      : "";
 
   const prixTtc = calcTtcStr(
     String(prixHtEur ?? ""),
@@ -920,7 +895,7 @@ function LigneAccordion({
         <div className="space-y-3 border-t px-4 pt-3 pb-4">
           {/* Service */}
           {services.length > 0 && (
-            <RhfControlledSelect<DevisNouveauFormType>
+            <RhfControlledSelect<FactureNouvelleFormType>
               name={`lignes.${index}.serviceId` as never}
               label="Service (optionnel)"
               placeholder="Sélectionnez un service"
@@ -935,99 +910,53 @@ function LigneAccordion({
           )}
 
           {/* Désignation */}
-          <RhfInput<DevisNouveauFormType>
+          <RhfInput<FactureNouvelleFormType>
             label="Titre"
-            name={`lignes.${index}.designation` as Path<DevisNouveauFormType>}
+            name={`lignes.${index}.designation` as Path<FactureNouvelleFormType>}
             placeholder="ex : Nettoyage des locaux"
           />
 
           {/* Description */}
-          <RhfTextArea<DevisNouveauFormType>
+          <RhfTextArea<FactureNouvelleFormType>
             label="Détails (optionnel)"
-            name={`lignes.${index}.description` as Path<DevisNouveauFormType>}
+            name={`lignes.${index}.description` as Path<FactureNouvelleFormType>}
             placeholder="Ajoutez plus de détails"
             rows={2}
           />
 
-          {/* Quantité + Unité + Type */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Quantité + Unité (inline) */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-sm">Quantité</Label>
-              <div className="flex gap-1">
-                <RhfInput<DevisNouveauFormType>
-                  name={`lignes.${index}.quantite` as Path<DevisNouveauFormType>}
-                  type="number"
-                  min="0"
-                  step="0.001"
-                  inputClassName="w-20 shrink-0"
-                />
-                <RhfComboboxInput<DevisNouveauFormType>
-                  name={`lignes.${index}.unite` as Path<DevisNouveauFormType>}
-                  options={devisLigneUniteCT.map((u) => ({
-                    value: u.code,
-                    label: u.name,
-                  }))}
-                  placeholder="Unité"
-                  className="flex-1"
-                />
-              </div>
-            </div>
-
-            {/* Type prix + Période */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-sm">Type</Label>
-              <div className="flex min-w-0 gap-1 overflow-hidden">
-                <RhfControlledSelect<DevisNouveauFormType>
-                  name={`lignes.${index}.typePrix` as never}
-                  selectClassName="w-full"
-                  className="min-w-0 flex-1"
-                  onChange={(v) => {
-                    if (v !== "abonnement") {
-                      setValue(
-                        `lignes.${index}.periodeFacturation` as Path<DevisNouveauFormType>,
-                        "" as never,
-                      );
-                    }
-                  }}
-                >
-                  {devisTypePrixCT.map((t) => (
-                    <SelectItem key={t.code} value={t.code}>
-                      {t.name}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-                {String(typePrix) === "abonnement" && (
-                  <RhfControlledSelect<DevisNouveauFormType>
-                    name={`lignes.${index}.periodeFacturation` as never}
-                    selectClassName="w-full"
-                    className="min-w-0 flex-1"
-                    placeholder="Période"
-                  >
-                    {devisPeriodeFacturationCT.map((p) => (
-                      <SelectItem key={p.code} value={p.code}>
-                        {p.name}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
-                )}
-              </div>
+          {/* Quantité + Unité */}
+          <div className="flex flex-col gap-2">
+            <Label className="text-sm">Quantité</Label>
+            <div className="flex gap-1">
+              <RhfInput<FactureNouvelleFormType>
+                name={`lignes.${index}.quantite` as Path<FactureNouvelleFormType>}
+                type="number"
+                min="0"
+                step="0.001"
+                inputClassName="w-20 shrink-0"
+              />
+              <RhfComboboxInput<FactureNouvelleFormType>
+                name={`lignes.${index}.unite` as Path<FactureNouvelleFormType>}
+                options={devisLigneUniteCT.map((u) => ({
+                  value: u.code,
+                  label: u.name,
+                }))}
+                placeholder="Unité"
+                className="flex-1"
+              />
             </div>
           </div>
 
           {/* PU HT + TVA */}
           <div className="grid grid-cols-2 gap-3">
-            {/* Prix unitaire HT */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm">
-                Prix unitaire (HT{periodeLabel})
-              </Label>
+              <Label className="text-sm">Prix unitaire (HT)</Label>
               <div className="relative">
                 <span className="text-muted-foreground absolute top-[18px] left-3 -translate-y-1/2 text-xs">
                   EUR
                 </span>
-                <RhfInput<DevisNouveauFormType>
-                  name={`lignes.${index}.prixUnitaireHtEur` as Path<DevisNouveauFormType>}
+                <RhfInput<FactureNouvelleFormType>
+                  name={`lignes.${index}.prixUnitaireHtEur` as Path<FactureNouvelleFormType>}
                   type="number"
                   min="0"
                   step="0.01"
@@ -1037,8 +966,7 @@ function LigneAccordion({
               </div>
             </div>
 
-            {/* TVA */}
-            <RhfControlledSelect<DevisNouveauFormType>
+            <RhfControlledSelect<FactureNouvelleFormType>
               name={`lignes.${index}.tauxTva` as never}
               label="TVA"
               selectClassName="w-full"
@@ -1053,7 +981,7 @@ function LigneAccordion({
 
           {/* PU TTC (calculé) */}
           <div className="flex flex-col gap-1">
-            <Label className="text-sm">Prix unitaire (TTC{periodeLabel})</Label>
+            <Label className="text-sm">Prix unitaire (TTC)</Label>
             <div className="relative">
               <span className="text-muted-foreground absolute top-[18px] left-3 -translate-y-1/2 text-xs">
                 EUR
@@ -1074,7 +1002,7 @@ function LigneAccordion({
               className="text-primary flex items-center gap-1 text-xs hover:underline"
               onClick={() =>
                 setValue(
-                  `lignes.${index}.hasRemise` as Path<DevisNouveauFormType>,
+                  `lignes.${index}.hasRemise` as Path<FactureNouvelleFormType>,
                   true as never,
                 )
               }
@@ -1085,17 +1013,17 @@ function LigneAccordion({
           ) : (
             <div className="flex flex-col gap-1">
               <div className="flex items-center justify-between">
-                <Label className="text-sm">Remise (HT{periodeLabel})</Label>
+                <Label className="text-sm">Remise (HT)</Label>
                 <button
                   type="button"
                   className="text-muted-foreground hover:text-destructive text-xs"
                   onClick={() => {
                     setValue(
-                      `lignes.${index}.hasRemise` as Path<DevisNouveauFormType>,
+                      `lignes.${index}.hasRemise` as Path<FactureNouvelleFormType>,
                       false as never,
                     );
                     setValue(
-                      `lignes.${index}.remiseHtMontantEur` as Path<DevisNouveauFormType>,
+                      `lignes.${index}.remiseHtMontantEur` as Path<FactureNouvelleFormType>,
                       "" as never,
                     );
                   }}
@@ -1107,8 +1035,8 @@ function LigneAccordion({
                 <span className="text-muted-foreground absolute top-[18px] left-3 -translate-y-1/2 text-xs">
                   EUR
                 </span>
-                <RhfInput<DevisNouveauFormType>
-                  name={`lignes.${index}.remiseHtMontantEur` as Path<DevisNouveauFormType>}
+                <RhfInput<FactureNouvelleFormType>
+                  name={`lignes.${index}.remiseHtMontantEur` as Path<FactureNouvelleFormType>}
                   type="number"
                   min="0"
                   step="0.01"

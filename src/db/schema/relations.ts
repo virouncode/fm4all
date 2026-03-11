@@ -27,7 +27,12 @@ import {
   serviceEntreprises,
 } from "./entreprises";
 // FACTURES TABLES
-import { factureLigneAllocations, factureLignes, factures } from "./factures";
+import {
+  factureLigneAllocations,
+  factureLignes,
+  factureLignesPrixAppliques,
+  factures,
+} from "./factures";
 // FONTAINES TABLES
 import { fontaines, fontainesTarifs } from "./fontaines";
 // FOOD TABLES
@@ -564,7 +569,7 @@ export const clientServicePerimetreRelations = relations(
 
 export const clientServicePrixAppliquesRelations = relations(
   clientServicePrixAppliques,
-  ({ one }) => ({
+  ({ one, many }) => ({
     executionPrix: one(clientServiceExecutionPrix, {
       fields: [clientServicePrixAppliques.executionPrixId],
       references: [clientServiceExecutionPrix.id],
@@ -581,6 +586,7 @@ export const clientServicePrixAppliquesRelations = relations(
       fields: [clientServicePrixAppliques.occurrenceId],
       references: [clientServiceOccurrences.id],
     }),
+    factureLignesPrixAppliques: many(factureLignesPrixAppliques),
   }),
 );
 
@@ -896,6 +902,21 @@ export const factureLignesRelations = relations(
       references: [services.id],
     }),
     allocations: many(factureLigneAllocations),
+    prixAppliques: many(factureLignesPrixAppliques),
+  }),
+);
+
+export const factureLignesPrixAppliquesRelations = relations(
+  factureLignesPrixAppliques,
+  ({ one }) => ({
+    factureLigne: one(factureLignes, {
+      fields: [factureLignesPrixAppliques.factureLigneId],
+      references: [factureLignes.id],
+    }),
+    clientServicePrixApplique: one(clientServicePrixAppliques, {
+      fields: [factureLignesPrixAppliques.clientServicePrixAppliqueId],
+      references: [clientServicePrixAppliques.id],
+    }),
   }),
 );
 

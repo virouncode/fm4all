@@ -514,10 +514,7 @@ export const saveDevisWithLignesAction = actionClient
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (plateformeRole?.role)
-      throw errors.forbidden(
-        "La plateforme ne peut pas créer ou modifier de devis.",
-      );
+    const isPlateformeActive = !!plateformeRole?.role;
 
     const normalized = normalizeForSubmit(parsedInput, {
       optionalStrings: [
@@ -539,20 +536,24 @@ export const saveDevisWithLignesAction = actionClient
         if (existing.statut !== "brouillon")
           throw errors.conflict("Le devis n'est plus modifiable.");
 
-        const hasAccess = await hasAccessToEntreprise(
-          currentUser.id,
-          existing.emetteurEntrepriseId,
-        );
-        if (!hasAccess) throw errors.forbidden("Accès refusé.");
+        if (!isPlateformeActive) {
+          const hasAccess = await hasAccessToEntreprise(
+            currentUser.id,
+            existing.emetteurEntrepriseId,
+          );
+          if (!hasAccess) throw errors.forbidden("Accès refusé.");
+        }
 
-        // D08: vérification rôle prestataire pour modification
-        const prestataireAdhUpdate = await db.query.userPrestataireAdhesions.findFirst({
-          where: and(
-            eq(userPrestataireAdhesions.userId, currentUser.id),
-            eq(userPrestataireAdhesions.entrepriseId, existing.emetteurEntrepriseId),
-            eq(userPrestataireAdhesions.statut, "actif"),
-          ),
-        });
+        // D08: vérification rôle prestataire pour modification (skip si plateforme)
+        const prestataireAdhUpdate = isPlateformeActive
+          ? null
+          : await db.query.userPrestataireAdhesions.findFirst({
+              where: and(
+                eq(userPrestataireAdhesions.userId, currentUser.id),
+                eq(userPrestataireAdhesions.entrepriseId, existing.emetteurEntrepriseId),
+                eq(userPrestataireAdhesions.statut, "actif"),
+              ),
+            });
         if (prestataireAdhUpdate && prestataireAdhUpdate.role !== "admin") {
           const siteRoleUpdate = await getUserPrestataireSiteRole({
             userId: currentUser.id,
@@ -606,31 +607,33 @@ export const saveDevisWithLignesAction = actionClient
         return updated;
       } else {
         // CREATE
-        const hasAccess = await hasAccessToEntreprise(
-          currentUser.id,
-          parsedInput.emetteurEntrepriseId,
-        );
-        if (!hasAccess)
-          throw errors.forbidden(
-            "Vous ne pouvez pas créer un devis au nom de cette entreprise.",
+        if (!isPlateformeActive) {
+          const hasAccess = await hasAccessToEntreprise(
+            currentUser.id,
+            parsedInput.emetteurEntrepriseId,
           );
+          if (!hasAccess)
+            throw errors.forbidden(
+              "Vous ne pouvez pas créer un devis au nom de cette entreprise.",
+            );
 
-        // D08: vérification rôle prestataire pour création
-        const prestataireAdhCreate2 = await db.query.userPrestataireAdhesions.findFirst({
-          where: and(
-            eq(userPrestataireAdhesions.userId, currentUser.id),
-            eq(userPrestataireAdhesions.entrepriseId, parsedInput.emetteurEntrepriseId),
-            eq(userPrestataireAdhesions.statut, "actif"),
-          ),
-        });
-        if (prestataireAdhCreate2 && prestataireAdhCreate2.role !== "admin") {
-          const siteRoleCreate2 = await getUserPrestataireSiteRole({
-            userId: currentUser.id,
-            siteId: parsedInput.siteId,
-            clientEntrepriseId: parsedInput.proprietaireEntrepriseId,
+          // D08: vérification rôle prestataire pour création
+          const prestataireAdhCreate = await db.query.userPrestataireAdhesions.findFirst({
+            where: and(
+              eq(userPrestataireAdhesions.userId, currentUser.id),
+              eq(userPrestataireAdhesions.entrepriseId, parsedInput.emetteurEntrepriseId),
+              eq(userPrestataireAdhesions.statut, "actif"),
+            ),
           });
-          if (!siteRoleCreate2 || siteRoleCreate2 === "observateur_site" || siteRoleCreate2 === "intervenant_site") {
-            throw errors.forbidden("Vous n'avez pas les droits pour créer un devis sur ce site.");
+          if (prestataireAdhCreate && prestataireAdhCreate.role !== "admin") {
+            const siteRoleCreate = await getUserPrestataireSiteRole({
+              userId: currentUser.id,
+              siteId: parsedInput.siteId,
+              clientEntrepriseId: parsedInput.proprietaireEntrepriseId,
+            });
+            if (!siteRoleCreate || siteRoleCreate === "observateur_site" || siteRoleCreate === "intervenant_site") {
+              throw errors.forbidden("Vous n'avez pas les droits pour créer un devis sur ce site.");
+            }
           }
         }
 
@@ -649,6 +652,7 @@ export const saveDevisWithLignesAction = actionClient
             dateEmission: normalized.dateEmission,
             remiseGlobaleHt: normalized.remiseGlobaleHt ?? 0,
             validTo: normalized.validTo,
+            modeCommercialSnapshot: parsedInput.modeCommercialSnapshot ?? null,
             statut: "brouillon",
             createdById: currentUser.id,
             updatedById: currentUser.id,

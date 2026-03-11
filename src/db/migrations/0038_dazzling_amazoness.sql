@@ -1,0 +1,2 @@
+CREATE TYPE "public"."facture_mode_commercial_snapshot" AS ENUM('direct', 'intermediaire');--> statement-breakpoint
+ALTER TABLE "factures" ADD COLUMN "mode_commercial_snapshot" "facture_mode_commercial_snapshot" DEFAULT 'direct' NOT NULL;

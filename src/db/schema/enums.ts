@@ -19,7 +19,8 @@ import {
   documentVisibiliteCodes,
   executionPeriodeFacturationCodes,
   executionTypePrixCodes,
-  factureLigneTypeCodes,
+  factureLigneTypeSourceCodes,
+  factureModeCommercialSnapshotCodes,
   factureStatutCodes,
   frequenceCodes,
   invitationTypeAdhesionCodes,
@@ -198,9 +199,13 @@ export const contratDealModeEnum = pgEnum(
 export const contratTypeEnum = pgEnum("contrat_type", contratTypeCodes);
 
 export const factureStatutEnum = pgEnum("facture_statut", factureStatutCodes);
-export const factureLigneTypeEnum = pgEnum(
-  "facture_ligne_type",
-  factureLigneTypeCodes,
+export const factureLigneTypeSourceEnum = pgEnum(
+  "facture_ligne_type_source",
+  factureLigneTypeSourceCodes,
+);
+export const factureModeCommercialSnapshotEnum = pgEnum(
+  "facture_mode_commercial_snapshot",
+  factureModeCommercialSnapshotCodes,
 );
 
 export const paiementStatutEnum = pgEnum(

@@ -24,6 +24,7 @@ import {
   devisPeriodeFacturationEnum,
   devisStatutEnum,
   devisTypePrixEnum,
+  factureModeCommercialSnapshotEnum,
 } from "./enums";
 import { prospects } from "./prospects";
 import { services } from "./services";
@@ -131,6 +132,9 @@ export const devis = pgTable(
     remiseGlobaleHt: integer("remise_globale_ht").notNull().default(0),
     dateEmission: timestamptz("date_emission"),
     validTo: timestamptz("valid_to"),
+    modeCommercialSnapshot: factureModeCommercialSnapshotEnum(
+      "mode_commercial_snapshot",
+    ),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),

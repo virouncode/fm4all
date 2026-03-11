@@ -1,0 +1,1 @@
+ALTER TABLE "devis" ADD COLUMN "mode_commercial_snapshot" "facture_mode_commercial_snapshot";

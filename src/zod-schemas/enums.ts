@@ -4,6 +4,9 @@ import {
   devisPeriodeFacturationEnum,
   devisStatutEnum,
   devisTypePrixEnum,
+  factureLigneTypeSourceEnum,
+  factureModeCommercialSnapshotEnum,
+  factureStatutEnum,
   occurrenceStatutEnum,
   occurrenceTacheStatutEnum,
   roleEnum,
@@ -73,3 +76,23 @@ export type OccurrenceTacheStatutType = z.infer<typeof occurrenceTacheStatutSche
 
 export const devisLigneUniteSchema = z.string().min(1, "Unité obligatoire");
 export type DevisLigneUniteType = string;
+
+export const factureStatutSchema = z.enum(factureStatutEnum.enumValues);
+export type FactureStatutType = z.infer<typeof factureStatutSchema>;
+
+export const factureLigneTypeSourceSchema = z.enum(
+  factureLigneTypeSourceEnum.enumValues,
+);
+export type FactureLigneTypeSourceType = z.infer<
+  typeof factureLigneTypeSourceSchema
+>;
+
+export const factureLigneUniteSchema = z.string().min(1, "Unité obligatoire");
+export type FactureLigneUniteType = string;
+
+export const factureModeCommercialSnapshotSchema = z.enum(
+  factureModeCommercialSnapshotEnum.enumValues,
+);
+export type FactureModeCommercialSnapshotType = z.infer<
+  typeof factureModeCommercialSnapshotSchema
+>;

@@ -10,6 +10,7 @@ export type PrestationView = "list" | "grid";
 export type EntrepriseView = "list" | "grid";
 export type DevisDemandeView = "list" | "grid";
 export type DevisView = "list" | "grid";
+export type FactureView = "list" | "grid";
 
 type UiStoreType = {
   // state
@@ -18,6 +19,7 @@ type UiStoreType = {
   entrepriseView: EntrepriseView;
   devisDemandeView: DevisDemandeView;
   devisView: DevisView;
+  factureView: FactureView;
 
   // actions
   setTicketView: (view: TicketView) => void;
@@ -25,6 +27,7 @@ type UiStoreType = {
   setEntrepriseView: (view: EntrepriseView) => void;
   setDevisDemandeView: (view: DevisDemandeView) => void;
   setDevisView: (view: DevisView) => void;
+  setFactureView: (view: FactureView) => void;
 };
 
 export const useUiStore = create<UiStoreType>()(
@@ -36,6 +39,7 @@ export const useUiStore = create<UiStoreType>()(
       entrepriseView: "list",
       devisDemandeView: "list",
       devisView: "list",
+      factureView: "list",
 
       // actions
       setTicketView: (view) => set({ ticketView: view }),
@@ -43,6 +47,7 @@ export const useUiStore = create<UiStoreType>()(
       setEntrepriseView: (view) => set({ entrepriseView: view }),
       setDevisDemandeView: (view) => set({ devisDemandeView: view }),
       setDevisView: (view) => set({ devisView: view }),
+      setFactureView: (view) => set({ factureView: view }),
     }),
     {
       name: UI_STORE_KEY,
@@ -52,6 +57,7 @@ export const useUiStore = create<UiStoreType>()(
         entrepriseView: state.entrepriseView,
         devisDemandeView: state.devisDemandeView,
         devisView: state.devisView,
+        factureView: state.factureView,
       }),
     }
   )

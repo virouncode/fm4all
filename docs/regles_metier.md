@@ -109,7 +109,7 @@ Un devis est émis PAR le prestataire. Possible même sans demande associée (`d
 
 ## C) Posture PLATEFORME
 
-**Règle simple : lecture seule.**
+**La plateforme peut créer et gérer des devis en mode intermédiaire.**
 
 | Action | Autorisé |
 |--------|----------|
@@ -118,9 +118,30 @@ Un devis est émis PAR le prestataire. Possible même sans demande associée (`d
 | Voir lignes de devis | ✔ |
 | Voir PDF | ✔ |
 | Créer/modifier/supprimer demande | ❌ |
-| Créer/modifier/supprimer devis | ❌ |
-| Émettre devis | ❌ |
-| Signer/Refuser devis | ❌ |
+| Créer devis | ✔ (modeCommercial forcé à `"intermediaire"`) |
+| Modifier devis (brouillon) | ✔ |
+| Supprimer devis (brouillon) | ✔ |
+| Émettre devis | ✔ |
+| Signer/Refuser devis | ❌ (concerne le client) |
+
+**Émetteur :** toujours FM4ALL (entreprise dont le rôle `entrepriseRoles.role = "plateforme"`). La plateforme ne peut jamais émettre un devis au nom d'une autre entreprise.
+
+**Bypass permissions :** `getEffectivePlateformeRole` (vérifie cookie + DB). Les checks `hasAccessToEntreprise` et rôle prestataire sont skippés si `isPlateformeActive = true`.
+
+---
+
+## D) Mode commercial (`modeCommercialSnapshot`)
+
+Le champ `modeCommercialSnapshot` est **forcé par la posture à la création** et ne peut pas être modifié ensuite.
+
+| Posture émetteur | Valeur forcée | Signification |
+|------------------|--------------|---------------|
+| `prestataire` | `"direct"` | Le prestataire facture directement le client |
+| `plateforme` (FM4ALL) | `"intermediaire"` | FM4ALL porte le contrat, prend une marge, reverse au prestataire |
+
+**Règle :** ce champ est un snapshot — il reflète le mode commercial au moment de la création du devis. Il n'est jamais recalculé.
+
+**Affichage :** visible en lecture seule dans le formulaire de création (Step 1 — section "Détails du devis") et dans la vue détail du devis.
 
 ---
 
@@ -139,7 +160,7 @@ Un devis est émis PAR le prestataire. Possible même sans demande associée (`d
 
 ---
 
-*Dernière mise à jour : 2026-03-10*
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
@@ -2768,3 +2789,162 @@ Better Auth envoie un email de vérification via `sendVerificationEmail`. Le cal
 ---
 
 *Dernière mise à jour : 2026-03-10*
+
+---
+
+# Règles Métier — Module Factures
+
+> Référence unique pour toutes les permissions liées aux factures.
+> À consulter systématiquement avant d'implémenter ou de modifier une permission.
+
+---
+
+## A) Modèle de données — Champs clés
+
+| Champ | Signification |
+|-------|---------------|
+| `emetteurEntrepriseId` | L'entreprise qui émet la facture (prestataire, ou FM4ALL en tant que prestataire) |
+| `destinataireEntrepriseId` | L'entreprise qui reçoit la facture (client) |
+| `proprietaireEntrepriseId` | L'entreprise cliente propriétaire du site concerné (peut différer du destinataire en mode intermédiaire) |
+| `numero` | Null en brouillon. Format `F-{year}-{000001}` via `factureNumeroSeq` — attribué uniquement à l'émission |
+| `statut` | `brouillon` → `emise` → `annulee` (ou `litige`) |
+| `montantHt` / `montantTva` / `montantTtc` | **Figés à l'émission.** Toujours `0` en brouillon |
+| `genereeParOutil` | `true` si créée automatiquement par un cron/outil de pré-facturation (V2) |
+| `periodeDebut` / `periodeFin` | Période de facturation couverte (optionnel, contexte abonnement) |
+| `dateEcheance` | Date de paiement attendue (optionnel, défini par l'émetteur) |
+
+### Montants sur `factureLignes`
+
+| Champ | Signification |
+|-------|---------------|
+| `prixUnitaireHt` | Prix unitaire en centimes (×100) |
+| `tauxTva` | Taux TVA en centièmes de % (ex: `2000` = 20,00%) |
+| `remiseHtMontant` | Remise ligne en centimes (appliquée avant calcul TVA) |
+| `montantHt` / `montantTva` / `montantTtc` | Null en brouillon, figés à l'émission |
+| `typeSource` | `manuel` (saisie libre V1) ou `prix_applique` (issu de pré-facturation V2) |
+
+---
+
+## B) Statuts et transitions
+
+```
+brouillon ──→ emise ──→ annulee
+                  ↘
+                litige  (à la main, par la plateforme)
+```
+
+| Transition | Qui peut l'effectuer | Guard backend |
+|------------|----------------------|---------------|
+| `brouillon → emise` | admin ou manager de l'émetteur | `canUserEmettreFacture` — calcule et fige les montants + attribue le numéro |
+| `emise → annulee` | admin ou manager de l'émetteur | `canUserAnnulerFacture` — garde-fou `statut = "emise"` |
+| `brouillon → (suppression)` | admin ou manager de l'émetteur | `canUserEditFacture` — interdit si émise |
+| `emise → litige` | Plateforme uniquement (opération manuelle en DB, pas d'action dédiée V1) | — |
+
+**Règle :** il n'y a pas de `payee` ou `en_retard` en DB. Ces états sont calculés dynamiquement côté UI (ex: `dateEcheance < now()` → en retard) et ne sont jamais stockés.
+
+---
+
+## C) Calcul des montants à l'émission
+
+Pour chaque ligne :
+```
+montantHtLigne  = round(quantite × prixUnitaireHt) − remiseHtMontant
+montantTvaLigne = round(montantHtLigne × tauxTva / 10000)
+montantTtcLigne = montantHtLigne + montantTvaLigne
+```
+
+Pour la facture (tête) :
+```
+totalHtLignes    = Σ montantHtLigne
+montantHt        = totalHtLignes − remiseGlobaleHt
+montantTva       = Σ montantTvaLigne   (simplification V1 : TVA non recalculée après remise globale)
+montantTtc       = montantHt + montantTva
+```
+
+**Décision V1 :** la TVA est calculée par ligne avant la remise globale HT. Acceptable pour la grande majorité des cas. Une remise globale entraîne un TTC légèrement différent d'un calcul pro-rata par taux — à raffiner en V2 si nécessaire.
+
+---
+
+## D) Permissions par posture
+
+### Posture ÉMETTEUR (admin ou manager de `emetteurEntrepriseId`)
+
+| Action | Autorisé |
+|--------|----------|
+| Voir la facture (tous statuts) | ✔ |
+| Créer une facture | ✔ |
+| Modifier une facture (brouillon) | ✔ |
+| Ajouter / modifier / supprimer une ligne (brouillon) | ✔ |
+| Réordonner les lignes (brouillon) | ✔ |
+| Émettre (brouillon → emise) | ✔ |
+| Annuler (emise → annulee) | ✔ |
+| Supprimer (brouillon uniquement) | ✔ |
+| Sauvegarder le PDF | ✔ |
+
+**Rôles concernés :** `admin` et `manager` de l'entreprise émettrice (via `userPrestataireAdhesions` OU `userClientAdhesions`).
+
+> NB : les rôles `collaborateur` de l'émetteur et tous les rôles d'attribution site ne donnent **pas** de droit d'écriture sur les factures (contrairement aux devis). Règle délibérément simplifiée.
+
+### Posture DESTINATAIRE (membre actif de `destinataireEntrepriseId`)
+
+| Action | Autorisé |
+|--------|----------|
+| Voir la facture (tous statuts) | ✔ |
+| Toute écriture | ❌ |
+
+**Rôles concernés :** tout utilisateur actif (`admin`, `manager`, `collaborateur`) de l'entreprise destinataire.
+
+### Posture PLATEFORME
+
+**Règle : lecture seule.** (même règle que pour les devis)
+
+| Action | Autorisé |
+|--------|----------|
+| Voir toutes les factures | ✔ |
+| Créer / modifier / émettre / annuler | ❌ |
+
+> Différence avec les devis : en V1, la plateforme ne peut pas émettre de factures directement. Si FM4ALL facture en tant que prestataire, elle utilisera la posture `prestataire` avec un compte utilisateur de l'entreprise FM4ALL.
+
+---
+
+## E) Périmètre par posture (liste des factures)
+
+| Posture | Périmètre |
+|---------|-----------|
+| `emetteur` (prestataire) | `emetteurEntrepriseId = entrepriseId` |
+| `destinataire` (client) | `destinataireEntrepriseId = entrepriseId` |
+| `plateforme` | Toutes les factures (pas de filtre) |
+
+> Pas de filtre par site role pour les factures (contrairement aux devis). La liste est scopée uniquement au niveau de l'entreprise.
+
+---
+
+## F) PDF de facture
+
+- Stocké via `documentsLinks.factureId + documents.categorie = "facture"`
+- Pas de `documentId` directement sur `factures` (même pattern que les devis)
+- Visibilité : `"public"` (visible émetteur + destinataire)
+- Un seul PDF par facture (l'ancien est remplacé à chaque régénération)
+- La génération PDF suit le même pattern que `saveDevisPdfAction` : upload temp S3 → `promoteS3Key` → insert document + documentsLink
+
+---
+
+## G) Anti-double-facturation (`factureLignesPrixAppliques`) — V2
+
+La table `factureLignesPrixAppliques` permet de lier une ligne de facture à un `clientServicePrixApplique`. Une contrainte unique sur `clientServicePrixAppliqueId` garantit qu'un prix appliqué ne peut être facturé qu'une seule fois.
+
+**V1 :** cette table n'est pas utilisée. Toutes les lignes ont `typeSource = "manuel"`.  
+**V2 :** l'onglet "À facturer" utilisera cette table pour pré-remplir les factures depuis les occurrences terminées.
+
+---
+
+## H) Numérotation
+
+- Séquence PostgreSQL : `facture_numero_seq` (start 1, increment 1)
+- Format : `F-{year}-{seq padStart 6}` — ex: `F-2026-000001`
+- Le numéro est attribué **uniquement à l'émission** (null en brouillon)
+- Contrainte unique sur `(emetteurEntrepriseId, numero)` → un numéro est unique par émetteur
+
+---
+
+*Dernière mise à jour : 2026-03-11*

@@ -8,6 +8,7 @@ import {
   devisPeriodeFacturationSchema,
   devisStatutSchema,
   devisTypePrixSchema,
+  factureModeCommercialSnapshotSchema,
 } from "./enums";
 
 // ============================= DEVIS ==============================//
@@ -129,6 +130,7 @@ export const saveDevisWithLignesSchema = z.object({
   dateEmission: z.date().optional(),
   remiseGlobaleHt: z.number().int().min(0).optional(),
   validTo: z.date().optional(),
+  modeCommercialSnapshot: factureModeCommercialSnapshotSchema.optional(),
   lignes: z.array(saveDevisLigneSchema),
 });
 export type SaveDevisWithLignesType = z.infer<typeof saveDevisWithLignesSchema>;
