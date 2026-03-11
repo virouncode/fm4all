@@ -34,6 +34,14 @@
 Si `now() > validTo` → devis expiré :
 - Interdire la signature **frontend** (pas de bouton + disclaimer "Devis expiré")
 - Interdire la signature **backend** (guard dans l'action `signerDevisAction`)
+- Interdire le refus **frontend** (pas de bouton si devis expiré)
+- Interdire le refus **backend** (guard dans l'action `refuserDevisAction`)
+
+**Décision confirmée** : L'expiration bloque à la fois la signature ET le refus. Un devis expiré ne peut plus être traité — le client doit en demander un nouveau.
+
+### Accès aux coordonnées du responsable de site (posture prestataire)
+
+`getSiteResponsableAction` est intentionnellement ouverte aux prestataires sans check d'accès à l'entreprise cliente. Un prestataire a besoin des coordonnées du responsable pour rédiger un devis sur un site client. La condition minimale d'accès (relation `clientPrestataireRelations`) est déjà vérifiée en amont lors de la récupération des demandes de devis.
 
 ---
 

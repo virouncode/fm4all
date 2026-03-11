@@ -1,4 +1,5 @@
 import formData from "form-data";
+import { env } from "@/lib/env";
 import Mailgun from "mailgun.js";
 import "server-only";
 
@@ -14,13 +15,8 @@ type SendEmailDirectParamsType = {
 };
 
 export async function sendEmailDirect(params: SendEmailDirectParamsType) {
-  const apiKey = process.env.MAILGUN_API_KEY;
-  if (!apiKey) {
-    throw new Error("MAILGUN_API_KEY is not configured");
-  }
-
   const mailgun = new Mailgun(formData);
-  const mg = mailgun.client({ username: "api", key: apiKey });
+  const mg = mailgun.client({ username: "api", key: env.MAILGUN_API_KEY });
 
   const {
     to,
@@ -36,7 +32,7 @@ export async function sendEmailDirect(params: SendEmailDirectParamsType) {
   const replyTo =
     from && from.toLowerCase() !== "noreply@mg.fm4all.com" ? from : undefined;
 
-  const bccEmail = process.env.MAILGUN_BCC_EMAIL;
+  const bccEmail = env.MAILGUN_BCC_EMAIL;
 
   const base = {
     from: `fm4all: Le Facility Management pour tous <noreply@mg.fm4all.com>`,

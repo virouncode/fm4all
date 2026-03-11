@@ -323,6 +323,8 @@ type TacheListeManagerDialogProps = {
   /** Fourni en posture plateforme : permet de choisir entre système et client */
   clientEntrepriseId?: string;
   clientEntrepriseNom?: string;
+  /** Si false, masque tous les boutons CRUD — défaut true */
+  canManage?: boolean;
 };
 
 export function TacheListeManagerDialog({
@@ -333,6 +335,7 @@ export function TacheListeManagerDialog({
   proprietaireEntrepriseId,
   clientEntrepriseId,
   clientEntrepriseNom,
+  canManage = true,
 }: TacheListeManagerDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -358,6 +361,7 @@ export function TacheListeManagerDialog({
               proprietaireEntrepriseId={proprietaireEntrepriseId}
               clientEntrepriseId={clientEntrepriseId}
               clientEntrepriseNom={clientEntrepriseNom}
+              canManage={canManage}
               className="px-6 py-4"
             />
           )}

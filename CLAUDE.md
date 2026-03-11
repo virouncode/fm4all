@@ -2609,7 +2609,23 @@ Une attribution peut être sur un site parent avec `scope = "subtree"`. Toujours
 
 ---
 
-**Dernière mise à jour**: 2026-03-09
+**Dernière mise à jour**: 2026-03-10
+
+---
+
+## Changelog (2026-03-10)
+
+**Audit Attribution des Sites + Devis + Auth — 4 bugs corrigés** :
+
+- 🔴 **`NEXT_PUBLIC_PUSHER_SECRET` exposé côté client** (`src/lib/env.ts` + `src/lib/pusher.ts`) : Le préfixe `NEXT_PUBLIC_` fait que Next.js inline la variable dans le bundle client. Renommé en `PUSHER_SECRET`. ⚠️ Mettre à jour le `.env` en conséquence.
+- 🔴 **Guard plateforme manquant sur `signerDevisAction` et `refuserDevisAction`** (`devisActions.ts`) : Un utilisateur FM4ALL ayant à la fois un `rolePlateformeAdhesion` ET un `userClientAdhesion` dans l'entreprise propriétaire pouvait signer/refuser un devis même en posture "plateforme" (qui est censée être lecture seule). Ajout de `getEffectivePlateformeRole` check au début des deux actions.
+- 🟠 **Self-action guard manquant pour managers prestataire** (`userPrestataireSiteAttributionsActions.ts` `deleteUserPrestataireSiteAttributionAction`) : Un manager prestataire (level 2) pouvait supprimer ses propres attributions de site car la condition `parsedInput.userId !== currentUser.id` était fausse → le check descendant était skipé. Ajout du guard explicite (cohérence avec le côté client).
+- 🟠 **`getSiteResponsableAction` sans vérification d'accès** (`devisActions.ts`) : N'importe quel utilisateur authentifié pouvait récupérer prénom/nom/email/téléphone du responsable de n'importe quel site. Ajout de `hasAccessToEntreprise` check.
+
+**Modules audités pour la première fois** :
+- ✅ Attribution des Sites (`userSiteAttributionsActions.ts` + `userPrestataireSiteAttributionsActions.ts`) — structure OK, règles §4-§10 bien implémentées, 1 bug corrigé
+- ✅ Auth (`auth.ts`, `inscription-admin/`, `reset-password/`, `email-ok/`, `unauthorized/`, `env.ts`) — flows corrects, 1 bug critique corrigé (Pusher secret)
+- 🚧 Devis (`devisActions.ts`, `devisDemandesActions.ts`, `devisPermissions.utils.ts`) — 3 bugs corrigés, module encore en cours de développement
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { documentCategorieCodes } from "@/constants/codeTables";
+import { env } from "@/lib/env";
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
@@ -28,15 +29,10 @@ export type S3AllowedContentType = (typeof S3_ALLOWED_CONTENT_TYPES)[number];
 export const S3_SCOPES = ["documents", "avatars", "tickets", "temp"] as const;
 export type S3ScopeType = (typeof S3_SCOPES)[number];
 
-/** Vars d'env */
-const AWS_REGION = process.env.AWS_REGION;
-export const S3_BUCKET = process.env.AWS_S3_BUCKET;
-
-if (!AWS_REGION) throw new Error("Missing env AWS_REGION");
-if (!S3_BUCKET) throw new Error("Missing env AWS_S3_BUCKET");
+export const S3_BUCKET = env.AWS_S3_BUCKET;
 
 export const s3 = new S3Client({
-  region: AWS_REGION,
+  region: env.AWS_REGION,
 });
 
 const EXT_BY_CONTENT_TYPE: Record<S3AllowedContentType, string> = {

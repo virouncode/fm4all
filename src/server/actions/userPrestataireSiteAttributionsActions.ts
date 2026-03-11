@@ -37,6 +37,7 @@ async function getPrestatairRoleLevel(
     where: and(
       eq(userPrestataireAdhesions.userId, userId),
       eq(userPrestataireAdhesions.entrepriseId, prestataireEntrepriseId),
+      eq(userPrestataireAdhesions.statut, "actif"),
     ),
   });
 
@@ -151,7 +152,10 @@ export const deleteUserPrestataireSiteAttributionAction = actionClient
 
     if (platformRole?.role) {
       const targetAdhesion = await db.query.userPrestataireAdhesions.findFirst({
-        where: eq(userPrestataireAdhesions.userId, parsedInput.userId),
+        where: and(
+          eq(userPrestataireAdhesions.userId, parsedInput.userId),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
       });
       if (!targetAdhesion) {
         throw errors.notFound(
@@ -198,6 +202,13 @@ export const deleteUserPrestataireSiteAttributionAction = actionClient
 
     if (currentUserLevel < 2) {
       throw errors.forbidden("Vous n'avez pas les permissions nécessaires.");
+    }
+
+    // Manager ne peut pas supprimer ses propres attributions (cohérence avec côté client)
+    if (currentUserLevel === 2 && parsedInput.userId === currentUser.id) {
+      throw errors.forbidden(
+        "Vous ne pouvez pas retirer vos propres attributions. Demandez à un administrateur.",
+      );
     }
 
     // Manager : ne peut supprimer que les attributions de ses subordonnés
@@ -305,7 +316,10 @@ export const bulkInsertMixedPrestataireAttributionsAction = actionClient
     if (platformRole?.role) {
       // Plateforme → utiliser l'entreprise du user cible
       const targetAdhesion = await db.query.userPrestataireAdhesions.findFirst({
-        where: eq(userPrestataireAdhesions.userId, parsedInput.userId),
+        where: and(
+          eq(userPrestataireAdhesions.userId, parsedInput.userId),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
       });
       if (!targetAdhesion) {
         throw errors.notFound(

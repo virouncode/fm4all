@@ -330,18 +330,20 @@ export function ChecklistsClient() {
             </>
           )}
 
-          {/* Bouton Nouvelle checklist — tout à droite */}
-          {canManageChecklist && (
-          <Button
-            type="button"
-            size="sm"
-            className="ml-auto"
-            onClick={() => setNewChecklistOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Nouvelle checklist
-          </Button>
-        )}
+          {/* Bouton Nouvelle checklist — masqué si aucune entreprise sélectionnée
+              (évite de créer un pack système par mégarde en mode "client"/"prestataire") */}
+          {canManageChecklist &&
+            !((typeFilter === "client" || typeFilter === "prestataire") && !entrepriseFilterId) && (
+              <Button
+                type="button"
+                size="sm"
+                className="ml-auto"
+                onClick={() => setNewChecklistOpen(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Nouvelle checklist
+              </Button>
+            )}
         </div>
       )}
 

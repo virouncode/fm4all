@@ -7,10 +7,11 @@ import { z } from "zod";
 
 import { parseJson } from "@/app/api/(helpers)/parseJson";
 import { errorResponse, successResponse } from "@/app/api/(helpers)/responses";
+import { env } from "@/lib/env";
 import { getSession } from "@/server/auth/get-session";
 import { s3, S3_BUCKET, validateKeyAllowed } from "@/server/s3/s3";
 
-const readExpiresIn = Number(process.env.S3_PRESIGN_READ_EXPIRES_SECONDS ?? 60);
+const readExpiresIn = env.S3_PRESIGN_READ_EXPIRES_SECONDS;
 
 const bodySchema = z.object({
   proprietaireEntrepriseId: z.uuid(),

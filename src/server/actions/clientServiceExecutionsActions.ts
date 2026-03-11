@@ -22,6 +22,7 @@ import {
   userPrestataireAdhesions,
 } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
+import { env } from "@/lib/env";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import { sendEmailDirect } from "@/server/email/mailgunDirect";
@@ -1793,7 +1794,7 @@ export const inviterPrestataireAdminAction = actionClient
     });
 
     // 8. Envoyer l'email d'invitation
-    const lien = `${process.env.APP_URL}/auth/inscription-admin?token=${token}`;
+    const lien = `${env.APP_URL}/auth/inscription-admin?token=${token}`;
     await sendEmailDirect({
       to: parsedInput.email,
       subject: "Invitation à rejoindre FM4ALL",
@@ -1935,7 +1936,7 @@ export const inviterClientAdminAction = actionClient
     });
 
     // 8. Envoyer l'email d'invitation
-    const lien = `${process.env.APP_URL}/auth/inscription-admin?token=${token}`;
+    const lien = `${env.APP_URL}/auth/inscription-admin?token=${token}`;
     await sendEmailDirect({
       to: parsedInput.email,
       subject: "Invitation à rejoindre FM4ALL",

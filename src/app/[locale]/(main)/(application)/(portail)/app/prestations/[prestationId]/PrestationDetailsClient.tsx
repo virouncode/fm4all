@@ -1343,6 +1343,7 @@ function ExecutionCard({
               serviceId={prestation.serviceId}
               serviceNom={prestation.serviceNom}
               proprietaireEntrepriseId={execution.prestataireEntrepriseId}
+              canManage={canManage}
             />
           )}
         </>

@@ -6,6 +6,7 @@ import { documents } from "@/db/schema/documents";
 import { entreprises } from "@/db/schema/entreprises";
 import { userClientAdhesions, userClientSiteAttributions, userPlateformeAdhesions, userPrestataireAdhesions, userPrestataireSiteAttributions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
+import { env } from "@/lib/env";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import {
@@ -479,7 +480,7 @@ export const insertUserAction = actionClient
     await auth.api.requestPasswordReset({
       body: {
         email: normalized.email,
-        redirectTo: `${process.env.APP_URL}/auth/reset-password`,
+        redirectTo: `${env.APP_URL}/auth/reset-password`,
       },
       headers: resetHeaders, // Passer les headers pour la session
     });
@@ -613,7 +614,7 @@ export const insertPlateformeUserAction = actionClient
     await auth.api.requestPasswordReset({
       body: {
         email: normalized.email,
-        redirectTo: `${process.env.APP_URL}/auth/reset-password`,
+        redirectTo: `${env.APP_URL}/auth/reset-password`,
       },
       headers: resetHeaders,
     });
@@ -846,7 +847,7 @@ export const updateUserAction = actionClient
           await auth.api.changeEmail({
             body: {
               newEmail: emailNormalized,
-              callbackURL: `${process.env.APP_URL}/auth/email-ok`,
+              callbackURL: `${env.APP_URL}/auth/email-ok`,
             },
             headers: changeEmailHeaders,
           });
@@ -1055,7 +1056,7 @@ export const updateUserAction = actionClient
         await auth.api.sendVerificationEmail({
           body: {
             email: adminEmailChangeNewEmail,
-            callbackURL: `${process.env.APP_URL}/auth/email-ok`,
+            callbackURL: `${env.APP_URL}/auth/email-ok`,
           },
         });
       } catch {
@@ -1384,7 +1385,7 @@ export const resendVerificationEmailAction = actionClient
     await auth.api.requestPasswordReset({
       body: {
         email: targetUser.email,
-        redirectTo: `${process.env.APP_URL}/auth/reset-password?type=activation`,
+        redirectTo: `${env.APP_URL}/auth/reset-password?type=activation`,
       },
       headers: await headers(),
     });

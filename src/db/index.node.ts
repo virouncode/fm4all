@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
-console.log("DATABASE_URL?", process.env.DATABASE_URL ? "OK" : "MISSING");
 
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";

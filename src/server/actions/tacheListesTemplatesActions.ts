@@ -17,7 +17,7 @@ import {
   getTacheListesTemplatesByProprietaire,
   getTacheListesWithServiceNames,
 } from "@/server/queries/tacheListesTemplates.query";
-import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { getActivePosture, getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
 import {
   deleteTacheListeItemSchema,
@@ -43,6 +43,11 @@ import { flattenValidationErrors } from "next-safe-action";
 /**
  * Vérifie que l'utilisateur peut écrire des checklists pour cette entreprise.
  * Requiert au minimum le rôle "manager" (client ou prestataire) ou rôle plateforme.
+ *
+ * Posture-aware : ne vérifie que la table correspondant à la posture active du cookie.
+ * - posture "prestataire" → vérifie userPrestataireAdhesions uniquement
+ * - posture "client" ou absente → vérifie userClientAdhesions uniquement
+ * Empêche qu'un admin client (double casquette) bypasse sa posture prestataire.
  */
 async function canManageChecklists(
   userId: string,
@@ -53,32 +58,30 @@ async function canManageChecklists(
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
-  const [clientAdhesion, prestataireAdhesion] = await Promise.all([
-    db.query.userClientAdhesions.findFirst({
-      where: and(
-        eq(userClientAdhesions.userId, userId),
-        eq(userClientAdhesions.entrepriseId, entrepriseId),
-        eq(userClientAdhesions.statut, "actif"),
-      ),
-    }),
-    db.query.userPrestataireAdhesions.findFirst({
+  const posture = await getActivePosture();
+
+  if (posture === "prestataire") {
+    const adhesion = await db.query.userPrestataireAdhesions.findFirst({
       where: and(
         eq(userPrestataireAdhesions.userId, userId),
         eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
         eq(userPrestataireAdhesions.statut, "actif"),
       ),
-    }),
-  ]);
+    });
+    const role = adhesion?.role;
+    return role === "admin" || role === "manager";
+  }
 
-  const clientRole = clientAdhesion?.role;
-  const prestataireRole = prestataireAdhesion?.role;
-
-  return (
-    clientRole === "admin" ||
-    clientRole === "manager" ||
-    prestataireRole === "admin" ||
-    prestataireRole === "manager"
-  );
+  // posture "client" ou absente (défaut le plus sûr)
+  const adhesion = await db.query.userClientAdhesions.findFirst({
+    where: and(
+      eq(userClientAdhesions.userId, userId),
+      eq(userClientAdhesions.entrepriseId, entrepriseId),
+      eq(userClientAdhesions.statut, "actif"),
+    ),
+  });
+  const role = adhesion?.role;
+  return role === "admin" || role === "manager";
 }
 
 /** Vérifie que l'utilisateur a le rôle plateforme */
@@ -534,6 +537,22 @@ export const deleteTacheListeItemAction = actionClient
 
     const { id, entrepriseId } = parsedInput;
 
+    // Récupérer l'item avec son pack en une seule query (nécessaire pour les checks ET la renumération)
+    const [itemRow] = await db
+      .select({
+        proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId,
+        listeTemplateId: tacheListeItems.listeTemplateId,
+      })
+      .from(tacheListeItems)
+      .innerJoin(
+        tacheListesTemplates,
+        eq(tacheListesTemplates.id, tacheListeItems.listeTemplateId),
+      )
+      .where(eq(tacheListeItems.id, id))
+      .limit(1);
+
+    if (!itemRow) throw errors.notFound("Item introuvable.");
+
     // Vérifier propriété via le pack
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
@@ -544,21 +563,6 @@ export const deleteTacheListeItemAction = actionClient
         );
       }
 
-      const [itemRow] = await db
-        .select({
-          proprietaireEntrepriseId:
-            tacheListesTemplates.proprietaireEntrepriseId,
-          listeTemplateId: tacheListeItems.listeTemplateId,
-        })
-        .from(tacheListeItems)
-        .innerJoin(
-          tacheListesTemplates,
-          eq(tacheListesTemplates.id, tacheListeItems.listeTemplateId),
-        )
-        .where(eq(tacheListeItems.id, id))
-        .limit(1);
-
-      if (!itemRow) throw errors.notFound("Item introuvable.");
       if (itemRow.proprietaireEntrepriseId === null) {
         throw errors.forbidden(
           "Seuls les utilisateurs plateforme peuvent modifier les templates système.",
@@ -571,30 +575,23 @@ export const deleteTacheListeItemAction = actionClient
       }
     }
 
-    // Récupérer le listeTemplateId AVANT la suppression pour pouvoir renuméroter
-    const [itemRow] = await db
-      .select({ listeTemplateId: tacheListeItems.listeTemplateId })
-      .from(tacheListeItems)
-      .where(eq(tacheListeItems.id, id))
-      .limit(1);
+    // Suppression + renumération dans une transaction atomique
+    await db.transaction(async (tx) => {
+      await tx.delete(tacheListeItems).where(eq(tacheListeItems.id, id));
 
-    await db.delete(tacheListeItems).where(eq(tacheListeItems.id, id));
-
-    // Renuméroter les ordres restants pour éviter les trous
-    if (itemRow) {
-      const remaining = await db
+      const remaining = await tx
         .select({ id: tacheListeItems.id })
         .from(tacheListeItems)
         .where(eq(tacheListeItems.listeTemplateId, itemRow.listeTemplateId))
         .orderBy(asc(tacheListeItems.ordre));
 
       for (let i = 0; i < remaining.length; i++) {
-        await db
+        await tx
           .update(tacheListeItems)
           .set({ ordre: i + 1, updatedById: currentUser.id })
           .where(eq(tacheListeItems.id, remaining[i].id));
       }
-    }
+    });
 
     return { success: true };
   });

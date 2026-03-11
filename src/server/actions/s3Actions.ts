@@ -2,6 +2,7 @@
 
 import { documentCategorieCodes } from "@/constants/codeTables";
 import { errors } from "@/lib/action/errors";
+import { env } from "@/lib/env";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import {
@@ -20,10 +21,8 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
-const uploadExpiresIn = Number(
-  process.env.S3_PRESIGN_UPLOAD_EXPIRES_SECONDS ?? 60,
-);
-const readExpiresIn = Number(process.env.S3_PRESIGN_READ_EXPIRES_SECONDS ?? 60);
+const uploadExpiresIn = env.S3_PRESIGN_UPLOAD_EXPIRES_SECONDS;
+const readExpiresIn = env.S3_PRESIGN_READ_EXPIRES_SECONDS;
 
 // ==================== GET PRESIGNED UPLOAD URL ====================
 

@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { parseJson } from "@/app/api/(helpers)/parseJson";
 import { errorResponse, successResponse } from "@/app/api/(helpers)/responses";
+import { env } from "@/lib/env";
 import { getSession } from "@/server/auth/get-session";
 
 import { getDocumentById } from "@/server/queries/documents.query";
@@ -55,7 +56,6 @@ const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10MB (ajuste)
 export async function POST(req: NextRequest) {
   const session = await getSession();
   const userId = session?.user?.id;
-  console.log("Mailgun route called by userId:", userId); // Debug log to check authentication
 
   if (!userId) {
     return errorResponse("UNAUTHORIZED", "Authentication required", {
@@ -63,15 +63,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const apiKey = process.env.MAILGUN_API_KEY;
-  if (!apiKey) {
-    return errorResponse("CONFIG", "La clé API Mailgun est manquante.", {
-      status: 500,
-    });
-  }
-
   const mailgun = new Mailgun(formData);
-  const mg = mailgun.client({ username: "api", key: apiKey });
+  const mg = mailgun.client({ username: "api", key: env.MAILGUN_API_KEY });
 
   try {
     const body = await parseJson(req, emailSchema);
@@ -138,7 +131,7 @@ export async function POST(req: NextRequest) {
     const base = {
       from: `fm4all: Le Facility Management pour tous <noreply@mg.fm4all.com>`,
       to: [body.to],
-      bcc: [process.env.MAILGUN_BCC_EMAIL!], // BCC => invisible côté destinataire
+      ...(env.MAILGUN_BCC_EMAIL ? { bcc: [env.MAILGUN_BCC_EMAIL] } : {}),
       subject: body.subject,
       ...(replyTo ? { "h:Reply-To": replyTo } : {}),
       ...(attachment ? { attachment } : {}),

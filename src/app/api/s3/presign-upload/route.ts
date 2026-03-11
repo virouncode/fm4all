@@ -8,6 +8,7 @@ import { z } from "zod";
 import { parseJson } from "@/app/api/(helpers)/parseJson";
 import { errorResponse, successResponse } from "@/app/api/(helpers)/responses";
 import { documentCategorieCodes } from "@/constants/codeTables";
+import { env } from "@/lib/env";
 import { getSession } from "@/server/auth/get-session";
 import {
   makeTempKey,
@@ -16,9 +17,7 @@ import {
   S3_BUCKET,
 } from "@/server/s3/s3";
 
-const uploadExpiresIn = Number(
-  process.env.S3_PRESIGN_UPLOAD_EXPIRES_SECONDS ?? 60,
-);
+const uploadExpiresIn = env.S3_PRESIGN_UPLOAD_EXPIRES_SECONDS;
 
 const bodySchema = z.object({
   proprietaireEntrepriseId: z.uuid(),

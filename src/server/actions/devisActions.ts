@@ -777,6 +777,11 @@ export const signerDevisAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
+    // Posture plateforme = lecture seule (regles_metier.md §C)
+    const plateformeRoleSigner = await getEffectivePlateformeRole(currentUser.id);
+    if (plateformeRoleSigner?.role)
+      throw errors.forbidden("La plateforme ne peut pas signer un devis.");
+
     const devisRow = await db.query.devis.findFirst({
       where: eq(devis.id, parsedInput.devisId),
     });
@@ -899,6 +904,11 @@ export const refuserDevisAction = actionClient
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    // Posture plateforme = lecture seule (regles_metier.md §C)
+    const plateformeRoleRefuser = await getEffectivePlateformeRole(currentUser.id);
+    if (plateformeRoleRefuser?.role)
+      throw errors.forbidden("La plateforme ne peut pas refuser un devis.");
 
     const devisRow = await db.query.devis.findFirst({
       where: eq(devis.id, parsedInput.devisId),
