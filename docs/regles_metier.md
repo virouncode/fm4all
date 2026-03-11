@@ -1,162 +1,176 @@
-# Règles Métier — Module Devis
+# Règles Métier — Référence Plateforme FM4ALL
 
-> Référence unique pour toutes les permissions liées aux devis et demandes de devis.
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
+> Document de référence unique pour toutes les permissions de la plateforme.
+> À consulter **systématiquement** avant d'implémenter ou de modifier une permission.
+> Basé sur le code réel (DB schema, server actions, queries) — pas sur des intentions.
 
 ---
 
-## A) Posture CLIENT
+## PRÉAMBULE — Doctrines Transversales
 
-### Demandes de devis (`devisDemandes`)
+### Glossaire des verbes
 
-| Rôle | Voir | Créer | Modifier | Annuler/Supprimer |
-|------|------|-------|----------|-------------------|
-| `admin` (roleAdhesion) | Toutes | Oui | Toutes | Toutes |
-| `responsable_site` (attribution) | Ses sites | Ses sites | Ses sites | Ses sites |
-| `demandeur_site` (attribution) | Ses sites | Ses sites | Seulement ses propres | ❌ |
-| `observateur_site` (attribution) | Ses sites | ❌ | ❌ | ❌ |
+| Verbe | Définition stricte |
+|-------|-------------------|
+| **voir** | Accès liste + détail fonctionnel (hors financier et documents) |
+| **voir (financier)** | Accès aux prix, montants, marges — toujours noté explicitement |
+| **voir (documents/PDF)** | Suit la visibilité du parent, sauf mention contraire |
+| **gérer** | Créer, modifier, planifier, annuler — acte de gouvernance |
+| **exécuter** | Démarrer, terminer, pointer — acte terrain |
+| **archiver** | Passer `actif = false` — données conservées en base |
+| **désactiver** | Synonyme d'archiver dans certains contextes (ex: exécutions) |
+| **supprimer** | DELETE physique — uniquement sur les brouillons non engagés, sous conditions strictes |
+| **annuler** | Statut `annule` ou `annulee` — acte métier, données conservées |
 
-**Règle importante :** un client ne peut PAS supprimer une demande de devis si un devis y est lié (même à l'état `brouillon`).
+---
 
-### Devis reçus (`devis`)
+### Doctrine globale : rôle `manager`
+
+> **Règle absolue :** Le rôle d'adhésion `manager` ne confère **aucun droit opérationnel** sur les modules terrain : prestations, exécutions, occurrences, tâches, tickets, devis, factures.
+>
+> **Exception unique et circonscrite :** Dans le module Attribution des Sites, un `manager` qui possède également une attribution `responsable_site` effective peut déléguer des rôles `demandeur_site` ou `observateur_site` à ses subordonnés (`usersArborescence`). Il ne peut jamais attribuer `responsable_site` (réservé à l'admin).
+>
+> Dans les modules Checklists et Factures (côté émetteur), `manager` a des droits de gouvernance d'équipe — ces exceptions sont documentées dans chaque module concerné.
+
+---
+
+### Doctrine globale : suppression / archivage / annulation
+
+| Catégorie | Règle |
+|-----------|-------|
+| **Événement terrain réalisé** (occurrences, tâches) | Jamais DELETE — changement de statut uniquement |
+| **Référentiel structurant** (sites, prestations, exécutions, utilisateurs) | Archivage (`actif = false`) — jamais DELETE sauf `super_admin_plateforme` |
+| **Brouillon non engagé** (devis brouillon, factures brouillon, exécution sans occurrence) | DELETE autorisé sous conditions strictes documentées par module |
+| **`devisDemandes`** | DELETE physique bloqué si devis lié ; sinon autorisé selon rôle |
+
+---
+
+### Niveaux de "voir"
+
+Dans toutes les matrices, "voir" signifie accès fonctionnel (liste + détail). Le financier est toujours noté séparément et explicitement. Les documents/PDF suivent la visibilité du parent.
+
+---
+
+## Module Devis
+
+> Référence unique pour toutes les permissions liées aux devis et demandes de devis.
+
+---
+
+### A) Posture CLIENT
+
+#### Demandes de devis (`devisDemandes`)
+
+**Statuts possibles :** `ouverte` → `en_cours` → `cloturee` | `annulee` | `archivee`
+
+| Rôle | Voir | Créer | Modifier | Annuler | Supprimer |
+|------|------|-------|----------|---------|-----------|
+| `admin` | Toutes | ✅ | Toutes | Toutes | Toutes (si aucun devis lié) |
+| `responsable_site` | Ses sites | ✅ | Ses sites | Ses sites | Ses sites (si aucun devis lié) |
+| `demandeur_site` | Ses sites | ✅ | Seulement les siennes | ❌ | ❌ |
+| `observateur_site` | Ses sites | ❌ | ❌ | ❌ | ❌ |
+| `manager`, `collaborateur` | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+> **Règle :** la suppression physique d'une `devisDemande` est bloquée si un devis y est lié, quel que soit le statut du devis. L'annulation logique (statut `annulee`) reste possible.
+
+#### Devis reçus (`devis`)
 
 | Rôle | Voir | Signer | Refuser |
 |------|------|--------|---------|
-| `admin` (roleAdhesion) | Tous | ✔ | ✔ |
-| `responsable_site` (attribution) | Ses sites | ✔ | ✔ |
-| `demandeur_site` (attribution) | Ses sites | ❌ | ❌ |
-| `observateur_site` (attribution) | Ses sites | ❌ | ❌ |
+| `admin` | Tous | ✅ | ✅ |
+| `responsable_site` | Ses sites | ✅ | ✅ |
+| `demandeur_site` | Ses sites | ❌ | ❌ |
+| `observateur_site` | Ses sites | ❌ | ❌ |
+| `manager`, `collaborateur` | ❌ | ❌ | ❌ |
 
-**Règle de modification :** le client ne modifie JAMAIS un devis (uniquement les `devisDemandes`).
+> **Règle :** le client ne modifie jamais un devis (uniquement les `devisDemandes`).
 
-### Expiration du devis
+#### Expiration du devis
 
 Si `now() > validTo` → devis expiré :
-- Interdire la signature **frontend** (pas de bouton + disclaimer "Devis expiré")
-- Interdire la signature **backend** (guard dans l'action `signerDevisAction`)
-- Interdire le refus **frontend** (pas de bouton si devis expiré)
-- Interdire le refus **backend** (guard dans l'action `refuserDevisAction`)
+- Signature **bloquée** (frontend + backend)
+- Refus **bloqué** (frontend + backend)
 
-**Décision confirmée** : L'expiration bloque à la fois la signature ET le refus. Un devis expiré ne peut plus être traité — le client doit en demander un nouveau.
-
-### Accès aux coordonnées du responsable de site (posture prestataire)
-
-`getSiteResponsableAction` est intentionnellement ouverte aux prestataires sans check d'accès à l'entreprise cliente. Un prestataire a besoin des coordonnées du responsable pour rédiger un devis sur un site client. La condition minimale d'accès (relation `clientPrestataireRelations`) est déjà vérifiée en amont lors de la récupération des demandes de devis.
+> **Rationale :** un devis expiré ne peut plus être traité. L'état métier est "expiré sans suite" — le client doit demander un nouveau devis. Permettre le refus d'un devis expiré ne produirait aucun effet utile.
 
 ---
 
-## B) Posture PRESTATAIRE
+### B) Posture PRESTATAIRE
 
-**Conditions minimales pour voir une demande de devis :**
-1. `clientPrestataireRelations` doit exister entre le prestataire et le client propriétaire de la demande
-2. Le `serviceId` de la demande doit correspondre à un service proposé par le prestataire (`getServicesByPrestataire`)
+**Conditions minimales pour voir une demande de devis (cumulatives) :**
+1. `clientPrestataireRelations` doit exister entre le prestataire et le client propriétaire
+2. Le `serviceId` de la demande doit correspondre à un service proposé par le prestataire
 
-Ces deux conditions sont cumulatives. Une demande sans `serviceId` correspondant n'est pas visible, même si la relation client existe.
+> Une demande sans `serviceId` correspondant n'est visible par aucun prestataire. La création de demandes "hors catalogue" n'est pas supportée — `serviceId` est obligatoire.
 
-### Visibilité des demandes de devis et devis
+#### Visibilité des demandes et devis
 
-| Rôle prestataire | Demandes de devis | Devis |
-|------------------|-------------------|-------|
-| `admin` (roleAdhesion) | Tous les sites clients | Tous |
-| `responsable_site` (attribution site) | Sites attribués | Sites attribués |
-| `demandeur_site` (attribution site) | Sites attribués | Sites attribués |
-| `observateur_site` (attribution site) | Sites attribués | Sites attribués |
-| `intervenant_site` (attribution site) | ❌ | ❌ |
+| Rôle | Demandes de devis | Devis |
+|------|-------------------|-------|
+| `admin` | Tous les sites clients | Tous |
+| `responsable_site` | Sites attribués | Sites attribués |
+| `demandeur_site` | Sites attribués | Sites attribués |
+| `observateur_site` | Sites attribués | Sites attribués |
+| `intervenant_site` | ❌ | ❌ |
+| `manager`, `collaborateur` | ❌ | ❌ |
 
-### Création d'un devis
+#### Création, modification, émission, suppression d'un devis
 
-Un devis est émis PAR le prestataire. Possible même sans demande associée (`devisDemandeId` nullable).
+| Rôle | Créer | Modifier (brouillon) | Émettre | Supprimer (brouillon) |
+|------|-------|---------------------|---------|----------------------|
+| `admin` | ✅ | ✅ | ✅ | ✅ |
+| `responsable_site` | ✅ | ✅ | ✅ | ✅ |
+| `demandeur_site` | ✅ | ✅ | ✅ | ✅ si `createdById = soi` |
+| `observateur_site` | ❌ | ❌ | ❌ | ❌ |
+| `intervenant_site` | ❌ | ❌ | ❌ | ❌ |
 
-| Rôle prestataire | Créer devis |
-|------------------|-------------|
-| `admin` | ✔ |
-| `responsable_site` | ✔ |
-| `demandeur_site` | ✔ |
-| `observateur_site` | ❌ |
-| `intervenant_site` | ❌ |
+#### Accès aux coordonnées du responsable de site
 
-### Modification d'un devis (statut `brouillon` uniquement)
-
-| Rôle prestataire | Modifier devis & lignes |
-|------------------|------------------------|
-| `admin` | ✔ |
-| `responsable_site` | ✔ |
-| `demandeur_site` | ✔ |
-| `observateur_site` | ❌ |
-| `intervenant_site` | ❌ |
-
-### Suppression d'un devis (statut `brouillon` uniquement)
-
-| Rôle prestataire | Supprimer devis |
-|------------------|-----------------|
-| `admin` | ✔ |
-| `responsable_site` | ✔ |
-| `demandeur_site` | Seulement si auteur (`createdById`) |
-| `observateur_site` | ❌ |
-| `intervenant_site` | ❌ |
-
-### Émettre un devis (statut `brouillon` uniquement)
-
-| Rôle prestataire | Émettre |
-|------------------|---------|
-| `admin` | ✔ |
-| `responsable_site` | ✔ |
-| `demandeur_site` | ✔ |
-| `observateur_site` | ❌ |
-| `intervenant_site` | ❌ |
+`getSiteResponsableAction` est intentionnellement ouverte aux prestataires sans check `hasAccessToEntreprise` sur l'entreprise cliente. Un prestataire a besoin des coordonnées du responsable pour rédiger un devis. La relation `clientPrestataireRelations` est déjà vérifiée en amont.
 
 ---
 
-## C) Posture PLATEFORME
-
-**La plateforme peut créer et gérer des devis en mode intermédiaire.**
+### C) Posture PLATEFORME
 
 | Action | Autorisé |
 |--------|----------|
-| Voir demandes de devis | ✔ |
-| Voir devis | ✔ |
-| Voir lignes de devis | ✔ |
-| Voir PDF | ✔ |
-| Créer/modifier/supprimer demande | ❌ |
-| Créer devis | ✔ (modeCommercial forcé à `"intermediaire"`) |
-| Modifier devis (brouillon) | ✔ |
-| Supprimer devis (brouillon) | ✔ |
-| Émettre devis | ✔ |
-| Signer/Refuser devis | ❌ (concerne le client) |
+| Voir demandes de devis | ✅ (lecture seule) |
+| Voir devis | ✅ |
+| Créer/modifier/supprimer une demande | ❌ |
+| Créer un devis | ✅ (`modeCommercial` forcé à `"intermediaire"`) |
+| Modifier un devis brouillon | ✅ |
+| Supprimer un devis brouillon | ✅ |
+| Émettre un devis | ✅ |
+| Signer / Refuser | ❌ (acte client) |
 
-**Émetteur :** toujours FM4ALL (entreprise dont le rôle `entrepriseRoles.role = "plateforme"`). La plateforme ne peut jamais émettre un devis au nom d'une autre entreprise.
-
-**Bypass permissions :** `getEffectivePlateformeRole` (vérifie cookie + DB). Les checks `hasAccessToEntreprise` et rôle prestataire sont skippés si `isPlateformeActive = true`.
+> La plateforme ne peut créer/modifier/émettre que les devis avec `modeCommercialSnapshot = "intermediaire"`. Un devis `"direct"` est en lecture seule pour la plateforme — l'utilisateur FM4ALL doit basculer en posture `"prestataire"` pour le gérer.
 
 ---
 
-## D) Mode commercial (`modeCommercialSnapshot`)
+### D) Mode commercial (`modeCommercialSnapshot`)
 
-Le champ `modeCommercialSnapshot` est **forcé par la posture à la création** et ne peut pas être modifié ensuite.
+Forcé à la création selon la posture de l'émetteur. Jamais modifié ensuite.
 
-| Posture émetteur | Valeur forcée | Signification |
-|------------------|--------------|---------------|
-| `prestataire` | `"direct"` | Le prestataire facture directement le client |
-| `plateforme` (FM4ALL) | `"intermediaire"` | FM4ALL porte le contrat, prend une marge, reverse au prestataire |
+| Posture émetteur | Valeur | Signification |
+|------------------|--------|--------------|
+| `prestataire` | `"direct"` | Facturation directe client → prestataire |
+| `plateforme` | `"intermediaire"` | FM4ALL porte le contrat, prend une marge, reverse au prestataire |
 
-**Règle :** ce champ est un snapshot — il reflète le mode commercial au moment de la création du devis. Il n'est jamais recalculé.
+#### Devis autonome (sans `devisDemandeId`)
 
-**Affichage :** visible en lecture seule dans le formulaire de création (Step 1 — section "Détails du devis") et dans la vue détail du devis.
+Un devis peut être créé sans demande associée. Dans ce cas, `siteId` est obligatoire pour permettre le calcul du périmètre des rôles `responsable_site` et `demandeur_site`. Un devis sans `siteId` créé par un non-admin est rejeté côté serveur.
 
 ---
 
-## Résumé des rôles
+### Résumé des rôles
 
-### Rôles d'adhésion enterprise (`userClientAdhesions` / `userPrestataireAdhesions`)
-- `admin` — droits globaux sur toute l'entreprise
-- `manager` — gestion d'équipe (NB : pas de droit de signer/refuser les devis côté client)
-- `collaborateur` — accès de base
+**Rôles d'adhésion** (`admin`, `manager`, `collaborateur`) — seul `admin` a des droits sur les devis.
 
-### Rôles d'attribution site (`userClientSiteAttributions` / `userPrestataireSiteAttributions`)
+**Rôles d'attribution site :**
 - `responsable_site` — peut signer/refuser (client), créer/modifier/émettre (prestataire)
-- `demandeur_site` — peut créer demandes/devis, modifier les siennes
+- `demandeur_site` — peut créer demandes/devis, modifier/émettre les siens, pas de signature
 - `observateur_site` — lecture seule
-- `intervenant_site` (prestataire uniquement) — aucun droit sur les devis
+- `intervenant_site` — aucun droit sur les devis
 
 ---
 
@@ -164,43 +178,34 @@ Le champ `modeCommercialSnapshot` est **forcé par la posture à la création** 
 
 ---
 
-# Règles Métier — Module Tickets
+## Module Tickets
 
 > Référence unique pour toutes les permissions liées aux tickets et à leurs messages.
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
 
 ---
 
-## 1. Sémantique des champs
+### 1. Sémantique des champs
 
 | Champ | Signification | Règle |
 |-------|--------------|-------|
-| `proprietaireEntrepriseId` | L'entreprise "chez qui vit le ticket" | = **entreprise cliente du site** — toujours, même si le ticket est créé par le prestataire |
-| `demandeurEntrepriseId` | L'entreprise qui a initié la demande | = entreprise de l'auteur initial (client, prestataire ou FM4ALL) |
-| `assigneEntrepriseId` | L'entreprise actuellement attendue ("chez qui est la balle") | Variable selon le flux ; cohérent mais distinct du statut |
+| `proprietaireEntrepriseId` | L'entreprise "chez qui vit le ticket" | = entreprise cliente du site — toujours, même si le ticket est créé par le prestataire |
+| `demandeurEntrepriseId` | L'entreprise qui a initié la demande | = entreprise de l'auteur initial |
+| `assigneEntrepriseId` | L'entreprise actuellement attendue ("chez qui est la balle") | Évolue à chaque transition — voir §3 |
 | `assigneUserId` | La personne concrète en charge | Optionnel — souvent `null` jusqu'à prise en charge explicite |
 
-**Doctrine :** un ticket appartient toujours au client, même s'il est créé ou traité par le prestataire.
+> **Doctrine :** un ticket appartient toujours au client, même s'il est créé ou traité par le prestataire.
 
 ---
 
-## 2. États du ticket
+### 2. États du ticket
 
-### États actifs
-- `nouveau`
-- `pris_en_charge`
-- `en_attente_prestataire`
-- `en_attente_client`
-- `a_valider`
+**États actifs :** `nouveau` · `pris_en_charge` · `en_attente_prestataire` · `en_attente_client` · `a_valider`
 
-### États finaux (aucune transition sauf plateforme)
-- `clos`
-- `annule`
-- `rejete`
+**États finaux** (aucune transition sauf plateforme) : `clos` · `annule` · `rejete`
 
 ---
 
-## 3. Machine d'état — transitions autorisées
+### 3. Machine d'état — transitions et `assigneEntrepriseId`
 
 ```
 nouveau
@@ -214,129 +219,93 @@ nouveau
   │               └──→ clos                            │
   │                                                    │
   ├──→ annule                                          │
-  └──→ rejete                                          │
-                                                       │
-  (retour vers pris_en_charge depuis en_attente_*)  ───┘
+  └──→ rejete                      (retour depuis en_attente_*) ─┘
 ```
 
-### Transitions interdites (sauf plateforme)
-- Depuis un état final (`clos`, `annule`, `rejete`) → tout autre état
-- Sauts non représentés dans le graphe ci-dessus (ex: `nouveau → clos` directement)
+| Transition | Qui peut | `assigneEntrepriseId` cible |
+|-----------|----------|-----------------------------|
+| `∅ → nouveau` | Tout créateur autorisé | Entreprise choisie par le créateur |
+| `nouveau → pris_en_charge` | Admin/responsable_site de l'entreprise assignée + plateforme | Inchangé |
+| `pris_en_charge → en_attente_prestataire` | Client admin/responsable_site + plateforme | = `prestataireEntrepriseId` |
+| `pris_en_charge → en_attente_client` | Prestataire admin/responsable_site + plateforme | = `proprietaireEntrepriseId` |
+| `en_attente_prestataire → pris_en_charge` | Prestataire admin/responsable_site + plateforme | Inchangé |
+| `en_attente_client → pris_en_charge` | Client admin/responsable_site + plateforme | Inchangé |
+| `pris_en_charge → a_valider` | Prestataire admin/responsable_site + plateforme | = `proprietaireEntrepriseId` |
+| `a_valider → clos` | Client admin/responsable_site + plateforme | Inchangé |
+| `nouveau → annule` | Admin/responsable_site + plateforme | Inchangé |
+| `pris_en_charge → annule` | Admin/responsable_site + plateforme | Inchangé |
+| `nouveau → rejete` | Admin/responsable_site de l'entreprise assignée + plateforme | Inchangé |
 
-### Détail des transitions
-
-| Transition | Déclencheur | Qui peut |
-|-----------|------------|----------|
-| `∅ → nouveau` | Création | Tout créateur autorisé |
-| `nouveau → pris_en_charge` | Prise en charge | Entreprise assignée (admin, responsable_site) + plateforme |
-| `pris_en_charge → en_attente_prestataire` | Le client attend une action du prestataire | Client admin, client responsable_site, plateforme |
-| `pris_en_charge → en_attente_client` | Le prestataire attend une action du client | Prestataire admin, prestataire responsable_site, plateforme |
-| `en_attente_prestataire → pris_en_charge` | Retour en traitement après réponse | Admin, responsable_site, plateforme |
-| `en_attente_client → pris_en_charge` | Retour en traitement après réponse | Admin, responsable_site, plateforme |
-| `pris_en_charge → a_valider` | Travail terminé, validation client attendue | Prestataire admin, prestataire responsable_site, plateforme |
-| `a_valider → clos` | Validation finale | Client admin, client responsable_site, plateforme |
-| `nouveau → annule` | Annulation avant prise en charge | Admin, responsable_site, plateforme |
-| `pris_en_charge → annule` | Annulation en cours de traitement | Admin, responsable_site, plateforme |
-| `nouveau → rejete` | Ticket hors périmètre ou erreur | Admin, responsable_site, plateforme |
+> **Règle "retour à pris_en_charge" :** seule l'**entreprise dont c'est actuellement la balle** peut remettre le ticket en traitement (prestataire pour `en_attente_prestataire → pris_en_charge`, client pour `en_attente_client → pris_en_charge`). La plateforme peut toujours faire les deux.
 
 **Effets automatiques :**
+- `nouveau → pris_en_charge` : `priseEnChargeAt = now()` ⚠️ (à ajouter en DB — nécessaire pour SLA)
 - `a_valider → clos` : `resolvedAt = now()`, `closedAt = now()`
-- `nouveau → pris_en_charge` : `priseEnChargeAt = now()` (futur SLA), `assigneUserId = currentUser` (optionnel)
 - Tout message ou modification : `lastActivityAt = now()`
 
 ---
 
-## 4. Création d'un ticket
+### 4. `annule` vs `rejete` — distinction métier
 
-### Valeurs automatiques à la création
+| Statut | Signification | Initiateur |
+|--------|--------------|------------|
+| `annule` | Le ticket est abandonné — la demande est retirée | L'entreprise **propriétaire** (client) |
+| `rejete` | Le ticket est déclaré hors périmètre ou invalide | L'entreprise **assignée** (prestataire ou FM4ALL) |
 
-| Champ | Valeur |
-|-------|--------|
-| `proprietaireEntrepriseId` | Entreprise cliente du site concerné |
-| `demandeurEntrepriseId` | Entreprise de l'auteur |
-| `assigneEntrepriseId` | Entreprise cible (souvent prestataire si incident) |
-| `assigneUserId` | `null` par défaut |
-| `statut` | `nouveau` |
+> Le `demandeur_site` ne peut ni annuler ni rejeter (pas de pilotage du workflow).
 
-### Qui peut créer un ticket ?
+---
+
+### 5. Création d'un ticket
 
 **Posture CLIENT**
 
 | Rôle | Peut créer |
 |------|-----------|
-| `admin` | Tous les sites de son entreprise |
+| `admin` | Tous les sites de l'entreprise |
 | `responsable_site` | Ses sites attribués |
 | `demandeur_site` | Ses sites attribués |
 | `observateur_site` | ❌ |
+| `manager`, `collaborateur` | ❌ |
 
-**Posture PRESTATAIRE** (condition préalable : `clientPrestataireRelations` doit exister)
+**Posture PRESTATAIRE** (condition : `clientPrestataireRelations` doit exister)
 
 | Rôle | Peut créer |
 |------|-----------|
 | `admin` | Tous les sites clients liés |
 | `responsable_site` | Ses sites clients attribués |
 | `demandeur_site` | Ses sites clients attribués |
-| `observateur_site` | ❌ |
-| `intervenant_site` | ❌ |
+| `observateur_site`, `intervenant_site` | ❌ |
 
-**Posture PLATEFORME** : peut toujours créer.
+**Posture PLATEFORME :** peut toujours créer.
 
 ---
 
-## 5. Modification d'un ticket
+### 6. Modification d'un ticket
 
-Deux niveaux de modification distincts.
+#### 6a. Contenu libre (titre, description)
 
-### 5a. Modifier le contenu libre (titre, description)
+Mêmes droits que la création. **Gelé** dès que le statut atteint `a_valider`, `clos`, `annule` ou `rejete`.
 
-Mêmes droits que la création.
+#### 6b. Workflow (statut, assignation, priorité, type)
 
 | Posture | Qui peut |
 |---------|---------|
-| Client | admin, responsable_site, demandeur_site |
-| Prestataire | admin, responsable_site, demandeur_site (selon périmètre site/relation) |
+| Client | `admin`, `responsable_site` |
+| Prestataire | `admin`, `responsable_site` |
 | Plateforme | Toujours |
 
-### 5b. Modifier le statut, l'assignation, la priorité, le type
-
-Droits restreints — pilotage du workflow.
-
-| Posture | Qui peut |
-|---------|---------|
-| Client | admin, responsable_site |
-| Prestataire | admin, responsable_site |
-| Plateforme | Toujours |
-
-**Règle :** `demandeur_site` peut ouvrir et commenter, mais **ne peut pas piloter le workflow** (statut, type, priorité, assignation).
+> `demandeur_site` peut ouvrir et commenter, mais **ne pilote pas le workflow**.
 
 ---
 
-## 6. Permissions par champ modifiable
+### 7. Messages
 
-| Champ | Qui peut modifier | Note |
-|-------|-----------------|------|
-| `titre`, `description` | admin, responsable_site, demandeur_site + plateforme | Contenu libre |
-| `type` | admin, responsable_site + plateforme | Pilotage — pas demandeur_site |
-| `priorite` | admin, responsable_site + plateforme | Pilotage — pas demandeur_site |
-| `statut` | Voir machine d'état (§3) | Transitions restrictives par posture |
-| `assigneEntrepriseId` | admin, responsable_site + plateforme | Pilotage |
-| `assigneUserId` | admin, responsable_site + plateforme | Pilotage |
+**Qui peut poster :** `admin`, `responsable_site`, `demandeur_site` (client et prestataire) + plateforme.
 
----
+**Immuabilité :** aucune modification ni suppression de message.
 
-## 7. Messages
-
-### Qui peut poster un message ?
-
-| Posture | Rôles autorisés |
-|---------|----------------|
-| Client | admin, responsable_site, demandeur_site |
-| Prestataire | admin, responsable_site, demandeur_site |
-| Plateforme | Toujours |
-
-**Règle :** pas de modification ni suppression de message (immuabilité).
-
-### Visibilité des messages
+**Visibilité :**
 
 | Valeur `visibilite` | Qui voit |
 |--------------------|---------|
@@ -345,9 +314,7 @@ Droits restreints — pilotage du workflow.
 | `client_only` | Client + plateforme |
 | `prestataire_only` | Prestataire + plateforme |
 
-**Règle :** la visibilité s'applique aussi aux pièces jointes attachées aux messages.
-
-### Contraintes d'écriture par visibilité
+**Contraintes d'écriture par visibilité :**
 
 | Posture auteur | Visibilités autorisées |
 |----------------|----------------------|
@@ -357,239 +324,53 @@ Droits restreints — pilotage du workflow.
 
 ---
 
-## 8. Périmètre de visibilité des tickets
+### 8. Périmètre de visibilité des tickets
 
-### Posture CLIENT
-- **admin** : tous les tickets dont `proprietaireEntrepriseId = entrepriseId`
-- **responsable_site** : tickets des sites attribués (périmètre effectif via `sitesArborescence`)
-- **demandeur_site** : tickets des sites attribués
-- **observateur_site** : tickets des sites attribués (lecture seule)
+**Posture CLIENT**
+- `admin` : tous les tickets dont `proprietaireEntrepriseId = entrepriseId`
+- `responsable_site` : tickets des sites attribués (périmètre effectif via `sitesArborescence`)
+- `demandeur_site` : tickets des sites attribués
+- `observateur_site` : tickets des sites attribués (lecture seule)
 
-### Posture PRESTATAIRE
-- **admin** : tous les tickets où `assigneEntrepriseId = prestataireId`
-- **non-admin** : idem + filtre sur les sites attribués
+**Posture PRESTATAIRE**
+- Visibilité basée sur `assigneEntrepriseId = prestataireId` au moment de la lecture
+- Si la balle repasse côté client, le prestataire ne voit plus le ticket dans sa liste — c'est intentionnel
+- `admin` : tous les tickets où `assigneEntrepriseId = prestataireId`
+- Non-admin : idem + filtre sur les sites attribués
 
-### Posture PLATEFORME
-- Tous les tickets sans filtre.
-
----
-
-## 9. Pièces jointes
-
-- Les PJ d'un ticket (`documentsLinks` avec `ticketId` rempli, `ticketMessageId` NULL) suivent les mêmes permissions que le ticket.
-- Les PJ d'un message (`documentsLinks` avec `ticketMessageId` rempli, `ticketId` NULL) suivent la visibilité du message.
-- **Jamais** les deux colonnes renseignées simultanément (principe de normalisation polymorphique).
+**Posture PLATEFORME :** tous les tickets sans filtre.
 
 ---
 
-## 10. Lien avec les occurrences et tâches
+### 9. Pièces jointes
 
-Un ticket peut être lié à :
-- `occurrenceId` → ticket créé depuis une intervention
-- `occurrenceTacheId` → ticket créé depuis une tâche (ex : tâche impossible à réaliser)
-
-Ces champs sont informatifs — ils n'influencent pas les permissions du ticket.
+- PJ du ticket : `documentsLinks` avec `ticketId` rempli, `ticketMessageId` NULL
+- PJ d'un message : `documentsLinks` avec `ticketMessageId` rempli, `ticketId` NULL
+- **Jamais** les deux colonnes renseignées simultanément
 
 ---
 
-## 11. Champs d'audit recommandés
-
-| Champ | Renseigné quand | Statut |
-|-------|----------------|--------|
-| `createdAt` | Création | ✅ En DB |
-| `lastActivityAt` | Tout message ou modification | ✅ En DB |
-| `priseEnChargeAt` | Transition `nouveau → pris_en_charge` | ⚠️ À ajouter en DB (prioritaire — nécessaire pour SLA) |
-| `resolvedAt` | Transition `a_valider → clos` | ✅ En DB |
-| `closedAt` | Transition `a_valider → clos` | ✅ En DB |
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
-## 12. Résumé des rôles
+## Module Prestations (`clientServices`)
 
-### Rôles d'adhésion entreprise
-- `admin` — droits globaux sur toute l'entreprise pour cette posture
-- `manager` / `collaborateur` — non mentionnés dans les droits tickets (rôles génériques non utilisés ici)
-
-### Rôles d'attribution site
-- `responsable_site` — pilotage du workflow (statut, priorité, assignation)
-- `demandeur_site` — création + commentaires, pas de pilotage
-- `observateur_site` — lecture seule, ne peut pas créer
-- `intervenant_site` — aucun droit sur les tickets
+> Référence unique pour toutes les permissions liées aux prestations.
 
 ---
 
-*Dernière mise à jour : 2026-03-10*
-
----
-
-# Règles Métier — Module Prestations
-
-> Référence unique pour toutes les permissions liées aux prestations (`clientServices`).
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
-
----
-
-## 1. Hiérarchie d'autorité
+### 1. Hiérarchie d'autorité
 
 ```
-plateforme   → contrôle total (god mode)
+plateforme   → contrôle total
 client       → propriétaire de la prestation
 prestataire  → opérateur (agit en délégation)
 ```
 
-Une prestation appartient toujours à l'entreprise cliente, même si elle est créée ou gérée par le prestataire.
-
 ---
 
-## 2. Posture CLIENT
-
-### 2a. Visibilité des prestations
-
-| Rôle | Voit quelles prestations |
-|------|--------------------------|
-| `admin` (roleAdhesion) | **Toutes** les prestations de l'entreprise |
-| `manager` (roleAdhesion) | ❌ Pas de droit implicite (sauf attribution site explicite) |
-| `responsable_site` (attribution) | Prestations des sites attribués |
-| `demandeur_site` (attribution) | Prestations des sites attribués |
-| `observateur_site` (attribution) | Prestations des sites attribués (lecture seule) |
-
-> **Règle manager :** le `manager` n'a PAS de droits automatiques sur les prestations. Il ne voit des prestations que s'il est explicitement attribué à un site avec un rôle opérationnel (`responsable_site`, `demandeur_site`, etc.). Cette doctrine évite de recréer un quasi-admin.
-
-### 2b. Visibilité des données financières / contractuelles
-
-Tous ceux qui voient une prestation ne voient pas forcément ses données sensibles (prix, montants, marges, détails contractuels).
-
-| Données | Qui peut voir |
-|---------|---------------|
-| Infos fonctionnelles (nom, description, site, fréquence…) | admin + tout rôle ayant accès à la prestation |
-| **Données financières / contractuelles** (prix, montants, marges) | `admin` + `responsable_site` uniquement |
-
-`demandeur_site` et `observateur_site` voient l'existence et le fonctionnel, **jamais** le financier.
-
-### 2c. Création
-
-| Rôle | Peut créer |
-|------|-----------|
-| `admin` | ✅ Sur n'importe quel site de l'entreprise |
-| `responsable_site` | ✅ Sur ses sites attribués |
-| `manager`, `demandeur_site`, `observateur_site` | ❌ |
-
-### 2d. Modification
-
-| Rôle | Peut modifier |
-|------|--------------|
-| `admin` | ✅ Toutes les prestations |
-| `responsable_site` | ✅ Prestations de ses sites attribués |
-| Autres | ❌ |
-
-### 2e. Archivage / Suppression
-
-| Rôle | Peut archiver |
-|------|--------------|
-| `admin` | ✅ |
-| Tous les autres | ❌ |
-
-> L'archivage est un acte de gouvernance fort — réservé à l'admin uniquement.
-
----
-
-## 3. Posture PRESTATAIRE
-
-### 3a. Visibilité — deux niveaux cumulatifs
-
-**Niveau 1 — sécurité inter-entreprises (obligatoire)**
-
-Une prestation n'est visible par un prestataire que s'il existe au moins une exécution (`clientServiceExecutions`) associant cette prestation à son entreprise :
-
-```sql
-EXISTS (
-  SELECT 1 FROM clientServiceExecutions cse
-  WHERE cse.clientServiceId = prestation.id
-    AND cse.prestataireEntrepriseId = monEntreprise
-)
-```
-
-- Le statut `actif` de l'exécution **n'entre pas en jeu** : une ancienne exécution suffit (historique conservé).
-- Le filtre se fait **par exécution, jamais par site seul** — sinon un prestataire pourrait voir les prestations d'autres prestataires sur le même site.
-
-**Niveau 2 — organisation interne prestataire (si non-admin)**
-
-Si le rôle n'est pas `admin`, filtrer en plus par attribution de site :
-
-```sql
-AND prestation.siteId IN (userPrestataireSiteAttributions du user courant)
-```
-
-> **Règle :** le rôle `manager` (adhésion) ne confère **aucun droit implicite supplémentaire**. Pour tout utilisateur non-admin, c'est l'**attribution de site** qui définit le périmètre visible. Un `manager` sans attribution de site ne voit aucune prestation.
-
-| Rôle prestataire | Périmètre interne |
-|------------------|-------------------|
-| `admin` | Toutes les prestations où l'entreprise intervient |
-| `manager` | Sites clients attribués (même règle que les non-admin) |
-| `responsable_site` | Prestations des sites clients attribués |
-| `intervenant_site` | Prestations des sites clients attribués |
-| `observateur_site` | Prestations des sites clients attribués (lecture seule) |
-
-### 3b. Visibilité des données financières
-
-| Données | Qui peut voir |
-|---------|---------------|
-| Infos fonctionnelles | Tout rôle ayant accès |
-| **Prix / montants côté prestataire** | `admin` uniquement |
-| Tous les autres rôles | ❌ Pas de données financières |
-
-> **Rationale :** un intervenant terrain, responsable de site ou manager n'a pas besoin de voir les prix vendus au client ni les marges FM4ALL. Seul l'admin prestataire a une vision contractuelle complète.
-
-### 3c. Création
-
-Autorisée même si le client a un compte actif — le client peut déléguer la gestion au prestataire, ou simplement ne jamais utiliser la plateforme.
-
-| Rôle prestataire | Peut créer |
-|------------------|-----------|
-| `admin` | ✅ Sur tous les sites clients dans son périmètre |
-| `responsable_site` | ✅ Sur ses sites clients attribués |
-| `manager`, `intervenant_site`, `observateur_site` | ❌ |
-
-> **Règle importante :** quand le prestataire crée une prestation, **l'exécution doit être créée simultanément** dans la même transaction. Sinon la prestation ne serait pas visible (règle niveau 1 — pas d'exécution associée).
-
-### 3d. Modification
-
-| Rôle prestataire | Peut modifier |
-|------------------|--------------|
-| `admin` | ✅ |
-| `responsable_site` | ✅ Sur ses sites |
-| Autres | ❌ |
-
-### 3e. Archivage
-
-| Rôle prestataire | Peut archiver |
-|------------------|--------------|
-| `admin` | ✅ |
-| Tous les autres | ❌ |
-
-> L'archivage reste un acte fort même en mode proxy : seul l'admin prestataire peut le faire.
-
----
-
-## 4. Posture PLATEFORME
-
-**Droits complets (god mode).** La plateforme n'est pas soumise au `modePilotage` ni aux restrictions d'entreprise.
-
-| Action | Autorisé |
-|--------|----------|
-| Voir toutes les prestations | ✅ |
-| Voir les données financières | ✅ |
-| Créer une prestation | ✅ |
-| Modifier une prestation | ✅ |
-| Archiver / supprimer | ✅ |
-
-> **Rationale :** la plateforme doit pouvoir corriger, migrer, débuguer n'importe quelle donnée. Restreindre la plateforme rendrait le support et l'administration impossibles.
-
----
-
-## 5. Résumé matriciel complet
-
-### Posture CLIENT
+### 2. Posture CLIENT
 
 | Action | `admin` | `responsable_site` | `demandeur_site` | `observateur_site` | `manager` |
 |--------|---------|--------------------|-------------------|--------------------|-----------|
@@ -599,260 +380,80 @@ Autorisée même si le client a un compte actif — le client peut déléguer la
 | Modifier | ✅ | ✅ (ses sites) | ❌ | ❌ | ❌ |
 | Archiver | ✅ | ❌ | ❌ | ❌ | ❌ |
 
-### Posture PRESTATAIRE
+> `manager` et `collaborateur` : zéro droit sur les prestations. Seule l'attribution de site compte.
+
+---
+
+### 3. Posture PRESTATAIRE
+
+**Visibilité niveau 1 (inter-entreprises) :** une prestation n'est visible que si au moins une exécution (`clientServiceExecutions`) associe cette prestation à l'entreprise prestataire — peu importe le statut `actif` de l'exécution.
+
+**Visibilité niveau 2 (interne non-admin) :** filtrage supplémentaire par attributions de site (`userPrestataireSiteAttributions`).
 
 | Action | `admin` | `manager` | `responsable_site` | `intervenant_site` | `observateur_site` |
 |--------|---------|-----------|--------------------|--------------------|--------------------|
-| Voir prestations | Périmètre exécution (toutes) | Sites attribués | Sites attribués | Sites attribués | Sites attribués (RO) |
-| Voir données financières | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Voir prestations | Périmètre exécution | Sites attribués | Sites attribués | Sites attribués | Sites attribués (RO) |
+| Voir données financières | ✅ | ❌ | ✅ | ❌ | ❌ |
 | Créer | ✅ | ❌ | ✅ (ses sites) | ❌ | ❌ |
 | Modifier | ✅ | ❌ | ✅ (ses sites) | ❌ | ❌ |
 | Archiver | ✅ | ❌ | ❌ | ❌ | ❌ |
 
-### Posture PLATEFORME
-
-| Action | Autorisé |
-|--------|----------|
-| Tout | ✅ |
+> **Règle :** quand le prestataire crée une prestation, l'exécution doit être créée simultanément dans la même transaction — sinon la prestation ne serait pas visible (règle niveau 1).
 
 ---
 
-## 6. Règles techniques d'implémentation
+### 4. Posture PLATEFORME
 
-### Filtre prestataire — toujours passer par les exécutions
-
-Ne jamais filtrer les prestations côté prestataire par `siteId` seul :
-
-```typescript
-// ✅ CORRECT — filtre via exécutions
-.innerJoin(clientServiceExecutions, and(
-  eq(clientServiceExecutions.clientServiceId, clientServices.id),
-  eq(clientServiceExecutions.prestataireEntrepriseId, prestataireEntrepriseId),
-))
-
-// ❌ FAUX — expose des prestations d'autres prestataires sur le même site
-.where(eq(clientServices.siteId, siteId))
-```
-
-### Mode proxy — création simultanée prestation + exécution
-
-```typescript
-await db.transaction(async (tx) => {
-  const [prestation] = await tx.insert(clientServices).values({ ... }).returning();
-  await tx.insert(clientServiceExecutions).values({
-    clientServiceId: prestation.id,
-    prestataireEntrepriseId: prestataireEntrepriseId,
-    // ...
-  });
-  return prestation;
-});
-```
-
-### Filtrage interne prestataire non-admin
-
-```typescript
-if (!isAdmin) {
-  query = query.where(
-    inArray(clientServices.siteId, userPrestataireSiteAttributionIds)
-  );
-}
-```
+Droits complets (god mode). Voir données financières inclus.
 
 ---
 
-*Dernière mise à jour : 2026-03-10*
+### 5. Conditions d'archivage
+
+L'archivage d'une prestation est bloqué si :
+1. Il existe une exécution avec `actif = true`
+2. Il existe une occurrence avec statut `planifiee` ou `en_cours`
+
+> L'admin doit d'abord désactiver les exécutions et annuler/terminer les occurrences futures avant d'archiver.
 
 ---
 
-# Règles Métier — Module Exécutions (`clientServiceExecutions`)
-
-> Référence unique pour toutes les permissions liées aux exécutions d'une prestation.
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
->
-> ⚠️ Ne pas confondre avec les **occurrences** (`clientServiceOccurrences`) qui représentent les interventions terrain réelles. Les exécutions définissent **qui fait quoi et comment** ; les occurrences correspondent aux **passages effectifs**.
-
-> **Règle fondamentale sur le rôle `manager` :** Le rôle d'adhésion `manager` ne confère **aucune permission opérationnelle** sur les exécutions (ni création, ni modification, ni désactivation, ni changement de `modePilotage`). Pour tout utilisateur non-`admin`, c'est exclusivement l'**attribution de site** qui détermine les droits. Un utilisateur `manager` possédant également une attribution `responsable_site` sur le site concerné obtient les droits correspondants **via son attribution de site**, non via son rôle d'adhésion.
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
-## 1. Définition d'une exécution
+## Module Exécutions (`clientServiceExecutions`)
 
-Une exécution (`clientServiceExecution`) configure l'organisation opérationnelle d'une prestation. Elle définit :
-
-| Champ | Rôle |
-|-------|------|
-| `prestataireEntrepriseId` | Quel prestataire intervient |
-| `dateDebutValidite` | À partir de quelle date |
-| `dateFinValidite` | Jusqu'à quelle date |
-| `priorite` | Priorité de l'exécution (si plusieurs exécutions coexistent) |
-| `checklistId` | Quelle checklist de tâches appliquer |
-| Prix / données financières | Quels tarifs appliqués |
-| `modePilotage` | Qui pilote les occurrences (`client` / `prestataire` / `collaboration`) |
-
-> **Doctrine :** une exécution appartient toujours au client. Le prestataire peut participer à sa création/modification, mais le client reste propriétaire.
-
-> **Plusieurs exécutions simultanées :** plusieurs exécutions peuvent coexister pour une même prestation (ex : prestataire A du 01/01 au 30/06, prestataire B à partir du 01/07). Le moteur sélectionne l'exécution active selon la date courante et la priorité.
+> ⚠️ Ne pas confondre avec les **occurrences** : les exécutions définissent **qui fait quoi et comment** ; les occurrences correspondent aux **passages effectifs**.
 
 ---
 
-## 2. `modePilotage` — valeurs et contraintes
+### 1. `modePilotage` — valeurs et contraintes
 
-`modePilotage` détermine **qui crée, planifie et assigne les occurrences**.
+`modePilotage` détermine qui crée, planifie et assigne les occurrences.
 
-| Valeur | Qui pilote les occurrences |
-|--------|---------------------------|
-| `client` | L'entreprise cliente |
-| `prestataire` | L'entreprise prestataire |
+| Valeur | Qui pilote |
+|--------|-----------|
+| `client` | L'entreprise cliente uniquement |
+| `prestataire` | L'entreprise prestataire uniquement |
 | `collaboration` | Les deux ensemble |
 
-### Contraintes selon les entreprises fantômes
+**Contraintes selon les entreprises fantômes** (sans admin actif) :
 
-Une entreprise est dite **fantôme** si elle n'a aucun utilisateur actif sur la plateforme (`hasActiveAdmin === false`).
+| Client fantôme | Prestataire fantôme | `modePilotage` autorisé |
+|:--------------:|:-------------------:|:-----------------------:|
+| ✅ | ❌ | `prestataire` uniquement |
+| ❌ | ✅ | `client` uniquement |
+| ❌ | ❌ | `client`, `prestataire`, `collaboration` |
+| ✅ | ✅ | ❌ Impossible — aucun pilote |
 
-| Client fantôme | Prestataire fantôme | Valeurs `modePilotage` autorisées |
-|:--------------:|:-------------------:|:---------------------------------:|
-| ✅ Oui | ❌ Non | `prestataire` uniquement |
-| ❌ Non | ✅ Oui | `client` uniquement |
-| ❌ Non | ❌ Non | `client`, `prestataire`, `collaboration` |
-| ✅ Oui | ✅ Oui | ❌ Impossible (pas de pilote) — à interdire |
+> Valeurs impossibles filtrées côté formulaire **et** validées côté serveur.
 
-> **Règle :** les valeurs impossibles doivent être **filtrées côté formulaire** ET **validées côté serveur**. Ne jamais faire confiance au front.
-
-> **Note :** `modePilotage` n'influence **pas les permissions** de l'exécution elle-même (voir, créer, modifier, désactiver). Il régit uniquement la gouvernance des occurrences.
-
-### Qui peut modifier `modePilotage` ?
-
-Changer `modePilotage` change qui crée les occurrences, qui les planifie, qui les assigne — c'est un acte de gouvernance opérationnelle.
-
-| Posture | Rôles autorisés |
-|---------|----------------|
-| Client | `admin`, `responsable_site` |
-| Prestataire | `admin`, `responsable_site` |
-| Plateforme | Toujours |
-
-> **Rappel manager :** Le rôle `manager` (adhésion) ne donne pas accès à la modification de `modePilotage`. Seul le rôle `admin` (adhésion) ou une attribution `responsable_site` sur le site concerné confèrent ce droit — quel que soit le rôle d'adhésion par ailleurs.
+> `modePilotage` n'influence **pas** les permissions de l'exécution elle-même. Il régit uniquement la gouvernance des occurrences.
 
 ---
 
-## 3. Posture CLIENT
-
-### 3a. Visibilité des exécutions
-
-| Rôle | Voit quelles exécutions |
-|------|--------------------------|
-| `admin` (roleAdhesion) | Toutes les exécutions des prestations de l'entreprise |
-| `responsable_site` (attribution) | Exécutions des prestations de ses sites attribués |
-| `demandeur_site` (attribution) | Exécutions des prestations de ses sites attribués |
-| `observateur_site` (attribution) | Exécutions des prestations de ses sites attribués (lecture seule) |
-
-### 3b. Visibilité des données financières
-
-| Données | Qui peut voir |
-|---------|---------------|
-| Infos fonctionnelles (dates, prestataire, mode pilotage, checklist…) | Tout rôle ayant accès à l'exécution |
-| **Prix / montants** | `admin` + `responsable_site` uniquement |
-
-### 3c. Création
-
-| Rôle | Peut créer |
-|------|-----------|
-| `admin` | ✅ Sur toutes les prestations de l'entreprise |
-| `responsable_site` | ✅ Sur les prestations de ses sites attribués |
-| `manager`, `demandeur_site`, `observateur_site` | ❌ |
-
-### 3d. Modification
-
-| Rôle | Peut modifier |
-|------|--------------|
-| `admin` | ✅ Toutes |
-| `responsable_site` | ✅ Exécutions de ses sites attribués |
-| Autres | ❌ |
-
-### 3e. Désactivation (`actif = false`)
-
-> **Règle :** ne jamais supprimer une exécution — toujours désactiver (`actif = false`) pour conserver l'historique.
-
-| Rôle | Peut désactiver |
-|------|----------------|
-| `admin` | ✅ |
-| `responsable_site`, `demandeur_site`, `observateur_site` | ❌ |
-
-> La désactivation est un acte de gouvernance fort (change qui intervient sur la prestation) — réservée à l'admin.
-
----
-
-## 4. Posture PRESTATAIRE
-
-Le prestataire ne voit et n'agit que sur les exécutions où `prestataireEntrepriseId = sonEntreprise`.
-
-### 4a. Visibilité des exécutions
-
-| Rôle prestataire | Voit quelles exécutions |
-|------------------|--------------------------|
-| `admin` | Toutes les exécutions où son entreprise intervient |
-| `manager` | Sites clients attribués (même règle que non-admin) |
-| `responsable_site` (attribution) | Exécutions des sites clients attribués |
-| `intervenant_site` (attribution) | Exécutions des sites clients attribués |
-| `observateur_site` (attribution) | Exécutions des sites clients attribués (lecture seule) |
-
-> **Règle :** le rôle `manager` (adhésion) ne confère **aucun droit implicite supplémentaire**. Pour tout utilisateur non-admin, c'est l'**attribution de site** qui définit le périmètre visible.
-
-### 4b. Visibilité des données financières
-
-| Données | Qui peut voir |
-|---------|---------------|
-| Infos fonctionnelles | Tout rôle ayant accès |
-| **Prix / montants côté prestataire** | `admin` uniquement |
-| Tous les autres rôles | ❌ |
-
-### 4c. Création
-
-Autorisée même si le client a un compte actif (le prestataire peut agir en proxy).
-
-**Condition préalable :** `clientPrestataireRelations` doit exister entre les deux entreprises.
-
-| Rôle prestataire | Peut créer |
-|------------------|-----------|
-| `admin` | ✅ Sur toutes les prestations des clients liés |
-| `responsable_site` | ✅ Sur les prestations de ses sites clients attribués |
-| `manager`, `intervenant_site`, `observateur_site` | ❌ |
-
-> La nouvelle exécution doit impérativement avoir `prestataireEntrepriseId = sonEntreprise`.
-
-### 4d. Modification
-
-| Rôle prestataire | Peut modifier |
-|------------------|--------------|
-| `admin` | ✅ (exécutions où son entreprise intervient) |
-| `responsable_site` | ✅ (ses sites clients attribués) |
-| Autres | ❌ |
-
-### 4e. Désactivation
-
-| Rôle prestataire | Peut désactiver |
-|------------------|----------------|
-| `admin` | ✅ |
-| `responsable_site`, `manager`, `intervenant_site`, `observateur_site` | ❌ |
-
----
-
-## 5. Posture PLATEFORME
-
-**Droits complets (god mode).** Aucune restriction d'entreprise ou de `modePilotage`.
-
-| Action | Autorisé |
-|--------|----------|
-| Voir toutes les exécutions | ✅ |
-| Voir les données financières | ✅ |
-| Créer une exécution | ✅ |
-| Modifier une exécution (y compris `modePilotage`) | ✅ |
-| Désactiver une exécution | ✅ |
-
----
-
-## 6. Résumé matriciel complet
-
-### Posture CLIENT
+### 2. Posture CLIENT
 
 | Action | `admin` | `responsable_site` | `demandeur_site` | `observateur_site` | `manager` |
 |--------|---------|--------------------|-------------------|--------------------|-----------|
@@ -862,296 +463,135 @@ Autorisée même si le client a un compte actif (le prestataire peut agir en pro
 | Modifier | ✅ | ✅ (ses sites) | ❌ | ❌ | ❌ |
 | Désactiver | ✅ | ❌ | ❌ | ❌ | ❌ |
 
-### Posture PRESTATAIRE
+---
+
+### 3. Posture PRESTATAIRE
+
+Le prestataire ne voit et n'agit que sur les exécutions où `prestataireEntrepriseId = sonEntreprise`.
 
 | Action | `admin` | `manager` | `responsable_site` | `intervenant_site` | `observateur_site` |
 |--------|---------|-----------|--------------------|--------------------|--------------------|
-| Voir exécutions | Périmètre entreprise (toutes) | Sites attribués | Sites attribués | Sites attribués | Sites attribués (RO) |
-| Voir données financières | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Voir exécutions | Toutes (son entreprise) | Sites attribués | Sites attribués | Sites attribués | Sites attribués (RO) |
+| Voir données financières | ✅ | ❌ | ✅ | ❌ | ❌ |
 | Créer | ✅ | ❌ | ✅ (ses sites) | ❌ | ❌ |
 | Modifier | ✅ | ❌ | ✅ (ses sites) | ❌ | ❌ |
 | Désactiver | ✅ | ❌ | ❌ | ❌ | ❌ |
 
-### Posture PLATEFORME
-
-| Action | Autorisé |
-|--------|----------|
-| Tout | ✅ |
+> Condition préalable à toute création : `clientPrestataireRelations` doit exister.
 
 ---
 
-## 7. Règles techniques d'implémentation
+### 4. Posture PLATEFORME
 
-### Filtre prestataire — toujours filtrer par `prestataireEntrepriseId`
+Droits complets. Voir données financières inclus.
 
-```typescript
-// ✅ CORRECT — filtrer uniquement les exécutions de son entreprise
-.where(eq(clientServiceExecutions.prestataireEntrepriseId, monEntrepriseId))
+---
 
-// ❌ FAUX — expose des exécutions d'autres prestataires sur le même site
-.where(eq(clientServices.siteId, siteId))
-```
+### 5. Désactivation et suppression
 
-### Validation `modePilotage` côté serveur
+> **Règle générale :** ne jamais supprimer une exécution — toujours désactiver (`actif = false`) pour conserver l'historique.
 
-```typescript
-// Dans insertExecutionAction et updateExecutionAction
-const clientGhost = !client.hasActiveAdmin;
-const prestataireGhost = !prestataire.hasActiveAdmin;
-
-if (clientGhost && prestataireGhost) {
-  throw errors.forbidden("Impossible : aucun pilote disponible.");
-}
-if (clientGhost && modePilotage !== "prestataire") {
-  throw errors.forbidden("Client fantôme — seul le mode 'prestataire' est autorisé.");
-}
-if (prestataireGhost && modePilotage !== "client") {
-  throw errors.forbidden("Prestataire fantôme — seul le mode 'client' est autorisé.");
-}
-```
-
-### Filtre interne prestataire non-admin
-
-```typescript
-if (!isAdmin) {
-  query = query.where(
-    inArray(clientServices.siteId, userPrestataireSiteAttributionIds)
-  );
-}
-```
-
-> `manager` = non-admin : soumis au filtre par attribution de site comme tous les autres rôles non-admin.
-
-### Désactivation — toujours `actif = false`, jamais DELETE
-
-```typescript
-// ✅ CORRECT
-await db.update(clientServiceExecutions)
-  .set({ actif: false, updatedById: currentUser.id })
-  .where(eq(clientServiceExecutions.id, executionId));
-
-// ❌ JAMAIS (sauf cas d'erreur de création — voir ci-dessous)
-await db.delete(clientServiceExecutions).where(...);
-```
-
-### Suppression — cas exceptionnel (exécution créée par erreur, sans intervention associée)
-
-La suppression physique (`DELETE`) est autorisée **uniquement** dans le cas d'une exécution créée par erreur, sans aucune occurrence associée. Elle ne remplace pas la désactivation.
-
-Permissions pour la suppression :
+**Exception — suppression physique :** autorisée uniquement si l'exécution a été créée par erreur et qu'elle n'a aucune occurrence associée.
 
 | Posture | Condition |
 |---------|-----------|
-| Plateforme | Toujours autorisé |
+| Plateforme | Toujours |
 | Client `admin` | `modePilotage = "client"` ou `"collaboration"` |
-| Prestataire `admin` | `modePilotage = "prestataire"` ou `"collaboration"` + ownership de l'exécution |
-
-```typescript
-// ✅ CORRECT — suppression conditionnelle selon modePilotage
-if (modePilotage === "client" && posture === "client" && isAdmin) { delete(); }
-if (modePilotage === "prestataire" && posture === "prestataire" && isAdmin) { delete(); }
-if (modePilotage === "collaboration" && isAdmin) { delete(); } // l'un ou l'autre côté
-```
+| Prestataire `admin` | `modePilotage = "prestataire"` ou `"collaboration"` + ownership |
 
 ---
 
-*Dernière mise à jour : 2026-03-10*
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
-# Règles Métier — Module Sites (`sites`)
+## Module Sites (`sites`)
 
 > Référence unique pour toutes les permissions liées aux sites.
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
 
 ---
 
-## A) Posture CLIENT (`/app/sites`)
+### A) Posture CLIENT (`/app/sites`)
 
-### 1. Voir les sites de l'entreprise
+**Voir les sites :** tous les utilisateurs avec une adhésion client `statut = actif` voient l'arborescence complète.
 
-Peuvent voir toute l'arborescence des sites de leur entreprise :
+| Action | `admin` | `manager` + `responsable_site` | `collaborateur` + `responsable_site` | `responsable_site` seul | Autres |
+|--------|---------|-------------------------------|--------------------------------------|------------------------|--------|
+| Créer site racine | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Créer sous-site | ✅ | ✅ si resp. du parent | ✅ si resp. du parent | ✅ si resp. du parent | ❌ |
+| Modifier | ✅ (tous) | ✅ si resp. du site | ✅ si resp. du site | ✅ ce site uniquement | ❌ |
+| Déplacer (changer parentId) | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Archiver | ✅ | ❌ | ❌ | ❌ | ❌ |
 
-- tous les utilisateurs ayant une ligne dans `userClientAdhesions`
-- avec `statut = actif`
+> **Archivage bloqué** si le site possède des sous-sites actifs.
 
-Aucune restriction par site à ce stade.
-
-### 2. Créer un site racine (`parentId = null`)
-
-| Rôle | Peut créer |
-|------|-----------|
-| `admin` | ✅ |
-| `manager`, `collaborateur` | ❌ |
-
-### 3. Créer un sous-site (`parentId ≠ null`)
-
-| Rôle | Peut créer |
-|------|-----------|
-| `admin` | ✅ Sur n'importe quel parent |
-| `manager` | ✅ Uniquement si `responsable_site` du site parent |
-| `collaborateur` | ❌ |
-
-### 4. Modifier un site
-
-| Rôle | Peut modifier |
-|------|--------------|
-| `admin` | ✅ Tous les sites |
-| `responsable_site` (attribution) | ✅ Ce site uniquement |
-| Autres | ❌ |
-
-> **Règle importante :** seul l'`admin` peut modifier le `parentId` d'un site (déplacer un site dans l'arborescence). Un `responsable_site` non-admin ne peut pas déplacer un site.
-
-### 5. Archiver un site
-
-| Rôle | Peut archiver |
-|------|--------------|
-| `admin` | ✅ |
-| Autres | ❌ |
-
-> Bloqué si le site possède des **sous-sites actifs**. Il faut d'abord archiver les enfants.
-
-### 6. Règles de cascade sur `actif`
-
-- **Désactivation** → tous les descendants passent à `actif = false` (transaction atomique).
-- **Réactivation** → bloquée si le parent direct est inactif. Les descendants **ne sont pas** réactivés automatiquement.
+**Règles de cascade :**
+- Désactivation → tous les descendants passent à `actif = false` (transaction atomique)
+- Réactivation → bloquée si le parent direct est inactif. Les descendants ne sont pas réactivés automatiquement.
 
 ---
 
-## B) Posture PRESTATAIRE (`/app/mes-sites-clients`)
+### B) Posture PRESTATAIRE (`/app/mes-sites-clients`)
 
-**Relation préalable obligatoire :** le client doit être lié à l'entreprise prestataire via `clientPrestataireRelations`.
+**Condition préalable :** `clientPrestataireRelations` doit exister.
 
-### Cas 1 — Le client possède au moins un admin actif
+**Cas 1 — Le client possède au moins un admin actif :**
+- Tous les utilisateurs prestataire actifs peuvent **voir** les sites du client
+- **Aucune mutation** (création, modification, archivage) n'est autorisée
+- L'interface affiche un bandeau informatif
 
-**Condition :**
-```
-userClientAdhesions.role = "admin"
-userClientAdhesions.statut = "actif"
-```
+**Cas 2 — Aucun admin client actif (mode proxy) :**
 
-**Conséquences :**
+| Action | `admin` prestataire | `manager` + `responsable_site` | Autres |
+|--------|--------------------|---------------------------------|--------|
+| Voir | ✅ | ✅ | ✅ (si adhésion active) |
+| Créer site racine | ✅ | ❌ | ❌ |
+| Créer sous-site | ✅ | ✅ si resp. du parent | ❌ |
+| Modifier | ✅ | ✅ si resp. du site | ❌ |
+| Archiver | ✅ | ❌ | ❌ |
 
-Tous les utilisateurs du prestataire ayant une adhésion active (`userPrestataireAdhesions.statut = actif`) peuvent :
-- **voir** tous les sites de ce client
-
-Mais aucune mutation n'est autorisée :
-- création interdite
-- modification interdite
-
-L'interface doit afficher un bandeau informatif :
-> Ce client possède désormais un administrateur actif. Les modifications doivent être effectuées par l'équipe cliente.
-
-### Cas 2 — Aucun admin client actif (mode proxy)
-
-Le prestataire agit alors en proxy du client.
-
-#### Voir les sites
-
-Tous les utilisateurs ayant une adhésion active dans `userPrestataireAdhesions` peuvent voir les sites du client.
-
-#### Créer un site racine
-
-| Rôle prestataire | Peut créer |
-|------------------|-----------|
-| `admin` | ✅ |
-| `manager`, autres | ❌ |
-
-#### Créer un sous-site
-
-| Rôle prestataire | Peut créer |
-|------------------|-----------|
-| `admin` | ✅ Sur n'importe quel parent |
-| `manager` | ✅ Uniquement si `responsable_site` du site parent |
-| Autres | ❌ |
-
-#### Modifier un site
-
-| Rôle prestataire | Peut modifier |
-|------------------|--------------|
-| `admin` | ✅ |
-| `responsable_site` (attribution) | ✅ Ce site uniquement |
-| Autres | ❌ |
-
-> **Règle importante :** lorsqu'un prestataire crée un site en mode proxy, aucune attribution `responsable_site` automatique n'est créée. Les responsables sont définis explicitement via le système d'attributions.
+> **Règle :** le proxy se déclenche dès l'absence d'admin client actif (`userClientAdhesions.role = "admin" AND statut = "actif"`), même si des managers ou collaborateurs sont actifs. Seul un admin peut prendre des décisions structurantes sur les sites.
 
 ---
 
-## C) Posture PLATEFORME (`/app/sites-clients`)
+### C) Posture PLATEFORME (`/app/sites-clients`)
 
-Tous les utilisateurs ayant `userPlateformeAdhesions.statut = actif` peuvent sur n'importe quel site de n'importe quel client :
+Droits complets sur tous les sites de tous les clients.
 
 | Action | Autorisé |
 |--------|----------|
 | Voir | ✅ |
-| Créer un site racine | ✅ |
-| Créer un sous-site | ✅ |
-| Modifier | ✅ |
-| Archiver | ✅ |
+| Créer / Modifier / Archiver | ✅ |
 | Supprimer définitivement | ✅ `super_admin_plateforme` uniquement |
 
 ---
 
-## Résumé conceptuel
+### Règle technique — Toujours inclure les sites inactifs dans les queries
 
-Le module Sites repose sur 3 principes simples :
-
-**1. Les sites appartiennent toujours au client**
-Les prestataires n'ont jamais de droit natif.
-
-**2. Le prestataire agit seulement dans deux cas**
-- lecture : si `clientPrestataireRelations` existe
-- mutation : uniquement en l'absence d'admin client actif (proxy)
-
-**3. La plateforme a un contrôle total**
-Les utilisateurs plateforme peuvent intervenir sur tous les sites de tous les clients.
+Les sites archivés (`actif = false`) doivent toujours être inclus — des données opérationnelles (tickets, occurrences, prestations) peuvent encore les référencer.
 
 ---
 
-*Dernière mise à jour : 2026-03-10*
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
-# Règles Métier — Module Occurrences (`clientServiceOccurrences`)
+## Module Occurrences (`clientServiceOccurrences`)
 
-> Référence unique pour toutes les permissions liées aux occurrences d'une prestation.
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
->
-> ⚠️ Ne pas confondre avec les **exécutions** (`clientServiceExecutions`) qui configurent l'organisation opérationnelle. Les occurrences représentent les **interventions terrain concrètes**, planifiées ou réalisées.
+> ⚠️ Ne pas confondre avec les **exécutions** : les occurrences représentent les **interventions terrain concrètes**.
 
 ---
 
-## 1. Définition d'une occurrence
+### 1. Deux capacités distinctes
 
-Une occurrence (`clientServiceOccurrence`) représente une intervention planifiée ou réalisée sur un site. Elle est liée à :
-
-| Champ | Rôle |
-|-------|------|
-| `clientServiceId` | La prestation concernée |
-| `siteId` | Le site où se déroule l'intervention |
-| `executionId` | Snapshot de la règle d'exécution active au moment de la planification |
-| `statut` | État courant de l'intervention |
-| `assigneeUserId` | L'utilisateur qui réalise ou a réalisé l'intervention (souvent renseigné au démarrage) |
-| `demandeeParUserId` | L'utilisateur qui a déclenché la création (traçabilité) |
-| `dateDebutPrevue` | Date et heure planifiées |
-| `dateDebutReelle` | Renseignée automatiquement au démarrage effectif |
-| `dateFinReelle` | Renseignée automatiquement à la terminaison |
-
-> **Doctrine :** une occurrence appartient toujours au client. Elle ne peut jamais être supprimée — on change son statut.
+| Capacité | Actions couvertes | Rôles requis |
+|----------|------------------|-------------|
+| `canManageOccurrence` | Créer, replanifier, annuler, marquer non honorée, réassigner | `admin` ou `responsable_site` (selon posture et `modePilotage`) |
+| `canExecuteOccurrence` | Démarrer, terminer | `admin`, `responsable_site`, `demandeur_site` (client), `intervenant_site` (prestataire) — selon `modePilotage` |
 
 ---
 
-## 2. Statuts et machine d'état
-
-### Valeurs
-
-- `planifiee` — intervention prévue, non encore démarrée
-- `en_cours` — intervention démarrée (assignée et en cours d'exécution)
-- `terminee` — intervention terminée
-- `annulee` — annulée avant démarrage
-- `non_honoree` — prévue mais non réalisée
-
-### Transitions autorisées
+### 2. Statuts et machine d'état
 
 ```
 planifiee
@@ -1163,161 +603,102 @@ planifiee
   └──→ non_honoree
 ```
 
-### Règle fondamentale
-
-**Jamais de DELETE.** Seul le statut change. Cela préserve l'historique, la traçabilité et l'intégrité des données de facturation.
+**Jamais de DELETE.** Seul le statut change.
 
 ---
 
-## 3. Deux capacités distinctes
+### 3. `modePilotage` — impact sur les occurrences
 
-Les permissions sur les occurrences se décomposent en deux capacités orthogonales :
+> Le `modePilotage` est une **contrainte d'accès stricte**, vérifiée côté serveur. Il ne restreint **pas la lecture** — tous les acteurs ayant accès à la prestation voient les occurrences quel que soit le mode.
 
-| Capacité | Actions couvertes |
-|----------|------------------|
-| `canManageOccurrence` | Créer, modifier la planification (dates, checklist), annuler, marquer comme non honorée, réassigner |
-| `canExecuteOccurrence` | Démarrer (auto-assignation), compléter les tâches, terminer |
-
-> **Principe :** gérer c'est gouverner la planification. Exécuter c'est intervenir sur le terrain. Ce ne sont pas les mêmes personnes ni les mêmes droits.
-
----
-
-## 4. Sources de création
-
-Les occurrences peuvent être créées de deux façons :
-
-1. **Génération automatique** — par le moteur de planification (planning récurrent)
-2. **Création manuelle** — par un utilisateur autorisé (mêmes droits que `canManageOccurrence`)
-
----
-
-## 5. `modePilotage` — impact sur les occurrences
-
-`modePilotage` est défini sur l'exécution parente. Il détermine **qui peut gérer et qui peut exécuter** les occurrences.
-
-| `modePilotage` | Qui peut gérer | Qui peut exécuter |
-|----------------|---------------|-------------------|
-| `client` | Côté client uniquement | Côté client uniquement |
-| `prestataire` | Côté prestataire uniquement | Côté prestataire uniquement |
-| `collaboration` | Les deux côtés | Les deux côtés |
-
-> **Règle :** le `modePilotage` n'est pas un paramètre de préférence — c'est une contrainte d'accès stricte, vérifiée côté serveur.
-
----
-
-## 6. Matrices de permissions par `modePilotage`
-
-Les 4 actions de la matrice :
-- **Voir** — accès en lecture à l'occurrence
-- **Gérer** — créer, replanifier, annuler, marquer non honorée, réassigner (`canManageOccurrence`)
-- **Démarrer** — démarrer l'occurrence et s'auto-assigner (`canExecuteOccurrence`)
-- **Terminer** — compléter les tâches et clore l'occurrence (`canExecuteOccurrence`)
-
-### Mode `client`
+#### Mode `client`
 
 | Rôle | Voir | Gérer | Démarrer | Terminer |
 |------|------|-------|----------|----------|
 | **client** `admin` | ✅ | ✅ | ✅ | ✅ |
 | **client** `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| **client** `demandeur_site` | ✅ | ❌ | ✅ | ✅ |
+| **client** `demandeur_site` | ✅ | ❌ | ✅ | ✅ si assigné |
 | **client** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
-| **prestataire** `admin` | ✅ | ❌ | ❌ | ❌ |
-| **prestataire** `responsable_site` | ✅ | ❌ | ❌ | ❌ |
-| **prestataire** `intervenant_site` | ✅ | ❌ | ❌ | ❌ |
-| **prestataire** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
+| **prestataire** (tous rôles) | ✅ | ❌ | ❌ | ❌ |
 
-### Mode `prestataire`
+#### Mode `prestataire`
 
 | Rôle | Voir | Gérer | Démarrer | Terminer |
 |------|------|-------|----------|----------|
-| **client** `admin` | ✅ | ❌ | ❌ | ❌ |
-| **client** `responsable_site` | ✅ | ❌ | ❌ | ❌ |
-| **client** `demandeur_site` | ✅ | ❌ | ❌ | ❌ |
-| **client** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
+| **client** (tous rôles) | ✅ | ❌ | ❌ | ❌ |
 | **prestataire** `admin` | ✅ | ✅ | ✅ | ✅ |
 | **prestataire** `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| **prestataire** `intervenant_site` | ✅ | ❌ | ✅ | ✅ |
+| **prestataire** `intervenant_site` | ✅ | ❌ | ✅ | ✅ si assigné |
 | **prestataire** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
 
-### Mode `collaboration`
+#### Mode `collaboration`
 
 | Rôle | Voir | Gérer | Démarrer | Terminer |
 |------|------|-------|----------|----------|
 | **client** `admin` | ✅ | ✅ | ✅ | ✅ |
 | **client** `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| **client** `demandeur_site` | ✅ | ❌ | ✅ | ✅ |
+| **client** `demandeur_site` | ✅ | ❌ | ✅ | ✅ si assigné |
 | **client** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
 | **prestataire** `admin` | ✅ | ✅ | ✅ | ✅ |
 | **prestataire** `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| **prestataire** `intervenant_site` | ✅ | ❌ | ✅ | ✅ |
+| **prestataire** `intervenant_site` | ✅ | ❌ | ✅ | ✅ si assigné |
 | **prestataire** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
 
-### Posture PLATEFORME (tous modes)
+#### Posture PLATEFORME (tous modes)
 
-| Action | Autorisé |
-|--------|----------|
-| Voir | ✅ |
-| Gérer | ✅ |
-| Démarrer | ✅ |
-| Terminer | ✅ |
+Voir ✅ Gérer ✅ Démarrer ✅ Terminer ✅
 
 ---
 
-## 7. Règle de démarrage
+### 4. Périmètre de visibilité des occurrences
 
-### Condition temporelle
+**Posture CLIENT**
 
-Une occurrence ne peut être démarrée que si :
+| Rôle | Voit quelles occurrences |
+|------|--------------------------|
+| `admin` | Toutes les occurrences des prestations de l'entreprise |
+| `responsable_site` | Occurrences des sites attribués |
+| `demandeur_site` | Occurrences des sites attribués |
+| `observateur_site` | Occurrences des sites attribués (lecture seule) |
 
-```
-date(dateDebutPrevue, siteTimezone) == today(siteTimezone)
-```
+**Posture PRESTATAIRE** (condition : `execution.prestataireEntrepriseId = sonEntrepriseId`)
 
-- En avance (ex : prévue à 10h, démarre à 7h) → **autorisé**
-- En retard (ex : prévue à 10h, démarre à 18h) → **autorisé**
-- Jour différent (ex : prévue demain ou hier) → **refusé**
-- `dateDebutPrevue = null` → démarrage **toujours autorisé**
+| Rôle | Voit quelles occurrences |
+|------|--------------------------|
+| `admin` | Toutes les occurrences liées à ses exécutions |
+| `manager` | Occurrences des sites clients attribués (même règle que non-admin) |
+| `responsable_site` | Occurrences des sites clients attribués |
+| `intervenant_site` | Occurrences des sites clients attribués |
+| `observateur_site` | Occurrences des sites clients attribués (lecture seule) |
 
-> **Rationale :** sur le terrain, les intervenants peuvent arriver tôt ou tard. La contrainte utile est la journée, pas l'heure. Un démarrage le mauvais jour est toujours une erreur.
+> `manager` prestataire = non-admin : filtré par attribution de site, aucun droit supplémentaire.
 
-> **Important :** toujours utiliser le **fuseau horaire du site** (`siteTimezone`), jamais UTC.
-
-### Condition de statut
-
-Le démarrage n'est autorisé que depuis le statut `planifiee` :
-
-| Statut | Démarrage |
-|--------|-----------|
-| `planifiee` | ✅ |
-| `en_cours` | ❌ (déjà démarrée) |
-| `terminee` | ❌ |
-| `annulee` | ❌ |
-| `non_honoree` | ❌ |
-
-### Effets automatiques du démarrage
-
-```
-statut           → en_cours
-dateDebutReelle  → now()
-assigneeUserId   → currentUser.id
-```
-
-### Occurrence déjà en cours
-
-Si `statut = en_cours`, le démarrage est bloqué. La reprise (takeover) par `admin` ou `responsable_site` peut être autorisée dans un second temps, mais reste simple par défaut : **premier arrivé, premier servi**.
+**Posture PLATEFORME :** toutes les occurrences sans filtre.
 
 ---
 
-## 8. Règle de terminaison
+### 5. Règle de démarrage
 
-### Condition
+**Condition temporelle :** même journée que `dateDebutPrevue` (fuseau `Europe/Paris`). Si `dateDebutPrevue = null` → toujours autorisé.
 
-Une occurrence peut être terminée uniquement si `statut = en_cours`.
+**Condition de statut :** `planifiee` uniquement.
 
-Aucune contrainte temporelle : une occurrence peut être terminée le jour même, le lendemain, ou plus tard — la réalité terrain l'exige.
+**Effets automatiques :**
+```
+statut          → en_cours
+dateDebutReelle → now()
+assigneeUserId  → currentUser.id  (écrase toute préassignation existante)
+```
 
-### Effets automatiques de la terminaison
+---
 
+### 6. Règle de terminaison
+
+**Condition :** `statut = en_cours` uniquement.
+
+**Contrainte tâches :** une occurrence peut être terminée même si certaines tâches ne sont pas dans un état terminal — la réalité terrain le justifie. Les tâches résiduelles sont un indicateur de rapport, pas un blocage.
+
+**Effets automatiques :**
 ```
 statut        → terminee
 dateFinReelle → now()
@@ -1325,232 +706,41 @@ dateFinReelle → now()
 
 ---
 
-## 9. Annulation et non-réalisation
+### 7. Annulation et non-réalisation
 
-### Annulation (`annulee`)
+| Action | Statut source | Qui peut |
+|--------|--------------|---------|
+| `annulee` | `planifiee` uniquement | `canManageOccurrence` |
+| `non_honoree` | `planifiee` uniquement | `canManageOccurrence` |
 
-L'annulation signifie que l'intervention ne se fera pas (décision anticipée).
-
-- Statut source autorisé : `planifiee` uniquement
-- Qui peut annuler : utilisateurs ayant `canManageOccurrence` selon `modePilotage`
-- **Jamais de DELETE** — statut uniquement
-
-### Non honorée (`non_honoree`)
-
-Indique que l'intervention était prévue mais n'a pas eu lieu (ex : intervenant absent, accès impossible).
-
-- Statut source autorisé : `planifiee` uniquement
-- Qui peut marquer : utilisateurs ayant `canManageOccurrence` selon `modePilotage`
+> Une occurrence déjà démarrée (`en_cours`) ne peut que terminer (`terminee`). Si l'intervention est impossible en cours de route, les tâches individuelles sont marquées `non_honoree` ou `non_applicable`. L'occurrence elle-même finit `terminee`.
 
 ---
 
-## 10. Auto-assignation — principe fondamental
+### 8. Auto-assignation
 
-> L'assignation est principalement un **effet du démarrage**, pas une opération de planification anticipée.
-
-### Règle
-
-- La préassignation de centaines d'occurrences n'est pas le modèle principal.
-- Quand un utilisateur clique **Démarrer**, `assigneeUserId = currentUser.id` est renseigné automatiquement.
-- L'utilisateur doit être attribué au site concerné pour pouvoir démarrer.
-
-### Éligibilité au démarrage (côté prestataire)
-
-Pour qu'un utilisateur prestataire puisse démarrer :
-1. Son entreprise correspond à `execution.prestataireEntrepriseId`
-2. Il est attribué au site (`userPrestataireSiteAttributions`)
-3. Son rôle est `admin`, `responsable_site` ou `intervenant_site`
-
-### Éligibilité au démarrage (côté client)
-
-Pour qu'un utilisateur client puisse démarrer (modes `client` ou `collaboration`) :
-1. Il est attribué au site
-2. Son rôle est `admin`, `responsable_site` ou `demandeur_site`
+L'assignation est un **effet du démarrage** (`assigneeUserId = currentUser.id`). Elle écrase toute préassignation existante.
 
 ---
 
-## 11. Cas particulier : prestataire fantôme
-
-Quand le prestataire n'a aucun utilisateur actif sur la plateforme :
-
-- `modePilotage` = `client` (seul mode autorisé — voir règles exécutions)
-- Le client peut **gérer et exécuter** les occurrences
-- Rôles autorisés côté client : `admin`, `responsable_site`, `demandeur_site`
-- Couvre le cas de l'office manager qui suit et réalise les interventions lui-même
-
-> **Rationale :** interdire au client d'exécuter quand le prestataire est fantôme rendrait le système inutilisable pour une majorité de cas terrain réels.
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
-## 12. Périmètre de visibilité des occurrences
+## Module Tâches (`occurrenceTaches`)
 
-### Posture CLIENT
-
-| Rôle | Voit quelles occurrences |
-|------|--------------------------|
-| `admin` | Toutes les occurrences des prestations de l'entreprise |
-| `responsable_site` | Occurrences des sites attribués (périmètre effectif via `sitesArborescence`) |
-| `demandeur_site` | Occurrences des sites attribués |
-| `observateur_site` | Occurrences des sites attribués (lecture seule) |
-
-### Posture PRESTATAIRE
-
-**Condition préalable :** `execution.prestataireEntrepriseId = sonEntrepriseId`
-
-| Rôle | Voit quelles occurrences |
-|------|--------------------------|
-| `admin` | Toutes les occurrences liées à ses exécutions |
-| `manager` | Toutes les occurrences liées à ses exécutions |
-| `responsable_site` | Occurrences des sites clients attribués |
-| `intervenant_site` | Occurrences des sites clients attribués |
-| `observateur_site` | Occurrences des sites clients attribués (lecture seule) |
-
-### Posture PLATEFORME
-
-Toutes les occurrences sans filtre.
+> ⚠️ Ne pas confondre avec les **checklists** (templates). Les tâches sont les **instances concrètes** créées par snapshot.
 
 ---
 
-## 13. Règles techniques d'implémentation
+### 1. Définition
 
-### Toujours filtrer côté prestataire via l'exécution
-
-```typescript
-// ✅ CORRECT — filtrer via executionId puis prestataireEntrepriseId
-.innerJoin(clientServiceExecutions, and(
-  eq(clientServiceOccurrences.executionId, clientServiceExecutions.id),
-  eq(clientServiceExecutions.prestataireEntrepriseId, prestataireEntrepriseId),
-))
-
-// ❌ FAUX — expose des occurrences d'autres prestataires sur le même site
-.where(eq(clientServiceOccurrences.siteId, siteId))
-```
-
-### Validation de la règle "même journée" pour le démarrage
-
-```typescript
-import { toZonedTime, startOfDay, isSameDay } from "date-fns-tz";
-
-function canStartOccurrence(
-  dateDebutPrevue: Date | null,
-  siteTimezone: string,
-): boolean {
-  if (!dateDebutPrevue) return true; // null → toujours autorisé
-
-  const now = new Date();
-  const todayInSiteTz = startOfDay(toZonedTime(now, siteTimezone));
-  const prevueDayInSiteTz = startOfDay(toZonedTime(dateDebutPrevue, siteTimezone));
-
-  return isSameDay(todayInSiteTz, prevueDayInSiteTz);
-}
-```
-
-### Effet du démarrage — transaction atomique
-
-```typescript
-await db.transaction(async (tx) => {
-  await tx.update(clientServiceOccurrences)
-    .set({
-      statut: "en_cours",
-      dateDebutReelle: new Date(),
-      assigneeUserId: currentUser.id,
-      updatedById: currentUser.id,
-    })
-    .where(eq(clientServiceOccurrences.id, occurrenceId));
-  // Autres effets : déverrouiller les tâches si nécessaire
-});
-```
-
-### Terminaison — toujours vérifier `statut = en_cours` côté serveur
-
-```typescript
-const occurrence = await getOccurrenceById(occurrenceId);
-if (occurrence.statut !== "en_cours") {
-  throw errors.forbidden("Seule une occurrence en cours peut être terminée.");
-}
-
-await db.update(clientServiceOccurrences)
-  .set({ statut: "terminee", dateFinReelle: new Date(), updatedById: currentUser.id })
-  .where(eq(clientServiceOccurrences.id, occurrenceId));
-```
-
-### Annulation / Non honorée — jamais de DELETE
-
-```typescript
-// ✅ CORRECT
-await db.update(clientServiceOccurrences)
-  .set({ statut: "annulee", updatedById: currentUser.id })
-  .where(eq(clientServiceOccurrences.id, occurrenceId));
-
-// ❌ JAMAIS
-await db.delete(clientServiceOccurrences).where(...);
-```
+- **Issue d'un template** : snapshot immuable de `titre` et `description` au moment de l'affectation. Aucune modification de contenu possible. Tous les autres champs (statut, assigné, etc.) restent modifiables selon permissions.
+- **Ad hoc** : créée manuellement (`listeItemId = null`). Titre et description modifiables par `canManage`.
 
 ---
 
-## 14. Résumé rapide
-
-| Règle | Valeur |
-|-------|--------|
-| Suppression | ❌ Jamais — statut uniquement |
-| Démarrage | `planifiee` + même jour (fuseau site) + `canExecuteOccurrence` |
-| Assignation | Automatique au démarrage (`assigneeUserId = currentUser`) |
-| Terminaison | `en_cours` uniquement, pas de contrainte temporelle |
-| Annulation | `planifiee` uniquement, `canManageOccurrence` requis |
-| Non honorée | `planifiee` uniquement, `canManageOccurrence` requis |
-| Préassignation | Non recommandée comme modèle principal — privilégier l'auto-assignation |
-
----
-
-*Dernière mise à jour : 2026-03-10*
-
----
-
-# Règles Métier — Module Tâches (`occurrenceTaches`)
-
-> Référence unique pour toutes les permissions liées aux tâches d'une occurrence.
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
->
-> ⚠️ Ne pas confondre avec les **checklists** (`tacheListeTemplates` / `tacheListeItems`) qui définissent les modèles de tâches. Les tâches sont les **instances concrètes**, créées par snapshot lors de l'affectation d'une checklist à une occurrence.
-
----
-
-## 1. Définition d'une tâche
-
-Une tâche (`occurrenceTache`) représente une action à réaliser dans le cadre d'une occurrence. Elle peut être :
-
-- **Issue d'un template** — snapshot d'un `tacheListeItem` au moment de l'affectation de la checklist à l'occurrence
-- **Ad hoc** — créée manuellement par un utilisateur autorisé (`listeItemId = null`)
-
-| Champ | Rôle |
-|-------|------|
-| `occurrenceId` | L'occurrence parente |
-| `listeItemId` | Référence au template d'origine (nullable si ad hoc) |
-| `titre` | Snapshot du titre au moment de la création (immuable si issu d'un template) |
-| `description` | Snapshot de la description (immuable si issu d'un template) |
-| `statut` | État courant de la tâche |
-| `assigneeUserId` | L'utilisateur assigné (souvent renseigné au démarrage) |
-| `startedAt` | Renseigné automatiquement au démarrage |
-| `doneAt` | Renseigné automatiquement à la terminaison |
-| `completeeParUserId` | L'utilisateur qui a terminé la tâche |
-| `tempsPasseSecondes` | Calculé automatiquement (`doneAt - startedAt`), corrigeable par admin/responsable_site |
-
-> **Doctrine :** le snapshot `titre + description` garantit que les occurrences passées restent intactes même si le template évolue. Une tâche ne peut jamais être supprimée — on change son statut.
-
----
-
-## 2. Statuts et machine d'état
-
-### Valeurs
-
-- `a_faire` — tâche créée, non démarrée
-- `en_cours` — tâche démarrée (assignée et en cours d'exécution)
-- `terminee` — tâche accomplie (état final sauf correction superviseur)
-- `non_honoree` — prévue mais impossible à réaliser (ex : accès impossible)
-- `annulee` — annulée avant ou pendant l'exécution
-- `non_applicable` — non pertinente dans le contexte réel (ex : terrasse inaccessible)
-
-### Transitions autorisées
+### 2. Statuts et machine d'état
 
 ```
 a_faire
@@ -1558,104 +748,50 @@ a_faire
   ├──→ en_cours ──→ terminee
   │
   ├──→ non_honoree
-  │
   ├──→ non_applicable
-  │
   └──→ annulee
 ```
 
-> **Note :** `terminee` est un état final sauf correction manuelle explicite du `tempsPasseSecondes` par un superviseur (admin ou responsable_site). Aucune transition de statut n'est autorisée depuis `terminee`.
-
-### Règle fondamentale
-
-**Jamais de DELETE.** Seul le statut change. Cela préserve l'historique, la traçabilité et l'intégrité des données de facturation.
+**Jamais de DELETE.** `terminee` est un état final — aucune transition depuis cet état (sauf correction `tempsPasseSecondes` par superviseur).
 
 ---
 
-## 3. Deux capacités distinctes
-
-Comme pour les occurrences, les permissions sur les tâches se décomposent en deux capacités orthogonales :
+### 3. Deux capacités distinctes
 
 | Capacité | Actions couvertes |
-|----------|------------------|
-| `canManage` | Créer des tâches ad hoc, modifier les tâches ad hoc, annuler, corriger `tempsPasseSecondes` |
-| `canExecute` | Démarrer (auto-assignation), terminer, marquer `non_honoree`, marquer `non_applicable`, ajouter des PJ |
+|----------|-----------------|
+| `canManage` | Créer ad hoc, modifier ad hoc, annuler, corriger `tempsPasseSecondes` |
+| `canExecute` | Démarrer, terminer (si assigné), non_honoree, non_applicable, ajouter PJ |
 
-> **Principe :** gérer c'est gouverner les tâches (création, suppression logique, correction). Exécuter c'est réaliser le travail terrain. Ce ne sont pas les mêmes personnes ni les mêmes droits.
-
----
-
-## 4. Visibilité des tâches
-
-La visibilité d'une tâche suit exactement la visibilité de son occurrence parente.
-
-### Posture CLIENT
-
-| Rôle | Voit les tâches |
-|------|----------------|
-| `admin` | Toutes les tâches des occurrences de l'entreprise |
-| `responsable_site` (attribution) | Tâches des occurrences des sites attribués |
-| `demandeur_site` (attribution) | Tâches des occurrences des sites attribués |
-| `observateur_site` (attribution) | Tâches des occurrences des sites attribués (lecture seule) |
-
-### Posture PRESTATAIRE
-
-**Condition préalable :** `execution.prestataireEntrepriseId = sonEntrepriseId`
-
-| Rôle | Voit les tâches |
-|------|----------------|
-| `admin` | Toutes les tâches des occurrences liées à ses exécutions |
-| `manager` | Tâches des occurrences des sites clients attribués |
-| `responsable_site` (attribution) | Tâches des occurrences des sites clients attribués |
-| `intervenant_site` (attribution) | Tâches des occurrences des sites clients attribués |
-| `observateur_site` (attribution) | Tâches des occurrences des sites clients attribués (lecture seule) |
-
-### Posture PLATEFORME
-
-Toutes les tâches sans filtre.
+`canManage` = `admin` ou `responsable_site` selon posture et `modePilotage`.
+`canExecute` = `admin`, `responsable_site`, `demandeur_site` (client, si non mode prestataire), `intervenant_site` (prestataire, si non mode client).
 
 ---
 
-## 5. Création de tâches
+### 4. Condition préalable : occurrence parente `en_cours`
 
-### Tâches issues d'un template (snapshot)
-
-Créées automatiquement lors de l'affectation d'une checklist à une occurrence. Aucune permission utilisateur requise — c'est le moteur qui les crée.
-
-### Tâches ad hoc (création manuelle)
-
-La création manuelle est restreinte pour ne pas contourner les checklists définies.
-
-| Posture | Rôle | Peut créer une tâche ad hoc |
-|---------|------|-----------------------------|
-| CLIENT | `admin` | ✅ Sur toutes les occurrences de l'entreprise |
-| CLIENT | `responsable_site` | ✅ Sur les occurrences de ses sites attribués |
-| CLIENT | `demandeur_site`, `observateur_site` | ❌ |
-| PRESTATAIRE | `admin` | ✅ Sur toutes les occurrences de ses exécutions |
-| PRESTATAIRE | `responsable_site` | ✅ Sur les occurrences de ses sites clients attribués |
-| PRESTATAIRE | `intervenant_site`, `observateur_site`, `manager` | ❌ |
-| PLATEFORME | Tous | ✅ |
-
-> **Rationale :** les intervenants terrain ne peuvent pas créer de tâches ad hoc — cela risquerait de casser la structure des checklists validées. Seuls les superviseurs (admin, responsable_site) ont ce droit.
+**Une tâche ne peut être démarrée que si son occurrence parente a le statut `en_cours`.** Les PJ et les transitions de statut (`non_applicable`, `non_honoree`) suivent la même règle.
 
 ---
 
-## 6. Démarrage d'une tâche
+### 5. Matrice des permissions
 
-### Condition de statut
+| Action | `canManage` | `canExecute` + assigné | `canExecute` non assigné |
+|--------|:-----------:|:----------------------:|:------------------------:|
+| Voir | ✅ | ✅ | ✅ |
+| Créer ad hoc | ✅ | ❌ | ❌ |
+| Modifier ad hoc | ✅ (si a_faire/en_cours) | ❌ | ❌ |
+| Démarrer (a_faire → en_cours) | ✅ | ✅ | ✅ |
+| Terminer (en_cours → terminee) | ✅ | ✅ | ❌ |
+| Non applicable | ✅ | ✅ | ✅ |
+| Non honorée | ✅ | ✅ | ✅ |
+| Annuler | ✅ | ❌ | ❌ |
+| Ajouter PJ (tâche en_cours) | ✅ | ✅ | ✅ |
+| Corriger tempsPassé (terminee) | ✅ | ❌ | ❌ |
 
-Le démarrage n'est autorisé que depuis le statut `a_faire` :
+---
 
-| Statut | Démarrage |
-|--------|-----------|
-| `a_faire` | ✅ |
-| `en_cours` | ❌ (déjà démarrée) |
-| `terminee` | ❌ |
-| `non_honoree` | ❌ |
-| `non_applicable` | ❌ |
-| `annulee` | ❌ |
-
-### Effets automatiques du démarrage
+### 6. Démarrage — effets automatiques
 
 ```
 statut         → en_cours
@@ -1663,31 +799,9 @@ startedAt      → now()
 assigneeUserId → currentUser.id
 ```
 
-### Qui peut démarrer ?
-
-Le droit de démarrer suit `canExecute`, conditionné par le `modePilotage` de l'exécution parente.
-
-| Posture | Rôle | Mode `client` | Mode `prestataire` | Mode `collaboration` |
-|---------|------|:---:|:---:|:---:|
-| CLIENT | `admin` | ✅ | ❌ | ✅ |
-| CLIENT | `responsable_site` | ✅ | ❌ | ✅ |
-| CLIENT | `demandeur_site` | ✅ | ❌ | ✅ |
-| CLIENT | `observateur_site` | ❌ | ❌ | ❌ |
-| PRESTATAIRE | `admin` | ❌ | ✅ | ✅ |
-| PRESTATAIRE | `responsable_site` | ❌ | ✅ | ✅ |
-| PRESTATAIRE | `intervenant_site` | ❌ | ✅ | ✅ |
-| PRESTATAIRE | `observateur_site` | ❌ | ❌ | ❌ |
-| PLATEFORME | Tous | ✅ | ✅ | ✅ |
-
 ---
 
-## 7. Terminaison d'une tâche
-
-### Condition
-
-Une tâche peut être terminée uniquement si `statut = en_cours`.
-
-### Effets automatiques
+### 7. Terminaison — effets automatiques
 
 ```
 statut               → terminee
@@ -1696,327 +810,87 @@ completeeParUserId   → currentUser.id
 tempsPasseSecondes   → (doneAt - startedAt) en secondes
 ```
 
-### Qui peut terminer ?
-
-Même droits que le démarrage, avec une restriction supplémentaire : seul l'utilisateur **assigné** à la tâche peut la terminer, sauf si `canManage` est vrai (admin ou responsable_site peuvent terminer n'importe quelle tâche de leur périmètre).
-
-| Condition | Peut terminer |
-|-----------|:---:|
-| `canManage` (admin ou responsable_site) | ✅ |
-| `canExecute` ET `assigneeUserId = currentUser.id` | ✅ |
-| `canExecute` mais pas assigné | ❌ |
-
-> **Rationale :** un intervenant non assigné ne doit pas pouvoir fermer la tâche d'un collègue. Le superviseur peut le faire pour débloquer une situation.
-
 ---
 
-## 8. Statuts spéciaux
-
-### Non applicable (`non_applicable`)
-
-Indique que la tâche n'est pas pertinente dans le contexte réel (ex : nettoyer la terrasse → terrasse inaccessible pour travaux).
-
-- Statut source autorisé : `a_faire` ou `en_cours`
-- Qui peut marquer : utilisateurs ayant `canExecute` ou `canManage` selon `modePilotage`
-
-### Non honorée (`non_honoree`)
-
-Indique que la tâche était prévue mais n'a pas pu être réalisée (ex : vider les poubelles → accès refusé).
-
-- Statut source autorisé : `a_faire` ou `en_cours`
-- Qui peut marquer : utilisateurs ayant `canExecute` ou `canManage` selon `modePilotage`
-
-### Annulation (`annulee`)
-
-Acte fort — la tâche ne sera pas réalisée et ne doit pas figurer dans les statistiques de réalisation.
-
-- Statut source autorisé : `a_faire` ou `en_cours`
-- Qui peut annuler : `canManage` uniquement (admin ou responsable_site)
-
-> **Rationale :** l'annulation est une décision de gouvernance, pas une décision terrain. Un intervenant peut marquer une tâche non applicable ou non honorée, mais seul un superviseur peut l'annuler.
-
----
-
-## 9. Pièces jointes (preuves)
-
-Les pièces jointes sur une tâche servent de **preuves d'exécution** (photo avant/après, bon de livraison, etc.).
-
-- Stockage via `documents` + `documentsLinks` (`occurrenceTacheId` renseigné)
-- Maximum recommandé : 2 PJ par tâche
-- Format : images et PDFs uniquement
-
-### Qui peut ajouter des PJ ?
-
-| Condition | Peut ajouter |
-|-----------|:---:|
-| `canExecute` ET tâche `en_cours` | ✅ |
-| `canManage` ET tâche `en_cours` | ✅ |
-| Tâche dans un autre statut | ❌ |
-
-### Qui peut voir les PJ ?
-
-Tout utilisateur pouvant voir la tâche peut voir ses pièces jointes.
-
----
-
-## 10. Temps passé (`tempsPasseSecondes`)
-
-### Calcul automatique
-
-Lors de la terminaison d'une tâche :
-
-```
-tempsPasseSecondes = (doneAt - startedAt) en secondes
-```
-
-### Correction manuelle
-
-Le temps calculé automatiquement peut être incorrect (pause, oubli de démarrage…). Un superviseur peut le corriger manuellement.
+### 8. Correction du temps passé
 
 | Condition | Peut corriger |
 |-----------|:---:|
-| `canManage` (admin ou responsable_site) ET tâche `terminee` | ✅ |
+| `canManage` ET tâche `terminee` | ✅ |
 | Tous les autres cas | ❌ |
 
-- Valeur minimale : 0 seconde
-- Valeur maximale : 604 800 secondes (7 jours)
-
-> **Rationale :** la correction est réservée aux superviseurs pour éviter que les intervenants manipulent leurs temps de travail. La tâche doit être `terminee` — on ne corrige pas un temps en cours d'exécution.
+- Valeur minimale : 0 s
+- Valeur maximale : 604 800 s (7 jours)
 
 ---
 
-## 11. Modification et suppression des tâches ad hoc
+### 9. Pièces jointes (preuves)
 
-Les tâches issues d'un template (snapshot) ne peuvent pas être modifiées ni supprimées — le snapshot est immuable.
+- Ajout : `canExecute` ou `canManage` + tâche `en_cours` uniquement
+- Vue : tout utilisateur pouvant voir la tâche
+- Maximum recommandé : 2 PJ par tâche (images et PDFs)
 
-Les tâches ad hoc peuvent être modifiées ou supprimées logiquement (via `annulee`) par les utilisateurs ayant `canManage`.
-
-| Action | Condition |
-|--------|-----------|
-| Modifier une tâche ad hoc | `canManage` + tâche `a_faire` ou `en_cours` |
-| Annuler une tâche ad hoc | `canManage` + tâche `a_faire` ou `en_cours` |
-| Modifier une tâche template | ❌ Jamais (snapshot immuable) |
-| Supprimer physiquement une tâche | ❌ Jamais |
+> Preuves ajoutables uniquement pendant l'exécution (`en_cours`). Contrainte UX intentionnelle : la preuve doit être fournie pendant l'acte, pas après coup.
 
 ---
 
-## 12. Résumé matriciel complet
-
-### Actions par rôle (toutes postures)
-
-| Action | `admin` | `responsable_site` | `demandeur_site` / `intervenant_site` | `observateur_site` |
-|--------|---------|--------------------|---------------------------------------|-------------------|
-| **Voir** | ✅ | ✅ (sites attribués) | ✅ (sites attribués) | ✅ (RO) |
-| **Créer ad hoc** | ✅ | ✅ | ❌ | ❌ |
-| **Modifier ad hoc** | ✅ | ✅ | ❌ | ❌ |
-| **Annuler** | ✅ | ✅ | ❌ | ❌ |
-| **Démarrer** | ✅ (selon modePilotage) | ✅ (selon modePilotage) | ✅ (selon modePilotage) | ❌ |
-| **Terminer** | ✅ | ✅ | ✅ si assigné | ❌ |
-| **Non applicable** | ✅ | ✅ | ✅ | ❌ |
-| **Non honorée** | ✅ | ✅ | ✅ | ❌ |
-| **Ajouter PJ** | ✅ si en_cours | ✅ si en_cours | ✅ si en_cours | ❌ |
-| **Corriger tempsPassé** | ✅ si terminee | ✅ si terminee | ❌ | ❌ |
-
-> **Note :** le `modePilotage` de l'exécution parente contraint les actions Démarrer/Terminer/Non applicable/Non honorée — voir §6 et §7.
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
-## 13. Règles techniques d'implémentation
+## Module Attribution des Sites
 
-### Fetch de la tâche avant le check de permission
-
-Pour vérifier `isAssignée`, la tâche doit être récupérée AVANT de calculer les permissions :
-
-```typescript
-// ✅ CORRECT — fetch d'abord, check après
-const tache = await getTacheById(tacheId);
-const isAssignee = tache.assigneeUserId === currentUser.id;
-const canTerminer = canManage || (canExecute && isAssignee);
-
-if (!canTerminer) throw errors.forbidden("...");
-```
-
-### Terminaison — transaction atomique avec calcul du temps
-
-```typescript
-await db.transaction(async (tx) => {
-  const now = new Date();
-  const tempsPasseSecondes = tache.startedAt
-    ? Math.floor((now.getTime() - tache.startedAt.getTime()) / 1000)
-    : 0;
-
-  await tx.update(occurrenceTaches)
-    .set({
-      statut: "terminee",
-      doneAt: now,
-      completeeParUserId: currentUser.id,
-      tempsPasseSecondes,
-      updatedById: currentUser.id,
-    })
-    .where(eq(occurrenceTaches.id, tacheId));
-});
-```
-
-### Correction du temps passé — validation des bornes
-
-```typescript
-// ✅ CORRECT — validation 0 à 604800 secondes (7 jours max)
-const MAX_TEMPS_PASSE = 7 * 24 * 60 * 60; // 604800
-
-if (tempsPasseSecondes < 0 || tempsPasseSecondes > MAX_TEMPS_PASSE) {
-  throw errors.badRequest("Temps passé invalide (0 à 604800 secondes).");
-}
-
-if (tache.statut !== "terminee") {
-  throw errors.forbidden("Seule une tâche terminée peut être corrigée.");
-}
-```
-
-### Jamais de DELETE — toujours un statut
-
-```typescript
-// ✅ CORRECT
-await db.update(occurrenceTaches)
-  .set({ statut: "annulee", updatedById: currentUser.id })
-  .where(eq(occurrenceTaches.id, tacheId));
-
-// ❌ JAMAIS
-await db.delete(occurrenceTaches).where(...);
-```
-
-### Snapshot immuable pour les tâches issues d'un template
-
-```typescript
-// À la création (snapshot)
-await tx.insert(occurrenceTaches).values({
-  occurrenceId,
-  listeItemId: item.id,          // Référence au template
-  titre: item.titre,             // Snapshot — copie au moment T
-  description: item.description, // Snapshot — copie au moment T
-  statut: "a_faire",
-  // ...
-});
-
-// Lors d'une tentative de modification du titre d'une tâche template
-if (tache.listeItemId !== null) {
-  throw errors.forbidden("Les tâches issues d'un template ne peuvent pas être modifiées.");
-}
-```
+> Référence unique pour les permissions liées à l'attribution de sites à des utilisateurs.
 
 ---
 
-## 14. Résumé rapide
+### 1. Principe fondamental
 
-| Règle | Valeur |
-|-------|--------|
-| Suppression physique | ❌ Jamais — statut uniquement |
-| Démarrage | `a_faire` + `canExecute` (selon `modePilotage`) → auto-assignation |
-| Terminaison | `en_cours` + (`canManage` OU assigné + `canExecute`) |
-| Non applicable / Non honorée | `a_faire` ou `en_cours` + `canExecute` ou `canManage` |
-| Annulation | `a_faire` ou `en_cours` + `canManage` uniquement |
-| Création ad hoc | `canManage` uniquement (admin + responsable_site) |
-| Tâche template | Snapshot immuable — aucune modification de contenu |
-| PJ preuves | `canExecute` ou `canManage` + tâche `en_cours` |
-| Correction temps passé | `canManage` + tâche `terminee` + 0–604 800 s |
+- **Adhésion entreprise** → accès au module
+- **Attribution site** → responsabilités opérationnelles
+
+Les attributions définissent qui peut agir sur les modules opérationnels (tickets, devis, occurrences…). La visibilité de base du référentiel sites n'est pas gérée ici.
 
 ---
 
-*Dernière mise à jour : 2026-03-10*
+### 2. Tables et rôles disponibles
 
----
-
-# Règles Métier — Attribution des Sites (`userClientSiteAttributions` / `userPrestataireSiteAttributions`)
-
-> Référence unique pour toutes les permissions liées à l'attribution de sites à des utilisateurs.
-> À consulter systématiquement avant d'implémenter ou de modifier une logique d'attribution.
-
----
-
-## 1. Principe fondamental
-
-Les attributions de sites définissent les **responsabilités opérationnelles** : qui est responsable d'un site, qui peut créer des sous-sites, qui peut interagir avec les modules opérationnels (tickets, devis, occurrences, etc.).
-
-Elles ne servent **pas** à filtrer la visibilité de base du référentiel côté client : tous les utilisateurs ayant une adhésion active voient les sites de leur entreprise. C'est l'attribution qui détermine ce qu'ils peuvent faire dessus.
-
-> **Règle d'or :**
-> - Adhésion entreprise → accès au module
-> - Attribution site → responsabilités opérationnelles
-
----
-
-## 2. Tables concernées
-
-| Posture | Table d'attribution |
-|---------|---------------------|
+| Posture | Table |
+|---------|-------|
 | Client | `userClientSiteAttributions` |
 | Prestataire | `userPrestataireSiteAttributions` |
 
-Les cibles d'attribution sont toujours des utilisateurs appartenant à la même entreprise :
-- Attribution client → `userClientAdhesions.userId` (statut actif)
-- Attribution prestataire → `userPrestataireAdhesions.userId` (statut actif)
+**Rôles client :** `responsable_site` · `demandeur_site` · `observateur_site`
+
+**Rôles prestataire :** `responsable_site` · `demandeur_site` · `observateur_site` · `intervenant_site`
 
 ---
 
-## 3. Rôles d'attribution disponibles
+### 3. Qui peut attribuer un site ?
 
-### Côté client (`userClientSiteAttributions`)
+**Posture CLIENT**
 
-| Rôle | Signification |
-|------|--------------|
-| `responsable_site` | Peut modifier le site, créer des sous-sites, attribuer des utilisateurs sur ce site |
-| `demandeur_site` | Peut créer des tickets, des demandes de devis, consulter les opérations |
-| `observateur_site` | Lecture seule |
+| Rôle de l'attributeur | Peut attribuer | Périmètre |
+|-----------------------|---------------|----------|
+| `admin` | ✅ | Tous les sites |
+| `manager` + `responsable_site` du site | ✅ | Sites de son périmètre, à ses descendants (`usersArborescence`) |
+| `collaborateur` + `responsable_site` du site | ✅ | Sites de son périmètre, à ses descendants (`usersArborescence`) |
+| `manager` sans `responsable_site` | ❌ | — |
+| `collaborateur` sans `responsable_site` | ❌ | — |
 
-### Côté prestataire (`userPrestataireSiteAttributions`)
+> **Hiérarchie utilisateurs :** la cible d'une attribution (non-admin) doit être un descendant de l'attributeur dans `usersArborescence` (closure table). Un responsable local ne peut pas attribuer à n'importe quel membre de l'entreprise.
 
-| Rôle | Signification |
-|------|--------------|
-| `responsable_site` | Chef d'équipe : peut modifier le site (si proxy), attribuer des prestataires, organiser les opérations |
-| `demandeur_site` | Peut créer des tickets, des demandes d'intervention |
-| `observateur_site` | Lecture seule |
-| `intervenant_site` | Agent terrain : peut voir ses tâches, intervenir, clôturer des tâches. Ne peut pas attribuer. |
+**Posture PRESTATAIRE**
+- Client avec admin actif → lecture seule, aucune attribution possible
+- Mode proxy → mêmes règles que côté client
 
----
-
-## 4. Qui peut attribuer un site ?
-
-### Posture CLIENT
-
-| Rôle de l'attributeur | Peut attribuer |
-|-----------------------|---------------|
-| `admin` (roleAdhesion) | ✅ Sur tous les sites |
-| `manager` + `responsable_site` du site concerné | ✅ Sur les sites de son périmètre uniquement |
-| `collaborateur` + `responsable_site` du site concerné | ✅ Sur les sites de son périmètre (délégation locale) |
-| `manager` sans `responsable_site` | ❌ |
-| `collaborateur` sans `responsable_site` | ❌ |
-
-> **Règle exacte :** un utilisateur peut attribuer un site si et seulement si `admin` (roleAdhesion) OU possède une attribution `responsable_site` (effective, i.e. `mode=inclure`) sur ce site. Le roleAdhesion `collaborateur` ne restreint pas ce droit : s'il est `responsable_site` sur un site, il peut déléguer les rôles `demandeur_site` et `observateur_site` sur ce site (mais jamais `responsable_site` — réservé aux admins, cf. §5).
-
-### Posture PRESTATAIRE
-
-**Cas 1 — Le client possède un admin actif :**
-Le prestataire est en lecture seule. Aucune attribution possible.
-
-**Cas 2 — Mode proxy (pas d'admin client actif) :**
-Mêmes règles que côté client :
-
-| Rôle du prestataire | Peut attribuer |
-|---------------------|---------------|
-| `admin` (roleAdhesion) | ✅ Sur tous les sites du client |
-| `responsable_site` du site concerné | ✅ Sur les sites de son périmètre |
-| Autres | ❌ |
-
-### Posture PLATEFORME
-
-Les utilisateurs plateforme peuvent attribuer n'importe quel site à n'importe quel utilisateur, sans restriction.
+**Posture PLATEFORME :** peut attribuer n'importe quel site à n'importe quel utilisateur.
 
 ---
 
-## 5. Qui peut attribuer quel rôle ?
+### 4. Qui peut attribuer quel rôle ?
 
-L'attributeur ne peut pas donner un rôle supérieur à son propre périmètre.
-
-### Attribution client
+**Attribution client**
 
 | Rôle donné | Qui peut l'attribuer |
 |------------|----------------------|
@@ -2024,7 +898,7 @@ L'attributeur ne peut pas donner un rôle supérieur à son propre périmètre.
 | `demandeur_site` | `admin` ou `responsable_site` |
 | `observateur_site` | `admin` ou `responsable_site` |
 
-### Attribution prestataire
+**Attribution prestataire**
 
 | Rôle donné | Qui peut l'attribuer |
 |------------|----------------------|
@@ -2033,917 +907,156 @@ L'attributeur ne peut pas donner un rôle supérieur à son propre périmètre.
 | `observateur_site` | `admin` ou `responsable_site` |
 | `intervenant_site` | `admin` ou `responsable_site` |
 
----
-
-## 6. Périmètre de l'attributeur
-
-Un utilisateur ne peut attribuer un site **que s'il a lui-même accès à ce site**.
-
-| Rôle | Peut attribuer quels sites |
-|------|---------------------------|
-| `admin` | Tous les sites de l'entreprise |
-| `responsable_site` | Uniquement les sites de son périmètre effectif (via closure table + scope) |
-
-> **Raison :** éviter qu'un responsable local étende son autorité à des sites hors de son périmètre.
+> **Guard self-action :** un manager ou collaborateur ne peut pas modifier ses propres attributions (uniquement `admin`).
 
 ---
 
-## 7. Scope et mode d'attribution
+### 5. Scope et mode d'attribution
 
-Chaque attribution dispose de deux dimensions complémentaires :
-
-### `scope` : étendue de l'attribution
-
-| Valeur | Signification |
-|--------|--------------|
-| `self` | S'applique uniquement au site désigné |
-| `subtree` | S'applique au site désigné et à tous ses descendants (via `sitesArborescence`) |
-
-### `mode` : type d'attribution
-
-| Valeur | Signification |
-|--------|--------------|
-| `inclure` | Accorde les droits sur ce site (et son sous-arbre si `scope=subtree`) |
-| `exclure` | Retire les droits sur ce site (et son sous-arbre si `scope=subtree`) |
-
-### Exemples
-
-**Exemple 1 — Réseau entier :**
-```
-inclure  siège   scope=subtree
-```
-→ L'utilisateur est responsable de tout le réseau sous le siège.
-
-**Exemple 2 — Réseau avec exception :**
-```
-inclure  siège         scope=subtree
-exclure  agence-paris  scope=subtree
-```
-→ L'utilisateur couvre tout le réseau sauf l'agence de Paris et ses sous-sites.
+| Dimension | Valeur | Signification |
+|-----------|--------|--------------|
+| `scope` | `subtree` | S'applique au site et tous ses descendants |
+| `scope` | `exact` | S'applique uniquement au site désigné |
+| `mode` | `inclure` | Accorde les droits |
+| `mode` | `exclure` | Retire les droits (exception dans un sous-arbre) |
 
 ---
 
-## 8. Règle de résolution des conflits (CRITIQUE)
-
-Quand plusieurs attributions s'appliquent à un même site (via le scope et la closure table), la règle de résolution est :
-
-> **L'exclusion prime toujours sur l'inclusion.**
-
-### Algorithme de résolution
-
-Pour un utilisateur U et un site S :
-
-1. Récupérer toutes les attributions actives de U dont le périmètre couvre S (via `sitesArborescence` pour le `scope=subtree`)
-2. Si au moins une attribution est `mode=exclure` → **accès refusé**
-3. Sinon, si au moins une attribution est `mode=inclure` → **accès autorisé**
-4. Sinon → **accès refusé**
-
-```
-exclure > inclure
-```
-
-### Pourquoi cette règle est impérative (sécurité)
-
-Sans règle explicite, un utilisateur pourrait :
-1. Être exclu d'un site via `exclure siège subtree`
-2. Se réattribuer une inclusion plus spécifique via `inclure siège self`
-3. Contourner l'exclusion
-
-La règle "exclusion gagne toujours" ferme cette faille : une exclusion posée sur un sous-arbre **ne peut pas être contournée** par une inclusion plus spécifique en dessous.
-
-### Implémentation SQL de référence
-
-```sql
--- Pour vérifier l'accès de userId au site targetSiteId :
-SELECT mode
-FROM user_client_site_attributions uca
-JOIN sites_arborescence sa
-  ON sa.ancetre_id = uca.site_id
-  AND sa.descendant_id = :targetSiteId
-  AND sa.entreprise_id = :entrepriseId
-WHERE uca.user_id = :userId
-  AND (
-    (uca.scope = 'self'    AND sa.profondeur = 0)
-    OR uca.scope = 'subtree'
-  )
-ORDER BY (uca.mode = 'exclure') DESC  -- exclusions en premier
-LIMIT 1;
--- Si la première ligne est 'exclure' → refus
--- Si la première ligne est 'inclure' → accès autorisé
--- Si aucune ligne → refus
-```
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
-## 9. Résolution des droits effectifs
+## Module Checklists (`tacheListesTemplates` / `tacheListeItems`)
 
-Pour calculer si un utilisateur est `responsable_site`, `demandeur_site`, etc. sur un site donné, le système combine :
-
-1. **Attributions directes** — lignes dans `userClientSiteAttributions` ou `userPrestataireSiteAttributions`
-2. **Closure table** — `sitesArborescence` pour propager les attributions `scope=subtree`
-3. **Règle d'exclusion prioritaire** — mode `exclure` annule toujours le mode `inclure`
-
-Le résultat est un **rôle effectif par site** :
-- `estResponsableSite` — peut modifier le site, sous-sites, attributions
-- `estDemandeurSite` — peut créer tickets, devis, interventions
-- `estObservateurSite` — lecture seule
-- `estIntervenantSite` (prestataire uniquement) — peut exécuter les tâches
-
-> **Règle :** si un utilisateur a plusieurs attributions `inclure` avec des rôles différents sur un même site, le rôle le plus permissif s'applique — sauf si une exclusion annule l'ensemble.
+> Référence unique pour les permissions liées aux packs de tâches (templates).
 
 ---
 
-## 10. Règles techniques d'implémentation
+### 1. Deux types de packs
 
-### Toujours vérifier le périmètre de l'attributeur
-
-```typescript
-// Avant d'insérer une attribution, vérifier que l'attributeur a accès au site cible
-const canAttribute =
-  isAdmin ||
-  (await isResponsableSiteEffectif({ userId: attributeurId, siteId, entrepriseId }));
-
-if (!canAttribute) {
-  throw errors.forbidden("Vous n'avez pas accès à ce site.");
-}
-```
-
-### Toujours vérifier que la cible appartient à la bonne entreprise
-
-```typescript
-// Vérifier que la cible a bien une adhésion active dans l'entreprise
-const adhesion = await db.query.userClientAdhesions.findFirst({
-  where: and(
-    eq(userClientAdhesions.userId, targetUserId),
-    eq(userClientAdhesions.entrepriseId, entrepriseId),
-    eq(userClientAdhesions.statut, "actif"),
-  ),
-});
-if (!adhesion) throw errors.forbidden("Utilisateur non membre de cette entreprise.");
-```
-
-### Résolution via closure table (Drizzle ORM)
-
-```typescript
-// Récupérer toutes les attributions qui couvrent un site cible
-const attributions = await db
-  .select({ mode: uca.mode, role: uca.role })
-  .from(userClientSiteAttributions.as("uca"))
-  .innerJoin(sitesArborescence.as("sa"), and(
-    eq(sa.ancetreId, uca.siteId),
-    eq(sa.descendantId, targetSiteId),
-    eq(sa.entrepriseId, entrepriseId),
-  ))
-  .where(and(
-    eq(uca.userId, userId),
-    or(
-      and(eq(uca.scope, "self"), eq(sa.profondeur, 0)),
-      eq(uca.scope, "subtree"),
-    ),
-  ));
-
-const hasExclusion = attributions.some((a) => a.mode === "exclure");
-const hasInclusion = attributions.some((a) => a.mode === "inclure");
-
-if (hasExclusion) return null;   // accès refusé — exclusion prioritaire
-if (!hasInclusion) return null;  // pas d'attribution active
-// Retourner le rôle le plus permissif parmi les inclusions
-const roles = attributions.filter((a) => a.mode === "inclure").map((a) => a.role);
-return getMostPermissiveRole(roles); // responsable_site > demandeur_site > observateur_site
-```
+| Type | `proprietaireEntrepriseId` | Accessible par |
+|------|---------------------------|----------------|
+| **Pack système** (FM4ALL) | `null` | Tous les utilisateurs authentifiés |
+| **Pack entreprise** | ID de l'entreprise | Utilisateurs de cette entreprise uniquement |
 
 ---
 
-## 11. Résumé rapide
+### 2. Exception doctrine manager
 
-| Question | Réponse |
-|----------|---------|
-| Qui peut attribuer ? | `admin` (toujours) ou `responsable_site` (dans son périmètre) |
-| À qui peut-on attribuer ? | Utilisateurs avec adhésion active dans la même entreprise |
-| Côté client — rôles disponibles | `responsable_site`, `demandeur_site`, `observateur_site` |
-| Côté prestataire — rôles disponibles | `responsable_site`, `demandeur_site`, `observateur_site`, `intervenant_site` |
-| Qui peut donner `responsable_site` ? | `admin` uniquement |
-| Règle de conflit inclure/exclure | Exclusion prioritaire — `exclure` annule toujours `inclure` |
-| Scope `subtree` + exclusion | L'exclusion parent bloque tout le sous-arbre, même avec inclusion spécifique en dessous |
+> Le module Checklists est un module **catalogue** (création de templates réutilisables), non un module terrain. Le `manager` peut gérer les packs car c'est une activité de gouvernance d'équipe. Cette exception à la doctrine générale `manager` est intentionnelle et circonscrite à ce module.
 
 ---
 
-*Dernière mise à jour : 2026-03-10*
+### 3. Qui peut gérer les packs ?
+
+**Pack système :** `super_admin_plateforme` uniquement.
+
+**Pack entreprise :**
+
+| Posture | Rôle requis |
+|---------|------------|
+| Client | `admin` ou `manager` (adhésion active) |
+| Prestataire | `admin` ou `manager` (adhésion active) |
+| Plateforme | Toujours |
 
 ---
 
-# Règles Métier — Module Utilisateurs (`app/utilisateurs`)
+### 4. Restriction prestataire — services proposés
 
-> Référence unique pour toutes les permissions liées à la gestion des utilisateurs.
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
+Un prestataire ne peut créer des packs entreprise que pour les **services qu'il propose réellement** (`servicesEntreprises`). Il ne peut pas créer de pack pour un service hors de son catalogue déclaré.
 
----
-
-## 1. Modèle à deux arbres indépendants
-
-Le module gère **deux systèmes hiérarchiques distincts** qui ne se mélangent pas :
-
-| Système | Table | Rôle | Exemple |
-|---------|-------|------|---------|
-| **Arbre organisationnel** | `usersArborescence` | Gouvernance administrative (qui manage qui) | Manager A → Collaborateur B |
-| **Arbre attributions sites** | `userClientSiteAttributions` | Responsabilités opérationnelles (qui gère quel site) | B est `responsable_site` du Siège |
-
-**Règles de coexistence** :
-- Un utilisateur peut être subordonné dans l'arbre organisationnel ET responsable d'un site = indépendant
-- La suppression d'un utilisateur supprime ses deux types d'entrées
-- La suspension d'un manager **ne modifie pas** les subordonnés dans l'arbre (l'arbre reste intact)
+> Les packs système restent accessibles à tous les utilisateurs authentifiés, sans filtre par service.
 
 ---
 
-## 2. Rôles d'adhésion par posture
+### 5. Lecture des packs disponibles
 
-### Posture CLIENT (`userClientAdhesions.role`)
-| Niveau | Rôle | Capacités |
-|--------|------|-----------|
-| 3 | `admin` | Droits complets sur tous les utilisateurs de l'entreprise |
-| 2 | `manager` | Gestion de sa propre branche uniquement |
-| 1 | `collaborateur` | Aucun droit de gestion utilisateurs |
-
-### Posture PRESTATAIRE (`userPrestataireAdhesions.role`)
-Même 3 niveaux (`admin`, `manager`, `collaborateur`) avec les mêmes règles de hiérarchie.
-
-### Posture PLATEFORME (`userPlateformeAdhesions.role`)
-| Rôle | Capacités |
-|------|-----------|
-| `super_admin_plateforme` | Droits complets sur toutes les entreprises (niveau 4) |
-| `operateur_plateforme` | Droits opérationnels plateforme |
+Lors de l'affectation d'une checklist à une occurrence, les packs disponibles sont filtrés :
+- Packs système : filtrés par `serviceId` de l'exécution
+- Packs entreprise : packs du client + packs du prestataire (si exécution associée)
 
 ---
 
-## 3. Matrice des permissions CRUD
-
-### 3.1 Voir la liste des utilisateurs
-
-Tout utilisateur avec une adhésion active dans l'entreprise peut consulter la liste.
-La liste est scopée selon la posture active :
-- **Client** → `userClientAdhesions` de cette `entrepriseId`
-- **Prestataire** → `userPrestataireAdhesions` de cette `entrepriseId`
-- **Plateforme** → `userPlateformeAdhesions` (liste cross-entreprises)
-
-### 3.2 Créer un utilisateur
-
-| Action | Admin | Manager | Collaborateur | Plateforme |
-|--------|-------|---------|---------------|------------|
-| Créer un utilisateur racine (sans parent) | ✅ | ❌ | ❌ | ✅ |
-| Créer un subordonné direct sous soi-même | ✅ | ✅ | ❌ | ✅ |
-| Créer un subordonné sous un collaborateur de sa branche | ✅ | ✅ | ❌ | ✅ |
-| Créer un subordonné sous un autre manager | ✅ | ❌ | ❌ | ✅ |
-| Créer un subordonné sous un admin | ✅ | ❌ | ❌ | ✅ |
-
-**Règle manager** : le manager peut créer uniquement sous lui-même OU sous un nœud `collaborateur` qui est dans SA branche (vérifié via `isUserDescendant()`).
-
-**`parentId`** : libre — un créateur peut rattacher le nouvel utilisateur à n'importe quel nœud de l'arbre de l'entreprise (dans les limites ci-dessus).
-
-### 3.3 Rattacher un utilisateur existant
-
-Réservé à `admin` et `super_admin_plateforme` uniquement.
-Les utilisateurs éligibles sont ceux présents dans l'arborescence de l'entreprise (entrée réflexive `profondeur=0`) mais sans adhésion pour la posture cible.
-
-| Action | Admin | Manager | Collaborateur | Plateforme |
-|--------|-------|---------|---------------|------------|
-| Rattacher un utilisateur existant | ✅ | ❌ | ❌ | ✅ |
-
-### 3.4 Modifier le profil d'un utilisateur
-
-| Qui modifie / Qui est modifié | Soi-même | Inférieur | Même niveau | Supérieur |
-|-------------------------------|----------|-----------|-------------|-----------|
-| `admin` (niveau 3) | ✅ | ✅ | ❌ (autre admin) | ❌ |
-| `manager` (niveau 2) | ✅ | ✅ (collaborateurs) | ❌ | ❌ |
-| `collaborateur` (niveau 1) | ✅ | N/A | ❌ | ❌ |
-| `super_admin_plateforme` | ✅ | ✅ | ✅ | ✅ |
-
-**Règle** : `canEdit = isViewingSelf || (currentLevel > targetLevel && currentLevel > 1)`
-
-### 3.5 Modifier le rôle ou le statut d'adhésion
-
-Même règle que 3.4 : niveau courant **strictement supérieur** au niveau cible.
-
-**Cas particulier** : un admin ne peut pas modifier le rôle d'un autre admin (même niveau = 3).
-
-### 3.6 Supprimer définitivement un utilisateur
-
-Réservé à `admin` et `super_admin_plateforme`.
-
-La suppression doit nettoyer toutes les adhésions de l'utilisateur :
-1. `userClientAdhesions` (si adhésion client existe)
-2. `userPrestataireAdhesions` (si adhésion prestataire existe)
-3. `userPlateformeAdhesions` (si adhésion plateforme existe)
-4. `usersArborescence` (toutes les entrées — ancêtres ET descendants)
-5. `userClientSiteAttributions` / `userPrestataireSiteAttributions`
+*Dernière mise à jour : 2026-03-11*
 
 ---
 
-## 4. Garde-fou "dernier administrateur actif"
-
-**Règle** : Il est interdit de laisser une entreprise sans aucun administrateur actif.
-
-**Actions bloquées** si l'utilisateur cible est le dernier admin actif :
-1. Changer son rôle (`admin` → `manager` ou `collaborateur`)
-2. Changer son statut (`actif` → `suspendu` ou `en_attente`)
-3. Le supprimer définitivement
-
-**Message d'erreur** : *"Impossible : cet utilisateur est le dernier administrateur actif de l'entreprise. Nommez un autre administrateur avant d'effectuer cette action."*
-
-**Implémentation** : `assertNotLastActiveAdmin({ entrepriseId, posture })` dans `usersActions.ts` — lève une erreur `forbidden` si le nombre d'admins actifs serait 0 après l'action.
-
-**Implication de sécurité FM4ALL** : l'absence d'admin actif chez un client active automatiquement les droits proxy prestataire (`canManageSiteAsProxy`). Ce garde-fou empêche un vecteur d'escalade de privilèges.
-
----
-
-## 5. Gestion des attributions de sites
-
-### 5a. Posture client — `userClientSiteAttributions`
-
-Visible et modifiable en posture **client**. L'`entrepriseId` est celui de l'entreprise cliente.
-
-| Qui | Peut gérer les attributions |
-|-----|----------------------------|
-| `super_admin_plateforme` | ✅ (y compris sur soi-même) |
-| `admin` | ✅ (y compris sur soi-même) |
-| `manager` | ✅ mais uniquement sur les **subordonnés** (jamais sur soi-même) |
-| `collaborateur` | ❌ |
-
-**Règle** : `canManageSiteAttributions = isAdmin || isPlatformAdmin || (!isViewingSelf && currentLevel > targetLevel && currentLevel > 1)`
-
-### 5b. Posture prestataire — `userPrestataireSiteAttributions`
-
-Visible et modifiable en posture **prestataire**. Les attributions sont liées à un **client** (`clientEntrepriseId`), pas à l'entreprise prestataire. L'UI présente un sélecteur de client dans le dialog.
-
-| Qui | Peut gérer les attributions |
-|-----|----------------------------|
-| `super_admin_plateforme` | ✅ |
-| `admin` prestataire | ✅ (y compris sur soi-même) |
-| `manager` prestataire | ✅ uniquement sur les **subordonnés** (jamais sur soi-même) |
-| `collaborateur` prestataire | ❌ |
-
-**Règles complémentaires** :
-- Le backend vérifie la relation `clientPrestataireRelations` avant toute lecture ou écriture
-- Seul un admin prestataire peut attribuer le rôle `responsable_site`
-- La présence d'un admin actif chez le client est **sans effet** ici : `userPrestataireSiteAttributions` concerne l'organisation interne du prestataire (qui de son équipe est responsable de quel site client), et non la gestion des utilisateurs clients. La règle "proxy prestataire" (`canManageSiteAsProxy`) s'applique exclusivement à `userClientSiteAttributions` (§5a).
-
-**Implémentation** : `UserSiteAttributionDialog` gère les deux postures (client picker pour prestataire). `UserDetails` affiche la section attribution pour `postureActive !== "plateforme"`.
-
-### 5c. Posture plateforme
-
-Les attributions de sites ne sont **pas gérées** depuis la posture plateforme dans `app/utilisateurs`. La plateforme passe en posture client ou prestataire pour gérer les attributions de l'entreprise concernée.
-
----
-
-## 6. Comportement multi-posture
-
-Un même compte peut avoir des adhésions dans plusieurs postures. La posture active (cookie `fm4all:postureActive`) détermine :
-- Quelle table d'adhésion est lue pour les permissions (`userClientAdhesions` vs `userPrestataireAdhesions`)
-- Quelle liste d'utilisateurs est affichée
-- Quelles actions sont disponibles
-
-**Règle critique** : En posture `prestataire`, les rôles viennent de `userPrestataireAdhesions.role`, **pas** de `userClientAdhesions.role`. Un utilisateur peut être `admin` prestataire et `collaborateur` client simultanément — ce sont deux contextes indépendants.
-
----
-
-## 7. Module Entreprises
-
-### 7a. Page `app/mon-entreprise` (postures client / prestataire / plateforme)
-
-Accessible à tout utilisateur ayant une adhésion active (client ou prestataire) dans l'entreprise.
-
-| Action | Condition |
-|--------|-----------|
-| Voir les informations | Toute adhésion active (client OU prestataire) |
-| Modifier infos (nom, SIRET, TVA) | `role === "admin"` dans l'adhésion active |
-| Modifier contact | idem |
-| Modifier logo | idem |
-| Modifier rôles / services | idem |
-| Inviter un administrateur | idem (seulement si `!hasActiveAdmin`) |
-
-**Règle plateforme** : un utilisateur en posture plateforme a accès à tout (bypass admin check).
-
-**Implémentation** :
-- UI : `canEdit = roleClientAdhesion === "admin" || rolePrestataireAdhesion === "admin"` dans `MonEntrepriseClient`
-- Serveur : vérifier `plateformeRole` OU `clientAdhesion.role === "admin"` OU `prestataireAdhesion.role === "admin"` (même entreprise)
-
-### 7b. Pages `app/entreprises` et `app/entreprises/[entrepriseId]` (posture plateforme uniquement)
-
-Accessibles uniquement aux utilisateurs ayant un rôle plateforme actif.
-
-| Action | Condition |
-|--------|-----------|
-| Voir la liste des entreprises | Rôle plateforme actif |
-| Voir le détail d'une entreprise | Rôle plateforme actif |
-| Créer une entreprise | Rôle plateforme actif |
-| Modifier infos / contact / logo / rôles | Rôle plateforme actif |
-| Inviter un administrateur | Rôle plateforme actif |
-
-**Note** : Ces pages utilisent le même composant `EntrepriseDetailsClient` que `app/mon-entreprise`, avec `canEdit = true` passé depuis la page plateforme (après guard serveur).
-
----
-
-# Règles Métier — Module Mes Clients (`app/mes-clients`)
-
-> Référence unique pour les permissions liées à la gestion des clients d'un prestataire.
-> Accessible uniquement en posture **prestataire**.
-
----
-
-## 1. Accès à la page
-
-Guard serveur (`page.tsx`) : l'utilisateur doit avoir une adhésion prestataire active.
-
-```
-userPrestataireAdhesions.userId   = currentUser.id
-userPrestataireAdhesions.statut   = "actif"
-```
-
-Sinon → redirect `/auth/unauthorized`.
-
----
-
-## 2. Périmètre des clients affichés
-
-Un client apparaît dans la liste si au moins l'une des deux conditions est vraie :
-
-1. Une relation explicite existe dans `clientPrestataireRelations` (prestataire a ajouté ce client manuellement)
-2. Le prestataire a au moins une exécution active (`clientServiceExecutions`) liée à ce client
-
----
-
-## 3. Matrice de permissions
-
-| Action | `admin` | `manager` | `collaborateur` |
-|--------|---------|-----------|-----------------|
-| Voir la liste des clients | ✅ | ✅ | ✅ |
-| Lier/créer un client (`AjouterClientDialog`) | ✅ | ✅ | ❌ |
-| Inviter l'admin d'un client (`InviterClientDialog`) | ✅ | ✅ | ❌ |
-
----
-
-## 4. Lier un client — règles métier
-
-L'action `createOrLinkClientAction` fonctionne en deux cas :
-
-- **SIRET connu en DB** : aucune création d'entreprise — seul le lien `clientPrestataireRelations` est créé
-- **SIRET inconnu** : création de l'entreprise + attribution du rôle `"client"` + création du lien
-
-**Contraintes :**
-- Un prestataire ne peut pas s'ajouter lui-même comme client (`clientId ≠ prestataireEntrepriseId`)
-- Si la relation existe déjà (`clientPrestataireRelations`), le lien n'est pas recréé (`onConflictDoNothing`)
-- Requiert au minimum le rôle `manager`
-
----
-
-## 5. Inviter l'admin d'un client — règles métier
-
-L'action `inviterClientAdminAction` envoie une invitation par email pour que le client crée son compte administrateur.
-
-**Conditions pour pouvoir inviter :**
-1. L'utilisateur prestataire est au moins `manager`
-2. La relation `clientPrestataireRelations` existe entre les deux entreprises
-3. Le client n'a pas encore d'admin actif (`userClientAdhesions.role = "admin"` et `statut = "actif"`)
-4. L'email cible n'est pas déjà utilisé par un compte existant
-
-**Effets :**
-1. Les invitations en attente existantes pour ce client sont annulées (`DELETE` sur `entrepriseInvitations` non acceptées)
-2. Une nouvelle invitation est créée (token UUID, expiration 7 jours, `typeAdhesion = "client"`)
-3. Un email est envoyé avec un lien `/auth/inscription-admin?token=…`
-
-**Note UI** : après l'envoi, la liste est rechargée depuis le serveur (`loadClients()`). Le bouton "Inviter" ne disparaît qu'une fois qu'un admin actif existe réellement en base — une invitation en attente ne suffit pas.
-
----
-
-## 6. Lecture seule des infos client
-
-Un prestataire peut **consulter** les informations d'un client (nom, SIRET, contact) mais ne peut **pas les modifier**.
-
-> Rationale : un client peut être partagé entre plusieurs prestataires. Permettre à un prestataire de modifier les données partagées risquerait de créer des incohérences pour les autres.
-
-Pour toute mise à jour, le client doit créer son compte ou contacter FM4ALL.
-
----
-
-# Règles Métier — Module Mes Prestataires (`app/mes-prestataires`)
-
-> Référence unique pour les permissions liées à la gestion des prestataires d'un client.
-> Accessible uniquement en posture **client**.
-
----
-
-## 1. Accès à la page
-
-Guard serveur (`page.tsx`) : l'utilisateur doit avoir une adhésion client active.
-
-```
-userClientAdhesions.userId  = currentUser.id
-userClientAdhesions.statut  = "actif"
-```
-
-Sinon → redirect `/auth/unauthorized`.
-
----
-
-## 2. Périmètre des prestataires affichés
-
-Un prestataire apparaît dans la liste si au moins l'une des deux conditions est vraie :
-
-1. Une relation explicite existe dans `clientPrestataireRelations` (le client a ajouté ce prestataire manuellement)
-2. Le prestataire a au moins une exécution active (`clientServiceExecutions`) liée à ce client
-
----
-
-## 3. Matrice de permissions
-
-| Action | `admin` | `manager` | `collaborateur` |
-|--------|---------|-----------|-----------------|
-| Voir la liste des prestataires | ✅ | ✅ | ✅ |
-| Ajouter un prestataire (`AjouterPrestataireDialog`) | ✅ | ✅ | ❌ |
-| Inviter l'admin d'un prestataire (`InviterPrestataireDialog`) | ✅ | ✅ | ❌ |
-
----
-
-## 4. Ajouter un prestataire — règles métier
-
-L'action `createOrLinkPrestataireAction` fonctionne en deux cas :
-
-- **SIRET connu en DB** : aucune création d'entreprise — seul le lien `clientPrestataireRelations` est créé
-- **SIRET inconnu** : création de l'entreprise + attribution du rôle `"prestataire"` + création du lien
-
-**Contraintes :**
-- Un client ne peut pas s'ajouter lui-même comme prestataire (`prestataireId ≠ clientEntrepriseId`)
-- Si la relation existe déjà (`clientPrestataireRelations`), le lien n'est pas recréé (`onConflictDoNothing`)
-- Requiert au minimum le rôle `manager`
-
----
-
-## 5. Inviter l'admin d'un prestataire — règles métier
-
-L'action `inviterPrestataireAdminAction` envoie une invitation par email pour que le prestataire crée son compte administrateur.
-
-**Conditions pour pouvoir inviter :**
-1. L'utilisateur client est au moins `manager`
-2. La relation `clientPrestataireRelations` existe entre les deux entreprises
-3. Le prestataire n'a pas encore d'admin actif (`userPrestataireAdhesions.role = "admin"` et `statut = "actif"`)
-4. L'email cible n'est pas déjà utilisé par un compte existant
-
-**Effets :**
-1. Les invitations en attente existantes pour ce prestataire sont annulées (`DELETE` sur `entrepriseInvitations` non acceptées, filtrées par `typeAdhesion = "prestataire"`)
-2. Une nouvelle invitation est créée (token UUID, expiration 7 jours, `typeAdhesion = "prestataire"`)
-3. Un email est envoyé avec un lien `/auth/inscription-admin?token=…`
-
-**Important — `typeAdhesion` sur l'invitation** :
-Lors de l'acceptation (`accepterInvitationAdminAction`), le champ `typeAdhesion` détermine quelle adhésion est créée :
-- `"prestataire"` → insert dans `userPrestataireAdhesions`
-- `"client"` → insert dans `userClientAdhesions`
-
-Cela évite qu'une invitation prestataire crée accidentellement une adhésion client (risque pour les entreprises ayant les deux rôles simultanément).
-
----
-
-## 6. Lecture seule des infos prestataire
-
-Un client peut **consulter** les informations d'un prestataire (nom, SIRET, contact) mais ne peut **pas les modifier**.
-
-> Rationale : un prestataire peut être partagé entre plusieurs clients. Permettre à un client de modifier les données partagées risquerait de créer des incohérences pour les autres.
-
-Pour toute mise à jour, le prestataire doit créer son compte ou contacter FM4ALL.
-
----
-
-# Règles Métier — Module Checklists (`app/checklists`)
-
-## 1. Concepts fondamentaux
-
-### Pack / checklist
-Un **pack** (`tacheListesTemplates`) est un modèle de liste de tâches rattaché à un service FM4ALL (nettoyage, maintenance, etc.). Il contient des **items** (`tacheListeItems`) ordonnés.
-
-### Deux types de packs
-| Type | `proprietaireEntrepriseId` | Visibilité | Modifiable par |
-|------|---------------------------|------------|----------------|
-| **Système** | `NULL` | Tous les utilisateurs authentifiés (lecture) | Plateforme uniquement |
-| **Entreprise** | UUID de l'entreprise | Propriétaire uniquement | Admin/Manager de l'entreprise |
-
-### Snapshot d'occurrence
-Quand une occurrence est créée, les items du pack sélectionné sont **copiés** dans `occurrenceTaches` (snapshot). Modifier le pack d'origine n'affecte pas les occurrences déjà créées.
-
----
-
-## 2. Accès à la page `/app/checklists`
-
-La page est accessible à toutes les postures (client, prestataire, plateforme). Aucun guard posture n'est requis — les server actions scopent les données par entreprise.
-
----
-
-## 3. Périmètre des packs affichés par posture
-
-| Posture | Packs système | Packs propres | Packs autres entreprises |
-|---------|:---:|:---:|:---:|
-| **Client** | ✅ (lecture seule, actifs uniquement) | ✅ (actifs + inactifs) | ❌ |
-| **Prestataire** | ✅ (lecture seule, actifs uniquement, filtrés sur services proposés) | ✅ (actifs + inactifs) | ❌ |
-| **Plateforme** | ✅ (tous, éditables) | ✅ (toutes entreprises) | ✅ (tous) |
-
-**Filtrage prestataire** : seuls les services que l'entreprise propose (`serviceEntreprises`) sont affichés dans les filtres et les packs.
-
----
-
-## 4. Matrice de permissions
-
-| Action | collaborateur | manager | admin | plateforme |
-|--------|:---:|:---:|:---:|:---:|
-| Voir packs système | ✅ | ✅ | ✅ | ✅ |
-| Voir ses propres packs | ✅ | ✅ | ✅ | ✅ |
-| Créer un pack entreprise | ❌ | ✅ | ✅ | ✅ |
-| Renommer / activer-désactiver un pack | ❌ | ✅ | ✅ | ✅ |
-| Supprimer un pack entreprise | ❌ | ✅ | ✅ | ✅ |
-| Ajouter / modifier / supprimer un item | ❌ | ✅ | ✅ | ✅ |
-| Réordonner les items (drag-drop) | ❌ | ✅ | ✅ | ✅ |
-| Créer / modifier / supprimer un pack système | ❌ | ❌ | ❌ | ✅ |
-
-**Règle posture-aware** : le rôle est évalué selon la **posture active** (cookie `fm4all:postureActive`) :
-- posture `prestataire` → vérifie `userPrestataireAdhesions` uniquement
-- posture `client` ou absente → vérifie `userClientAdhesions` uniquement
-
-Cela empêche qu'un utilisateur admin client (double casquette) bypasse ses droits limités en posture prestataire.
-
----
-
-## 5. Règles de création d'un pack
-
-1. **Pack système** (`proprietaireEntrepriseId = null`) : la posture cookie doit être `"plateforme"` ET l'utilisateur doit avoir un `rolePlateformeAdhesion`.
-2. **Pack entreprise** : l'utilisateur doit être au minimum `manager` actif de cette entreprise (vérifié de façon posture-aware).
-3. **Mode plateforme filtré "client" ou "prestataire" sans entreprise sélectionnée** : le bouton "Nouvelle checklist" est masqué — évite la création d'un pack système par mégarde.
-
----
-
-## 6. Règles de mutation (update / delete / reorder)
-
-Pour toute mutation, deux vérifications cumulatives côté serveur :
-1. **`canManageChecklists`** : admin/manager actif de l'entreprise (posture-aware via cookie).
-2. **Ownership** : `pack.proprietaireEntrepriseId === entrepriseId` passé en input. Un utilisateur ne peut modifier que les packs de son entreprise, jamais ceux d'une autre ni les packs système.
-
-Si le pack est système (`proprietaireEntrepriseId = null`) et l'utilisateur n'est pas plateforme → `403 Forbidden`.
-
----
-
-## 7. Suppression d'un pack
-
-- Les items sont supprimés en cascade (`ON DELETE CASCADE` sur `tache_liste_items.liste_template_id`).
-- Les références dans `clientServices.tacheListeTemplateId` et `clientServiceExecutions.tacheListeTemplateId` passent à `NULL` (`ON DELETE SET NULL`).
-- Les `occurrenceTaches` déjà créés (snapshots) **ne sont pas affectés** — ils sont des copies indépendantes.
-
----
-
-## 8. Réordonnancement des items
-
-Utilise une **double passe** avec offset intermédiaire (`10000 + i`) pour contourner la contrainte unique `(listeTemplateId, ordre)` lors des swaps :
-1. Passe 1 : `ordre = 10000 + i` (évite les collisions temporaires)
-2. Passe 2 : `ordre = i + 1` (ordre final)
-
----
-
-## 9. Intégration avec les prestations et occurrences
-
-- Dans `/app/prestations/[prestationId]`, `TacheListeManagerDialog` permet à un admin/manager de gérer les packs. Il n'est affiché que si `canManage = true` ET que la prestation a un prestataire associé (`execution.prestataireEntrepriseId`).
-- Le pack sélectionné pour une exécution est stocké dans `clientServiceExecutions.tacheListeTemplateId`. Un prestataire peut substituer le pack du client avec le sien propre.
-- À la création d'une occurrence, les items actifs du pack choisi sont copiés en `occurrenceTaches` (snapshot immuable vis-à-vis des modifications ultérieures du template).
-
----
-
-*Dernière mise à jour : 2026-03-10*
-
----
-
-# Règles Métier — Module Auth
-
-> Référence pour les flows d'inscription, d'activation et de réinitialisation de mot de passe.
-
----
-
-## 1. Flows d'accès
-
-### 1a. Inscription admin via invitation
-
-1. Acteur ayant les droits invoque `inviterEntrepriseAdminAction` (ou `inviterClientAdminAction`)
-2. Un token UUID + TTL 7 jours est inséré dans `entrepriseInvitations`
-3. Un email est envoyé à l'adresse cible avec le lien `APP_URL/auth/inscription-admin?token=<token>`
-4. L'invité arrive sur la page `/auth/inscription-admin` qui lit `?token=` et valide le token en base (expiry + unicité)
-5. À la soumission du formulaire (`accepterInvitationAdminAction`) :
-   - Création du compte Better Auth
-   - Insertion des adhésions (client ou prestataire selon `typeAdhesion`)
-   - Insertion dans `usersArborescence`
-   - Marquage du token comme utilisé (`usedAt = now()`)
-   - Envoi d'un email de reset password pour définir le mot de passe (non bloquant : le compte est déjà créé)
-
-### 1b. Reset password (mot de passe oublié)
-
-1. L'utilisateur soumet son email depuis `/auth/forgot-password`
-2. Better Auth envoie un email avec un lien `BETTER_AUTH_URL/api/auth/reset-password?token=<token>&redirectTo=APP_URL/auth/reset-password`
-3. L'utilisateur arrive sur `/auth/reset-password?token=<token>` et saisit son nouveau mot de passe
-4. Validation Zod : min 8 chars, 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial
-5. `authClient.resetPassword({ newPassword, token })` est appelé
-
-### 1c. Activation du compte (premier mot de passe)
-
-Identique au reset password mais le lien inclut `?type=activation`. La page `/auth/reset-password` affiche un message adapté selon ce paramètre.
-
-### 1d. Vérification email
-
-Better Auth envoie un email de vérification via `sendVerificationEmail`. Le callback renvoie vers `APP_URL/auth/email-ok` qui affiche une confirmation et redirige vers `/auth/login` après 5 secondes.
-
----
-
-## 2. Règles de sécurité
-
-| Règle | Détail |
-|-------|--------|
-| Token invitation | UUID v4, TTL 7 jours, usage unique (`usedAt` doit être `null`) |
-| Token reset | Géré par Better Auth, opaque |
-| Mot de passe | Min 8 chars + majuscule + minuscule + chiffre + caractère spécial |
-| Email BCC | Optionnel via `MAILGUN_BCC_EMAIL` (env) — jamais hardcodé |
-| Erreur email d'activation | Non bloquante — le compte est déjà créé, l'utilisateur peut re-demander un lien |
-| Page `/auth/unauthorized` | Déconnecte l'utilisateur et redirige vers `/auth/login` |
-
----
-
-## 3. Variables d'environnement requises
-
-| Variable | Rôle | Requis |
-|----------|------|--------|
-| `APP_URL` | Base des liens envoyés par email (ex: invitation, activation) | ✅ |
-| `BETTER_AUTH_URL` | Base des liens Better Auth (ex: vérification email) | ✅ |
-| `MAILGUN_API_KEY` | Envoi des emails transactionnels | ✅ |
-| `MAILGUN_BCC_EMAIL` | BCC optionnel sur tous les emails | ❌ optionnel |
-
-**Règle :** ne jamais appeler `process.env.XXX` directement. Toujours passer par `env.XXX` depuis `src/lib/env.ts`.
-
----
-
-## 4. Guards de page
-
-- `/auth/login` → redirect vers `/app` si session active (évite la double connexion)
-- `/auth/unauthorized` → accessible à tous (redirige après déconnexion)
-- `/auth/inscription-admin` → vérifie le token en base avant d'afficher le formulaire
-- `/auth/reset-password` → vérifie la présence du `?token=` avant d'afficher le formulaire
-
----
-
-*Dernière mise à jour : 2026-03-10*
-
----
-
-# Règles Métier — Module Factures
+## Module Factures (`factures`)
 
 > Référence unique pour toutes les permissions liées aux factures.
-> À consulter systématiquement avant d'implémenter ou de modifier une permission.
 
 ---
 
-## A) Modèle de données — Champs clés
+### 1. Statuts
 
-| Champ | Signification |
-|-------|---------------|
-| `emetteurEntrepriseId` | L'entreprise qui émet la facture (prestataire, ou FM4ALL en tant que prestataire) |
-| `destinataireEntrepriseId` | L'entreprise qui reçoit la facture (client) |
-| `proprietaireEntrepriseId` | L'entreprise cliente propriétaire du site concerné (peut différer du destinataire en mode intermédiaire) |
-| `numero` | Null en brouillon. Format `F-{year}-{000001}` via `factureNumeroSeq` — attribué uniquement à l'émission |
-| `statut` | `brouillon` → `emise` → `annulee` (ou `litige`) |
-| `montantHt` / `montantTva` / `montantTtc` | **Figés à l'émission.** Toujours `0` en brouillon |
-| `genereeParOutil` | `true` si créée automatiquement par un cron/outil de pré-facturation (V2) |
-| `periodeDebut` / `periodeFin` | Période de facturation couverte (optionnel, contexte abonnement) |
-| `dateEcheance` | Date de paiement attendue (optionnel, défini par l'émetteur) |
+| Statut | Signification |
+|--------|--------------|
+| `brouillon` | Création/modification possible, non visible par le destinataire |
+| `emise` | Pièce comptable figée, visible par le destinataire, montants verrouillés |
+| `litige` | Facture émise contestée — en attente de résolution |
+| `annulee` | Annulée après émission — données conservées |
 
-### Montants sur `factureLignes`
-
-| Champ | Signification |
-|-------|---------------|
-| `prixUnitaireHt` | Prix unitaire en centimes (×100) |
-| `tauxTva` | Taux TVA en centièmes de % (ex: `2000` = 20,00%) |
-| `remiseHtMontant` | Remise ligne en centimes (appliquée avant calcul TVA) |
-| `montantHt` / `montantTva` / `montantTtc` | Null en brouillon, figés à l'émission |
-| `typeSource` | `manuel` (saisie libre V1) ou `prix_applique` (issu de pré-facturation V2) |
+> V1 : l'annulation change uniquement le statut. Aucun avoir automatique n'est créé. Un avoir comptable devra être géré manuellement en V2 pour conformité.
 
 ---
 
-## B) Statuts et transitions
+### 2. Parties d'une facture
 
-```
-brouillon ──→ emise ──→ annulee
-                  ↘
-                litige  (à la main, par la plateforme)
-```
+| Champ | Rôle |
+|-------|------|
+| `emetteurEntrepriseId` | Entreprise qui facture (prestataire ou FM4ALL) |
+| `destinataireEntrepriseId` | Entreprise qui reçoit la facture (client) |
+| `modeCommercialSnapshot` | `"direct"` ou `"intermediaire"` — figé à la création |
 
-| Transition | Qui peut l'effectuer | Guard backend |
-|------------|----------------------|---------------|
-| `brouillon → emise` | admin ou manager de l'émetteur | `canUserEmettreFacture` — calcule et fige les montants + attribue le numéro |
-| `emise → annulee` | admin ou manager de l'émetteur | `canUserAnnulerFacture` — garde-fou `statut = "emise"` |
-| `brouillon → (suppression)` | admin ou manager de l'émetteur | `canUserEditFacture` — interdit si émise |
-| `emise → litige` | Plateforme uniquement (opération manuelle en DB, pas d'action dédiée V1) | — |
-
-**Règle :** il n'y a pas de `payee` ou `en_retard` en DB. Ces états sont calculés dynamiquement côté UI (ex: `dateEcheance < now()` → en retard) et ne sont jamais stockés.
+> Une facture est **toujours émise par un prestataire ou FM4ALL**. Une entreprise en posture client n'émet jamais de facture.
 
 ---
 
-## C) Calcul des montants à l'émission
+### 3. Posture ÉMETTEUR (prestataire)
 
-Pour chaque ligne :
-```
-montantHtLigne  = round(quantite × prixUnitaireHt) − remiseHtMontant
-montantTvaLigne = round(montantHtLigne × tauxTva / 10000)
-montantTtcLigne = montantHtLigne + montantTvaLigne
-```
+| Action | `admin` | `manager` | `responsable_site` | Autres |
+|--------|---------|-----------|--------------------|--------|
+| Voir (brouillon + émises) | ✅ | ✅ | ❌ | ❌ |
+| Créer | ✅ | ✅ | ❌ | ❌ |
+| Modifier (brouillon) | ✅ | ✅ | ❌ | ❌ |
+| Émettre | ✅ | ✅ | ❌ | ❌ |
+| Annuler (émise) | ✅ | ✅ | ❌ | ❌ |
 
-Pour la facture (tête) :
-```
-totalHtLignes    = Σ montantHtLigne
-montantHt        = totalHtLignes − remiseGlobaleHt
-montantTva       = Σ montantTvaLigne   (simplification V1 : TVA non recalculée après remise globale)
-montantTtc       = montantHt + montantTva
-```
-
-**Décision V1 :** la TVA est calculée par ligne avant la remise globale HT. Acceptable pour la grande majorité des cas. Une remise globale entraîne un TTC légèrement différent d'un calcul pro-rata par taux — à raffiner en V2 si nécessaire.
+> **Exception manager :** dans ce module, `manager` a des droits d'émission car la facturation est une activité de gouvernance d'entreprise, non une activité terrain.
 
 ---
 
-## D) Permissions par posture
+### 4. Posture DESTINATAIRE (client)
 
-### Posture ÉMETTEUR (admin ou manager de `emetteurEntrepriseId`)
+Le destinataire voit uniquement les factures au statut `emise` (jamais les brouillons).
+
+La visibilité est restreinte selon le `siteId` de la facture :
+
+| Condition | Qui peut voir |
+|-----------|--------------|
+| Facture **avec `siteId`** | `admin` + `responsable_site` du site concerné |
+| Facture **sans `siteId`** | `admin` uniquement |
+
+> Aucune modification, émission ou annulation possible côté destinataire.
+
+---
+
+### 5. Posture PLATEFORME
+
+**Lecture seule uniquement** — la plateforme ne crée, ne modifie, n'émet et n'annule pas de factures en posture plateforme.
+
+> Exception : si FM4ALL est **prestataire direct** (ex: office manager, pilotage FM), l'utilisateur FM4ALL bascule en posture `"prestataire"` pour gérer ses propres factures — les règles de la posture émetteur s'appliquent.
 
 | Action | Autorisé |
 |--------|----------|
-| Voir la facture (tous statuts) | ✔ |
-| Créer une facture | ✔ |
-| Modifier une facture (brouillon) | ✔ |
-| Ajouter / modifier / supprimer une ligne (brouillon) | ✔ |
-| Réordonner les lignes (brouillon) | ✔ |
-| Émettre (brouillon → emise) | ✔ |
-| Annuler (emise → annulee) | ✔ |
-| Supprimer (brouillon uniquement) | ✔ |
-| Sauvegarder le PDF | ✔ |
-
-**Rôles concernés :** `admin` et `manager` de l'entreprise émettrice (via `userPrestataireAdhesions` OU `userClientAdhesions`).
-
-> NB : les rôles `collaborateur` de l'émetteur et tous les rôles d'attribution site ne donnent **pas** de droit d'écriture sur les factures (contrairement aux devis). Règle délibérément simplifiée.
-
-### Posture DESTINATAIRE (membre actif de `destinataireEntrepriseId`)
-
-| Action | Autorisé |
-|--------|----------|
-| Voir la facture (tous statuts) | ✔ |
-| Toute écriture | ❌ |
-
-**Rôles concernés :** tout utilisateur actif (`admin`, `manager`, `collaborateur`) de l'entreprise destinataire.
-
-### Posture PLATEFORME
-
-**Règle : lecture seule.** (même règle que pour les devis)
-
-| Action | Autorisé |
-|--------|----------|
-| Voir toutes les factures | ✔ |
-| Créer / modifier / émettre / annuler | ❌ |
-
-> Différence avec les devis : en V1, la plateforme ne peut pas émettre de factures directement. Si FM4ALL facture en tant que prestataire, elle utilisera la posture `prestataire` avec un compte utilisateur de l'entreprise FM4ALL.
+| Voir toutes les factures émises | ✅ |
+| Créer / Modifier / Émettre / Annuler | ❌ |
 
 ---
 
-## E) Périmètre par posture (liste des factures)
+### 6. Montants figés à l'émission
 
-| Posture | Périmètre |
-|---------|-----------|
-| `emetteur` (prestataire) | `emetteurEntrepriseId = entrepriseId` |
-| `destinataire` (client) | `destinataireEntrepriseId = entrepriseId` |
-| `plateforme` | Toutes les factures (pas de filtre) |
-
-> Pas de filtre par site role pour les factures (contrairement aux devis). La liste est scopée uniquement au niveau de l'entreprise.
-
----
-
-## F) PDF de facture
-
-- Stocké via `documentsLinks.factureId + documents.categorie = "facture"`
-- Pas de `documentId` directement sur `factures` (même pattern que les devis)
-- Visibilité : `"public"` (visible émetteur + destinataire)
-- Un seul PDF par facture (l'ancien est remplacé à chaque régénération)
-- La génération PDF suit le même pattern que `saveDevisPdfAction` : upload temp S3 → `promoteS3Key` → insert document + documentsLink
-
----
-
-## G) Anti-double-facturation (`factureLignesPrixAppliques`) — V2
-
-La table `factureLignesPrixAppliques` permet de lier une ligne de facture à un `clientServicePrixApplique`. Une contrainte unique sur `clientServicePrixAppliqueId` garantit qu'un prix appliqué ne peut être facturé qu'une seule fois.
-
-**V1 :** cette table n'est pas utilisée. Toutes les lignes ont `typeSource = "manuel"`.  
-**V2 :** l'onglet "À facturer" utilisera cette table pour pré-remplir les factures depuis les occurrences terminées.
-
----
-
-## H) Numérotation
-
-- Séquence PostgreSQL : `facture_numero_seq` (start 1, increment 1)
-- Format : `F-{year}-{seq padStart 6}` — ex: `F-2026-000001`
-- Le numéro est attribué **uniquement à l'émission** (null en brouillon)
-- Contrainte unique sur `(emetteurEntrepriseId, numero)` → un numéro est unique par émetteur
+À l'émission, les champs `montantHt`, `montantTva`, `montantTtc` de chaque ligne sont calculés et stockés en base. Ils ne sont jamais recalculés — la facture est une pièce comptable immuable.
 
 ---
 
