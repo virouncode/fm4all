@@ -104,13 +104,16 @@ export function UserSiteAttributionsList({
   const siteTree = useMemo(() => buildSiteTree(allSites), [allSites]);
 
   // Trier les attributions selon l'ordre de l'arbre pour un affichage cohérent
+  // Les attributions mode=exclure sont des marqueurs internes (annulation subtree) :
+  // elles ne doivent pas apparaître dans la liste affichée à l'utilisateur
   const sortedAttributions = useMemo(() => {
-    if (attributions.length === 0 || siteTree.length === 0) {
-      return attributions;
+    const visibleAttributions = attributions.filter((a) => a.mode === "inclure");
+    if (visibleAttributions.length === 0 || siteTree.length === 0) {
+      return visibleAttributions;
     }
 
     const orderMap = createSiteOrderMap(siteTree);
-    return [...attributions].sort((a, b) => {
+    return [...visibleAttributions].sort((a, b) => {
       const orderA = orderMap.get(a.siteId) ?? Number.MAX_SAFE_INTEGER;
       const orderB = orderMap.get(b.siteId) ?? Number.MAX_SAFE_INTEGER;
       return orderA - orderB;

@@ -264,30 +264,39 @@ export function UserSiteAttributionDialog({
    * Calcule l'état d'un site : "disabled" si déjà attribué (inclure ou hérité), "available" sinon.
    */
   const getSiteState = (siteId: string): "disabled" | "available" => {
-    const directAttr = directAttributions.find(
-      (attr) => attr.siteId === siteId,
-    );
-
-    if (directAttr) {
-      if (directAttr.mode === "inclure") return "disabled";
-      if (directAttr.mode === "exclure") return "available";
-    }
-
+    // 1. Vérifier si un ancêtre couvre ce site via scope=subtree
+    let isCoveredByAncestor = false;
     let currentId: string | null = siteId;
     while (currentId) {
       const site = allSites.find((s) => s.id === currentId);
       if (!site?.parentId) break;
-
       const parentAttr = directAttributions.find(
         (attr) =>
           attr.siteId === site.parentId &&
           attr.scope === "subtree" &&
           attr.mode === "inclure",
       );
-
-      if (parentAttr) return "disabled";
+      if (parentAttr) {
+        isCoveredByAncestor = true;
+        break;
+      }
       currentId = site.parentId;
     }
+
+    // 2. Vérifier s'il existe une attribution directe (exception)
+    const directAttr = directAttributions.find((attr) => attr.siteId === siteId);
+
+    if (directAttr) {
+      // Exclusion totale → disponible (peut être réattribué)
+      if (directAttr.mode === "exclure") return "available";
+      // Override de rôle sur un site couvert par ancêtre → disponible (exception modifiable)
+      if (directAttr.mode === "inclure" && isCoveredByAncestor) return "available";
+      // Attribution primaire (pas couverte par ancêtre) → indisponible
+      return "disabled";
+    }
+
+    // 3. Couvert par ancêtre sans exception → indisponible
+    if (isCoveredByAncestor) return "disabled";
 
     return "available";
   };
@@ -350,11 +359,15 @@ export function UserSiteAttributionDialog({
     );
 
     for (const rootId of roots) {
-      const existingExclusion = directAttributions.find(
-        (attr) => attr.siteId === rootId && attr.mode === "exclure",
+      // Détecter toute exception directe existante pour ce site :
+      // - mode=exclure (exclusion totale)
+      // - mode=inclure (override de rôle)
+      // Les deux cas sont des exceptions à supprimer avant réattribution
+      const existingException = directAttributions.find(
+        (attr) => attr.siteId === rootId,
       );
-      if (existingExclusion) {
-        exclusionsToDelete.push(existingExclusion.id);
+      if (existingException) {
+        exclusionsToDelete.push(existingException.id);
       }
 
       attributions.push({

@@ -194,6 +194,8 @@ export async function getUserClientSiteAttributions({
   }
 
   // Combiner attributions directes + héritées
+  // Les attributions mode=exclure sont incluses (nécessaires pour que le dialog
+  // d'attribution détecte les exclusions via getSiteState)
   const allAttributions = [
     ...attributions.map((a) => ({
       ...a,
@@ -217,16 +219,18 @@ export async function getAvailableSitesForAttribution(
     orderBy: (sites, { asc }) => [asc(sites.nom)],
   });
 
-  // Récupérer TOUS les sites attribués (peu importe le rôle)
+  // Récupérer les sites déjà attribués en mode=inclure (les exclusions ne bloquent pas la ré-attribution)
   const existingAttributions = await db.query.userClientSiteAttributions.findMany({
     where: and(
       eq(userClientSiteAttributions.userId, userId),
       eq(userClientSiteAttributions.entrepriseId, entrepriseId),
     ),
-    columns: { siteId: true },
+    columns: { siteId: true, mode: true },
   });
 
-  const attributedSiteIds = new Set(existingAttributions.map((a) => a.siteId));
+  const attributedSiteIds = new Set(
+    existingAttributions.filter((a) => a.mode === "inclure").map((a) => a.siteId),
+  );
   const availableSites = allSites.filter(
     (site) => !attributedSiteIds.has(site.id),
   );

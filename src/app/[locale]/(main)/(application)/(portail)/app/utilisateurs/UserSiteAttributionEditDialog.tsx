@@ -142,8 +142,12 @@ export function UserSiteAttributionEditDialog({
       return;
     }
 
-    if (result?.data?.attribution) {
-      toast.success("Attribution mise à jour avec succès");
+    if (result?.data) {
+      // attribution null = ligne supprimée car rôle identique au parent subtree
+      const message = result.data.attribution
+        ? "Attribution mise à jour avec succès"
+        : "Rôle rétabli — exception supprimée";
+      toast.success(message);
       onSuccess();
       onOpenChange(false);
     }

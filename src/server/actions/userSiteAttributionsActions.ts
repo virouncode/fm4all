@@ -14,6 +14,7 @@ import { isUserDescendant } from "@/server/utils/usersArborescence.utils";
 import {
   canonizeAttributions,
   resolveUserEffectiveRoleOnSite,
+  siteHasOtherEffectiveResponsable,
 } from "@/server/utils/userClientSiteAttributions.utils";
 import {
   bulkInsertMixedAttributionsFormSchema,
@@ -567,7 +568,27 @@ export const bulkInsertMixedAttributionsAction = actionClient
         }
       }
 
-      // 2. Vérifier qu'aucun des siteIds n'a déjà une attribution (contrainte: un rôle par site)
+      // 2. Filtrer canonized : exclure les attributions mode=inclure déjà couvertes par le DB existant
+      // (ex: sous-site couvert par un subtree parent — supprimer l'exclusion suffit, pas besoin d'insérer)
+      const canonizedToInsert: typeof canonized = [];
+      for (const attr of canonized) {
+        if (attr.mode === "exclure") {
+          canonizedToInsert.push(attr);
+          continue;
+        }
+        const effectiveRole = await resolveUserEffectiveRoleOnSite({
+          userId: parsedInput.userId,
+          siteId: attr.siteId,
+          entrepriseId: parsedInput.entrepriseId,
+          tx,
+        });
+        // Si l'existant couvre déjà ce site avec le même rôle → pas besoin d'insérer
+        if (effectiveRole !== attr.role) {
+          canonizedToInsert.push(attr);
+        }
+      }
+
+      // 3. Vérifier qu'aucun des siteIds n'a déjà une attribution (contrainte: un rôle par site)
       const existingAttributions = await tx.query.userClientSiteAttributions.findMany(
         {
           where: and(
@@ -581,7 +602,7 @@ export const bulkInsertMixedAttributionsAction = actionClient
       const existingSiteIds = new Set(
         existingAttributions.map((a) => a.siteId),
       );
-      const conflicts = canonized
+      const conflicts = canonizedToInsert
         .map((a) => a.siteId)
         .filter((siteId) => existingSiteIds.has(siteId));
 
@@ -591,8 +612,8 @@ export const bulkInsertMixedAttributionsAction = actionClient
         );
       }
 
-      // 3. Préparer les values pour insertion
-      const values = canonized.map((attr) => ({
+      // 4. Préparer les values pour insertion
+      const values = canonizedToInsert.map((attr) => ({
         userId: parsedInput.userId,
         siteId: attr.siteId,
         mode: attr.mode,
@@ -787,16 +808,15 @@ export const deleteUserSiteAttributionAction = actionClient
     }
 
     // Garde-fou : Ne jamais supprimer le dernier responsable_site d'un site
+    // Tient compte des attributions scope=subtree des sites parents
     if (attribution.role === "responsable_site") {
-      const otherResponsables = await db.query.userClientSiteAttributions.findMany({
-        where: and(
-          eq(userClientSiteAttributions.siteId, attribution.siteId),
-          eq(userClientSiteAttributions.role, "responsable_site"),
-          eq(userClientSiteAttributions.entrepriseId, attribution.entrepriseId),
-        ),
+      const hasOtherResponsable = await siteHasOtherEffectiveResponsable({
+        siteId: attribution.siteId,
+        entrepriseId: attribution.entrepriseId,
+        excludeAttributionId: parsedInput.id,
       });
 
-      if (otherResponsables.length === 1) {
+      if (!hasOtherResponsable) {
         throw errors.forbidden(
           "Impossible de supprimer cette attribution : le site doit toujours avoir au moins un responsable.",
         );
@@ -1057,37 +1077,66 @@ export const updateUserSiteAttributionAction = actionClient
     }
 
     // Garde-fou : Si on change responsable_site → autre rôle, vérifier qu'il reste au moins 1 responsable
+    // Tient compte des attributions scope=subtree des sites parents
     if (
       attribution.role === "responsable_site" &&
       parsedInput.role !== "responsable_site"
     ) {
-      const otherResponsables = await db.query.userClientSiteAttributions.findMany({
-        where: and(
-          eq(userClientSiteAttributions.siteId, attribution.siteId),
-          eq(userClientSiteAttributions.role, "responsable_site"),
-          eq(userClientSiteAttributions.entrepriseId, attribution.entrepriseId),
-        ),
+      const hasOtherResponsable = await siteHasOtherEffectiveResponsable({
+        siteId: attribution.siteId,
+        entrepriseId: attribution.entrepriseId,
+        excludeAttributionId: parsedInput.id,
       });
 
-      if (otherResponsables.length === 1) {
+      if (!hasOtherResponsable) {
         throw errors.forbidden(
           "Impossible de modifier ce rôle : le site doit toujours avoir au moins un responsable. Ajoutez un autre responsable avant de modifier ce rôle.",
         );
       }
     }
 
-    // Update
-    const [updated] = await db
-      .update(userClientSiteAttributions)
-      .set({
-        mode: parsedInput.mode,
-        scope: parsedInput.scope,
-        role: parsedInput.role,
-        updatedById: currentUser.id,
-      })
-      .where(eq(userClientSiteAttributions.id, parsedInput.id))
-      .returning();
+    // Vérifier si le nouveau rôle est déjà couvert par un ancêtre subtree
+    // Si oui → supprimer la ligne (elle deviendrait redondante)
+    // Si non → remplacer avec le nouveau rôle
+    const txResult = await db.transaction(async (tx) => {
+      // Supprimer la ligne actuelle
+      await tx
+        .delete(userClientSiteAttributions)
+        .where(eq(userClientSiteAttributions.id, parsedInput.id));
 
-    const validated = selectUserClientSiteAttributionSchema.parse(updated);
+      // Vérifier le rôle effectif sans cette ligne (parent subtree uniquement)
+      const effectiveRoleWithout = await resolveUserEffectiveRoleOnSite({
+        userId: attribution.userId,
+        siteId: attribution.siteId,
+        entrepriseId: attribution.entrepriseId,
+        tx,
+      });
+
+      // Parent couvre déjà avec le même rôle → pas besoin de réinsérer
+      if (effectiveRoleWithout === parsedInput.role) {
+        return { attribution: null };
+      }
+
+      // Rôle différent ou pas de couverture → réinsérer avec le nouveau rôle
+      const [inserted] = await tx
+        .insert(userClientSiteAttributions)
+        .values({
+          userId: attribution.userId,
+          siteId: attribution.siteId,
+          mode: parsedInput.mode,
+          scope: parsedInput.scope,
+          role: parsedInput.role,
+          entrepriseId: attribution.entrepriseId,
+          createdById: attribution.createdById,
+          updatedById: currentUser.id,
+        })
+        .returning();
+
+      return { attribution: inserted };
+    });
+
+    const validated = txResult.attribution
+      ? selectUserClientSiteAttributionSchema.parse(txResult.attribution)
+      : null;
     return { attribution: validated };
   });

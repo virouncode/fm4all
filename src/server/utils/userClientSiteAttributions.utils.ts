@@ -2,7 +2,7 @@ import "server-only";
 import { db } from "@/db";
 import { userClientSiteAttributions } from "@/db/schema/users";
 import { sitesArborescence } from "@/db/schema/sites";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, ne } from "drizzle-orm";
 import type {
   AttributionModeType,
   RoleClientAttributionType,
@@ -562,4 +562,75 @@ export async function canonizeAttributions({
   }
 
   return canonical;
+}
+
+/**
+ * Vérifie si un site a au moins un responsable_site effectif
+ * après suppression ou modification d'une attribution donnée.
+ *
+ * Tient compte des attributions scope=subtree des sites parents
+ * (un responsable_site sur un site racine couvre tous ses descendants).
+ *
+ * @param excludeAttributionId - ID de l'attribution en cours de suppression/modification
+ */
+export async function siteHasOtherEffectiveResponsable({
+  siteId,
+  entrepriseId,
+  excludeAttributionId,
+  tx,
+}: {
+  siteId: string;
+  entrepriseId: string;
+  excludeAttributionId: string;
+  tx?: DbOrTransactionType;
+}): Promise<boolean> {
+  const dbClient = tx || db;
+
+  // 1. Récupérer tous les ancêtres du site (y compris lui-même, profondeur=0)
+  const ancestors = await dbClient
+    .select({ ancetreId: sitesArborescence.ancetreId })
+    .from(sitesArborescence)
+    .where(
+      and(
+        eq(sitesArborescence.entrepriseId, entrepriseId),
+        eq(sitesArborescence.descendantId, siteId),
+      ),
+    );
+
+  const ancestorIds = ancestors.map((a) => a.ancetreId);
+  if (ancestorIds.length === 0) return false;
+
+  // 2. Trouver tous les candidats : attributions responsable_site inclure
+  // dont le siteId est le site lui-même (self) ou un ancêtre (subtree),
+  // en excluant l'attribution en cours de suppression
+  const candidates = await dbClient
+    .select({ userId: userClientSiteAttributions.userId })
+    .from(userClientSiteAttributions)
+    .where(
+      and(
+        eq(userClientSiteAttributions.entrepriseId, entrepriseId),
+        eq(userClientSiteAttributions.role, "responsable_site"),
+        eq(userClientSiteAttributions.mode, "inclure"),
+        ne(userClientSiteAttributions.id, excludeAttributionId),
+        inArray(userClientSiteAttributions.siteId, ancestorIds),
+      ),
+    );
+
+  if (candidates.length === 0) return false;
+
+  // 3. Pour chaque utilisateur candidat, vérifier le rôle effectif
+  // (tient compte des attributions exclure qui pourraient annuler la couverture)
+  const uniqueUserIds = [...new Set(candidates.map((c) => c.userId))];
+
+  for (const userId of uniqueUserIds) {
+    const effectiveRole = await resolveUserEffectiveRoleOnSite({
+      userId,
+      siteId,
+      entrepriseId,
+      tx,
+    });
+    if (effectiveRole === "responsable_site") return true;
+  }
+
+  return false;
 }
