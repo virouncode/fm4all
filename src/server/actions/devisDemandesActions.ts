@@ -277,6 +277,11 @@ export const updateDevisDemandeAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+    if (plateformeRole?.role) {
+      throw errors.forbidden("La plateforme ne peut pas modifier les demandes de devis.");
+    }
+
     const owns = await assertDevisDemandeOwnership({
       devisDemandeId: parsedInput.id,
       entrepriseId: parsedInput.entrepriseId,
@@ -365,6 +370,14 @@ export const deleteDevisDemandeAction = actionClient
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    // Plateforme ne peut pas supprimer une demande de devis (regles_metier.md §C)
+    const plateformeRoleDelete = await getEffectivePlateformeRole(currentUser.id);
+    if (plateformeRoleDelete?.role) {
+      throw errors.forbidden(
+        "La plateforme ne peut pas supprimer une demande de devis.",
+      );
+    }
 
     const owns = await assertDevisDemandeOwnership({
       devisDemandeId: parsedInput.id,

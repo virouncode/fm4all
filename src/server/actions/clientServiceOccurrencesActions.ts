@@ -88,19 +88,30 @@ async function getExecutionContext(
 }
 
 /**
- * Vérifie si une date est aujourd'hui (même jour calendaire UTC).
+ * Vérifie si une date est aujourd'hui (même jour calendaire en heure de Paris).
  * null → démarrage autorisé (occurrence sans date prévue).
  *
- * Note : idéalement on comparerait avec le fuseau horaire du site quand disponible.
+ * Utilise le fuseau Europe/Paris pour éviter les décalages entre 00h et 02h du matin.
  */
 function isSameDayAsToday(date: Date | null): boolean {
   if (!date) return true;
-  const today = new Date();
-  return (
-    date.getUTCFullYear() === today.getUTCFullYear() &&
-    date.getUTCMonth() === today.getUTCMonth() &&
-    date.getUTCDate() === today.getUTCDate()
-  );
+  const formatter = new Intl.DateTimeFormat("fr-FR", {
+    timeZone: "Europe/Paris",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const todayStr = formatter
+    .format(new Date())
+    .split("/")
+    .reverse()
+    .join("-"); // → "YYYY-MM-DD"
+  const dateStr = formatter
+    .format(date)
+    .split("/")
+    .reverse()
+    .join("-"); // → "YYYY-MM-DD"
+  return dateStr === todayStr;
 }
 
 /**
@@ -132,8 +143,9 @@ async function canManageOccurrence(
   if (posture === "prestataire") {
     if (modePilotage !== "prestataire" && modePilotage !== "collaboration") return false;
     const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
-    if (prestataireAdhesion?.role === "admin") return true;
-    const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId: clientEntrepriseId });
+    if (!prestataireAdhesion) return false;
+    if (prestataireAdhesion.role === "admin") return true;
+    const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId: prestataireAdhesion.entrepriseId });
     return siteRole === "responsable_site";
   }
 
@@ -170,8 +182,9 @@ async function canExecuteOccurrence(
   if (posture === "prestataire") {
     if (modePilotage !== "prestataire" && modePilotage !== "collaboration") return false;
     const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
-    if (prestataireAdhesion?.role === "admin") return true;
-    const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId: clientEntrepriseId });
+    if (!prestataireAdhesion) return false;
+    if (prestataireAdhesion.role === "admin") return true;
+    const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId: prestataireAdhesion.entrepriseId });
     return siteRole === "responsable_site" || siteRole === "intervenant_site";
   }
 
@@ -287,22 +300,8 @@ export const updateOccurrenceStatutAction = actionClient
       }
     }
 
-    // 7. RÈGLE CLÔTURE : aucune tâche ouverte
-    if (newStatut === "terminee") {
-      const tasks = await db
-        .select({ statut: occurrenceTaches.statut })
-        .from(occurrenceTaches)
-        .where(eq(occurrenceTaches.occurrenceId, occurrenceId));
-
-      const hasOpenTask = tasks.some(
-        (t) => t.statut === "a_faire" || t.statut === "en_cours",
-      );
-      if (hasOpenTask) {
-        throw errors.conflict(
-          "Des tâches sont encore ouvertes. Clôturez ou annulez toutes les tâches avant de terminer l'intervention.",
-        );
-      }
-    }
+    // 7. RÈGLE CLÔTURE : la terminaison est autorisée même si des tâches sont encore ouvertes
+    // (regles_metier.md §6 — "la réalité terrain le justifie")
 
     // 8. Mise à jour statut + auto-assignation au démarrage + snapshot facturation
     const now = new Date();
@@ -561,7 +560,7 @@ const TACHE_TRANSITIONS: Record<
   )[]
 > = {
   a_faire: ["en_cours", "non_honoree", "non_applicable", "annulee"],
-  en_cours: ["terminee", "non_honoree", "non_applicable", "annulee"],
+  en_cours: ["terminee"], // regles_metier.md §2 — seule transition valide depuis en_cours
 };
 
 export const updateOccurrenceTacheStatutAction = actionClient

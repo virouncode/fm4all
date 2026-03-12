@@ -1366,7 +1366,7 @@ function TacheRow({
               )}
               {tache.statut === "en_cours" && (
                 <>
-                  {(tache.assigneeUserId === currentUserId || canManage) && (
+                  {canExecute && (tache.assigneeUserId === currentUserId || canManage) && (
                     <Button
                       size="sm"
                       variant="outline"

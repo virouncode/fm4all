@@ -156,18 +156,11 @@ export default async function PrestationDetailPage({
     (posture === "prestataire" && isPrestataireAdmin);
 
   // canSeeFinancials : données financières (onglet Exécution & Tarifs)
-  // - Posture client   : admin + responsable_site (= canManage)
-  // - Posture prestataire : admin uniquement
-  // - Plateforme       : toujours
-  let canSeeFinancials = isPlateforme;
-  if (!isPlateforme) {
-    if (posture === "prestataire") {
-      canSeeFinancials = isPrestataireAdmin;
-    } else {
-      // client : admin || responsable_site
-      canSeeFinancials = canManage;
-    }
-  }
+  // - Posture client      : admin + responsable_site (= canManage)
+  // - Posture prestataire : admin + responsable_site (= canManage)
+  // - Plateforme          : toujours
+  // Référence : docs/regles_metier.md — Exécutions §3b & §4b
+  const canSeeFinancials = isPlateforme || canManage;
 
   const defaultTab = resolvedSearchParams.tab ?? "parametres";
 

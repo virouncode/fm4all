@@ -44,10 +44,25 @@ export async function getFacturePermissionsType({
     };
   }
 
-  // Plateforme = lecture seule
+  // Posture plateforme (regles_metier.md §5)
   if (plateformeRole?.role) {
+    // Factures "intermediaire" : FM4ALL est l'émetteur → droits émetteur complets selon rôle
+    if (factureRow.modeCommercialSnapshot === "intermediaire") {
+      const emetteurRole = await getAdhesionRoleForEntreprise(userId, factureRow.emetteurEntrepriseId);
+      const isAdminOrManager = emetteurRole === "admin" || emetteurRole === "manager";
+      const isBrouillonInter = factureRow.statut === "brouillon";
+      const isEmiseInter = factureRow.statut === "emise";
+      return {
+        canView: true,
+        canCreate: isAdminOrManager,
+        canEdit: isAdminOrManager && isBrouillonInter,
+        canEmettre: isAdminOrManager && isBrouillonInter,
+        canAnnuler: isAdminOrManager && isEmiseInter,
+      };
+    }
+    // Factures "direct" : lecture seule (emise + litige uniquement)
     return {
-      canView: true,
+      canView: factureRow.statut === "emise" || factureRow.statut === "litige",
       canCreate: false,
       canEdit: false,
       canEmettre: false,
@@ -78,7 +93,7 @@ export async function getFacturePermissionsType({
  * Retourne le rôle de l'utilisateur dans une entreprise
  * en vérifiant les deux tables d'adhésion (prestataire puis client).
  */
-async function getAdhesionRoleForEntreprise(
+export async function getAdhesionRoleForEntreprise(
   userId: string,
   entrepriseId: string,
 ): Promise<string | null> {

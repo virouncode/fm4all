@@ -340,7 +340,8 @@ export function MesSitesClientsClient() {
                     ? () => handleCreateChild(selectedSite.id)
                     : () => {}
                 }
-                currentUserRole={canManage ? "admin" : null}
+                currentUserRole={null}
+                canManageOverride={canManage}
                 currentUserPlateformeRole={null}
                 responsableSiteIds={new Set()}
                 siteResponsables={siteResponsables}

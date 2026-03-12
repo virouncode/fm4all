@@ -1,6 +1,7 @@
 import "server-only";
 
 import { db } from "@/db";
+import { clientPrestataireRelations } from "@/db/schema/entreprises";
 import { devis } from "@/db/schema/devis";
 import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
@@ -59,19 +60,31 @@ export async function getDevisPermissionsType({
     };
   }
 
-  const [isEmetteur, isProprietaire] = await Promise.all([
+  const [isEmetteurRaw, clientRole] = await Promise.all([
     isUserPrestataireDe(userId, devisRow.emetteurEntrepriseId),
-    isUserClientDe(userId, devisRow.proprietaireEntrepriseId),
+    getClientRoleForDevis(userId, devisRow.proprietaireEntrepriseId, devisRow.siteId),
   ]);
+
+  // Vérifier que la relation clientPrestataireRelations existe
+  let isEmetteur = isEmetteurRaw;
+  if (isEmetteurRaw) {
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: and(
+        eq(clientPrestataireRelations.prestataireEntrepriseId, devisRow.emetteurEntrepriseId),
+        eq(clientPrestataireRelations.clientEntrepriseId, devisRow.proprietaireEntrepriseId),
+      ),
+    });
+    if (!relation) {
+      isEmetteur = false;
+    }
+  }
 
   const isBrouillon = devisRow.statut === "brouillon";
   const isEmis = devisRow.statut === "emis";
 
-  // BUG-6 fix: Les rôles site observateur_site et intervenant_site ne peuvent pas modifier/émettre.
-  // Vérifier si l'utilisateur a un rôle site restreint sur le site du devis.
+  // Côté émetteur : restreindre les rôles de site observateur/intervenant
   let hasRestrictedSiteRoleOnly = false;
   if (isEmetteur) {
-    // Cas prestataire (emetteur) : vérifier via userPrestataireSiteAttributions
     const prestataireAdh = await db.query.userPrestataireAdhesions.findFirst({
       where: and(
         eq(userPrestataireAdhesions.userId, userId),
@@ -90,34 +103,19 @@ export async function getDevisPermissionsType({
       }
     }
   }
-  if (!hasRestrictedSiteRoleOnly && isProprietaire) {
-    // Cas client (peut aussi être émetteur si même entreprise) : vérifier via userClientSiteAttributions
-    const clientAdh = await db.query.userClientAdhesions.findFirst({
-      where: and(
-        eq(userClientAdhesions.userId, userId),
-        eq(userClientAdhesions.entrepriseId, devisRow.emetteurEntrepriseId),
-        eq(userClientAdhesions.statut, "actif"),
-      ),
-    });
-    if (clientAdh && clientAdh.role !== "admin" && clientAdh.role !== "manager") {
-      const siteRole = await resolvePostureAwareSiteRole({
-        userId,
-        siteId: devisRow.siteId,
-        entrepriseId: devisRow.emetteurEntrepriseId,
-      });
-      if (!siteRole || siteRole === "observateur_site" || siteRole === "intervenant_site") {
-        hasRestrictedSiteRoleOnly = true;
-      }
-    }
-  }
+
+  // Côté client : seuls admin et responsable_site peuvent signer/refuser
+  const isProprietaire = !!clientRole;
+  const canSignRefuse =
+    (clientRole === "admin" || clientRole === "responsable_site") && isEmis;
 
   return {
     canView: isEmetteur || isProprietaire,
     canCreate: isEmetteur,
     canEdit: isEmetteur && isBrouillon && !hasRestrictedSiteRoleOnly,
     canEmettre: isEmetteur && isBrouillon && !hasRestrictedSiteRoleOnly,
-    canSigner: isProprietaire && isEmis,
-    canRefuser: isProprietaire && isEmis,
+    canSigner: canSignRefuse,
+    canRefuser: canSignRefuse,
   };
 }
 
@@ -135,18 +133,49 @@ async function isUserPrestataireDe(
   return !!row;
 }
 
-async function isUserClientDe(
+/**
+ * Retourne le rôle effectif d'un utilisateur en tant que client sur un devis.
+ *
+ * Règles (regles_metier.md §A) :
+ * - admin → accès total (voir + signer/refuser)
+ * - responsable_site → voir ses sites + signer/refuser
+ * - demandeur_site, observateur_site → voir ses sites uniquement
+ * - manager, collaborateur sans rôle de site qualifiant → aucun accès
+ */
+async function getClientRoleForDevis(
   userId: string,
-  clientEntrepriseId: string,
-): Promise<boolean> {
-  const row = await db.query.userClientAdhesions.findFirst({
+  proprietaireEntrepriseId: string,
+  siteId: string | null,
+): Promise<"admin" | "responsable_site" | "demandeur_site" | "observateur_site" | null> {
+  const clientAdh = await db.query.userClientAdhesions.findFirst({
     where: and(
       eq(userClientAdhesions.userId, userId),
-      eq(userClientAdhesions.entrepriseId, clientEntrepriseId),
+      eq(userClientAdhesions.entrepriseId, proprietaireEntrepriseId),
       eq(userClientAdhesions.statut, "actif"),
     ),
   });
-  return !!row;
+
+  if (!clientAdh) return null;
+  if (clientAdh.role === "admin") return "admin";
+
+  // manager et collaborateur n'ont accès aux devis que via un rôle de site qualifiant
+  if (!siteId) return null; // sans siteId, seul admin peut accéder
+
+  const siteRole = await resolvePostureAwareSiteRole({
+    userId,
+    siteId,
+    entrepriseId: proprietaireEntrepriseId,
+  });
+
+  if (
+    siteRole === "responsable_site" ||
+    siteRole === "demandeur_site" ||
+    siteRole === "observateur_site"
+  ) {
+    return siteRole;
+  }
+
+  return null;
 }
 
 export async function canUserEditDevis(

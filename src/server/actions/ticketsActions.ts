@@ -1,11 +1,14 @@
 "use server";
 
 import { db } from "@/db";
-import { clientPrestataireRelations, entreprises } from "@/db/schema/entreprises";
-import { userPrestataireAdhesions } from "@/db/schema/users";
 import { documents, documentsLinks } from "@/db/schema/documents";
+import {
+  clientPrestataireRelations,
+  entreprises,
+} from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
 import { ticketMessages, tickets } from "@/db/schema/tickets";
+import { userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import {
@@ -54,6 +57,7 @@ import {
 } from "@/server/utils/ticketsPermissions.utils";
 import { isStatusTransitionAllowed } from "@/server/utils/ticketsTransitions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
+import { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
 
 // ═══════════════════════════════════════════════════════════════
 // GET TICKETS (avec filtres et pagination)
@@ -86,7 +90,7 @@ export const getTicketsAction = actionClient
     // Déterminer posture depuis le cookie
     const cookieStore = await cookies();
     const posture = (cookieStore.get("fm4all:postureActive")?.value ??
-      "client") as "client" | "prestataire" | "plateforme";
+      "client") as RoleEntrepriseType;
 
     // Récupérer tickets avec périmètre
     const result = await getTicketsByPerimetre({
@@ -242,10 +246,7 @@ export const insertTicketAction = actionClient
       // Vérifier que la relation client-prestataire existe
       const relation = await db.query.clientPrestataireRelations.findFirst({
         where: and(
-          eq(
-            clientPrestataireRelations.clientEntrepriseId,
-            site.entrepriseId,
-          ),
+          eq(clientPrestataireRelations.clientEntrepriseId, site.entrepriseId),
           eq(
             clientPrestataireRelations.prestataireEntrepriseId,
             parsedInput.entrepriseId,
@@ -924,10 +925,7 @@ export const updateTicketStatutAction = actionClient
       updates.closedAt = now;
     }
 
-    if (
-      parsedInput.statut === "annule" ||
-      parsedInput.statut === "rejete"
-    ) {
+    if (parsedInput.statut === "annule" || parsedInput.statut === "rejete") {
       updates.closedAt = now;
     }
 
@@ -1272,7 +1270,10 @@ export const getPrestataireMesClientsForTicketAction = actionClient
     const adhesion = await db.query.userPrestataireAdhesions.findFirst({
       where: and(
         eq(userPrestataireAdhesions.userId, currentUser.id),
-        eq(userPrestataireAdhesions.entrepriseId, parsedInput.prestataireEntrepriseId),
+        eq(
+          userPrestataireAdhesions.entrepriseId,
+          parsedInput.prestataireEntrepriseId,
+        ),
         eq(userPrestataireAdhesions.statut, "actif"),
       ),
     });
@@ -1297,7 +1298,12 @@ export const getPrestataireMesClientsForTicketAction = actionClient
     const clients = await db
       .select({ id: entreprises.id, nom: entreprises.nom })
       .from(entreprises)
-      .where(inArray(entreprises.id, clientIds.map((c) => c.id)));
+      .where(
+        inArray(
+          entreprises.id,
+          clientIds.map((c) => c.id),
+        ),
+      );
 
     return { clients };
   });

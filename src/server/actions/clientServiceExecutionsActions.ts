@@ -1312,10 +1312,11 @@ export const getMesSitesClientsAction = actionClient
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     // Vérifier l'adhésion à l'entreprise prestataire
-    const adhesion = await db.query.userClientAdhesions.findFirst({
+    const adhesion = await db.query.userPrestataireAdhesions.findFirst({
       where: and(
-        eq(userClientAdhesions.userId, currentUser.id),
-        eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userPrestataireAdhesions.userId, currentUser.id),
+        eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userPrestataireAdhesions.statut, "actif"),
       ),
     });
     if (!adhesion) {

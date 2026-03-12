@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { clientPrestataireRelations, entreprises } from "@/db/schema/entreprises";
+import { clientPrestataireRelations, entrepriseRoles, entreprises } from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
 import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
@@ -194,8 +194,7 @@ export const getSitesAction = actionClient
 
     await assertCanAccessEntreprise(currentUser.id, entrepriseId);
 
-    // Récupérer TOUS les sites (actifs ET inactifs)
-    const sites = await getSitesByEntrepriseId(entrepriseId, true);
+    const sites = await getSitesByEntrepriseId(entrepriseId);
     return sites;
   });
 
@@ -286,9 +285,8 @@ export const getAccessibleSitesAction = actionClient
     // Vérifier si l'utilisateur est plateforme
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
-    // Si plateforme : retourner TOUS les sites sans filtrage (inclure inactifs)
     if (platformRole?.role) {
-      const sites = await getSitesByEntrepriseId(parsedInput.entrepriseId, true);
+      const sites = await getSitesByEntrepriseId(parsedInput.entrepriseId);
       return sites;
     }
 
@@ -372,8 +370,8 @@ export const getSitesForPrestationAction = actionClient
 
     const { entrepriseId, posture } = parsedInput;
 
-    // Charger tous les sites du client
-    const allSites = await getSitesByEntrepriseId(entrepriseId, false);
+    // Charger tous les sites du client (inactifs inclus — règle métier)
+    const allSites = await getSitesByEntrepriseId(entrepriseId);
 
     // Branche plateforme → tous les sites activés
     // (ignoré si l'utilisateur est en posture prestataire ou client)
@@ -685,7 +683,7 @@ export const updateSiteAction = actionClient
     // LOGIQUE DE CASCADE POUR LE STATUT ACTIF
     if (newActif !== undefined) {
       // Récupérer le site actuel pour détecter un changement de statut
-      const currentSite = await getSiteById(siteId, true);
+      const currentSite = await getSiteById(siteId);
 
       if (currentSite && currentSite.actif !== newActif) {
         // Changement de statut détecté
@@ -727,7 +725,7 @@ export const updateSiteAction = actionClient
           // RÉACTIVATION → VÉRIFIER PARENT ACTIF
           // ═══════════════════════════════════════════════════════
           if (currentSite.parentId) {
-            const parent = await getSiteById(currentSite.parentId, true);
+            const parent = await getSiteById(currentSite.parentId);
             if (parent && !parent.actif) {
               throw errors.conflict(
                 "Impossible de réactiver ce site car son parent est inactif. Réactivez d'abord le parent.",
@@ -766,7 +764,7 @@ export const updateSiteAction = actionClient
     }
 
     // Récupérer le site mis à jour
-    const updatedSite = await getSiteById(siteId, true);
+    const updatedSite = await getSiteById(siteId);
     if (!updatedSite) {
       throw errors.internal("Échec de la récupération du site mis à jour.");
     }
@@ -890,14 +888,15 @@ export const permanentlyDeleteSiteAction = actionClient
       );
     }
 
-    // 2. Vérifier que l'entreprise est FM4ALL (plateforme)
-    const entreprise = await db.query.entreprises.findFirst({
-      where: eq(entreprises.id, entrepriseId),
+    // 2. Vérifier que l'entreprise est FM4ALL (plateforme) via le rôle "plateforme" en DB
+    const plateformeRole = await db.query.entrepriseRoles.findFirst({
+      where: and(
+        eq(entrepriseRoles.entrepriseId, entrepriseId),
+        eq(entrepriseRoles.role, "plateforme"),
+      ),
     });
 
-    // TODO(BUG-9): Cette vérification est fragile car elle repose sur le nom de l'entreprise.
-    // Préférer un identifiant stable (ex: variable d'env FM4ALL_ENTREPRISE_ID, ou colonne `isPlateforme`).
-    if (!entreprise || entreprise.nom !== "FM4ALL") {
+    if (!plateformeRole) {
       throw errors.forbidden(
         "La suppression définitive est réservée à la plateforme FM4ALL.",
       );

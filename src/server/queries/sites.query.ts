@@ -21,18 +21,12 @@ export type SiteResponsable = {
 /**
  * GET ALL SITES FOR AN ENTREPRISE
  * Returns flat list, tree building done client-side
- * @param includeInactive - If true, includes archived sites. Default: false
+ * Always includes inactive sites (règle métier : les sites inactifs restent visibles)
  */
 export async function getSitesByEntrepriseId(
   entrepriseId: string,
-  includeInactive: boolean = false,
 ): Promise<SelectSiteType[]> {
   const conditions = [eq(sites.entrepriseId, entrepriseId)];
-
-  // Exclure les sites archivés par défaut
-  if (!includeInactive) {
-    conditions.push(eq(sites.actif, true));
-  }
 
   const rows = await db
     .select()
@@ -46,18 +40,12 @@ export async function getSitesByEntrepriseId(
 
 /**
  * GET SINGLE SITE BY ID
- * @param includeInactive - If true, includes archived sites. Default: false
+ * Always includes inactive sites (règle métier : les sites inactifs restent visibles)
  */
 export async function getSiteById(
   siteId: string,
-  includeInactive: boolean = false,
 ): Promise<SelectSiteType | null> {
   const conditions = [eq(sites.id, siteId)];
-
-  // Exclure les sites archivés par défaut
-  if (!includeInactive) {
-    conditions.push(eq(sites.actif, true));
-  }
 
   const [site] = await db
     .select()
@@ -132,10 +120,10 @@ export async function siteBelongsToEntreprise({
 
 /**
  * Récupère TOUS les sites (toutes entreprises) - pour la plateforme uniquement
+ * Inclut les sites inactifs (règle métier)
  */
 export async function getAllSites(): Promise<SelectSiteType[]> {
   const allSites = await db.query.sites.findMany({
-    where: eq(sites.actif, true),
     orderBy: (sites, { asc }) => [asc(sites.nom)],
   });
   return selectSiteSchema.array().parse(allSites);
@@ -179,11 +167,7 @@ export async function getAccessibleSitesByUser({
     );
     const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
     if (adhesion?.role === "admin") {
-      const allSites = await db.query.sites.findMany({
-        where: eq(sites.entrepriseId, entrepriseId),
-        orderBy: (sites, { asc }) => [asc(sites.nom)],
-      });
-      return selectSiteSchema.array().parse(allSites);
+      return getSitesByEntrepriseId(entrepriseId);
     }
   }
 

@@ -183,41 +183,41 @@ export const insertDevisAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    // La plateforme ne crée pas de devis
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (plateformeRole?.role)
-      throw errors.forbidden(
-        "La plateforme ne peut pas créer de devis directement.",
-      );
+    const isPlateformeActive = !!plateformeRole?.role;
 
-    // D08: vérification rôle prestataire (observateur_site/intervenant_site → ❌)
-    const prestataireAdhCreate = await db.query.userPrestataireAdhesions.findFirst({
-      where: and(
-        eq(userPrestataireAdhesions.userId, currentUser.id),
-        eq(userPrestataireAdhesions.entrepriseId, parsedInput.emetteurEntrepriseId),
-        eq(userPrestataireAdhesions.statut, "actif"),
-      ),
-    });
-    if (prestataireAdhCreate && prestataireAdhCreate.role !== "admin") {
-      const siteRoleCreate = await getUserPrestataireSiteRole({
-        userId: currentUser.id,
-        siteId: parsedInput.siteId,
-        clientEntrepriseId: parsedInput.proprietaireEntrepriseId,
+    // D08: vérification rôle prestataire (observateur_site/intervenant_site → ❌) — skip si plateforme
+    if (!isPlateformeActive) {
+      const prestataireAdhCreate = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, parsedInput.emetteurEntrepriseId),
+          eq(userPrestataireAdhesions.statut, "actif"),
+        ),
       });
-      if (!siteRoleCreate || siteRoleCreate === "observateur_site" || siteRoleCreate === "intervenant_site") {
-        throw errors.forbidden("Vous n'avez pas les droits pour créer un devis sur ce site.");
+      if (prestataireAdhCreate && prestataireAdhCreate.role !== "admin") {
+        const siteRoleCreate = await getUserPrestataireSiteRole({
+          userId: currentUser.id,
+          siteId: parsedInput.siteId,
+          clientEntrepriseId: parsedInput.proprietaireEntrepriseId,
+        });
+        if (!siteRoleCreate || siteRoleCreate === "observateur_site" || siteRoleCreate === "intervenant_site") {
+          throw errors.forbidden("Vous n'avez pas les droits pour créer un devis sur ce site.");
+        }
       }
     }
 
-    // L'utilisateur doit être dans l'entreprise émettrice
-    const hasAccess = await hasAccessToEntreprise(
-      currentUser.id,
-      parsedInput.emetteurEntrepriseId,
-    );
-    if (!hasAccess)
-      throw errors.forbidden(
-        "Vous ne pouvez pas créer un devis au nom de cette entreprise.",
+    // L'utilisateur doit être dans l'entreprise émettrice — skip si plateforme
+    if (!isPlateformeActive) {
+      const hasAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        parsedInput.emetteurEntrepriseId,
       );
+      if (!hasAccess)
+        throw errors.forbidden(
+          "Vous ne pouvez pas créer un devis au nom de cette entreprise.",
+        );
+    }
 
     const normalized = normalizeForSubmit(parsedInput, {
       optionalStrings: [
@@ -242,6 +242,7 @@ export const insertDevisAction = actionClient
         noteInterne: normalized.noteInterne,
         remiseGlobaleHt: normalized.remiseGlobaleHt ?? 0,
         validTo: normalized.validTo,
+        modeCommercialSnapshot: isPlateformeActive ? "intermediaire" : "direct",
         statut: "brouillon",
         createdById: currentUser.id,
         updatedById: currentUser.id,
@@ -652,7 +653,7 @@ export const saveDevisWithLignesAction = actionClient
             dateEmission: normalized.dateEmission,
             remiseGlobaleHt: normalized.remiseGlobaleHt ?? 0,
             validTo: normalized.validTo,
-            modeCommercialSnapshot: parsedInput.modeCommercialSnapshot ?? null,
+            modeCommercialSnapshot: isPlateformeActive ? "intermediaire" : "direct",
             statut: "brouillon",
             createdById: currentUser.id,
             updatedById: currentUser.id,

@@ -14,7 +14,6 @@ import { isUserDescendant } from "@/server/utils/usersArborescence.utils";
 import {
   canonizeAttributions,
   resolveUserEffectiveRoleOnSite,
-  userHasRoleOnSite,
 } from "@/server/utils/userClientSiteAttributions.utils";
 import {
   bulkInsertMixedAttributionsFormSchema,
@@ -123,14 +122,14 @@ export const insertUserSiteAttributionAction = actionClient
       }
 
       // 2. Vérifier que le site fait partie des sites où le manager est responsable_site
-      const isResponsable = await userHasRoleOnSite({
+      // (resolveUserEffectiveRoleOnSite prend en compte scope=subtree, contrairement à userHasRoleOnSite)
+      const resolvedManagerRole = await resolveUserEffectiveRoleOnSite({
         userId: currentUser.id,
         siteId: parsedInput.siteId,
-        role: "responsable_site",
         entrepriseId: parsedInput.entrepriseId,
       });
 
-      if (!isResponsable) {
+      if (resolvedManagerRole !== "responsable_site") {
         throw errors.forbidden(
           "Vous ne pouvez attribuer que des sites où vous êtes responsable (avec scope=subtree).",
         );
@@ -281,15 +280,15 @@ export const bulkInsertUserSiteAttributionsAction = actionClient
       }
 
       // 2. Pour bulk insert, vérifier chaque siteId individuellement
+      // (resolveUserEffectiveRoleOnSite prend en compte scope=subtree, contrairement à userHasRoleOnSite)
       for (const siteId of parsedInput.siteIds) {
-        const isResponsable = await userHasRoleOnSite({
+        const resolvedBulkRole = await resolveUserEffectiveRoleOnSite({
           userId: currentUser.id,
           siteId,
-          role: "responsable_site",
           entrepriseId: parsedInput.entrepriseId,
         });
 
-        if (!isResponsable) {
+        if (resolvedBulkRole !== "responsable_site") {
           throw errors.forbidden(
             "Vous ne pouvez attribuer que des sites où vous êtes responsable (avec scope=subtree).",
           );
@@ -470,15 +469,15 @@ export const bulkInsertMixedAttributionsAction = actionClient
       }
 
       // 2. Vérifier chaque siteId individuellement
+      // (resolveUserEffectiveRoleOnSite prend en compte scope=subtree, contrairement à userHasRoleOnSite)
       for (const siteId of uniqueSiteIds) {
-        const isResponsable = await userHasRoleOnSite({
+        const resolvedMixedRole = await resolveUserEffectiveRoleOnSite({
           userId: currentUser.id,
           siteId,
-          role: "responsable_site",
           entrepriseId: parsedInput.entrepriseId,
         });
 
-        if (!isResponsable) {
+        if (resolvedMixedRole !== "responsable_site") {
           throw errors.forbidden(
             "Vous ne pouvez attribuer que des sites où vous êtes responsable (avec scope=subtree).",
           );
@@ -734,14 +733,14 @@ export const deleteUserSiteAttributionAction = actionClient
       }
 
       // 2. Vérifier que le site fait partie des sites où le manager est responsable_site
-      const isResponsable = await userHasRoleOnSite({
+      // (resolveUserEffectiveRoleOnSite prend en compte scope=subtree, contrairement à userHasRoleOnSite)
+      const resolvedDeleteRole = await resolveUserEffectiveRoleOnSite({
         userId: currentUser.id,
         siteId: attribution.siteId,
-        role: "responsable_site",
         entrepriseId: attribution.entrepriseId,
       });
 
-      if (!isResponsable) {
+      if (resolvedDeleteRole !== "responsable_site") {
         throw errors.forbidden(
           "Vous ne pouvez retirer que des sites où vous êtes responsable (avec scope=subtree).",
         );
@@ -901,18 +900,18 @@ export const getAvailableSitesForAttributionAction = actionClient
     }
 
     // Voie 2 : Manager → Filtrer les sites où il est responsable_site
+    // (resolveUserEffectiveRoleOnSite prend en compte scope=subtree, contrairement à userHasRoleOnSite)
     if (currentUserLevel === 2) {
       const filteredSites: typeof allAvailableSites = [];
 
       for (const site of allAvailableSites) {
-        const isResponsable = await userHasRoleOnSite({
+        const resolvedAvailableRole = await resolveUserEffectiveRoleOnSite({
           userId: currentUser.id,
           siteId: site.id,
-          role: "responsable_site",
           entrepriseId: parsedInput.entrepriseId,
         });
 
-        if (isResponsable) {
+        if (resolvedAvailableRole === "responsable_site") {
           filteredSites.push(site);
         }
       }
@@ -1004,14 +1003,14 @@ export const updateUserSiteAttributionAction = actionClient
       }
 
       // 2. Vérifier que le site fait partie des sites où le manager est responsable_site
-      const isResponsable = await userHasRoleOnSite({
+      // (resolveUserEffectiveRoleOnSite prend en compte scope=subtree, contrairement à userHasRoleOnSite)
+      const resolvedUpdateRole = await resolveUserEffectiveRoleOnSite({
         userId: currentUser.id,
         siteId: attribution.siteId,
-        role: "responsable_site",
         entrepriseId: attribution.entrepriseId,
       });
 
-      if (!isResponsable) {
+      if (resolvedUpdateRole !== "responsable_site") {
         throw errors.forbidden(
           "Vous ne pouvez modifier que des sites où vous êtes responsable (avec scope=subtree).",
         );

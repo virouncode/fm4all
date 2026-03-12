@@ -13,6 +13,7 @@ import {
   canUserAnnulerFacture,
   canUserEditFacture,
   canUserEmettreFacture,
+  getAdhesionRoleForEntreprise,
 } from "@/server/utils/facturesPermissions.utils";
 import {
   getActivePosture,
@@ -79,9 +80,23 @@ export const getFacturesAction = actionClient
       }
     }
 
-    // Plateforme : "recues" = toutes les factures emise (vue destinataires)
-    if (plateformeRole?.role && parsedInput.tabType === "recues") {
-      scopeCondition = eq(factures.statut, "emise");
+    if (plateformeRole?.role) {
+      if (parsedInput.tabType === "recues") {
+        // Vue destinataires : toutes les factures émises (tous émetteurs)
+        scopeCondition = eq(factures.statut, "emise");
+      } else {
+        // Vue émises (regles_metier.md §5) :
+        // - emise + litige pour tous les émetteurs (factures "direct" ET "intermediaire")
+        // - brouillon uniquement pour les factures "intermediaire" de l'entreprise FM4ALL
+        scopeCondition = sql<boolean>`(
+          ${factures.statut} IN ('emise', 'litige')
+          OR (
+            ${factures.statut} = 'brouillon'
+            AND ${factures.modeCommercialSnapshot} = 'intermediaire'
+            AND ${factures.emetteurEntrepriseId} = ${parsedInput.entrepriseId}
+          )
+        )`;
+      }
     }
 
     return getFacturesPaginated(parsedInput, scopeCondition);
@@ -174,6 +189,20 @@ export const insertFactureAction = actionClient
       throw errors.forbidden(
         "Vous ne pouvez pas créer une facture au nom de cette entreprise.",
       );
+
+    // Vérifier le rôle : seuls admin et manager peuvent créer une facture (regles_metier.md §3)
+    const plateformeRoleInsert = await getEffectivePlateformeRole(currentUser.id);
+    if (!plateformeRoleInsert?.role) {
+      const role = await getAdhesionRoleForEntreprise(
+        currentUser.id,
+        parsedInput.emetteurEntrepriseId,
+      );
+      if (role !== "admin" && role !== "manager") {
+        throw errors.forbidden(
+          "Seuls les administrateurs et managers peuvent créer une facture.",
+        );
+      }
+    }
 
     const normalized = normalizeForSubmit(parsedInput, {
       optionalStrings: [
@@ -531,6 +560,20 @@ export const saveFactureWithLignesAction = actionClient
           throw errors.forbidden(
             "Vous ne pouvez pas créer une facture au nom de cette entreprise.",
           );
+
+        // Vérifier le rôle : seuls admin et manager peuvent créer une facture (regles_metier.md §3)
+        const plateformeRoleSave = await getEffectivePlateformeRole(currentUser.id);
+        if (!plateformeRoleSave?.role) {
+          const roleCreate = await getAdhesionRoleForEntreprise(
+            currentUser.id,
+            parsedInput.emetteurEntrepriseId,
+          );
+          if (roleCreate !== "admin" && roleCreate !== "manager") {
+            throw errors.forbidden(
+              "Seuls les administrateurs et managers peuvent créer une facture.",
+            );
+          }
+        }
 
         const [inserted] = await tx
           .insert(factures)

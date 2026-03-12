@@ -40,6 +40,8 @@ type SiteDetailsProps = {
   siteResponsables: SiteResponsable[];
   loadingResponsables: boolean;
   ancestorPath: Array<{ id: string; nom: string }>;
+  /** Override pour les cas proxy (prestataire agissant à la place du client sans admin actif) */
+  canManageOverride?: boolean;
 };
 
 export function SiteDetails({
@@ -52,6 +54,7 @@ export function SiteDetails({
   siteResponsables,
   loadingResponsables,
   ancestorPath,
+  canManageOverride,
 }: SiteDetailsProps) {
   const t = useTranslations("DevisPage.locaux.locauxForm");
   const typeBatiment =
@@ -66,10 +69,10 @@ export function SiteDetails({
     currentUserRole === "admin";
   const isResponsable = responsableSiteIds.has(site.id);
 
-  // Admin peut tout faire
-  // Non-admin doit être responsable du site
-  const canEdit = isAdmin || isResponsable;
-  const canCreateChild = isAdmin || isResponsable;
+  // Admin peut tout faire, non-admin doit être responsable du site
+  // canManageOverride : proxy prestataire en l'absence d'admin client actif
+  const canEdit = canManageOverride || isAdmin || isResponsable;
+  const canCreateChild = canManageOverride || isAdmin || isResponsable;
 
   return (
     <div className="space-y-6">
