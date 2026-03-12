@@ -373,10 +373,8 @@ export const documentTypeCodes = documentTypeCT.map(
 ];
 
 export const documentVisibiliteCT = [
-  { code: "public", name: "Public" }, // visible client + fournisseur + fm4all
-  { code: "fm4all_only", name: "fm4all uniquement" }, // fm4all only
-  { code: "client_only", name: "Client uniquement" },
-  { code: "fournisseur_only", name: "Prestataire uniquement" },
+  { code: "prive", name: "Privé" }, // visible uniquement par l'entreprise propriétaire
+  { code: "public", name: "Partagé" }, // visible par les entreprises en relation
 ] as const;
 
 export const documentVisibiliteCodes = documentVisibiliteCT.map(
@@ -650,9 +648,7 @@ export const factureModeCommercialSnapshotCT = [
 ] as const;
 
 export const factureModeCommercialSnapshotCodes =
-  factureModeCommercialSnapshotCT.map(
-    (i) => i.code,
-  ) as unknown as [
+  factureModeCommercialSnapshotCT.map((i) => i.code) as unknown as [
     (typeof factureModeCommercialSnapshotCT)[number]["code"],
     ...(typeof factureModeCommercialSnapshotCT)[number]["code"][],
   ];

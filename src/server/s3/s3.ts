@@ -21,6 +21,14 @@ export const S3_ALLOWED_CONTENT_TYPES = [
   "video/mp4",
   "video/webm",
   "video/quicktime", // .mov (iPhone)
+  // Office
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+  "application/msword", // .doc (ancien format)
+  "application/vnd.ms-excel", // .xls (ancien format)
+  "text/plain", // .txt
+  "text/csv", // .csv
 ] as const;
 
 export type S3AllowedContentType = (typeof S3_ALLOWED_CONTENT_TYPES)[number];
@@ -43,6 +51,15 @@ const EXT_BY_CONTENT_TYPE: Record<S3AllowedContentType, string> = {
   "video/mp4": "mp4",
   "video/webm": "webm",
   "video/quicktime": "mov",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "docx",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    "pptx",
+  "application/msword": "doc",
+  "application/vnd.ms-excel": "xls",
+  "text/plain": "txt",
+  "text/csv": "csv",
 };
 
 /**

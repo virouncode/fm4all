@@ -4,6 +4,7 @@ import {
   devisPeriodeFacturationEnum,
   devisStatutEnum,
   devisTypePrixEnum,
+  documentVisibiliteEnum,
   factureLigneTypeSourceEnum,
   factureModeCommercialSnapshotEnum,
   factureStatutEnum,
@@ -96,3 +97,8 @@ export const factureModeCommercialSnapshotSchema = z.enum(
 export type FactureModeCommercialSnapshotType = z.infer<
   typeof factureModeCommercialSnapshotSchema
 >;
+
+export const documentVisibiliteSchema = z.enum(
+  documentVisibiliteEnum.enumValues,
+);
+export type DocumentVisibiliteType = z.infer<typeof documentVisibiliteSchema>;

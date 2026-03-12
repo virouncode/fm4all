@@ -17,7 +17,7 @@ import { contratClientServices, contratDevis, contrats } from "./contrats";
 // DEVIS TABLES
 import { devis, devisDemandes, devisLignes, devisTemporaires } from "./devis";
 // DOCUMENTS TABLES
-import { documents, documentsLinks } from "./documents";
+import { documentTagLinks, documents, documentsLinks, documentsTags } from "./documents";
 // ENTREPRISES TABLES
 import {
   clientPrestataireRelations as clientPrestataireRelationsTable,
@@ -381,6 +381,7 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
     relationName: "documentsProprietaireEntreprise",
   }),
   links: many(documentsLinks),
+  tagLinks: many(documentTagLinks),
   // Tables qui référencent documents.imageId
   cafeMachines: many(cafeMachines),
   fontaines: many(fontaines),
@@ -441,6 +442,25 @@ export const documentsLinksRelations = relations(documentsLinks, ({ one }) => ({
   occurrenceTache: one(occurrenceTaches, {
     fields: [documentsLinks.occurrenceTacheId],
     references: [occurrenceTaches.id],
+  }),
+}));
+
+export const documentsTagsRelations = relations(documentsTags, ({ one, many }) => ({
+  proprietaireEntreprise: one(entreprises, {
+    fields: [documentsTags.proprietaireEntrepriseId],
+    references: [entreprises.id],
+  }),
+  tagLinks: many(documentTagLinks),
+}));
+
+export const documentTagLinksRelations = relations(documentTagLinks, ({ one }) => ({
+  document: one(documents, {
+    fields: [documentTagLinks.documentId],
+    references: [documents.id],
+  }),
+  tag: one(documentsTags, {
+    fields: [documentTagLinks.tagId],
+    references: [documentsTags.id],
   }),
 }));
 

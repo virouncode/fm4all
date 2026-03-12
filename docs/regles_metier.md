@@ -1043,14 +1043,33 @@ La visibilité est restreinte selon le `siteId` de la facture :
 
 ### 5. Posture PLATEFORME
 
-**Lecture seule uniquement** — la plateforme ne crée, ne modifie, n'émet et n'annule pas de factures en posture plateforme.
+Deux périmètres distincts selon le `modeCommercialSnapshot` :
 
-> Exception : si FM4ALL est **prestataire direct** (ex: office manager, pilotage FM), l'utilisateur FM4ALL bascule en posture `"prestataire"` pour gérer ses propres factures — les règles de la posture émetteur s'appliquent.
+#### Factures `modeCommercialSnapshot = "direct"` (prestataire externe → client)
+
+Lecture seule. FM4ALL n'est pas partie prenante de ces contrats en posture plateforme.
 
 | Action | Autorisé |
 |--------|----------|
-| Voir toutes les factures émises | ✅ |
+| Voir (`emise` + `litige`) — tous les émetteurs | ✅ |
+| Voir brouillons | ❌ |
 | Créer / Modifier / Émettre / Annuler | ❌ |
+
+> Si FM4ALL est lui-même prestataire direct (ex: office manager, pilotage FM), l'utilisateur FM4ALL bascule en posture `"prestataire"` pour gérer ses propres factures — les règles de la posture émetteur s'appliquent.
+
+#### Factures `modeCommercialSnapshot = "intermediaire"` (FM4ALL facture le client)
+
+FM4ALL est l'émetteur. Les utilisateurs FM4ALL disposent des **mêmes droits que la posture émetteur** (§3), selon leur rôle dans l'entreprise FM4ALL.
+
+| Action | `admin` FM4ALL | `manager` FM4ALL | Autres |
+|--------|----------------|------------------|--------|
+| Voir (brouillon + `emise` + `litige`) | ✅ | ✅ | ❌ |
+| Créer | ✅ | ✅ | ❌ |
+| Modifier (brouillon) | ✅ | ✅ | ❌ |
+| Émettre | ✅ | ✅ | ❌ |
+| Annuler (`emise`) | ✅ | ✅ | ❌ |
+
+> Ces droits sont conditionnés à `getEffectivePlateformeRole` non-null (cookie posture = `"plateforme"`) ET `emetteurEntrepriseId` = entreprise FM4ALL.
 
 ---
 
@@ -1060,4 +1079,132 @@ La visibilité est restreinte selon le `siteId` de la facture :
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+*Dernière mise à jour : 2026-03-12*
+
+---
+
+## Module Documents (`documents`)
+
+> Référence unique pour toutes les permissions liées à la bibliothèque de documents.
+
+---
+
+### 1. Sémantique des champs
+
+| Champ | Signification |
+|-------|--------------|
+| `proprietaireEntrepriseId` | L'entreprise propriétaire du document |
+| `visibilite` | `"prive"` (interne) ou `"public"` (partagé aux partenaires) |
+| `categorie` | `"document"` — seule valeur supportée en V1 |
+| `storageKey` | Clé S3 permanente (promue depuis `temp/` à l'upload) |
+
+> La table `documentsLinks` porte la visibilité. Un document sans ligne dans `documentsLinks` pour son propre `entrepriseId` n'est pas visible — cette ligne est toujours créée dans la même transaction que l'insertion du document.
+
+---
+
+### 2. Deux onglets — périmètres distincts
+
+| Onglet | Contenu | Filtrable par |
+|--------|---------|--------------|
+| **Mes documents** | Documents dont `proprietaireEntrepriseId = monEntrepriseId` | Recherche, visibilité, tags, tri |
+| **Documents partagés** | Documents `visibilite = "public"` appartenant aux partenaires | Recherche, entreprise partenaire, tags, tri |
+
+> Les documents privés (`visibilite = "prive"`) n'apparaissent **jamais** dans l'onglet "Documents partagés" — la lecture est filtrée à l'exécution sur `visibilite = "public"`.
+
+---
+
+### 3. Qui sont les "partenaires" ?
+
+Le périmètre des partenaires visibles dans "Documents partagés" dépend de la posture :
+
+| Posture | Partenaires vus |
+|---------|----------------|
+| `client` | Prestataires liés via `clientPrestataireRelations` |
+| `prestataire` | Clients liés via `clientPrestataireRelations` |
+| `plateforme` | Toutes les entreprises (sauf la sienne) |
+
+---
+
+### 4. Permissions de lecture
+
+Tout utilisateur avec une adhésion active sur l'entreprise peut **voir** les documents :
+
+| Onglet | Conditions |
+|--------|-----------|
+| Mes documents | `hasAccessToEntreprise(userId, entrepriseId)` = vrai |
+| Documents partagés | Idem + document `visibilite = "public"` d'un partenaire |
+
+> **Règle :** `hasAccessToEntreprise` est posture-aware. Un utilisateur en posture prestataire ne peut pas accéder aux documents d'une entreprise cliente en passant son ID directement — seul le périmètre `clientPrestataireRelations` est autorisé.
+
+---
+
+### 5. Permissions d'écriture (`assertCanWrite`)
+
+Seuls **admin** et **manager** peuvent créer, modifier ou supprimer des documents. La plateforme bypasse toujours.
+
+| Posture | Rôle requis |
+|---------|------------|
+| `client` | `admin` ou `manager` (adhésion active) |
+| `prestataire` | `admin` ou `manager` (adhésion active) |
+| `plateforme` | Toujours (`getEffectivePlateformeRole` non-null) |
+
+> **Exception doctrine manager :** dans ce module, `manager` a des droits d'écriture car la gestion documentaire est une activité de gouvernance d'entreprise, non une activité terrain. Cohérent avec le module Factures.
+
+---
+
+### 6. Actions disponibles par posture
+
+#### Onglet "Mes documents"
+
+| Action | `admin` | `manager` | `collaborateur` | `responsable_site` |
+|--------|---------|-----------|-----------------|--------------------|
+| Voir | ✅ | ✅ | ✅ | ✅ |
+| Télécharger / Prévisualiser | ✅ | ✅ | ✅ | ✅ |
+| Créer | ✅ | ✅ | ❌ | ❌ |
+| Modifier (titre, visibilité, tags) | ✅ | ✅ | ❌ | ❌ |
+| Supprimer | ✅ | ✅ | ❌ | ❌ |
+| Créer un tag | ✅ | ✅ | ❌ | ❌ |
+
+#### Onglet "Documents partagés"
+
+Lecture seule pour tous : aucune création, modification ou suppression de documents partenaires.
+
+| Action | Tous |
+|--------|------|
+| Voir | ✅ |
+| Télécharger / Prévisualiser | ✅ |
+| Créer / Modifier / Supprimer | ❌ |
+
+---
+
+### 7. Suppression d'un document
+
+- La suppression est un **DELETE physique** (document + objet S3 via `deleteS3Object`).
+- Aucun archivage logique — la donnée disparaît définitivement.
+- Réservé aux documents dont `proprietaireEntrepriseId` correspond à l'entreprise de l'utilisateur.
+
+> **Rationale :** un document est un fichier binaire externe. L'archivage logique n'apporte pas de valeur — le fichier S3 resterait à facturer. La suppression est le comportement attendu.
+
+---
+
+### 8. Tags
+
+- Les tags sont **par entreprise** (`proprietaireEntrepriseId` sur `documentsTags`).
+- Un tag créé par un client n'est pas visible par un prestataire et vice-versa.
+- La création de tag requiert `assertCanWrite` (admin ou manager).
+- Le filtrage par tag utilise une logique **OR** (un document avec l'un des tags sélectionnés est retourné).
+- Dans "Documents partagés", les tags affichés sont ceux des partenaires, filtrés selon la posture (même périmètre que §3).
+
+---
+
+### 9. Prévisualisation et téléchargement
+
+Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de validité courte (`S3_PRESIGN_READ_EXPIRES_SECONDS`, défaut 60 s).
+
+- **Prévisualisables** : `image/*`, `application/pdf`, `video/*` — récupérés via `fetch → Blob → createObjectURL` pour contourner les erreurs CORS S3.
+- **Non prévisualisables** (Office, CSV, etc.) : affichage "Aperçu non disponible" + lien de téléchargement.
+- Les URLs présignées ne sont **jamais** générées côté serveur pour les listes — uniquement au montage du composant client.
+
+---
+
+*Dernière mise à jour : 2026-03-12*

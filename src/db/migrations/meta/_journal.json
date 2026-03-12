@@ -281,6 +281,27 @@
       "when": 1773238542414,
       "tag": "0039_shocking_miracleman",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1773252403682,
+      "tag": "0040_faulty_silver_surfer",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1773268412438,
+      "tag": "0041_careless_thunderbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1773268723756,
+      "tag": "0042_rename_document_visibilite_partage_to_public",
+      "breakpoints": true
     }
   ]
 }

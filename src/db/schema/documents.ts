@@ -2,6 +2,7 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   uniqueIndex,
   uuid,
   varchar,
@@ -145,5 +146,44 @@ export const documentsLinks = pgTable(
       t.proprietaireEntrepriseId,
       t.visibilite,
     ),
+  ],
+);
+
+// ─── Tags standalone ───────────────────────────────────────────────────────
+
+export const documentsTags = pgTable(
+  "documents_tags",
+  {
+    id: id(),
+    proprietaireEntrepriseId: uuid("proprietaire_entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, { onDelete: "cascade" }),
+    nom: varchar("nom", { length: 50 }).notNull(),
+    couleur: varchar("couleur", { length: 7 }), // hex ex: "#3b82f6"
+    createdById: createdById(() => user),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("documents_tags_owner_idx").on(t.proprietaireEntrepriseId),
+    uniqueIndex("documents_tags_owner_nom_udx").on(
+      t.proprietaireEntrepriseId,
+      t.nom,
+    ),
+  ],
+);
+
+export const documentTagLinks = pgTable(
+  "document_tag_links",
+  {
+    documentId: uuid("document_id")
+      .notNull()
+      .references(() => documents.id, { onDelete: "cascade" }),
+    tagId: uuid("tag_id")
+      .notNull()
+      .references(() => documentsTags.id, { onDelete: "cascade" }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.documentId, t.tagId] }),
+    index("document_tag_links_tag_idx").on(t.tagId),
   ],
 );
