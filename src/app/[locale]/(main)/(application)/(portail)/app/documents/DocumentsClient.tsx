@@ -175,6 +175,9 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
     setLoading(true);
     setIsError(false);
     try {
+      const tagIds = searchParams.tagIds
+        ? searchParams.tagIds.split(",").filter(Boolean)
+        : [];
       const result = await getDocumentsAction({
         entrepriseId: entreprise.id,
         tab: currentTab,
@@ -184,7 +187,7 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
           searchParams.visibilite === "public"
             ? searchParams.visibilite
             : undefined,
-        tagIds: activeTagIds.length > 0 ? activeTagIds : undefined,
+        tagIds: tagIds.length > 0 ? tagIds : undefined,
         partenaireEntrepriseId:
           searchParams.partenaireEntrepriseId || undefined,
         orderBy: toOrderBy(searchParams.orderBy),
@@ -225,7 +228,7 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
     loadDocuments();
     loadTags();
     if (isPartagesTab) loadPartners();
-  }, [entreprise?.id, posture, searchParams]);
+  }, [entreprise?.id, posture, searchParams, isPartagesTab, loadDocuments, loadTags, loadPartners]);
 
   // Load more (infinite scroll)
   const loadMore = useCallback(async () => {
@@ -233,6 +236,9 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
     setIsLoadingMore(true);
     const nextPage = page + 1;
     try {
+      const tagIds = searchParams.tagIds
+        ? searchParams.tagIds.split(",").filter(Boolean)
+        : [];
       const result = await getDocumentsAction({
         entrepriseId: entreprise.id,
         tab: currentTab,
@@ -242,7 +248,7 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
           searchParams.visibilite === "public"
             ? searchParams.visibilite
             : undefined,
-        tagIds: activeTagIds.length > 0 ? activeTagIds : undefined,
+        tagIds: tagIds.length > 0 ? tagIds : undefined,
         partenaireEntrepriseId:
           searchParams.partenaireEntrepriseId || undefined,
         orderBy: toOrderBy(searchParams.orderBy),
