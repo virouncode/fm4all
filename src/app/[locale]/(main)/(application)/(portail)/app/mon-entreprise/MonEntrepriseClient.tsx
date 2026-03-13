@@ -13,8 +13,10 @@ type ServiceItemType = { serviceId: string; nom: string };
 
 export function MonEntrepriseClient() {
   const entreprise = useAppStore((s) => s.entreprise);
+  const postureActive = useAppStore((s) => s.postureActive);
   const roleClientAdhesion = useAppStore((s) => s.roleClientAdhesion);
   const rolePrestataireAdhesion = useAppStore((s) => s.rolePrestataireAdhesion);
+  const rolePlateformeAdhesion = useAppStore((s) => s.rolePlateformeAdhesion);
 
   const [data, setData] = useState<{
     entreprise: EntrepriseWithDetails;
@@ -75,7 +77,20 @@ export function MonEntrepriseClient() {
     loadData();
   }, [loadData]);
 
-  const canEdit = roleClientAdhesion === "admin" || rolePrestataireAdhesion === "admin";
+  const activeRole =
+    postureActive === "plateforme" ? rolePlateformeAdhesion
+    : postureActive === "prestataire" ? rolePrestataireAdhesion
+    : roleClientAdhesion;
+
+  // Infos / Logo / Rôles : admin uniquement (ou n'importe quel rôle plateforme)
+  const canEdit =
+    postureActive === "plateforme" ? activeRole !== null : activeRole === "admin";
+
+  // Contacts : admin + manager (ou n'importe quel rôle plateforme)
+  const canEditContacts =
+    postureActive === "plateforme"
+      ? activeRole !== null
+      : activeRole === "admin" || activeRole === "manager";
 
   if (loading) {
     return (
@@ -115,8 +130,8 @@ export function MonEntrepriseClient() {
       logoUrl={logoUrl}
       logoStorageKey={data.entreprise.logoStorageKey}
       canEdit={canEdit}
-      canEditContacts={false}
-      canInviteContacts={canEdit}
+      canEditContacts={canEditContacts}
+      canInviteContacts={canEditContacts}
       showBackButton={false}
       onUpdate={loadData}
     />
