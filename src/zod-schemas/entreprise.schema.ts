@@ -214,6 +214,13 @@ export const insertRelationContactSchema = z.object({
 });
 export type InsertRelationContactType = z.infer<typeof insertRelationContactSchema>;
 
+export const updateRelationContactSchema = z.object({
+  linkId: z.uuid("ID du lien invalide"),
+  role: z.string().optional(),
+  estPrincipal: z.boolean(),
+});
+export type UpdateRelationContactType = z.infer<typeof updateRelationContactSchema>;
+
 export const insertEntrepriseContactAndLinkToRelationSchema = z.object({
   relationId: z.uuid("ID de relation invalide"),
   targetEntrepriseId: z.uuid("ID entreprise invalide"),

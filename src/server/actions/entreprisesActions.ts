@@ -67,6 +67,7 @@ import {
   updateEntrepriseLogoSchema,
   updateEntrepriseRolesSchema,
   updateEntrepriseSireneFieldsSchema,
+  updateRelationContactSchema,
   type RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
 import {
@@ -1279,6 +1280,62 @@ export const deleteRelationContactAction = actionClient
       .where(eq(clientPrestataireRelationContacts.id, parsedInput.linkId));
 
     return { success: true };
+  });
+
+/**
+ * Met à jour le rôle et estPrincipal d'un lien contact↔relation.
+ * Permission : admin ou manager côté client OU côté prestataire (+ plateforme).
+ */
+export const updateRelationContactAction = actionClient
+  .metadata({ actionName: "updateRelationContactAction" })
+  .inputSchema(updateRelationContactSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const link = await db.query.clientPrestataireRelationContacts.findFirst({
+      where: eq(clientPrestataireRelationContacts.id, parsedInput.linkId),
+      columns: { id: true, relationId: true },
+    });
+    if (!link) throw errors.notFound("Lien de contact non trouvé.");
+
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: eq(clientPrestataireRelations.id, link.relationId),
+      columns: {
+        id: true,
+        clientEntrepriseId: true,
+        prestataireEntrepriseId: true,
+      },
+    });
+    if (!relation) throw errors.notFound("Relation non trouvée.");
+
+    const canManage = await canManageRelationContacts(
+      currentUser.id,
+      relation.clientEntrepriseId,
+      relation.prestataireEntrepriseId,
+    );
+    if (!canManage)
+      throw errors.forbidden(
+        "Seuls les administrateurs et managers peuvent gérer les contacts.",
+      );
+
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["role"] as const,
+    });
+
+    const [updated] = await db
+      .update(clientPrestataireRelationContacts)
+      .set({
+        role: normalized.role,
+        estPrincipal: parsedInput.estPrincipal,
+        updatedById: currentUser.id,
+        updatedAt: new Date(),
+      })
+      .where(eq(clientPrestataireRelationContacts.id, parsedInput.linkId))
+      .returning();
+
+    return { link: updated };
   });
 
 /**

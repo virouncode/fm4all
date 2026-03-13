@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { Link, useRouter } from "@/i18n/navigation";
 import { deleteRelationContactAction } from "@/server/actions/entreprisesActions";
+import { EditRelationContactDialog } from "../../EditRelationContactDialog";
 import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions.query";
 import type { RelationContactWithDetails } from "@/server/queries/entreprises.query";
 import {
@@ -57,6 +58,8 @@ export function ClientDetailClient({
     useState<RelationContactWithDetails[]>(initialContacts);
   const [addContactOpen, setAddContactOpen] = useState(false);
   const [editInfosOpen, setEditInfosOpen] = useState(false);
+  const [editingContact, setEditingContact] =
+    useState<RelationContactWithDetails | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmRemoveContact, setConfirmRemoveContact] =
     useState<RelationContactWithDetails | null>(null);
@@ -349,19 +352,30 @@ export function ClientDetailClient({
                       )}
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-destructive hover:text-destructive"
-                    onClick={() => setConfirmRemoveContact(c)}
-                    disabled={deletingId === c.id}
-                  >
-                    {deletingId === c.id ? (
-                      <Spinner className="h-3.5 w-3.5" />
-                    ) : (
-                      <Trash2 className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => setEditingContact(c)}
+                      disabled={deletingId === c.id}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-destructive hover:text-destructive"
+                      onClick={() => setConfirmRemoveContact(c)}
+                      disabled={deletingId === c.id}
+                    >
+                      {deletingId === c.id ? (
+                        <Spinner className="h-3.5 w-3.5" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -386,6 +400,22 @@ export function ClientDetailClient({
         onOpenChange={setEditInfosOpen}
         entrepriseId={client.id}
         currentSiret={client.siret}
+        onSuccess={() => router.refresh()}
+      />
+
+      <EditRelationContactDialog
+        open={!!editingContact}
+        onOpenChange={(v) => {
+          if (!v) setEditingContact(null);
+        }}
+        linkId={editingContact?.id ?? ""}
+        contactNom={
+          editingContact
+            ? `${editingContact.prenom} ${editingContact.nom}`
+            : ""
+        }
+        currentRole={editingContact?.role ?? null}
+        currentEstPrincipal={editingContact?.estPrincipal ?? false}
         onSuccess={() => router.refresh()}
       />
 
