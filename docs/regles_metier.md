@@ -10,17 +10,17 @@
 
 ### Glossaire des verbes
 
-| Verbe | Définition stricte |
-|-------|-------------------|
-| **voir** | Accès liste + détail fonctionnel (hors financier et documents) |
-| **voir (financier)** | Accès aux prix, montants, marges — toujours noté explicitement |
-| **voir (documents/PDF)** | Suit la visibilité du parent, sauf mention contraire |
-| **gérer** | Créer, modifier, planifier, annuler — acte de gouvernance |
-| **exécuter** | Démarrer, terminer, pointer — acte terrain |
-| **archiver** | Passer `actif = false` — données conservées en base |
-| **désactiver** | Synonyme d'archiver dans certains contextes (ex: exécutions) |
-| **supprimer** | DELETE physique — uniquement sur les brouillons non engagés, sous conditions strictes |
-| **annuler** | Statut `annule` ou `annulee` — acte métier, données conservées |
+| Verbe                    | Définition stricte                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------- |
+| **voir**                 | Accès liste + détail fonctionnel (hors financier et documents)                        |
+| **voir (financier)**     | Accès aux prix, montants, marges — toujours noté explicitement                        |
+| **voir (documents/PDF)** | Suit la visibilité du parent, sauf mention contraire                                  |
+| **gérer**                | Créer, modifier, planifier, annuler — acte de gouvernance                             |
+| **exécuter**             | Démarrer, terminer, pointer — acte terrain                                            |
+| **archiver**             | Passer `actif = false` — données conservées en base                                   |
+| **désactiver**           | Synonyme d'archiver dans certains contextes (ex: exécutions)                          |
+| **supprimer**            | DELETE physique — uniquement sur les brouillons non engagés, sous conditions strictes |
+| **annuler**              | Statut `annule` ou `annulee` — acte métier, données conservées                        |
 
 ---
 
@@ -36,12 +36,12 @@
 
 ### Doctrine globale : suppression / archivage / annulation
 
-| Catégorie | Règle |
-|-----------|-------|
-| **Événement terrain réalisé** (occurrences, tâches) | Jamais DELETE — changement de statut uniquement |
-| **Référentiel structurant** (sites, prestations, exécutions, utilisateurs) | Archivage (`actif = false`) — jamais DELETE sauf `super_admin_plateforme` |
-| **Brouillon non engagé** (devis brouillon, factures brouillon, exécution sans occurrence) | DELETE autorisé sous conditions strictes documentées par module |
-| **`devisDemandes`** | DELETE physique bloqué si devis lié ; sinon autorisé selon rôle |
+| Catégorie                                                                                 | Règle                                                                     |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Événement terrain réalisé** (occurrences, tâches)                                       | Jamais DELETE — changement de statut uniquement                           |
+| **Référentiel structurant** (sites, prestations, exécutions, utilisateurs)                | Archivage (`actif = false`) — jamais DELETE sauf `super_admin_plateforme` |
+| **Brouillon non engagé** (devis brouillon, factures brouillon, exécution sans occurrence) | DELETE autorisé sous conditions strictes documentées par module           |
+| **`devisDemandes`**                                                                       | DELETE physique bloqué si devis lié ; sinon autorisé selon rôle           |
 
 ---
 
@@ -63,31 +63,32 @@ Dans toutes les matrices, "voir" signifie accès fonctionnel (liste + détail). 
 
 **Statuts possibles :** `ouverte` → `en_cours` → `cloturee` | `annulee` | `archivee`
 
-| Rôle | Voir | Créer | Modifier | Annuler | Supprimer |
-|------|------|-------|----------|---------|-----------|
-| `admin` | Toutes | ✅ | Toutes | Toutes | Toutes (si aucun devis lié) |
-| `responsable_site` | Ses sites | ✅ | Ses sites | Ses sites | Ses sites (si aucun devis lié) |
-| `demandeur_site` | Ses sites | ✅ | Seulement les siennes | ❌ | ❌ |
-| `observateur_site` | Ses sites | ❌ | ❌ | ❌ | ❌ |
-| `manager`, `collaborateur` | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Rôle                       | Voir      | Créer | Modifier              | Annuler   | Supprimer                      |
+| -------------------------- | --------- | ----- | --------------------- | --------- | ------------------------------ |
+| `admin`                    | Toutes    | ✅    | Toutes                | Toutes    | Toutes (si aucun devis lié)    |
+| `responsable_site`         | Ses sites | ✅    | Ses sites             | Ses sites | Ses sites (si aucun devis lié) |
+| `demandeur_site`           | Ses sites | ✅    | Seulement les siennes | ❌        | ❌                             |
+| `observateur_site`         | Ses sites | ❌    | ❌                    | ❌        | ❌                             |
+| `manager`, `collaborateur` | ❌        | ❌    | ❌                    | ❌        | ❌                             |
 
 > **Règle :** la suppression physique d'une `devisDemande` est bloquée si un devis y est lié, quel que soit le statut du devis. L'annulation logique (statut `annulee`) reste possible.
 
 #### Devis reçus (`devis`)
 
-| Rôle | Voir | Signer | Refuser |
-|------|------|--------|---------|
-| `admin` | Tous | ✅ | ✅ |
-| `responsable_site` | Ses sites | ✅ | ✅ |
-| `demandeur_site` | Ses sites | ❌ | ❌ |
-| `observateur_site` | Ses sites | ❌ | ❌ |
-| `manager`, `collaborateur` | ❌ | ❌ | ❌ |
+| Rôle                       | Voir      | Signer | Refuser |
+| -------------------------- | --------- | ------ | ------- |
+| `admin`                    | Tous      | ✅     | ✅      |
+| `responsable_site`         | Ses sites | ✅     | ✅      |
+| `demandeur_site`           | Ses sites | ❌     | ❌      |
+| `observateur_site`         | Ses sites | ❌     | ❌      |
+| `manager`, `collaborateur` | ❌        | ❌     | ❌      |
 
 > **Règle :** le client ne modifie jamais un devis (uniquement les `devisDemandes`).
 
 #### Expiration du devis
 
 Si `now() > validTo` → devis expiré :
+
 - Signature **bloquée** (frontend + backend)
 - Refus **bloqué** (frontend + backend)
 
@@ -98,6 +99,7 @@ Si `now() > validTo` → devis expiré :
 ### B) Posture PRESTATAIRE
 
 **Conditions minimales pour voir une demande de devis (cumulatives) :**
+
 1. `clientPrestataireRelations` doit exister entre le prestataire et le client propriétaire
 2. Le `serviceId` de la demande doit correspondre à un service proposé par le prestataire
 
@@ -105,24 +107,24 @@ Si `now() > validTo` → devis expiré :
 
 #### Visibilité des demandes et devis
 
-| Rôle | Demandes de devis | Devis |
-|------|-------------------|-------|
-| `admin` | Tous les sites clients | Tous |
-| `responsable_site` | Sites attribués | Sites attribués |
-| `demandeur_site` | Sites attribués | Sites attribués |
-| `observateur_site` | Sites attribués | Sites attribués |
-| `intervenant_site` | ❌ | ❌ |
-| `manager`, `collaborateur` | ❌ | ❌ |
+| Rôle                       | Demandes de devis      | Devis           |
+| -------------------------- | ---------------------- | --------------- |
+| `admin`                    | Tous les sites clients | Tous            |
+| `responsable_site`         | Sites attribués        | Sites attribués |
+| `demandeur_site`           | Sites attribués        | Sites attribués |
+| `observateur_site`         | Sites attribués        | Sites attribués |
+| `intervenant_site`         | ❌                     | ❌              |
+| `manager`, `collaborateur` | ❌                     | ❌              |
 
 #### Création, modification, émission, suppression d'un devis
 
-| Rôle | Créer | Modifier (brouillon) | Émettre | Supprimer (brouillon) |
-|------|-------|---------------------|---------|----------------------|
-| `admin` | ✅ | ✅ | ✅ | ✅ |
-| `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| `demandeur_site` | ✅ | ✅ | ✅ | ✅ si `createdById = soi` |
-| `observateur_site` | ❌ | ❌ | ❌ | ❌ |
-| `intervenant_site` | ❌ | ❌ | ❌ | ❌ |
+| Rôle               | Créer | Modifier (brouillon) | Émettre | Supprimer (brouillon)     |
+| ------------------ | ----- | -------------------- | ------- | ------------------------- |
+| `admin`            | ✅    | ✅                   | ✅      | ✅                        |
+| `responsable_site` | ✅    | ✅                   | ✅      | ✅                        |
+| `demandeur_site`   | ✅    | ✅                   | ✅      | ✅ si `createdById = soi` |
+| `observateur_site` | ❌    | ❌                   | ❌      | ❌                        |
+| `intervenant_site` | ❌    | ❌                   | ❌      | ❌                        |
 
 #### Accès aux coordonnées du responsable de site
 
@@ -132,16 +134,16 @@ Si `now() > validTo` → devis expiré :
 
 ### C) Posture PLATEFORME
 
-| Action | Autorisé |
-|--------|----------|
-| Voir demandes de devis | ✅ (lecture seule) |
-| Voir devis | ✅ |
-| Créer/modifier/supprimer une demande | ❌ |
-| Créer un devis | ✅ (`modeCommercial` forcé à `"intermediaire"`) |
-| Modifier un devis brouillon | ✅ |
-| Supprimer un devis brouillon | ✅ |
-| Émettre un devis | ✅ |
-| Signer / Refuser | ❌ (acte client) |
+| Action                               | Autorisé                                        |
+| ------------------------------------ | ----------------------------------------------- |
+| Voir demandes de devis               | ✅ (lecture seule)                              |
+| Voir devis                           | ✅                                              |
+| Créer/modifier/supprimer une demande | ❌                                              |
+| Créer un devis                       | ✅ (`modeCommercial` forcé à `"intermediaire"`) |
+| Modifier un devis brouillon          | ✅                                              |
+| Supprimer un devis brouillon         | ✅                                              |
+| Émettre un devis                     | ✅                                              |
+| Signer / Refuser                     | ❌ (acte client)                                |
 
 > La plateforme ne peut créer/modifier/émettre que les devis avec `modeCommercialSnapshot = "intermediaire"`. Un devis `"direct"` est en lecture seule pour la plateforme — l'utilisateur FM4ALL doit basculer en posture `"prestataire"` pour le gérer.
 
@@ -151,10 +153,10 @@ Si `now() > validTo` → devis expiré :
 
 Forcé à la création selon la posture de l'émetteur. Jamais modifié ensuite.
 
-| Posture émetteur | Valeur | Signification |
-|------------------|--------|--------------|
-| `prestataire` | `"direct"` | Facturation directe client → prestataire |
-| `plateforme` | `"intermediaire"` | FM4ALL porte le contrat, prend une marge, reverse au prestataire |
+| Posture émetteur | Valeur            | Signification                                                    |
+| ---------------- | ----------------- | ---------------------------------------------------------------- |
+| `prestataire`    | `"direct"`        | Facturation directe client → prestataire                         |
+| `plateforme`     | `"intermediaire"` | FM4ALL porte le contrat, prend une marge, reverse au prestataire |
 
 #### Devis autonome (sans `devisDemandeId`)
 
@@ -167,6 +169,7 @@ Un devis peut être créé sans demande associée. Dans ce cas, `siteId` est obl
 **Rôles d'adhésion** (`admin`, `manager`, `collaborateur`) — seul `admin` a des droits sur les devis.
 
 **Rôles d'attribution site :**
+
 - `responsable_site` — peut signer/refuser (client), créer/modifier/émettre (prestataire)
 - `demandeur_site` — peut créer demandes/devis, modifier/émettre les siens, pas de signature
 - `observateur_site` — lecture seule
@@ -187,7 +190,7 @@ Le formulaire de création de devis propose un sélecteur **Contact (optionnel)*
 
 ---
 
-*Dernière mise à jour : 2026-03-13*
+_Dernière mise à jour : 2026-03-13_
 
 ---
 
@@ -199,12 +202,12 @@ Le formulaire de création de devis propose un sélecteur **Contact (optionnel)*
 
 ### 1. Sémantique des champs
 
-| Champ | Signification | Règle |
-|-------|--------------|-------|
-| `proprietaireEntrepriseId` | L'entreprise "chez qui vit le ticket" | = entreprise cliente du site — toujours, même si le ticket est créé par le prestataire |
-| `demandeurEntrepriseId` | L'entreprise qui a initié la demande | = entreprise de l'auteur initial |
-| `assigneEntrepriseId` | L'entreprise actuellement attendue ("chez qui est la balle") | Évolue à chaque transition — voir §3 |
-| `assigneUserId` | La personne concrète en charge | Optionnel — souvent `null` jusqu'à prise en charge explicite |
+| Champ                      | Signification                                                | Règle                                                                                  |
+| -------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `proprietaireEntrepriseId` | L'entreprise "chez qui vit le ticket"                        | = entreprise cliente du site — toujours, même si le ticket est créé par le prestataire |
+| `demandeurEntrepriseId`    | L'entreprise qui a initié la demande                         | = entreprise de l'auteur initial                                                       |
+| `assigneEntrepriseId`      | L'entreprise actuellement attendue ("chez qui est la balle") | Évolue à chaque transition — voir §3                                                   |
+| `assigneUserId`            | La personne concrète en charge                               | Optionnel — souvent `null` jusqu'à prise en charge explicite                           |
 
 > **Doctrine :** un ticket appartient toujours au client, même s'il est créé ou traité par le prestataire.
 
@@ -235,23 +238,24 @@ nouveau
   └──→ rejete                      (retour depuis en_attente_*) ─┘
 ```
 
-| Transition | Qui peut | `assigneEntrepriseId` cible |
-|-----------|----------|-----------------------------|
-| `∅ → nouveau` | Tout créateur autorisé | Entreprise choisie par le créateur |
-| `nouveau → pris_en_charge` | Admin/responsable_site de l'entreprise assignée + plateforme | Inchangé |
-| `pris_en_charge → en_attente_prestataire` | Client admin/responsable_site + plateforme | = `prestataireEntrepriseId` |
-| `pris_en_charge → en_attente_client` | Prestataire admin/responsable_site + plateforme | = `proprietaireEntrepriseId` |
-| `en_attente_prestataire → pris_en_charge` | Prestataire admin/responsable_site + plateforme | Inchangé |
-| `en_attente_client → pris_en_charge` | Client admin/responsable_site + plateforme | Inchangé |
-| `pris_en_charge → a_valider` | Prestataire admin/responsable_site + plateforme | = `proprietaireEntrepriseId` |
-| `a_valider → clos` | Client admin/responsable_site + plateforme | Inchangé |
-| `nouveau → annule` | Admin/responsable_site + plateforme | Inchangé |
-| `pris_en_charge → annule` | Admin/responsable_site + plateforme | Inchangé |
-| `nouveau → rejete` | Admin/responsable_site de l'entreprise assignée + plateforme | Inchangé |
+| Transition                                | Qui peut                                                     | `assigneEntrepriseId` cible        |
+| ----------------------------------------- | ------------------------------------------------------------ | ---------------------------------- |
+| `∅ → nouveau`                             | Tout créateur autorisé                                       | Entreprise choisie par le créateur |
+| `nouveau → pris_en_charge`                | Admin/responsable_site de l'entreprise assignée + plateforme | Inchangé                           |
+| `pris_en_charge → en_attente_prestataire` | Client admin/responsable_site + plateforme                   | = `prestataireEntrepriseId`        |
+| `pris_en_charge → en_attente_client`      | Prestataire admin/responsable_site + plateforme              | = `proprietaireEntrepriseId`       |
+| `en_attente_prestataire → pris_en_charge` | Prestataire admin/responsable_site + plateforme              | Inchangé                           |
+| `en_attente_client → pris_en_charge`      | Client admin/responsable_site + plateforme                   | Inchangé                           |
+| `pris_en_charge → a_valider`              | Prestataire admin/responsable_site + plateforme              | = `proprietaireEntrepriseId`       |
+| `a_valider → clos`                        | Client admin/responsable_site + plateforme                   | Inchangé                           |
+| `nouveau → annule`                        | Admin/responsable_site + plateforme                          | Inchangé                           |
+| `pris_en_charge → annule`                 | Admin/responsable_site + plateforme                          | Inchangé                           |
+| `nouveau → rejete`                        | Admin/responsable_site de l'entreprise assignée + plateforme | Inchangé                           |
 
 > **Règle "retour à pris_en_charge" :** seule l'**entreprise dont c'est actuellement la balle** peut remettre le ticket en traitement (prestataire pour `en_attente_prestataire → pris_en_charge`, client pour `en_attente_client → pris_en_charge`). La plateforme peut toujours faire les deux.
 
 **Effets automatiques :**
+
 - `nouveau → pris_en_charge` : `priseEnChargeAt = now()` ⚠️ (à ajouter en DB — nécessaire pour SLA)
 - `a_valider → clos` : `resolvedAt = now()`, `closedAt = now()`
 - Tout message ou modification : `lastActivityAt = now()`
@@ -260,9 +264,9 @@ nouveau
 
 ### 4. `annule` vs `rejete` — distinction métier
 
-| Statut | Signification | Initiateur |
-|--------|--------------|------------|
-| `annule` | Le ticket est abandonné — la demande est retirée | L'entreprise **propriétaire** (client) |
+| Statut   | Signification                                    | Initiateur                                        |
+| -------- | ------------------------------------------------ | ------------------------------------------------- |
+| `annule` | Le ticket est abandonné — la demande est retirée | L'entreprise **propriétaire** (client)            |
 | `rejete` | Le ticket est déclaré hors périmètre ou invalide | L'entreprise **assignée** (prestataire ou FM4ALL) |
 
 > Le `demandeur_site` ne peut ni annuler ni rejeter (pas de pilotage du workflow).
@@ -273,22 +277,22 @@ nouveau
 
 **Posture CLIENT**
 
-| Rôle | Peut créer |
-|------|-----------|
-| `admin` | Tous les sites de l'entreprise |
-| `responsable_site` | Ses sites attribués |
-| `demandeur_site` | Ses sites attribués |
-| `observateur_site` | ❌ |
-| `manager`, `collaborateur` | ❌ |
+| Rôle                       | Peut créer                     |
+| -------------------------- | ------------------------------ |
+| `admin`                    | Tous les sites de l'entreprise |
+| `responsable_site`         | Ses sites attribués            |
+| `demandeur_site`           | Ses sites attribués            |
+| `observateur_site`         | ❌                             |
+| `manager`, `collaborateur` | ❌                             |
 
 **Posture PRESTATAIRE** (condition : `clientPrestataireRelations` doit exister)
 
-| Rôle | Peut créer |
-|------|-----------|
-| `admin` | Tous les sites clients liés |
-| `responsable_site` | Ses sites clients attribués |
-| `demandeur_site` | Ses sites clients attribués |
-| `observateur_site`, `intervenant_site` | ❌ |
+| Rôle                                   | Peut créer                  |
+| -------------------------------------- | --------------------------- |
+| `admin`                                | Tous les sites clients liés |
+| `responsable_site`                     | Ses sites clients attribués |
+| `demandeur_site`                       | Ses sites clients attribués |
+| `observateur_site`, `intervenant_site` | ❌                          |
 
 **Posture PLATEFORME :** peut toujours créer.
 
@@ -302,11 +306,11 @@ Mêmes droits que la création. **Gelé** dès que le statut atteint `a_valider`
 
 #### 6b. Workflow (statut, assignation, priorité, type)
 
-| Posture | Qui peut |
-|---------|---------|
-| Client | `admin`, `responsable_site` |
+| Posture     | Qui peut                    |
+| ----------- | --------------------------- |
+| Client      | `admin`, `responsable_site` |
 | Prestataire | `admin`, `responsable_site` |
-| Plateforme | Toujours |
+| Plateforme  | Toujours                    |
 
 > `demandeur_site` peut ouvrir et commenter, mais **ne pilote pas le workflow**.
 
@@ -320,32 +324,34 @@ Mêmes droits que la création. **Gelé** dès que le statut atteint `a_valider`
 
 **Visibilité :**
 
-| Valeur `visibilite` | Qui voit |
-|--------------------|---------|
-| `public` | Tout acteur ayant accès au ticket |
-| `fm4all_only` | Plateforme uniquement |
-| `client_only` | Client + plateforme |
-| `prestataire_only` | Prestataire + plateforme |
+| Valeur `visibilite` | Qui voit                          |
+| ------------------- | --------------------------------- |
+| `public`            | Tout acteur ayant accès au ticket |
+| `fm4all_only`       | Plateforme uniquement             |
+| `client_only`       | Client + plateforme               |
+| `prestataire_only`  | Prestataire + plateforme          |
 
 **Contraintes d'écriture par visibilité :**
 
-| Posture auteur | Visibilités autorisées |
-|----------------|----------------------|
-| Client | `public`, `client_only` |
-| Prestataire | `public`, `prestataire_only` |
-| Plateforme | Toutes |
+| Posture auteur | Visibilités autorisées       |
+| -------------- | ---------------------------- |
+| Client         | `public`, `client_only`      |
+| Prestataire    | `public`, `prestataire_only` |
+| Plateforme     | Toutes                       |
 
 ---
 
 ### 8. Périmètre de visibilité des tickets
 
 **Posture CLIENT**
+
 - `admin` : tous les tickets dont `proprietaireEntrepriseId = entrepriseId`
 - `responsable_site` : tickets des sites attribués (périmètre effectif via `sitesArborescence`)
 - `demandeur_site` : tickets des sites attribués
 - `observateur_site` : tickets des sites attribués (lecture seule)
 
 **Posture PRESTATAIRE**
+
 - Visibilité basée sur `assigneEntrepriseId = prestataireId` au moment de la lecture
 - Si la balle repasse côté client, le prestataire ne voit plus le ticket dans sa liste — c'est intentionnel
 - `admin` : tous les tickets où `assigneEntrepriseId = prestataireId`
@@ -363,7 +369,7 @@ Mêmes droits que la création. **Gelé** dès que le statut atteint `a_valider`
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+_Dernière mise à jour : 2026-03-11_
 
 ---
 
@@ -385,13 +391,13 @@ prestataire  → opérateur (agit en délégation)
 
 ### 2. Posture CLIENT
 
-| Action | `admin` | `responsable_site` | `demandeur_site` | `observateur_site` | `manager` |
-|--------|---------|--------------------|-------------------|--------------------|-----------|
-| Voir prestations | Toutes | Sites attribués | Sites attribués | Sites attribués (RO) | ❌ |
-| Voir données financières | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Créer | ✅ | ✅ (ses sites) | ❌ | ❌ | ❌ |
-| Modifier | ✅ | ✅ (ses sites) | ❌ | ❌ | ❌ |
-| Archiver | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Action                   | `admin` | `responsable_site` | `demandeur_site` | `observateur_site`   | `manager` |
+| ------------------------ | ------- | ------------------ | ---------------- | -------------------- | --------- |
+| Voir prestations         | Toutes  | Sites attribués    | Sites attribués  | Sites attribués (RO) | ❌        |
+| Voir données financières | ✅      | ✅                 | ❌               | ❌                   | ❌        |
+| Créer                    | ✅      | ✅ (ses sites)     | ❌               | ❌                   | ❌        |
+| Modifier                 | ✅      | ✅ (ses sites)     | ❌               | ❌                   | ❌        |
+| Archiver                 | ✅      | ❌                 | ❌               | ❌                   | ❌        |
 
 > `manager` et `collaborateur` : zéro droit sur les prestations. Seule l'attribution de site compte.
 
@@ -403,13 +409,13 @@ prestataire  → opérateur (agit en délégation)
 
 **Visibilité niveau 2 (interne non-admin) :** filtrage supplémentaire par attributions de site (`userPrestataireSiteAttributions`).
 
-| Action | `admin` | `manager` | `responsable_site` | `intervenant_site` | `observateur_site` |
-|--------|---------|-----------|--------------------|--------------------|--------------------|
-| Voir prestations | Périmètre exécution | Sites attribués | Sites attribués | Sites attribués | Sites attribués (RO) |
-| Voir données financières | ✅ | ❌ | ✅ | ❌ | ❌ |
-| Créer | ✅ | ❌ | ✅ (ses sites) | ❌ | ❌ |
-| Modifier | ✅ | ❌ | ✅ (ses sites) | ❌ | ❌ |
-| Archiver | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Action                   | `admin`             | `manager`       | `responsable_site` | `intervenant_site` | `observateur_site`   |
+| ------------------------ | ------------------- | --------------- | ------------------ | ------------------ | -------------------- |
+| Voir prestations         | Périmètre exécution | Sites attribués | Sites attribués    | Sites attribués    | Sites attribués (RO) |
+| Voir données financières | ✅                  | ❌              | ✅                 | ❌                 | ❌                   |
+| Créer                    | ✅                  | ❌              | ✅ (ses sites)     | ❌                 | ❌                   |
+| Modifier                 | ✅                  | ❌              | ✅ (ses sites)     | ❌                 | ❌                   |
+| Archiver                 | ✅                  | ❌              | ❌                 | ❌                 | ❌                   |
 
 > **Règle :** quand le prestataire crée une prestation, l'exécution doit être créée simultanément dans la même transaction — sinon la prestation ne serait pas visible (règle niveau 1).
 
@@ -424,6 +430,7 @@ Droits complets (god mode). Voir données financières inclus.
 ### 5. Conditions d'archivage
 
 L'archivage d'une prestation est bloqué si :
+
 1. Il existe une exécution avec `actif = true`
 2. Il existe une occurrence avec statut `planifiee` ou `en_cours`
 
@@ -431,7 +438,7 @@ L'archivage d'une prestation est bloqué si :
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+_Dernière mise à jour : 2026-03-11_
 
 ---
 
@@ -445,20 +452,20 @@ L'archivage d'une prestation est bloqué si :
 
 `modePilotage` détermine qui crée, planifie et assigne les occurrences.
 
-| Valeur | Qui pilote |
-|--------|-----------|
-| `client` | L'entreprise cliente uniquement |
-| `prestataire` | L'entreprise prestataire uniquement |
-| `collaboration` | Les deux ensemble |
+| Valeur          | Qui pilote                          |
+| --------------- | ----------------------------------- |
+| `client`        | L'entreprise cliente uniquement     |
+| `prestataire`   | L'entreprise prestataire uniquement |
+| `collaboration` | Les deux ensemble                   |
 
 **Contraintes selon les entreprises fantômes** (sans admin actif) :
 
-| Client fantôme | Prestataire fantôme | `modePilotage` autorisé |
-|:--------------:|:-------------------:|:-----------------------:|
-| ✅ | ❌ | `prestataire` uniquement |
-| ❌ | ✅ | `client` uniquement |
-| ❌ | ❌ | `client`, `prestataire`, `collaboration` |
-| ✅ | ✅ | ❌ Impossible — aucun pilote |
+| Client fantôme | Prestataire fantôme |         `modePilotage` autorisé          |
+| :------------: | :-----------------: | :--------------------------------------: |
+|       ✅       |         ❌          |         `prestataire` uniquement         |
+|       ❌       |         ✅          |           `client` uniquement            |
+|       ❌       |         ❌          | `client`, `prestataire`, `collaboration` |
+|       ✅       |         ✅          |       ❌ Impossible — aucun pilote       |
 
 > Valeurs impossibles filtrées côté formulaire **et** validées côté serveur.
 
@@ -468,13 +475,13 @@ L'archivage d'une prestation est bloqué si :
 
 ### 2. Posture CLIENT
 
-| Action | `admin` | `responsable_site` | `demandeur_site` | `observateur_site` | `manager` |
-|--------|---------|--------------------|-------------------|--------------------|-----------|
-| Voir exécutions | Toutes | Sites attribués | Sites attribués | Sites attribués (RO) | ❌ |
-| Voir données financières | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Créer | ✅ | ✅ (ses sites) | ❌ | ❌ | ❌ |
-| Modifier | ✅ | ✅ (ses sites) | ❌ | ❌ | ❌ |
-| Désactiver | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Action                   | `admin` | `responsable_site` | `demandeur_site` | `observateur_site`   | `manager` |
+| ------------------------ | ------- | ------------------ | ---------------- | -------------------- | --------- |
+| Voir exécutions          | Toutes  | Sites attribués    | Sites attribués  | Sites attribués (RO) | ❌        |
+| Voir données financières | ✅      | ✅                 | ❌               | ❌                   | ❌        |
+| Créer                    | ✅      | ✅ (ses sites)     | ❌               | ❌                   | ❌        |
+| Modifier                 | ✅      | ✅ (ses sites)     | ❌               | ❌                   | ❌        |
+| Désactiver               | ✅      | ❌                 | ❌               | ❌                   | ❌        |
 
 ---
 
@@ -482,13 +489,13 @@ L'archivage d'une prestation est bloqué si :
 
 Le prestataire ne voit et n'agit que sur les exécutions où `prestataireEntrepriseId = sonEntreprise`.
 
-| Action | `admin` | `manager` | `responsable_site` | `intervenant_site` | `observateur_site` |
-|--------|---------|-----------|--------------------|--------------------|--------------------|
-| Voir exécutions | Toutes (son entreprise) | Sites attribués | Sites attribués | Sites attribués | Sites attribués (RO) |
-| Voir données financières | ✅ | ❌ | ✅ | ❌ | ❌ |
-| Créer | ✅ | ❌ | ✅ (ses sites) | ❌ | ❌ |
-| Modifier | ✅ | ❌ | ✅ (ses sites) | ❌ | ❌ |
-| Désactiver | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Action                   | `admin`                 | `manager`       | `responsable_site` | `intervenant_site` | `observateur_site`   |
+| ------------------------ | ----------------------- | --------------- | ------------------ | ------------------ | -------------------- |
+| Voir exécutions          | Toutes (son entreprise) | Sites attribués | Sites attribués    | Sites attribués    | Sites attribués (RO) |
+| Voir données financières | ✅                      | ❌              | ✅                 | ❌                 | ❌                   |
+| Créer                    | ✅                      | ❌              | ✅ (ses sites)     | ❌                 | ❌                   |
+| Modifier                 | ✅                      | ❌              | ✅ (ses sites)     | ❌                 | ❌                   |
+| Désactiver               | ✅                      | ❌              | ❌                 | ❌                 | ❌                   |
 
 > Condition préalable à toute création : `clientPrestataireRelations` doit exister.
 
@@ -506,15 +513,15 @@ Droits complets. Voir données financières inclus.
 
 **Exception — suppression physique :** autorisée uniquement si l'exécution a été créée par erreur et qu'elle n'a aucune occurrence associée.
 
-| Posture | Condition |
-|---------|-----------|
-| Plateforme | Toujours |
-| Client `admin` | `modePilotage = "client"` ou `"collaboration"` |
+| Posture             | Condition                                                       |
+| ------------------- | --------------------------------------------------------------- |
+| Plateforme          | Toujours                                                        |
+| Client `admin`      | `modePilotage = "client"` ou `"collaboration"`                  |
 | Prestataire `admin` | `modePilotage = "prestataire"` ou `"collaboration"` + ownership |
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+_Dernière mise à jour : 2026-03-11_
 
 ---
 
@@ -528,17 +535,18 @@ Droits complets. Voir données financières inclus.
 
 **Voir les sites :** tous les utilisateurs avec une adhésion client `statut = actif` voient l'arborescence complète.
 
-| Action | `admin` | `manager` + `responsable_site` | `collaborateur` + `responsable_site` | `responsable_site` seul | Autres |
-|--------|---------|-------------------------------|--------------------------------------|------------------------|--------|
-| Créer site racine | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Créer sous-site | ✅ | ✅ si resp. du parent | ✅ si resp. du parent | ✅ si resp. du parent | ❌ |
-| Modifier | ✅ (tous) | ✅ si resp. du site | ✅ si resp. du site | ✅ ce site uniquement | ❌ |
-| Déplacer (changer parentId) | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Archiver | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Action                      | `admin`   | `manager` + `responsable_site` | `collaborateur` + `responsable_site` | `responsable_site` seul | Autres |
+| --------------------------- | --------- | ------------------------------ | ------------------------------------ | ----------------------- | ------ |
+| Créer site racine           | ✅        | ❌                             | ❌                                   | ❌                      | ❌     |
+| Créer sous-site             | ✅        | ✅ si resp. du parent          | ✅ si resp. du parent                | ✅ si resp. du parent   | ❌     |
+| Modifier                    | ✅ (tous) | ✅ si resp. du site            | ✅ si resp. du site                  | ✅ ce site uniquement   | ❌     |
+| Déplacer (changer parentId) | ✅        | ❌                             | ❌                                   | ❌                      | ❌     |
+| Archiver                    | ✅        | ❌                             | ❌                                   | ❌                      | ❌     |
 
 > **Archivage bloqué** si le site possède des sous-sites actifs.
 
 **Règles de cascade :**
+
 - Désactivation → tous les descendants passent à `actif = false` (transaction atomique)
 - Réactivation → bloquée si le parent direct est inactif. Les descendants ne sont pas réactivés automatiquement.
 
@@ -549,19 +557,20 @@ Droits complets. Voir données financières inclus.
 **Condition préalable :** `clientPrestataireRelations` doit exister.
 
 **Cas 1 — Le client possède au moins un admin actif :**
+
 - Tous les utilisateurs prestataire actifs peuvent **voir** les sites du client
 - **Aucune mutation** (création, modification, archivage) n'est autorisée
 - L'interface affiche un bandeau informatif
 
 **Cas 2 — Aucun admin client actif (mode proxy) :**
 
-| Action | `admin` prestataire | `manager` + `responsable_site` | Autres |
-|--------|--------------------|---------------------------------|--------|
-| Voir | ✅ | ✅ | ✅ (si adhésion active) |
-| Créer site racine | ✅ | ❌ | ❌ |
-| Créer sous-site | ✅ | ✅ si resp. du parent | ❌ |
-| Modifier | ✅ | ✅ si resp. du site | ❌ |
-| Archiver | ✅ | ❌ | ❌ |
+| Action            | `admin` prestataire | `manager` + `responsable_site` | Autres                  |
+| ----------------- | ------------------- | ------------------------------ | ----------------------- |
+| Voir              | ✅                  | ✅                             | ✅ (si adhésion active) |
+| Créer site racine | ✅                  | ❌                             | ❌                      |
+| Créer sous-site   | ✅                  | ✅ si resp. du parent          | ❌                      |
+| Modifier          | ✅                  | ✅ si resp. du site            | ❌                      |
+| Archiver          | ✅                  | ❌                             | ❌                      |
 
 > **Règle :** le proxy se déclenche dès l'absence d'admin client actif (`userClientAdhesions.role = "admin" AND statut = "actif"`), même si des managers ou collaborateurs sont actifs. Seul un admin peut prendre des décisions structurantes sur les sites.
 
@@ -571,11 +580,11 @@ Droits complets. Voir données financières inclus.
 
 Droits complets sur tous les sites de tous les clients.
 
-| Action | Autorisé |
-|--------|----------|
-| Voir | ✅ |
-| Créer / Modifier / Archiver | ✅ |
-| Supprimer définitivement | ✅ `super_admin_plateforme` uniquement |
+| Action                      | Autorisé                               |
+| --------------------------- | -------------------------------------- |
+| Voir                        | ✅                                     |
+| Créer / Modifier / Archiver | ✅                                     |
+| Supprimer définitivement    | ✅ `super_admin_plateforme` uniquement |
 
 ---
 
@@ -585,7 +594,7 @@ Les sites archivés (`actif = false`) doivent toujours être inclus — des donn
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+_Dernière mise à jour : 2026-03-11_
 
 ---
 
@@ -597,10 +606,10 @@ Les sites archivés (`actif = false`) doivent toujours être inclus — des donn
 
 ### 1. Deux capacités distinctes
 
-| Capacité | Actions couvertes | Rôles requis |
-|----------|------------------|-------------|
-| `canManageOccurrence` | Créer, replanifier, annuler, marquer non honorée, réassigner | `admin` ou `responsable_site` (selon posture et `modePilotage`) |
-| `canExecuteOccurrence` | Démarrer, terminer | `admin`, `responsable_site`, `demandeur_site` (client), `intervenant_site` (prestataire) — selon `modePilotage` |
+| Capacité               | Actions couvertes                                            | Rôles requis                                                                                                    |
+| ---------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `canManageOccurrence`  | Créer, replanifier, annuler, marquer non honorée, réassigner | `admin` ou `responsable_site` (selon posture et `modePilotage`)                                                 |
+| `canExecuteOccurrence` | Démarrer, terminer                                           | `admin`, `responsable_site`, `demandeur_site` (client), `intervenant_site` (prestataire) — selon `modePilotage` |
 
 ---
 
@@ -626,36 +635,36 @@ planifiee
 
 #### Mode `client`
 
-| Rôle | Voir | Gérer | Démarrer | Terminer |
-|------|------|-------|----------|----------|
-| **client** `admin` | ✅ | ✅ | ✅ | ✅ |
-| **client** `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| **client** `demandeur_site` | ✅ | ❌ | ✅ | ✅ si assigné |
-| **client** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
-| **prestataire** (tous rôles) | ✅ | ❌ | ❌ | ❌ |
+| Rôle                          | Voir | Gérer | Démarrer | Terminer      |
+| ----------------------------- | ---- | ----- | -------- | ------------- |
+| **client** `admin`            | ✅   | ✅    | ✅       | ✅            |
+| **client** `responsable_site` | ✅   | ✅    | ✅       | ✅            |
+| **client** `demandeur_site`   | ✅   | ❌    | ✅       | ✅ si assigné |
+| **client** `observateur_site` | ✅   | ❌    | ❌       | ❌            |
+| **prestataire** (tous rôles)  | ✅   | ❌    | ❌       | ❌            |
 
 #### Mode `prestataire`
 
-| Rôle | Voir | Gérer | Démarrer | Terminer |
-|------|------|-------|----------|----------|
-| **client** (tous rôles) | ✅ | ❌ | ❌ | ❌ |
-| **prestataire** `admin` | ✅ | ✅ | ✅ | ✅ |
-| **prestataire** `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| **prestataire** `intervenant_site` | ✅ | ❌ | ✅ | ✅ si assigné |
-| **prestataire** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
+| Rôle                               | Voir | Gérer | Démarrer | Terminer      |
+| ---------------------------------- | ---- | ----- | -------- | ------------- |
+| **client** (tous rôles)            | ✅   | ❌    | ❌       | ❌            |
+| **prestataire** `admin`            | ✅   | ✅    | ✅       | ✅            |
+| **prestataire** `responsable_site` | ✅   | ✅    | ✅       | ✅            |
+| **prestataire** `intervenant_site` | ✅   | ❌    | ✅       | ✅ si assigné |
+| **prestataire** `observateur_site` | ✅   | ❌    | ❌       | ❌            |
 
 #### Mode `collaboration`
 
-| Rôle | Voir | Gérer | Démarrer | Terminer |
-|------|------|-------|----------|----------|
-| **client** `admin` | ✅ | ✅ | ✅ | ✅ |
-| **client** `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| **client** `demandeur_site` | ✅ | ❌ | ✅ | ✅ si assigné |
-| **client** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
-| **prestataire** `admin` | ✅ | ✅ | ✅ | ✅ |
-| **prestataire** `responsable_site` | ✅ | ✅ | ✅ | ✅ |
-| **prestataire** `intervenant_site` | ✅ | ❌ | ✅ | ✅ si assigné |
-| **prestataire** `observateur_site` | ✅ | ❌ | ❌ | ❌ |
+| Rôle                               | Voir | Gérer | Démarrer | Terminer      |
+| ---------------------------------- | ---- | ----- | -------- | ------------- |
+| **client** `admin`                 | ✅   | ✅    | ✅       | ✅            |
+| **client** `responsable_site`      | ✅   | ✅    | ✅       | ✅            |
+| **client** `demandeur_site`        | ✅   | ❌    | ✅       | ✅ si assigné |
+| **client** `observateur_site`      | ✅   | ❌    | ❌       | ❌            |
+| **prestataire** `admin`            | ✅   | ✅    | ✅       | ✅            |
+| **prestataire** `responsable_site` | ✅   | ✅    | ✅       | ✅            |
+| **prestataire** `intervenant_site` | ✅   | ❌    | ✅       | ✅ si assigné |
+| **prestataire** `observateur_site` | ✅   | ❌    | ❌       | ❌            |
 
 #### Posture PLATEFORME (tous modes)
 
@@ -667,22 +676,22 @@ Voir ✅ Gérer ✅ Démarrer ✅ Terminer ✅
 
 **Posture CLIENT**
 
-| Rôle | Voit quelles occurrences |
-|------|--------------------------|
-| `admin` | Toutes les occurrences des prestations de l'entreprise |
-| `responsable_site` | Occurrences des sites attribués |
-| `demandeur_site` | Occurrences des sites attribués |
-| `observateur_site` | Occurrences des sites attribués (lecture seule) |
+| Rôle               | Voit quelles occurrences                               |
+| ------------------ | ------------------------------------------------------ |
+| `admin`            | Toutes les occurrences des prestations de l'entreprise |
+| `responsable_site` | Occurrences des sites attribués                        |
+| `demandeur_site`   | Occurrences des sites attribués                        |
+| `observateur_site` | Occurrences des sites attribués (lecture seule)        |
 
 **Posture PRESTATAIRE** (condition : `execution.prestataireEntrepriseId = sonEntrepriseId`)
 
-| Rôle | Voit quelles occurrences |
-|------|--------------------------|
-| `admin` | Toutes les occurrences liées à ses exécutions |
-| `manager` | Occurrences des sites clients attribués (même règle que non-admin) |
-| `responsable_site` | Occurrences des sites clients attribués |
-| `intervenant_site` | Occurrences des sites clients attribués |
-| `observateur_site` | Occurrences des sites clients attribués (lecture seule) |
+| Rôle               | Voit quelles occurrences                                           |
+| ------------------ | ------------------------------------------------------------------ |
+| `admin`            | Toutes les occurrences liées à ses exécutions                      |
+| `manager`          | Occurrences des sites clients attribués (même règle que non-admin) |
+| `responsable_site` | Occurrences des sites clients attribués                            |
+| `intervenant_site` | Occurrences des sites clients attribués                            |
+| `observateur_site` | Occurrences des sites clients attribués (lecture seule)            |
 
 > `manager` prestataire = non-admin : filtré par attribution de site, aucun droit supplémentaire.
 
@@ -697,6 +706,7 @@ Voir ✅ Gérer ✅ Démarrer ✅ Terminer ✅
 **Condition de statut :** `planifiee` uniquement.
 
 **Effets automatiques :**
+
 ```
 statut          → en_cours
 dateDebutReelle → now()
@@ -712,6 +722,7 @@ assigneeUserId  → currentUser.id  (écrase toute préassignation existante)
 **Contrainte tâches :** une occurrence peut être terminée même si certaines tâches ne sont pas dans un état terminal — la réalité terrain le justifie. Les tâches résiduelles sont un indicateur de rapport, pas un blocage.
 
 **Effets automatiques :**
+
 ```
 statut        → terminee
 dateFinReelle → now()
@@ -721,9 +732,9 @@ dateFinReelle → now()
 
 ### 7. Annulation et non-réalisation
 
-| Action | Statut source | Qui peut |
-|--------|--------------|---------|
-| `annulee` | `planifiee` uniquement | `canManageOccurrence` |
+| Action        | Statut source          | Qui peut              |
+| ------------- | ---------------------- | --------------------- |
+| `annulee`     | `planifiee` uniquement | `canManageOccurrence` |
 | `non_honoree` | `planifiee` uniquement | `canManageOccurrence` |
 
 > Une occurrence déjà démarrée (`en_cours`) ne peut que terminer (`terminee`). Si l'intervention est impossible en cours de route, les tâches individuelles sont marquées `non_honoree` ou `non_applicable`. L'occurrence elle-même finit `terminee`.
@@ -736,7 +747,7 @@ L'assignation est un **effet du démarrage** (`assigneeUserId = currentUser.id`)
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+_Dernière mise à jour : 2026-03-11_
 
 ---
 
@@ -771,9 +782,9 @@ a_faire
 
 ### 3. Deux capacités distinctes
 
-| Capacité | Actions couvertes |
-|----------|-----------------|
-| `canManage` | Créer ad hoc, modifier ad hoc, annuler, corriger `tempsPasseSecondes` |
+| Capacité     | Actions couvertes                                                        |
+| ------------ | ------------------------------------------------------------------------ |
+| `canManage`  | Créer ad hoc, modifier ad hoc, annuler, corriger `tempsPasseSecondes`    |
 | `canExecute` | Démarrer, terminer (si assigné), non_honoree, non_applicable, ajouter PJ |
 
 `canManage` = `admin` ou `responsable_site` selon posture et `modePilotage`.
@@ -789,18 +800,18 @@ a_faire
 
 ### 5. Matrice des permissions
 
-| Action | `canManage` | `canExecute` + assigné | `canExecute` non assigné |
-|--------|:-----------:|:----------------------:|:------------------------:|
-| Voir | ✅ | ✅ | ✅ |
-| Créer ad hoc | ✅ | ❌ | ❌ |
-| Modifier ad hoc | ✅ (si a_faire/en_cours) | ❌ | ❌ |
-| Démarrer (a_faire → en_cours) | ✅ | ✅ | ✅ |
-| Terminer (en_cours → terminee) | ✅ | ✅ | ❌ |
-| Non applicable | ✅ | ✅ | ✅ |
-| Non honorée | ✅ | ✅ | ✅ |
-| Annuler | ✅ | ❌ | ❌ |
-| Ajouter PJ (tâche en_cours) | ✅ | ✅ | ✅ |
-| Corriger tempsPassé (terminee) | ✅ | ❌ | ❌ |
+| Action                         |       `canManage`        | `canExecute` + assigné | `canExecute` non assigné |
+| ------------------------------ | :----------------------: | :--------------------: | :----------------------: |
+| Voir                           |            ✅            |           ✅           |            ✅            |
+| Créer ad hoc                   |            ✅            |           ❌           |            ❌            |
+| Modifier ad hoc                | ✅ (si a_faire/en_cours) |           ❌           |            ❌            |
+| Démarrer (a_faire → en_cours)  |            ✅            |           ✅           |            ✅            |
+| Terminer (en_cours → terminee) |            ✅            |           ✅           |            ❌            |
+| Non applicable                 |            ✅            |           ✅           |            ✅            |
+| Non honorée                    |            ✅            |           ✅           |            ✅            |
+| Annuler                        |            ✅            |           ❌           |            ❌            |
+| Ajouter PJ (tâche en_cours)    |            ✅            |           ✅           |            ✅            |
+| Corriger tempsPassé (terminee) |            ✅            |           ❌           |            ❌            |
 
 ---
 
@@ -827,10 +838,10 @@ tempsPasseSecondes   → (doneAt - startedAt) en secondes
 
 ### 8. Correction du temps passé
 
-| Condition | Peut corriger |
-|-----------|:---:|
-| `canManage` ET tâche `terminee` | ✅ |
-| Tous les autres cas | ❌ |
+| Condition                       | Peut corriger |
+| ------------------------------- | :-----------: |
+| `canManage` ET tâche `terminee` |      ✅       |
+| Tous les autres cas             |      ❌       |
 
 - Valeur minimale : 0 s
 - Valeur maximale : 604 800 s (7 jours)
@@ -847,7 +858,7 @@ tempsPasseSecondes   → (doneAt - startedAt) en secondes
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+_Dernière mise à jour : 2026-03-11_
 
 ---
 
@@ -868,9 +879,9 @@ Les attributions définissent qui peut agir sur les modules opérationnels (tick
 
 ### 2. Tables et rôles disponibles
 
-| Posture | Table |
-|---------|-------|
-| Client | `userClientSiteAttributions` |
+| Posture     | Table                             |
+| ----------- | --------------------------------- |
+| Client      | `userClientSiteAttributions`      |
 | Prestataire | `userPrestataireSiteAttributions` |
 
 **Rôles client :** `responsable_site` · `demandeur_site` · `observateur_site`
@@ -883,17 +894,18 @@ Les attributions définissent qui peut agir sur les modules opérationnels (tick
 
 **Posture CLIENT**
 
-| Rôle de l'attributeur | Peut attribuer | Périmètre |
-|-----------------------|---------------|----------|
-| `admin` | ✅ | Tous les sites |
-| `manager` + `responsable_site` du site | ✅ | Sites de son périmètre, à ses descendants (`usersArborescence`) |
-| `collaborateur` + `responsable_site` du site | ✅ | Sites de son périmètre, à ses descendants (`usersArborescence`) |
-| `manager` sans `responsable_site` | ❌ | — |
-| `collaborateur` sans `responsable_site` | ❌ | — |
+| Rôle de l'attributeur                        | Peut attribuer | Périmètre                                                       |
+| -------------------------------------------- | -------------- | --------------------------------------------------------------- |
+| `admin`                                      | ✅             | Tous les sites                                                  |
+| `manager` + `responsable_site` du site       | ✅             | Sites de son périmètre, à ses descendants (`usersArborescence`) |
+| `collaborateur` + `responsable_site` du site | ✅             | Sites de son périmètre, à ses descendants (`usersArborescence`) |
+| `manager` sans `responsable_site`            | ❌             | —                                                               |
+| `collaborateur` sans `responsable_site`      | ❌             | —                                                               |
 
 > **Hiérarchie utilisateurs :** la cible d'une attribution (non-admin) doit être un descendant de l'attributeur dans `usersArborescence` (closure table). Un responsable local ne peut pas attribuer à n'importe quel membre de l'entreprise.
 
 **Posture PRESTATAIRE**
+
 - Client avec admin actif → lecture seule, aucune attribution possible
 - Mode proxy → mêmes règles que côté client
 
@@ -905,18 +917,18 @@ Les attributions définissent qui peut agir sur les modules opérationnels (tick
 
 **Attribution client**
 
-| Rôle donné | Qui peut l'attribuer |
-|------------|----------------------|
-| `responsable_site` | `admin` uniquement |
-| `demandeur_site` | `admin` ou `responsable_site` |
+| Rôle donné         | Qui peut l'attribuer          |
+| ------------------ | ----------------------------- |
+| `responsable_site` | `admin` uniquement            |
+| `demandeur_site`   | `admin` ou `responsable_site` |
 | `observateur_site` | `admin` ou `responsable_site` |
 
 **Attribution prestataire**
 
-| Rôle donné | Qui peut l'attribuer |
-|------------|----------------------|
-| `responsable_site` | `admin` uniquement |
-| `demandeur_site` | `admin` ou `responsable_site` |
+| Rôle donné         | Qui peut l'attribuer          |
+| ------------------ | ----------------------------- |
+| `responsable_site` | `admin` uniquement            |
+| `demandeur_site`   | `admin` ou `responsable_site` |
 | `observateur_site` | `admin` ou `responsable_site` |
 | `intervenant_site` | `admin` ou `responsable_site` |
 
@@ -926,16 +938,16 @@ Les attributions définissent qui peut agir sur les modules opérationnels (tick
 
 ### 5. Scope et mode d'attribution
 
-| Dimension | Valeur | Signification |
-|-----------|--------|--------------|
-| `scope` | `subtree` | S'applique au site et tous ses descendants |
-| `scope` | `exact` | S'applique uniquement au site désigné |
-| `mode` | `inclure` | Accorde les droits |
-| `mode` | `exclure` | Retire les droits (exception dans un sous-arbre) |
+| Dimension | Valeur    | Signification                                    |
+| --------- | --------- | ------------------------------------------------ |
+| `scope`   | `subtree` | S'applique au site et tous ses descendants       |
+| `scope`   | `exact`   | S'applique uniquement au site désigné            |
+| `mode`    | `inclure` | Accorde les droits                               |
+| `mode`    | `exclure` | Retire les droits (exception dans un sous-arbre) |
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+_Dernière mise à jour : 2026-03-11_
 
 ---
 
@@ -947,10 +959,10 @@ Les attributions définissent qui peut agir sur les modules opérationnels (tick
 
 ### 1. Deux types de packs
 
-| Type | `proprietaireEntrepriseId` | Accessible par |
-|------|---------------------------|----------------|
-| **Pack système** (FM4ALL) | `null` | Tous les utilisateurs authentifiés |
-| **Pack entreprise** | ID de l'entreprise | Utilisateurs de cette entreprise uniquement |
+| Type                      | `proprietaireEntrepriseId` | Accessible par                              |
+| ------------------------- | -------------------------- | ------------------------------------------- |
+| **Pack système** (FM4ALL) | `null`                     | Tous les utilisateurs authentifiés          |
+| **Pack entreprise**       | ID de l'entreprise         | Utilisateurs de cette entreprise uniquement |
 
 ---
 
@@ -966,11 +978,11 @@ Les attributions définissent qui peut agir sur les modules opérationnels (tick
 
 **Pack entreprise :**
 
-| Posture | Rôle requis |
-|---------|------------|
-| Client | `admin` ou `manager` (adhésion active) |
+| Posture     | Rôle requis                            |
+| ----------- | -------------------------------------- |
+| Client      | `admin` ou `manager` (adhésion active) |
 | Prestataire | `admin` ou `manager` (adhésion active) |
-| Plateforme | Toujours |
+| Plateforme  | Toujours                               |
 
 ---
 
@@ -985,12 +997,13 @@ Un prestataire ne peut créer des packs entreprise que pour les **services qu'il
 ### 5. Lecture des packs disponibles
 
 Lors de l'affectation d'une checklist à une occurrence, les packs disponibles sont filtrés :
+
 - Packs système : filtrés par `serviceId` de l'exécution
 - Packs entreprise : packs du client + packs du prestataire (si exécution associée)
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+_Dernière mise à jour : 2026-03-11_
 
 ---
 
@@ -1002,12 +1015,12 @@ Lors de l'affectation d'une checklist à une occurrence, les packs disponibles s
 
 ### 1. Statuts
 
-| Statut | Signification |
-|--------|--------------|
-| `brouillon` | Création/modification possible, non visible par le destinataire |
-| `emise` | Pièce comptable figée, visible par le destinataire, montants verrouillés |
-| `litige` | Facture émise contestée — en attente de résolution |
-| `annulee` | Annulée après émission — données conservées |
+| Statut      | Signification                                                            |
+| ----------- | ------------------------------------------------------------------------ |
+| `brouillon` | Création/modification possible, non visible par le destinataire          |
+| `emise`     | Pièce comptable figée, visible par le destinataire, montants verrouillés |
+| `litige`    | Facture émise contestée — en attente de résolution                       |
+| `annulee`   | Annulée après émission — données conservées                              |
 
 > V1 : l'annulation change uniquement le statut. Aucun avoir automatique n'est créé. Un avoir comptable devra être géré manuellement en V2 pour conformité.
 
@@ -1015,11 +1028,11 @@ Lors de l'affectation d'une checklist à une occurrence, les packs disponibles s
 
 ### 2. Parties d'une facture
 
-| Champ | Rôle |
-|-------|------|
-| `emetteurEntrepriseId` | Entreprise qui facture (prestataire ou FM4ALL) |
-| `destinataireEntrepriseId` | Entreprise qui reçoit la facture (client) |
-| `modeCommercialSnapshot` | `"direct"` ou `"intermediaire"` — figé à la création |
+| Champ                      | Rôle                                                 |
+| -------------------------- | ---------------------------------------------------- |
+| `emetteurEntrepriseId`     | Entreprise qui facture (prestataire ou FM4ALL)       |
+| `destinataireEntrepriseId` | Entreprise qui reçoit la facture (client)            |
+| `modeCommercialSnapshot`   | `"direct"` ou `"intermediaire"` — figé à la création |
 
 > Une facture est **toujours émise par un prestataire ou FM4ALL**. Une entreprise en posture client n'émet jamais de facture.
 
@@ -1027,13 +1040,13 @@ Lors de l'affectation d'une checklist à une occurrence, les packs disponibles s
 
 ### 3. Posture ÉMETTEUR (prestataire)
 
-| Action | `admin` | `manager` | `responsable_site` | Autres |
-|--------|---------|-----------|--------------------|--------|
-| Voir (brouillon + émises) | ✅ | ✅ | ❌ | ❌ |
-| Créer | ✅ | ✅ | ❌ | ❌ |
-| Modifier (brouillon) | ✅ | ✅ | ❌ | ❌ |
-| Émettre | ✅ | ✅ | ❌ | ❌ |
-| Annuler (émise) | ✅ | ✅ | ❌ | ❌ |
+| Action                    | `admin` | `manager` | `responsable_site` | Autres |
+| ------------------------- | ------- | --------- | ------------------ | ------ |
+| Voir (brouillon + émises) | ✅      | ✅        | ❌                 | ❌     |
+| Créer                     | ✅      | ✅        | ❌                 | ❌     |
+| Modifier (brouillon)      | ✅      | ✅        | ❌                 | ❌     |
+| Émettre                   | ✅      | ✅        | ❌                 | ❌     |
+| Annuler (émise)           | ✅      | ✅        | ❌                 | ❌     |
 
 > **Exception manager :** dans ce module, `manager` a des droits d'émission car la facturation est une activité de gouvernance d'entreprise, non une activité terrain.
 
@@ -1045,10 +1058,10 @@ Le destinataire voit uniquement les factures au statut `emise` (jamais les broui
 
 La visibilité est restreinte selon le `siteId` de la facture :
 
-| Condition | Qui peut voir |
-|-----------|--------------|
+| Condition                 | Qui peut voir                                 |
+| ------------------------- | --------------------------------------------- |
 | Facture **avec `siteId`** | `admin` + `responsable_site` du site concerné |
-| Facture **sans `siteId`** | `admin` uniquement |
+| Facture **sans `siteId`** | `admin` uniquement                            |
 
 > Aucune modification, émission ou annulation possible côté destinataire.
 
@@ -1062,11 +1075,11 @@ Deux périmètres distincts selon le `modeCommercialSnapshot` :
 
 Lecture seule. FM4ALL n'est pas partie prenante de ces contrats en posture plateforme.
 
-| Action | Autorisé |
-|--------|----------|
-| Voir (`emise` + `litige`) — tous les émetteurs | ✅ |
-| Voir brouillons | ❌ |
-| Créer / Modifier / Émettre / Annuler | ❌ |
+| Action                                         | Autorisé |
+| ---------------------------------------------- | -------- |
+| Voir (`emise` + `litige`) — tous les émetteurs | ✅       |
+| Voir brouillons                                | ❌       |
+| Créer / Modifier / Émettre / Annuler           | ❌       |
 
 > Si FM4ALL est lui-même prestataire direct (ex: office manager, pilotage FM), l'utilisateur FM4ALL bascule en posture `"prestataire"` pour gérer ses propres factures — les règles de la posture émetteur s'appliquent.
 
@@ -1074,13 +1087,13 @@ Lecture seule. FM4ALL n'est pas partie prenante de ces contrats en posture plate
 
 FM4ALL est l'émetteur. Les utilisateurs FM4ALL disposent des **mêmes droits que la posture émetteur** (§3), selon leur rôle dans l'entreprise FM4ALL.
 
-| Action | `admin` FM4ALL | `manager` FM4ALL | Autres |
-|--------|----------------|------------------|--------|
-| Voir (brouillon + `emise` + `litige`) | ✅ | ✅ | ❌ |
-| Créer | ✅ | ✅ | ❌ |
-| Modifier (brouillon) | ✅ | ✅ | ❌ |
-| Émettre | ✅ | ✅ | ❌ |
-| Annuler (`emise`) | ✅ | ✅ | ❌ |
+| Action                                | `admin` FM4ALL | `manager` FM4ALL | Autres |
+| ------------------------------------- | -------------- | ---------------- | ------ |
+| Voir (brouillon + `emise` + `litige`) | ✅             | ✅               | ❌     |
+| Créer                                 | ✅             | ✅               | ❌     |
+| Modifier (brouillon)                  | ✅             | ✅               | ❌     |
+| Émettre                               | ✅             | ✅               | ❌     |
+| Annuler (`emise`)                     | ✅             | ✅               | ❌     |
 
 > Ces droits sont conditionnés à `getEffectivePlateformeRole` non-null (cookie posture = `"plateforme"`) ET `emetteurEntrepriseId` = entreprise FM4ALL.
 
@@ -1097,10 +1110,12 @@ FM4ALL est l'émetteur. Les utilisateurs FM4ALL disposent des **mêmes droits qu
 Contrairement au devis, le `siteId` est **nullable** en DB (`factures.siteId` sans `.notNull()`).
 
 **Sélecteur Site (optionnel)** :
+
 - Option **"Pas de site"** (`value="none"`) disponible → `siteId` envoyé comme `""` → `normalizeForSubmit` → `null` en DB
 - Affiché dans `FacturePreviewCard` sous le SIRET du client, avec adresse formatée (`siteAdresse + codePostal + ville` en une seule ligne)
 
 **Sélecteur Contact (optionnel)** :
+
 - Chargé depuis `entreprise_contacts` pour le client sélectionné (`getEntrepriseContactsAction`)
 - Option **"Pas de contact"** (`value="none"`) → `contactId` envoyé comme `""` → `normalizeForSubmit` → `null`
 - Affiché dans `FacturePreviewCard` sous le SIRET/TVA du destinataire, avant la section site
@@ -1109,7 +1124,7 @@ Contrairement au devis, le `siteId` est **nullable** en DB (`factures.siteId` sa
 
 ---
 
-*Dernière mise à jour : 2026-03-13*
+_Dernière mise à jour : 2026-03-13_
 
 ---
 
@@ -1121,12 +1136,12 @@ Contrairement au devis, le `siteId` est **nullable** en DB (`factures.siteId` sa
 
 ### 1. Sémantique des champs
 
-| Champ | Signification |
-|-------|--------------|
-| `proprietaireEntrepriseId` | L'entreprise propriétaire du document |
-| `visibilite` | `"prive"` (interne) ou `"public"` (partagé aux partenaires) |
-| `categorie` | `"document"` — seule valeur supportée en V1 |
-| `storageKey` | Clé S3 permanente (promue depuis `temp/` à l'upload) |
+| Champ                      | Signification                                               |
+| -------------------------- | ----------------------------------------------------------- |
+| `proprietaireEntrepriseId` | L'entreprise propriétaire du document                       |
+| `visibilite`               | `"prive"` (interne) ou `"public"` (partagé aux partenaires) |
+| `categorie`                | `"document"` — seule valeur supportée en V1                 |
+| `storageKey`               | Clé S3 permanente (promue depuis `temp/` à l'upload)        |
 
 > La table `documentsLinks` porte la visibilité. Un document sans ligne dans `documentsLinks` pour son propre `entrepriseId` n'est pas visible — cette ligne est toujours créée dans la même transaction que l'insertion du document.
 
@@ -1134,9 +1149,9 @@ Contrairement au devis, le `siteId` est **nullable** en DB (`factures.siteId` sa
 
 ### 2. Deux onglets — périmètres distincts
 
-| Onglet | Contenu | Filtrable par |
-|--------|---------|--------------|
-| **Mes documents** | Documents dont `proprietaireEntrepriseId = monEntrepriseId` | Recherche, visibilité, tags, tri |
+| Onglet                 | Contenu                                                       | Filtrable par                               |
+| ---------------------- | ------------------------------------------------------------- | ------------------------------------------- |
+| **Mes documents**      | Documents dont `proprietaireEntrepriseId = monEntrepriseId`   | Recherche, visibilité, tags, tri            |
 | **Documents partagés** | Documents `visibilite = "public"` appartenant aux partenaires | Recherche, entreprise partenaire, tags, tri |
 
 > Les documents privés (`visibilite = "prive"`) n'apparaissent **jamais** dans l'onglet "Documents partagés" — la lecture est filtrée à l'exécution sur `visibilite = "public"`.
@@ -1147,11 +1162,11 @@ Contrairement au devis, le `siteId` est **nullable** en DB (`factures.siteId` sa
 
 Le périmètre des partenaires visibles dans "Documents partagés" dépend de la posture :
 
-| Posture | Partenaires vus |
-|---------|----------------|
-| `client` | Prestataires liés via `clientPrestataireRelations` |
-| `prestataire` | Clients liés via `clientPrestataireRelations` |
-| `plateforme` | Toutes les entreprises (sauf la sienne) |
+| Posture       | Partenaires vus                                    |
+| ------------- | -------------------------------------------------- |
+| `client`      | Prestataires liés via `clientPrestataireRelations` |
+| `prestataire` | Clients liés via `clientPrestataireRelations`      |
+| `plateforme`  | Toutes les entreprises (sauf la sienne)            |
 
 ---
 
@@ -1159,9 +1174,9 @@ Le périmètre des partenaires visibles dans "Documents partagés" dépend de la
 
 Tout utilisateur avec une adhésion active sur l'entreprise peut **voir** les documents :
 
-| Onglet | Conditions |
-|--------|-----------|
-| Mes documents | `hasAccessToEntreprise(userId, entrepriseId)` = vrai |
+| Onglet             | Conditions                                              |
+| ------------------ | ------------------------------------------------------- |
+| Mes documents      | `hasAccessToEntreprise(userId, entrepriseId)` = vrai    |
 | Documents partagés | Idem + document `visibilite = "public"` d'un partenaire |
 
 > **Règle :** `hasAccessToEntreprise` est posture-aware. Un utilisateur en posture prestataire ne peut pas accéder aux documents d'une entreprise cliente en passant son ID directement — seul le périmètre `clientPrestataireRelations` est autorisé.
@@ -1172,11 +1187,11 @@ Tout utilisateur avec une adhésion active sur l'entreprise peut **voir** les do
 
 Seuls **admin** et **manager** peuvent créer, modifier ou supprimer des documents. La plateforme bypasse toujours.
 
-| Posture | Rôle requis |
-|---------|------------|
-| `client` | `admin` ou `manager` (adhésion active) |
-| `prestataire` | `admin` ou `manager` (adhésion active) |
-| `plateforme` | Toujours (`getEffectivePlateformeRole` non-null) |
+| Posture       | Rôle requis                                      |
+| ------------- | ------------------------------------------------ |
+| `client`      | `admin` ou `manager` (adhésion active)           |
+| `prestataire` | `admin` ou `manager` (adhésion active)           |
+| `plateforme`  | Toujours (`getEffectivePlateformeRole` non-null) |
 
 > **Exception doctrine manager :** dans ce module, `manager` a des droits d'écriture car la gestion documentaire est une activité de gouvernance d'entreprise, non une activité terrain. Cohérent avec le module Factures.
 
@@ -1186,24 +1201,24 @@ Seuls **admin** et **manager** peuvent créer, modifier ou supprimer des documen
 
 #### Onglet "Mes documents"
 
-| Action | `admin` | `manager` | `collaborateur` | `responsable_site` |
-|--------|---------|-----------|-----------------|--------------------|
-| Voir | ✅ | ✅ | ✅ | ✅ |
-| Télécharger / Prévisualiser | ✅ | ✅ | ✅ | ✅ |
-| Créer | ✅ | ✅ | ❌ | ❌ |
-| Modifier (titre, visibilité, tags) | ✅ | ✅ | ❌ | ❌ |
-| Supprimer | ✅ | ✅ | ❌ | ❌ |
-| Créer un tag | ✅ | ✅ | ❌ | ❌ |
+| Action                             | `admin` | `manager` | `collaborateur` | `responsable_site` |
+| ---------------------------------- | ------- | --------- | --------------- | ------------------ |
+| Voir                               | ✅      | ✅        | ✅              | ✅                 |
+| Télécharger / Prévisualiser        | ✅      | ✅        | ✅              | ✅                 |
+| Créer                              | ✅      | ✅        | ❌              | ❌                 |
+| Modifier (titre, visibilité, tags) | ✅      | ✅        | ❌              | ❌                 |
+| Supprimer                          | ✅      | ✅        | ❌              | ❌                 |
+| Créer un tag                       | ✅      | ✅        | ❌              | ❌                 |
 
 #### Onglet "Documents partagés"
 
 Lecture seule pour tous : aucune création, modification ou suppression de documents partenaires.
 
-| Action | Tous |
-|--------|------|
-| Voir | ✅ |
-| Télécharger / Prévisualiser | ✅ |
-| Créer / Modifier / Supprimer | ❌ |
+| Action                       | Tous |
+| ---------------------------- | ---- |
+| Voir                         | ✅   |
+| Télécharger / Prévisualiser  | ✅   |
+| Créer / Modifier / Supprimer | ❌   |
 
 ---
 
@@ -1247,6 +1262,7 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 **Avant** : 4 champs inline sur `entreprises` (prénom/nom/email/téléphone) + 8 champs inline sur `client_prestataire_relations` (4 côté client, 4 côté prestataire). Limité à 1 contact par entité/relation.
 
 **Après** :
+
 - `entreprise_contacts` — n contacts par entreprise, avec lien optionnel vers un `userId` de la plateforme
 - `client_prestataire_relation_contacts` — table de jonction entre une relation et un contact, avec `side: "client" | "prestataire"`, `role` (texte libre), `est_principal` (booléen)
 
@@ -1254,11 +1270,11 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 
 ### 2. Permissions — Contacts d'entreprise (`entreprise_contacts`)
 
-| Action | Condition |
-|--------|-----------|
-| Voir (liste) | `hasAccessToEntreprise(userId, entrepriseId)` |
-| Créer | `hasAccessToEntreprise(userId, entrepriseId)` |
-| Modifier | `hasAccessToEntreprise(userId, entrepriseId)` (ownership vérifié via lookup) |
+| Action                      | Condition                                                                                                         |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Voir (liste)                | `hasAccessToEntreprise(userId, entrepriseId)`                                                                     |
+| Créer                       | `hasAccessToEntreprise(userId, entrepriseId)`                                                                     |
+| Modifier                    | `hasAccessToEntreprise(userId, entrepriseId)` (ownership vérifié via lookup)                                      |
 | Supprimer (DELETE physique) | `hasAccessToEntreprise(userId, entrepriseId)` + contact non référencé dans `client_prestataire_relation_contacts` |
 
 > **Blocage suppression** : si le contact est lié à au moins une relation (`COUNT(client_prestataire_relation_contacts WHERE contactId = ...)` > 0), la suppression est refusée avec un message explicite. Il faut d'abord le retirer de toutes les relations.
@@ -1269,36 +1285,36 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 
 ### 3. Permissions — Contacts de relation (`client_prestataire_relation_contacts`)
 
-| Action | Condition |
-|--------|-----------|
-| Voir (liste) | Accès à l'entreprise cliente OU prestataire de la relation |
-| Lier un contact | `admin` ou `manager` côté client OU côté prestataire (+ plateforme) |
+| Action                           | Condition                                                           |
+| -------------------------------- | ------------------------------------------------------------------- |
+| Voir (liste)                     | Accès à l'entreprise cliente OU prestataire de la relation          |
+| Lier un contact                  | `admin` ou `manager` côté client OU côté prestataire (+ plateforme) |
 | Délier (DELETE physique du lien) | `admin` ou `manager` côté client OU côté prestataire (+ plateforme) |
 
 > **Vérification** : via `canManageRelationContacts(userId, clientEntrepriseId, prestataireEntrepriseId)` — vérifie `getUserClientAdhesion` (role admin/manager + statut actif) OU `getUserPrestataireAdhesion` (entrepriseId match + role admin/manager + statut actif) OU `getEffectivePlateformeRole`. Un `collaborateur` ne peut pas gérer les contacts de relation.
 
 ### 4. Actions disponibles
 
-| Action | Fichier | Description |
-|--------|---------|-------------|
-| `getEntrepriseContactsAction` | `entreprisesActions.ts` | Liste les contacts d'une entreprise |
-| `insertEntrepriseContactAction` | `entreprisesActions.ts` | Crée un contact (normalizeForSubmit) |
-| `updateEntrepriseContactAction` | `entreprisesActions.ts` | Modifie un contact (normalizeForSubmit) |
-| `deleteEntrepriseContactAction` | `entreprisesActions.ts` | Supprime un contact (DELETE physique) |
-| `inviterContactAction` | `entreprisesActions.ts` | Envoie une invitation par email à un contact sans compte |
+| Action                            | Fichier                 | Description                                                    |
+| --------------------------------- | ----------------------- | -------------------------------------------------------------- |
+| `getEntrepriseContactsAction`     | `entreprisesActions.ts` | Liste les contacts d'une entreprise                            |
+| `insertEntrepriseContactAction`   | `entreprisesActions.ts` | Crée un contact (normalizeForSubmit)                           |
+| `updateEntrepriseContactAction`   | `entreprisesActions.ts` | Modifie un contact (normalizeForSubmit)                        |
+| `deleteEntrepriseContactAction`   | `entreprisesActions.ts` | Supprime un contact (DELETE physique)                          |
+| `inviterContactAction`            | `entreprisesActions.ts` | Envoie une invitation par email à un contact sans compte       |
 | `accepterInvitationContactAction` | `entreprisesActions.ts` | Crée le compte user + adhésion collaborateur à partir du token |
-| `getRelationContactsAction` | `entreprisesActions.ts` | Liste les contacts d'une relation avec détails |
-| `insertRelationContactAction` | `entreprisesActions.ts` | Lie un contact à une relation (normalizeForSubmit) |
-| `deleteRelationContactAction` | `entreprisesActions.ts` | Retire un contact d'une relation |
+| `getRelationContactsAction`       | `entreprisesActions.ts` | Liste les contacts d'une relation avec détails                 |
+| `insertRelationContactAction`     | `entreprisesActions.ts` | Lie un contact à une relation (normalizeForSubmit)             |
+| `deleteRelationContactAction`     | `entreprisesActions.ts` | Retire un contact d'une relation                               |
 
 ### 5. Normalisation (`normalizeForSubmit`)
 
-| Schema | Champs normalisés (`"" → null`) |
-|--------|----------------------------------|
-| `insertEntrepriseContactSchema` | `email`, `phone`, `fonction`, `notes` |
-| `updateEntrepriseContactSchema` | `email`, `phone`, `fonction`, `notes` |
-| `insertRelationContactSchema` | `role` |
-| `accepterInvitationContactSchema` | `phone`, `fonction` |
+| Schema                            | Champs normalisés (`"" → null`)       |
+| --------------------------------- | ------------------------------------- |
+| `insertEntrepriseContactSchema`   | `email`, `phone`, `fonction`, `notes` |
+| `updateEntrepriseContactSchema`   | `email`, `phone`, `fonction`, `notes` |
+| `insertRelationContactSchema`     | `role`                                |
+| `accepterInvitationContactSchema` | `phone`, `fonction`                   |
 
 `userId` sur le contact est un UUID optionnel (`z.uuid().optional()`) — géré avec `?? null` directement, sans passer par `normalizeForSubmit`.
 
@@ -1307,6 +1323,7 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 > Anciennement `entreprise_invitations`. Renommée et enrichie d'une FK `contact_id` vers `entreprise_contacts`.
 
 **Conditions d'envoi** (`inviterContactAction`) :
+
 - Appelant : accès à l'entreprise (`hasAccessToEntreprise`) OU rôle plateforme
 - Contact cible : doit avoir un `email`, ne pas avoir de `userId`, appartenir à l'entreprise
 - L'email cible ne doit pas correspondre à un compte utilisateur existant
@@ -1315,6 +1332,7 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 **Données du token** : entreprise, email, typeAdhesion (client|prestataire), contactId, expiresAt (7 jours)
 
 **Acceptation** (`accepterInvitationContactAction`, page `/auth/inscription?token=xxx`) :
+
 1. Validation du token (non expiré, non accepté)
 2. Création du compte via `auth.api.signUpEmail` (mot de passe aléatoire)
 3. Transaction atomique :
@@ -1329,6 +1347,7 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 **Cas `contactId = null`** (ancienne invitation admin sans contact source) : au lieu de mettre à jour un contact existant, la transaction crée une nouvelle entrée `entrepriseContacts` avec les données saisies par l'utilisateur (`prenom`, `nom`, `email`, `phone`, `fonction`) et le `userId` du compte fraîchement créé.
 
 **Page publique** : `/auth/inscription?token=xxx`
+
 - Champs pré-remplis depuis le contact : prenom, nom, phone, fonction (tous modifiables)
 - Email en lecture seule (contrôlé par l'invitation)
 - Pas d'upload d'avatar (pas de session — possible depuis les paramètres post-connexion)
@@ -1366,26 +1385,29 @@ Après création du compte (`signUpEmail`), un email `requestPasswordReset` est 
 
 ### 1. Liste des entreprises
 
-| Feature | Détail |
-|---------|--------|
-| Filtres | Nom (ilike), rôle (client/prestataire/plateforme), statut admin |
-| Tri | Nom, date de création, SIRET |
-| Pagination | Infinite scroll |
-| Logos | Chargement côté client via `LogoAvatar` (storageKey → presigned URL) |
+| Feature    | Détail                                                               |
+| ---------- | -------------------------------------------------------------------- |
+| Filtres    | Nom (ilike), rôle (client/prestataire/plateforme), statut admin      |
+| Tri        | Nom, date de création, SIRET                                         |
+| Pagination | Infinite scroll                                                      |
+| Logos      | Chargement côté client via `LogoAvatar` (storageKey → presigned URL) |
 
 ### 2. Création d'entreprise (`createEntrepriseAction`)
 
 Étapes :
+
 1. Infos générales (nom, SIRET, adresse, forme juridique, TVA)
 2. Rôles et services proposés
 
 Contraintes :
+
 - SIRET unique en base
 - Au moins un rôle requis
 
 ### 3. Détail entreprise (`/app/entreprises/[entrepriseId]`)
 
 Sections :
+
 - **Informations** : SIRET, forme juridique, TVA, adresse — modifiable via `EditEntrepriseInfosDialog`
 - **Logo** : upload S3 via `EditEntrepriseLogoDialog` (temp → permanent, `documents.storageKey` + `entreprises.logoId`)
 - **Rôles** : ajout/retrait avec guard métier (pas de retrait si `clientServices` ou `clientServiceExecutions` actifs) — `EditEntrepriseRolesDialog`
@@ -1393,11 +1415,11 @@ Sections :
 
 ### 4. Permissions de modification
 
-| Action | Condition |
-|--------|-----------|
-| Modifier infos, logo, rôles | `canEdit = true` (plateforme par défaut) |
-| Ajouter/modifier/supprimer contact | `canEdit = true` |
-| Inviter un contact | `canEdit && !c.userId && c.email` |
+| Action                             | Condition                                |
+| ---------------------------------- | ---------------------------------------- |
+| Modifier infos, logo, rôles        | `canEdit = true` (plateforme par défaut) |
+| Ajouter/modifier/supprimer contact | `canEdit = true`                         |
+| Inviter un contact                 | `canEdit && !c.userId && c.email`        |
 
 ### 5. Chargement des contacts (pattern important)
 
@@ -1423,6 +1445,7 @@ Les contacts sont chargés **côté serveur** dans `page.tsx` via `getEntreprise
 **Exception — Proxy prestataire** : Si le client n'a pas d'admin actif (`userClientAdhesions.role = "admin" AND statut = "actif"`), le bouton "Modifier" est affiché dans la section Informations de la page détail. Ce bouton ouvre `EditEntrepriseInfosDialog` (mise à jour depuis l'API SIRENE). L'action serveur `updateEntrepriseSireneFieldsAction` autorise cette modification via `canManageClientInfosAsProxy()`. Si le client a un admin actif, un message amber s'affiche : "Ce client a un administrateur actif, vous ne pouvez pas modifier ses informations. Pour tout changement, contacter l'administrateur." (lien `mailto:` sur "administrateur" si `adminEmail` disponible).
 
 **`canManageClientInfosAsProxy(userId, clientEntrepriseId)`** (dans `entreprisesActions.ts`) :
+
 1. Le client n'a pas d'admin actif → sinon `false`
 2. L'utilisateur est `admin` ou `manager` prestataire actif → sinon `false`
 3. La relation `clientPrestataireRelations` entre le prestataire et ce client existe → sinon `false`
@@ -1430,6 +1453,7 @@ Les contacts sont chargés **côté serveur** dans `page.tsx` via `getEntreprise
 ### 3. Page détail (`/app/mes-clients/[clientEntrepriseId]`)
 
 Sections :
+
 - **Message admin** (conditionnel) : si `client.hasActiveAdmin`, bannière amber "Ce client a un administrateur actif..." avec lien `mailto:` sur "administrateur"
 - **Informations** : SIRET, forme juridique, TVA, adresse — bouton "Modifier" conditionnel (`!client.hasActiveAdmin`) → `EditEntrepriseInfosDialog`
 - **Sites** : compteur `client.nbSites` (lecture seule)
@@ -1441,12 +1465,12 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 
 ### 4. Actions disponibles
 
-| Action | Condition |
-|--------|-----------|
-| Voir la page détail | Adhésion prestataire active + client dans périmètre |
-| Modifier informations (SIRENE) | `!client.hasActiveAdmin` + `canManageClientInfosAsProxy` (admin/manager prestataire) |
-| Ajouter un contact à la relation | `admin` ou `manager` prestataire actif + `relationId` existant |
-| Retirer un contact de la relation | Idem |
+| Action                            | Condition                                                                            |
+| --------------------------------- | ------------------------------------------------------------------------------------ |
+| Voir la page détail               | Adhésion prestataire active + client dans périmètre                                  |
+| Modifier informations (SIRENE)    | `!client.hasActiveAdmin` + `canManageClientInfosAsProxy` (admin/manager prestataire) |
+| Ajouter un contact à la relation  | `admin` ou `manager` prestataire actif + `relationId` existant                       |
+| Retirer un contact de la relation | Idem                                                                                 |
 
 ---
 
@@ -1466,6 +1490,7 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 **Exception — Proxy client** : Si le prestataire n'a pas d'admin actif (`userPrestataireAdhesions.role = "admin" AND statut = "actif"`), les boutons "Modifier" sont affichés dans les sections Informations et Services. Si le prestataire a un admin actif, un message amber s'affiche : "Ce prestataire a un administrateur actif, vous ne pouvez pas modifier ses informations. Pour tout changement, contacter l'administrateur." (lien `mailto:` sur "administrateur" si `adminEmail` disponible).
 
 **`canManagePrestataireInfosAsClient(userId, prestataireEntrepriseId)`** (dans `entreprisesActions.ts`) :
+
 1. Le prestataire n'a pas d'admin actif → sinon `false`
 2. L'utilisateur est `admin` ou `manager` client actif → sinon `false`
 3. La relation `clientPrestataireRelations` entre ce prestataire et le client existe → sinon `false`
@@ -1473,6 +1498,7 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 ### 3. Page détail (`/app/mes-prestataires/[prestataireEntrepriseId]`)
 
 Sections :
+
 - **Informations** : SIRET, forme juridique, TVA, adresse — bouton "Modifier" conditionnel (`!prestataire.hasActiveAdmin`) → `EditEntrepriseInfosDialog`
 - **Services** : badges des services offerts — bouton "Modifier" conditionnel (`!prestataire.hasActiveAdmin`) → `EditPrestataireServicesDialog` (checkboxes, disclaimer blocage retrait si exécutions actives)
 - **Contacts** : liste des contacts de la relation (`clientPrestataireRelationContacts`, `side = "prestataire"`) avec bouton "Ajouter" → `AddRelationContactDialog`
@@ -1483,13 +1509,13 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 
 ### 4. Actions disponibles
 
-| Action | Condition |
-|--------|-----------|
-| Voir la page détail | Adhésion client active + prestataire dans périmètre |
-| Modifier informations (SIRENE) | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` (admin/manager client) |
-| Modifier services | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` via `updatePrestataireServicesAsProxyAction` |
-| Ajouter un contact à la relation | `admin` ou `manager` client actif + `relationId` existant |
-| Retirer un contact de la relation | Idem |
+| Action                            | Condition                                                                                                        |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Voir la page détail               | Adhésion client active + prestataire dans périmètre                                                              |
+| Modifier informations (SIRENE)    | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` (admin/manager client)                       |
+| Modifier services                 | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` via `updatePrestataireServicesAsProxyAction` |
+| Ajouter un contact à la relation  | `admin` ou `manager` client actif + `relationId` existant                                                        |
+| Retirer un contact de la relation | Idem                                                                                                             |
 
 ---
 
@@ -1497,10 +1523,10 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 
 Cette action est partagée entre plusieurs contextes :
 
-| Contexte | Condition |
-|----------|-----------|
-| Posture plateforme | `getEffectivePlateformeRole` non-null |
-| Proxy prestataire → client | `canManageClientInfosAsProxy` (prestataire admin/manager + client sans admin actif + relation existante) |
+| Contexte                   | Condition                                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Posture plateforme         | `getEffectivePlateformeRole` non-null                                                                          |
+| Proxy prestataire → client | `canManageClientInfosAsProxy` (prestataire admin/manager + client sans admin actif + relation existante)       |
 | Proxy client → prestataire | `canManagePrestataireInfosAsClient` (client admin/manager + prestataire sans admin actif + relation existante) |
 
 `getSireneDataAction` est accessible à tout utilisateur authentifié (données SIRENE = publiques).
@@ -1512,6 +1538,7 @@ Cette action est partagée entre plusieurs contextes :
 Utilisé dans `/app/mes-clients/[id]` (`side="client"`) et `/app/mes-prestataires/[id]` (`side="prestataire"`).
 
 Deux onglets :
+
 - **Créer nouveau** : formulaire `newContactFormSchema` (prénom, nom, email, téléphone, fonction, rôle, est_principal). Appelle `insertEntrepriseContactAndLinkToRelationAction` — crée d'abord un `entrepriseContacts` pour `targetEntrepriseId`, puis lie à la relation via `clientPrestataireRelationContacts`. Vérification d'unicité email par entreprise avant insertion.
 - **Choisir existant** : charge tous les contacts de `targetEntrepriseId` via `getEntrepriseContactsForRelationAction`. Si liste vide, affiche uniquement un message (pas de formulaire). Lie le contact sélectionné + rôle + est_principal via `linkExistingContactToRelationAction`.
 
@@ -1534,20 +1561,22 @@ Deux onglets :
 **Règle** : Toute création d'utilisateur crée **automatiquement** une entrée dans `entreprise_contacts` dans la même transaction atomique.
 
 Concerné par cette règle :
+
 - `insertUserAction` (création via UI `/app/utilisateurs`) — insère dans `entrepriseContacts` avec `prenom`, `nom`, `email`, `phone`, `userId`
 - `insertPlateformeUserAction` (création d'un utilisateur plateforme) — idem
 - `accepterInvitationContactAction` — si `contactId` non-null : met à jour le contact existant ; si `contactId` null : crée une nouvelle entrée `entrepriseContacts`
 
 **Non concerné** :
+
 - `addAdhesionToExistingUserAction` ("Rattacher existant") — l'utilisateur existe déjà, son entrée `entrepriseContacts` également.
 
 ### 2. Boutons "Devenir admin" / "Devenir manager"
 
 Visibles **uniquement** dans le panneau de détail de l'utilisateur courant (`isViewingSelf = true`) en posture **client** ou **prestataire** (jamais en posture plateforme).
 
-| Bouton | Condition d'affichage |
-|--------|----------------------|
-| "Devenir admin" | `user.adhesion?.role !== "admin"` |
+| Bouton            | Condition d'affichage                     |
+| ----------------- | ----------------------------------------- |
+| "Devenir admin"   | `user.adhesion?.role !== "admin"`         |
 | "Devenir manager" | `user.adhesion?.role === "collaborateur"` |
 
 Ces boutons ouvrent une Dialog d'information — ils ne déclenchent aucune mutation directe.
@@ -1556,12 +1585,13 @@ Ces boutons ouvrent une Dialog d'information — ils ne déclenchent aucune muta
 
 La dialog affiche un message contextuel selon la présence d'un admin actif dans l'entreprise :
 
-| Cas | Message |
-|-----|---------|
+| Cas                | Message                                                                                   |
+| ------------------ | ----------------------------------------------------------------------------------------- |
 | Admin actif trouvé | "Veuillez vous adresser à votre [administrateur](mailto:admin@...) pour changer de rôle." |
-| Aucun admin actif | "Veuillez vous adresser à [FM4ALL](mailto:contact@fm4all.com)." |
+| Aucun admin actif  | "Veuillez vous adresser à [FM4ALL](mailto:contact@fm4all.com)."                           |
 
 L'action serveur `getActiveAdminEmailAction` (`usersActions.ts`) :
+
 - Paramètres : `entrepriseId: uuid`, `posture: "client" | "prestataire"`
 - Requête : `userClientAdhesions` (posture client) ou `userPrestataireAdhesions` (posture prestataire), filtre `role = "admin"` ET `statut = "actif"`, jointure `user` pour récupérer l'email
 - Retour : `{ adminEmail: string | null }`
@@ -1574,6 +1604,7 @@ L'action serveur `getActiveAdminEmailAction` (`usersActions.ts`) :
 2. Créer l'utilisateur dans l'entreprise sélectionnée (`viewEntrepriseId`), **pas** dans l'entreprise FM4ALL
 
 **Implémentation** :
+
 - `UsersClient` passe `targetPosture` et `targetEntrepriseId` à `UserFormDialog`
 - `UserFormDialog` route vers `CreateOrLinkUserForm` avec `entrepriseId=targetEntrepriseId` et `posture=targetPosture` (et non `"plateforme"`)
 
@@ -1585,4 +1616,4 @@ Raison : si l'email est déjà vérifié, l'utilisateur a déjà un compte actif
 
 ---
 
-*Dernière mise à jour : 2026-03-13*
+_Dernière mise à jour : 2026-03-13_

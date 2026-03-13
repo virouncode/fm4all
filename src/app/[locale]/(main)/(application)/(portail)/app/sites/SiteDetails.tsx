@@ -64,9 +64,7 @@ export function SiteDetails({
     site.typeOccupation;
 
   // Permissions
-  const isAdmin =
-    !!currentUserPlateformeRole ||
-    currentUserRole === "admin";
+  const isAdmin = !!currentUserPlateformeRole || currentUserRole === "admin";
   const isResponsable = responsableSiteIds.has(site.id);
 
   // Admin peut tout faire, non-admin doit être responsable du site
@@ -189,7 +187,7 @@ export function SiteDetails({
         <div className="flex-1 space-y-3 border-l pl-4">
           <div className="flex items-center gap-2">
             <UserCog className="text-primary size-4 shrink-0" />
-            <span className="text-sm font-medium">Responsable du site</span>
+            <span className="text-sm font-medium">Responsable(s) du site</span>
           </div>
 
           {loadingResponsables ? (

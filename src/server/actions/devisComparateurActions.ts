@@ -6,7 +6,10 @@ import { db } from "@/db";
 import { devis, devisTemporaires, prospects } from "@/db/schema";
 import { actionClient } from "@/lib/action/safe-actions";
 import { sendEmailFromServer } from "@/lib/email/sendEmail";
-import { insertDevisSchema, saveProgressSchema } from "@/zod-schemas/devisComparateur";
+import {
+  insertDevisSchema,
+  saveProgressSchema,
+} from "@/zod-schemas/devisComparateur";
 import { finaliserDevisSchema } from "@/zod-schemas/finaliserDevis";
 import { SelectProspectType } from "@/zod-schemas/prospect";
 import { format } from "date-fns";
@@ -117,7 +120,7 @@ export const saveProgressAction = actionClient
               <p>Voici ses informations de chiffrage (avant personnalisation) :</p><br/>
               <pre>${insertedDevisTemp.texte}</pre>
               `,
-        useTemplate: false,
+        useTemplate: false, //car trop long pour les templates Mailgun (limite de 10k caractères)
       });
     } catch (err) {
       console.log("Erreur envoi email", err);

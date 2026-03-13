@@ -127,7 +127,21 @@ export const getAvailableTacheListesTemplatesAction = actionClient
 
     const { serviceId, entrepriseId, executionId } = parsedInput;
 
-    const hasAccess = await hasAccessToEntreprise(currentUser.id, entrepriseId);
+    // Résolution préalable du prestataireEntrepriseId (réutilisé pour le check d'accès ET pour les packs)
+    const prestataireEntrepriseId = executionId
+      ? await getExecutionPrestataireEntrepriseId(executionId)
+      : null;
+
+    // En posture prestataire, l'entrepriseId passé est celui du CLIENT — le prestataire
+    // n'a pas d'adhésion client, donc on vérifie l'accès contre son propre entrepriseId
+    // (récupéré depuis l'exécution).
+    const posture = await getActivePosture();
+    const entrepriseIdToCheck =
+      posture === "prestataire" && prestataireEntrepriseId
+        ? prestataireEntrepriseId
+        : entrepriseId;
+
+    const hasAccess = await hasAccessToEntreprise(currentUser.id, entrepriseIdToCheck);
     if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
@@ -135,12 +149,8 @@ export const getAvailableTacheListesTemplatesAction = actionClient
     // Résolution des entreprises visibles (les packs système IS NULL sont inclus automatiquement par la query)
     const entrepriseIds: string[] = [entrepriseId];
 
-    if (executionId) {
-      const prestataireId =
-        await getExecutionPrestataireEntrepriseId(executionId);
-      if (prestataireId && !entrepriseIds.includes(prestataireId)) {
-        entrepriseIds.push(prestataireId);
-      }
+    if (prestataireEntrepriseId && !entrepriseIds.includes(prestataireEntrepriseId)) {
+      entrepriseIds.push(prestataireEntrepriseId);
     }
 
     const packs = await getAvailableTacheListesTemplates({

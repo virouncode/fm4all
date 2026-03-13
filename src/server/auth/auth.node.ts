@@ -39,16 +39,17 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async ({ newEmail, url }) => {
+      sendChangeEmailVerification: async ({ newEmail, url, user }) => {
         await sendEmailDirect({
           to: newEmail,
           from: "noreply@mg.fm4all.com",
           subject: "Changement d'adresse email",
           text: `<p>Vous avez demandé à changer votre adresse email</p><br/>
                  <p>Veuillez cliquer sur le lien suivant pour vérifier votre nouvel email :</p><br/>
-                <p>${url}</p>
+                <p><a href="${url}">Vérifier mon adresse email</a></p>
                 `,
-          useTemplate: false,
+          useTemplate: true,
+          nomDestinataire: user.name,
         });
       },
     },
@@ -144,7 +145,7 @@ export const auth = betterAuth({
         subject: "Veuillez vérifier votre adresse email",
         text: `<p>Votre email pour la connection à FM4ALL vient d'être modifié.</p><br/>
               <p>Veuillez cliquer sur le lien suivant pour vérifier votre email :</p><br/>
-              <p>${verificationUrl}</p>
+              <p><a href="${verificationUrl}">Vérifier mon adresse email</a></p>
               `,
         nomDestinataire: user.name,
         useTemplate: true,
@@ -154,5 +155,5 @@ export const auth = betterAuth({
   plugins: [openAPI(), nextCookies()], //api/auth/reference
 } satisfies BetterAuthOptions);
 
-export type AuthSession = typeof auth.$Infer.Session;
-export type AuthUser = AuthSession["user"];
+export type AuthSessionType = typeof auth.$Infer.Session;
+export type AuthUserType = AuthSessionType["user"];

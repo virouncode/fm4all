@@ -105,11 +105,7 @@ export function EntrepriseCard({ entreprise, onClick }: EntrepriseCardProps) {
           {/* Adresse */}
           <div className="text-xs">
             <span className="text-muted-foreground">Adresse : </span>
-            <span
-              className={
-                adresseParts.length === 0 ? "text-muted-foreground" : undefined
-              }
-            >
+            <span>
               {adresseParts.length > 0 ? adresseParts.join(", ") : "N/A"}
             </span>
           </div>

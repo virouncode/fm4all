@@ -253,6 +253,7 @@ function LinkExistingUserForm({
   const [eligibleUsers, setEligibleUsers] = useState<
     { id: string; prenom: string; nom: string; email: string }[]
   >([]);
+  const [totalUsersInEntreprise, setTotalUsersInEntreprise] = useState(0);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
@@ -273,8 +274,9 @@ function LinkExistingUserForm({
         entrepriseId,
         posture,
       });
-      if (result?.data?.users) {
+      if (result?.data) {
         setEligibleUsers(result.data.users);
+        setTotalUsersInEntreprise(result.data.totalUsersInEntreprise);
       }
       setLoadingUsers(false);
     }
@@ -318,13 +320,26 @@ function LinkExistingUserForm({
   }
 
   if (eligibleUsers.length === 0) {
-    return (
-      <>
-        <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
+    const emptyMessage =
+      totalUsersInEntreprise === 0 ? (
+        <>
+          Cette entreprise n&apos;a pas encore d&apos;utilisateur.
+          <br />
+          Créez d&apos;abord un utilisateur via l&apos;onglet &laquo;&nbsp;Nouvel
+          utilisateur&nbsp;&raquo;.
+        </>
+      ) : (
+        <>
           Aucun utilisateur existant à rattacher pour cette posture.
           <br />
           Tous les utilisateurs de l&apos;entreprise ont déjà une adhésion{" "}
           {posture}.
+        </>
+      );
+    return (
+      <>
+        <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
+          {emptyMessage}
         </div>
         <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>

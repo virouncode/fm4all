@@ -36,7 +36,6 @@ import {
   Lock,
   RotateCcw,
   Search,
-  UserCheck,
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -356,7 +355,7 @@ export function EntrepriseFormDialog({
                 {step === 1 ? (
                   <div className="space-y-4">
                     {/* Prospect picker */}
-                    {siretState.status === "idle" && (
+                    {/* {siretState.status === "idle" && (
                       <Button
                         type="button"
                         variant="outline"
@@ -367,7 +366,7 @@ export function EntrepriseFormDialog({
                         <UserCheck className="h-4 w-4" />
                         Remplir depuis un prospect existant
                       </Button>
-                    )}
+                    )} */}
 
                     {/* SIRET */}
                     <div className="space-y-1.5">
@@ -512,7 +511,6 @@ export function EntrepriseFormDialog({
                             </div>
                           )}
                         </div>
-
                       </>
                     )}
                   </div>
