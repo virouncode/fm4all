@@ -1438,7 +1438,32 @@ Sections :
 | Ajouter/modifier/supprimer contact | `canEditContacts && !c.userId` (`canEditContacts` = `canEdit` par défaut) |
 | Inviter un contact                 | `canInviteContacts && !c.userId && c.email` (`canInviteContacts` = `canEditContacts` par défaut) |
 
-> **`canInviteContacts` indépendant** : prop séparée permettant d'autoriser l'invitation sans autoriser la modification/suppression. Utilisé dans `/app/mon-entreprise` : `canEditContacts={false}`, `canInviteContacts={canEdit}` — les admins peuvent inviter leurs contacts sans pouvoir éditer les fiches.
+> **`canInviteContacts` indépendant** : prop séparée permettant d'autoriser l'invitation sans autoriser la modification/suppression.
+
+#### Calcul des permissions dans `/app/mon-entreprise` (`MonEntrepriseClient`)
+
+Les permissions sont calculées côté client de façon **posture-aware** en lisant depuis le store :
+
+```typescript
+const activeRole =
+  postureActive === "plateforme" ? rolePlateformeAdhesion
+  : postureActive === "prestataire" ? rolePrestataireAdhesion
+  : roleClientAdhesion;
+
+// Infos / Logo / Rôles : admin uniquement (ou n'importe quel rôle plateforme)
+const canEdit =
+  postureActive === "plateforme" ? activeRole !== null : activeRole === "admin";
+
+// Contacts : admin + manager (ou n'importe quel rôle plateforme)
+const canEditContacts =
+  postureActive === "plateforme"
+    ? activeRole !== null
+    : activeRole === "admin" || activeRole === "manager";
+```
+
+`canInviteContacts={canEditContacts}` (les managers peuvent aussi inviter leurs contacts).
+
+> **Règle** : `postureActive` est lu depuis le store Zustand **uniquement** pour cet affichage conditionnel. Il n'est **jamais** envoyé vers une server action. Les server actions lisent toujours la posture depuis le cookie httpOnly via `getEffectivePlateformeRole()`.
 
 ### 5. Chargement des contacts (pattern important)
 
@@ -1484,12 +1509,13 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 
 ### 4. Actions disponibles
 
-| Action                            | Condition                                                                            |
-| --------------------------------- | ------------------------------------------------------------------------------------ |
-| Voir la page détail               | Adhésion prestataire active + client dans périmètre                                  |
-| Modifier informations (SIRENE)    | `!client.hasActiveAdmin` + `canManageClientInfosAsProxy` (admin/manager prestataire) |
-| Ajouter un contact à la relation  | `admin` ou `manager` prestataire actif + `relationId` existant                       |
-| Retirer un contact de la relation | Idem — confirmation AlertDialog "Voulez-vous vraiment retirer **Nom** de vos contacts pour ce client ?" |
+| Action                                      | Condition                                                                            |
+| ------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Voir la page détail                         | Adhésion prestataire active + client dans périmètre                                  |
+| Modifier informations (SIRENE)              | `!client.hasActiveAdmin` + `canManageClientInfosAsProxy` (admin/manager prestataire) |
+| Ajouter un contact à la relation            | `admin` ou `manager` prestataire actif + `relationId` existant                       |
+| Modifier rôle/estPrincipal d'un lien        | Idem — `EditRelationContactDialog` (bouton Pencil sur chaque contact)                |
+| Retirer un contact de la relation           | Idem — confirmation AlertDialog "Voulez-vous vraiment retirer **Nom** de vos contacts pour ce client ?" |
 
 ---
 
@@ -1528,13 +1554,14 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 
 ### 4. Actions disponibles
 
-| Action                            | Condition                                                                                                        |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Voir la page détail               | Adhésion client active + prestataire dans périmètre                                                              |
-| Modifier informations (SIRENE)    | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` (admin/manager client)                       |
-| Modifier services                 | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` via `updatePrestataireServicesAsProxyAction` |
-| Ajouter un contact à la relation  | `admin` ou `manager` client actif + `relationId` existant                                                        |
-| Retirer un contact de la relation | Idem — confirmation AlertDialog "Voulez-vous vraiment retirer **Nom** de vos contacts pour ce prestataire ?"    |
+| Action                                      | Condition                                                                                                        |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Voir la page détail                         | Adhésion client active + prestataire dans périmètre                                                              |
+| Modifier informations (SIRENE)              | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` (admin/manager client)                       |
+| Modifier services                           | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` via `updatePrestataireServicesAsProxyAction` |
+| Ajouter un contact à la relation            | `admin` ou `manager` client actif + `relationId` existant                                                        |
+| Modifier rôle/estPrincipal d'un lien        | Idem — `EditRelationContactDialog` (bouton Pencil sur chaque contact)                                            |
+| Retirer un contact de la relation           | Idem — confirmation AlertDialog "Voulez-vous vraiment retirer **Nom** de vos contacts pour ce prestataire ?"    |
 
 ---
 
@@ -1564,6 +1591,27 @@ Deux onglets :
   - `totalContactCount === 0` → "X n'a pas encore de contacts. Créez-en un nouveau."
 
 > **Avant** : la liste affichait tous les contacts de l'entreprise sans filtrage, y compris ceux déjà liés à la relation (bug). Corrigé le 2026-03-13.
+
+---
+
+### `EditRelationContactDialog` — Dialog d'édition du lien de relation
+
+Utilisé dans `/app/mes-clients/[id]` et `/app/mes-prestataires/[id]`. Affiché via le bouton Pencil sur chaque contact de la liste de relation.
+
+**Périmètre d'édition** : uniquement les champs du lien `clientPrestataireRelationContacts`, **pas** les champs du contact lui-même (`prenom`, `nom`, `email`, etc.) :
+
+| Champ       | Type         | Description                                            |
+| ----------- | ------------ | ------------------------------------------------------ |
+| `role`      | texte libre  | Rôle de ce contact dans la relation (ex : "Commercial") |
+| `estPrincipal` | booléen  | Ce contact est-il le contact principal de la relation ? |
+
+**Schéma** : `updateRelationContactSchema` (`linkId: uuid`, `role?: string`, `estPrincipal: boolean`)
+
+**Action** : `updateRelationContactAction` — même guard `canManageRelationContacts` (`admin` ou `manager` actif) que les actions insert/delete. Utilise `normalizeForSubmit({ optionalStrings: ["role"] })` pour convertir `""` → `null`.
+
+**Affichage** : le champ `role` est affiché en italique sous les badges de chaque contact dans la liste, quand il est défini.
+
+> **Distinction** : `EditRelationContactDialog` édite le **lien** (relation). Pour éditer les **coordonnées** du contact (prénom, nom, téléphone...), utiliser `EditEntrepriseContactDialog` dans `/app/entreprises` (posture plateforme) — uniquement si `contact.userId === null`.
 
 ---
 
