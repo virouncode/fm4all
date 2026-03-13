@@ -40,7 +40,7 @@ import {
   usersQueryBackendSchema,
 } from "@/zod-schemas/user.schema";
 import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { headers } from "next/headers";
 import { z } from "zod";
@@ -1084,6 +1084,29 @@ export const updateUserAction = actionClient
         }
       }
 
+      // 5. Synchroniser le contact lié (prenom, nom, phone) si l'utilisateur en a un
+      const hasUserDataChange =
+        prenomNormalized !== undefined ||
+        nomNormalized !== undefined ||
+        parsedInput.phone !== undefined;
+
+      if (hasUserDataChange) {
+        await tx
+          .update(entrepriseContacts)
+          .set({
+            ...(prenomNormalized !== undefined
+              ? { prenom: prenomNormalized }
+              : {}),
+            ...(nomNormalized !== undefined ? { nom: nomNormalized } : {}),
+            ...(parsedInput.phone !== undefined
+              ? { phone: normalized.phone }
+              : {}),
+            updatedById: currentUser.id,
+            updatedAt: new Date(),
+          })
+          .where(eq(entrepriseContacts.userId, userId));
+      }
+
       // Changement email admin : mettre à jour email + emailVerified:false dans la transaction
       if (adminEmailChangeNewEmail) {
         await tx
@@ -1264,35 +1287,54 @@ export const getUsersEligibleForAdhesionAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès (admin actif ou tout rôle plateforme)
+    // Vérifier accès (admin ou manager actif, ou tout rôle plateforme)
+    // Les managers peuvent aussi créer des subordonnés → ils doivent pouvoir rattacher des users existants
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     if (!platformRole?.role) {
-      // Vérifier que l'utilisateur est admin actif dans cette entreprise (peu importe la posture)
-      const isClientAdmin = await db.query.userClientAdhesions.findFirst({
+      const hasClientAccess = await db.query.userClientAdhesions.findFirst({
         where: and(
           eq(userClientAdhesions.userId, currentUser.id),
           eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
-          eq(userClientAdhesions.role, "admin"),
+          inArray(userClientAdhesions.role, ["admin", "manager"]),
           eq(userClientAdhesions.statut, "actif"),
         ),
       });
-      const isPrestataireAdmin =
+      const hasPrestataireAccess =
         await db.query.userPrestataireAdhesions.findFirst({
           where: and(
             eq(userPrestataireAdhesions.userId, currentUser.id),
-            eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
-            eq(userPrestataireAdhesions.role, "admin"),
+            eq(
+              userPrestataireAdhesions.entrepriseId,
+              parsedInput.entrepriseId,
+            ),
+            inArray(userPrestataireAdhesions.role, ["admin", "manager"]),
             eq(userPrestataireAdhesions.statut, "actif"),
           ),
         });
-      if (!isClientAdmin && !isPrestataireAdmin) {
-        throw errors.forbidden("Accès administrateur requis.");
+      if (!hasClientAccess && !hasPrestataireAccess) {
+        throw errors.forbidden("Accès administrateur ou manager requis.");
       }
     }
 
-    const [users, totalResult] = await Promise.all([
-      getUsersEligibleForAdhesion(parsedInput),
-      db
+    const users = await getUsersEligibleForAdhesion(parsedInput);
+
+    let totalUsersInEntreprise = 0;
+    if (parsedInput.posture === "client") {
+      const r = await db
+        .select({ total: count() })
+        .from(userClientAdhesions)
+        .where(eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId));
+      totalUsersInEntreprise = r[0]?.total ?? 0;
+    } else if (parsedInput.posture === "prestataire") {
+      const r = await db
+        .select({ total: count() })
+        .from(userPrestataireAdhesions)
+        .where(
+          eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+        );
+      totalUsersInEntreprise = r[0]?.total ?? 0;
+    } else {
+      const r = await db
         .select({ total: count() })
         .from(usersArborescence)
         .where(
@@ -1300,9 +1342,9 @@ export const getUsersEligibleForAdhesionAction = actionClient
             eq(usersArborescence.ancetreId, usersArborescence.descendantId),
             eq(usersArborescence.entrepriseId, parsedInput.entrepriseId),
           ),
-        ),
-    ]);
-    const totalUsersInEntreprise = totalResult[0]?.total ?? 0;
+        );
+      totalUsersInEntreprise = r[0]?.total ?? 0;
+    }
     return { users, totalUsersInEntreprise };
   });
 

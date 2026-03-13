@@ -46,7 +46,7 @@ import {
   type UpdateUserFormType,
 } from "@/zod-schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserPlus, User } from "lucide-react";
+import { User, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -196,13 +196,13 @@ function CreateOrLinkUserForm({
         >
           <ToggleGroupItem
             value="nouveau"
-            className="text-xs px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3 text-xs"
           >
             Nouvel utilisateur
           </ToggleGroupItem>
           <ToggleGroupItem
             value="existant"
-            className="text-xs px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3 text-xs"
           >
             Rattacher existant
           </ToggleGroupItem>
@@ -325,8 +325,8 @@ function LinkExistingUserForm({
         <>
           Cette entreprise n&apos;a pas encore d&apos;utilisateur.
           <br />
-          Créez d&apos;abord un utilisateur via l&apos;onglet &laquo;&nbsp;Nouvel
-          utilisateur&nbsp;&raquo;.
+          Créez d&apos;abord un utilisateur via l&apos;onglet
+          &laquo;&nbsp;Nouvel utilisateur&nbsp;&raquo;.
         </>
       ) : (
         <>
@@ -426,7 +426,9 @@ function CreateUserFormInner({
   onOpenChange: (open: boolean) => void;
 }) {
   const roleClientAdhesion = useAppStore((state) => state.roleClientAdhesion);
-  const rolePrestataireAdhesion = useAppStore((state) => state.rolePrestataireAdhesion);
+  const rolePrestataireAdhesion = useAppStore(
+    (state) => state.rolePrestataireAdhesion,
+  );
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
@@ -435,7 +437,9 @@ function CreateUserFormInner({
     posture === "prestataire" ? rolePrestataireAdhesion : roleClientAdhesion;
 
   const roleCT =
-    posture === "prestataire" ? rolePrestataireAdhesionCT : roleClientAdhesionCT;
+    posture === "prestataire"
+      ? rolePrestataireAdhesionCT
+      : roleClientAdhesionCT;
 
   const availableRoles = roleCT.filter((r) => {
     if (!currentUserRole && !currentUserPlateformeRole) return false;
@@ -511,11 +515,7 @@ function CreateUserFormInner({
               name="prenom"
               requiredMark
             />
-            <RhfInput<InsertUserFormType>
-              label="Nom"
-              name="nom"
-              requiredMark
-            />
+            <RhfInput<InsertUserFormType> label="Nom" name="nom" requiredMark />
           </div>
 
           <RhfInput<InsertUserFormType>
@@ -524,10 +524,7 @@ function CreateUserFormInner({
             type="email"
             requiredMark
           />
-          <RhfInput<InsertUserFormType>
-            label="N° de téléphone"
-            name="phone"
-          />
+          <RhfInput<InsertUserFormType> label="N° de téléphone" name="phone" />
           <RhfControlledSelect<InsertUserFormType>
             label="Rôle"
             name="roleAdhesion"
@@ -712,13 +709,17 @@ function EditUserForm({
   const currentUser = useAppStore((state) => state.user);
   const postureActive = useAppStore((state) => state.postureActive);
   const roleClientAdhesion = useAppStore((state) => state.roleClientAdhesion);
-  const rolePrestataireAdhesion = useAppStore((state) => state.rolePrestataireAdhesion);
+  const rolePrestataireAdhesion = useAppStore(
+    (state) => state.rolePrestataireAdhesion,
+  );
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
 
   const currentUserRole =
-    postureActive === "prestataire" ? rolePrestataireAdhesion : roleClientAdhesion;
+    postureActive === "prestataire"
+      ? rolePrestataireAdhesion
+      : roleClientAdhesion;
 
   const posture: "client" | "prestataire" =
     postureActive === "prestataire" ? "prestataire" : "client";
@@ -726,7 +727,9 @@ function EditUserForm({
   const isEditingSelf = currentUser?.id === userId;
 
   const roleCT =
-    posture === "prestataire" ? rolePrestataireAdhesionCT : roleClientAdhesionCT;
+    posture === "prestataire"
+      ? rolePrestataireAdhesionCT
+      : roleClientAdhesionCT;
 
   const availableRoles = roleCT.filter(() => {
     if (!currentUserRole && !currentUserPlateformeRole) return false;

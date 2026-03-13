@@ -58,6 +58,10 @@ type EntrepriseDetailsClientProps = {
   initialContacts?: EntrepriseContactWithInvitationType[];
   /** Si false, les boutons "Modifier" et l'avatar cliquable sont masqués (non-admin) */
   canEdit?: boolean;
+  /** Si false, les boutons d'action sur les contacts (inviter, modifier, supprimer) sont masqués */
+  canEditContacts?: boolean;
+  /** Si false, le bouton "Inviter" sur les contacts sans compte est masqué (défaut = canEditContacts) */
+  canInviteContacts?: boolean;
   /** Si false, le bouton "Retour aux entreprises" est masqué (ex: page Mon Entreprise) */
   showBackButton?: boolean;
   /** Callback après mutation réussie — par défaut router.refresh() */
@@ -69,8 +73,10 @@ export function EntrepriseDetailsClient({
   services,
   logoUrl,
   logoStorageKey,
-  initialContacts = [],
+  initialContacts,
   canEdit = true,
+  canEditContacts = canEdit,
+  canInviteContacts = canEditContacts,
   showBackButton = true,
   onUpdate,
 }: EntrepriseDetailsClientProps) {
@@ -88,9 +94,11 @@ export function EntrepriseDetailsClient({
 
   // Contacts state — synchronisé avec initialContacts quand le serveur re-fetch (router.refresh())
   const [contacts, setContacts] =
-    useState<EntrepriseContactWithInvitationType[]>(initialContacts);
+    useState<EntrepriseContactWithInvitationType[]>(initialContacts ?? []);
   useEffect(() => {
-    setContacts(initialContacts);
+    if (initialContacts !== undefined) {
+      setContacts(initialContacts);
+    }
   }, [initialContacts]);
   const [addContactOpen, setAddContactOpen] = useState(false);
   const [editingContact, setEditingContact] =
@@ -429,7 +437,7 @@ export function EntrepriseDetailsClient({
               <Users className="text-primary h-4 w-4" />
               Contacts
             </CardTitle>
-            {canEdit && (
+            {canEditContacts && (
               <Button
                 size="sm"
                 variant="outline"
@@ -455,9 +463,26 @@ export function EntrepriseDetailsClient({
                   className="flex items-start justify-between gap-3 rounded-md border p-3"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium">
-                      {c.prenom} {c.nom}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-medium">
+                        {c.prenom} {c.nom}
+                      </p>
+                      {c.userId ? (
+                        <Badge
+                          variant="outline"
+                          className="border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-950/30 dark:text-green-400 text-xs"
+                        >
+                          Utilisateur
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="text-muted-foreground text-xs"
+                        >
+                          Sans compte
+                        </Badge>
+                      )}
+                    </div>
                     {c.fonction && (
                       <p className="text-muted-foreground text-xs">
                         {c.fonction}
@@ -491,9 +516,9 @@ export function EntrepriseDetailsClient({
                       </p>
                     )}
                   </div>
-                  {canEdit && (
+                  {(canInviteContacts || canEditContacts) && !c.userId && (
                     <div className="flex shrink-0 gap-1">
-                      {!c.userId && c.email && (
+                      {canInviteContacts && c.email && (
                         <Button
                           variant="ghost"
                           size="icon"
@@ -509,27 +534,31 @@ export function EntrepriseDetailsClient({
                           )}
                         </Button>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => setEditingContact(c)}
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive h-7 w-7"
-                        onClick={() => setConfirmDeleteContact(c)}
-                        disabled={deletingContactId === c.id}
-                      >
-                        {deletingContactId === c.id ? (
-                          <Spinner className="h-3.5 w-3.5" />
-                        ) : (
-                          <Trash2 className="h-3.5 w-3.5" />
-                        )}
-                      </Button>
+                      {canEditContacts && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => setEditingContact(c)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive h-7 w-7"
+                            onClick={() => setConfirmDeleteContact(c)}
+                            disabled={deletingContactId === c.id}
+                          >
+                            {deletingContactId === c.id ? (
+                              <Spinner className="h-3.5 w-3.5" />
+                            ) : (
+                              <Trash2 className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -539,107 +568,112 @@ export function EntrepriseDetailsClient({
         </CardContent>
       </Card>
 
-      {/* Dialog confirmation invitation */}
-      <AlertDialog
-        open={!!confirmInviteContact}
-        onOpenChange={(v) => {
-          if (!v) setConfirmInviteContact(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Envoyer une invitation ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Un email sera envoyé à{" "}
-              <strong>{confirmInviteContact?.email}</strong> pour inviter{" "}
-              {confirmInviteContact?.prenom} {confirmInviteContact?.nom} à créer
-              son compte.
-              {confirmInviteContact?.pendingInvitationSentAt && (
-                <span className="mt-1 block">
-                  Une invitation précédente avait été envoyée le{" "}
-                  {formatEntrepriseDate(
-                    confirmInviteContact.pendingInvitationSentAt,
-                  )}
-                  . Elle sera remplacée par la nouvelle.
-                </span>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                confirmInviteContact &&
-                handleInviterContact(confirmInviteContact.id)
-              }
-            >
-              Envoyer l&apos;invitation
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Dialog confirmation suppression contact */}
-      <AlertDialog
-        open={!!confirmDeleteContact}
-        onOpenChange={(v) => {
-          if (!v) setConfirmDeleteContact(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer ce contact ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {confirmDeleteContact?.prenom} {confirmDeleteContact?.nom} sera
-              définitivement supprimé de la liste des contacts.
-              {confirmDeleteContact?.pendingInvitationSentAt && (
-                <span className="text-destructive mt-1 block font-medium">
-                  Une invitation est en attente pour ce contact. Elle deviendra
-                  caduque si vous supprimez le contact.
-                </span>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() =>
-                confirmDeleteContact &&
-                handleDeleteContact(confirmDeleteContact.id)
-              }
-            >
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Dialog ajout contact */}
-      {canEdit && (
-        <EditEntrepriseContactDialog
-          open={addContactOpen}
-          onOpenChange={setAddContactOpen}
-          mode="create"
-          entrepriseId={entreprise.id}
-          onSuccess={() => router.refresh()}
-        />
+      {/* Dialog confirmation invitation — visible si canInviteContacts */}
+      {canInviteContacts && (
+        <AlertDialog
+          open={!!confirmInviteContact}
+          onOpenChange={(v) => {
+            if (!v) setConfirmInviteContact(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Envoyer une invitation ?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Un email sera envoyé à{" "}
+                <strong>{confirmInviteContact?.email}</strong> pour inviter{" "}
+                {confirmInviteContact?.prenom} {confirmInviteContact?.nom} à créer
+                son compte.
+                {confirmInviteContact?.pendingInvitationSentAt && (
+                  <span className="mt-1 block">
+                    Une invitation précédente avait été envoyée le{" "}
+                    {formatEntrepriseDate(
+                      confirmInviteContact.pendingInvitationSentAt,
+                    )}
+                    . Elle sera remplacée par la nouvelle.
+                  </span>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() =>
+                  confirmInviteContact &&
+                  handleInviterContact(confirmInviteContact.id)
+                }
+              >
+                Envoyer l&apos;invitation
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
 
-      {/* Dialog édition contact */}
-      {canEdit && editingContact && (
-        <EditEntrepriseContactDialog
-          open={!!editingContact}
-          onOpenChange={(v) => {
-            if (!v) setEditingContact(null);
-          }}
-          mode="edit"
-          contact={editingContact}
-          onSuccess={() => {
-            setEditingContact(null);
-            router.refresh();
-          }}
-        />
+      {/* Dialogs contacts — masqués si canEditContacts=false (ex: page Mon Entreprise) */}
+      {canEditContacts && (
+        <>
+          {/* Dialog confirmation suppression contact */}
+          <AlertDialog
+            open={!!confirmDeleteContact}
+            onOpenChange={(v) => {
+              if (!v) setConfirmDeleteContact(null);
+            }}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Supprimer ce contact ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {confirmDeleteContact?.prenom} {confirmDeleteContact?.nom} sera
+                  définitivement supprimé de la liste des contacts.
+                  {confirmDeleteContact?.pendingInvitationSentAt && (
+                    <span className="text-destructive mt-1 block font-medium">
+                      Une invitation est en attente pour ce contact. Elle deviendra
+                      caduque si vous supprimez le contact.
+                    </span>
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() =>
+                    confirmDeleteContact &&
+                    handleDeleteContact(confirmDeleteContact.id)
+                  }
+                >
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Dialog ajout contact */}
+          <EditEntrepriseContactDialog
+            open={addContactOpen}
+            onOpenChange={setAddContactOpen}
+            mode="create"
+            entrepriseId={entreprise.id}
+            onSuccess={() => router.refresh()}
+          />
+
+          {/* Dialog édition contact */}
+          {editingContact && (
+            <EditEntrepriseContactDialog
+              open={!!editingContact}
+              onOpenChange={(v) => {
+                if (!v) setEditingContact(null);
+              }}
+              mode="edit"
+              contact={editingContact}
+              onSuccess={() => {
+                setEditingContact(null);
+                router.refresh();
+              }}
+            />
+          )}
+        </>
       )}
 
       {/* Dialogs — uniquement si l'utilisateur peut éditer */}

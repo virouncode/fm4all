@@ -1274,14 +1274,27 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Voir (liste)                | `hasAccessToEntreprise(userId, entrepriseId)`                                                                     |
 | Créer                       | `hasAccessToEntreprise(userId, entrepriseId)`                                                                     |
-| Modifier                    | `hasAccessToEntreprise(userId, entrepriseId)` (ownership vérifié via lookup)                                      |
-| Supprimer (DELETE physique) | `hasAccessToEntreprise(userId, entrepriseId)` + contact non référencé dans `client_prestataire_relation_contacts` |
+| Modifier                    | `hasAccessToEntreprise(userId, entrepriseId)` + **`contact.userId` doit être `null`** (ownership vérifié via lookup) |
+| Supprimer (DELETE physique) | `hasAccessToEntreprise(userId, entrepriseId)` + **`contact.userId` doit être `null`** + contact non référencé dans `client_prestataire_relation_contacts` |
 
-> **Blocage suppression** : si le contact est lié à au moins une relation (`COUNT(client_prestataire_relation_contacts WHERE contactId = ...)` > 0), la suppression est refusée avec un message explicite. Il faut d'abord le retirer de toutes les relations.
+> **Blocage si userId** : si le contact a un `userId` (= lié à un compte utilisateur actif), les actions `updateEntrepriseContactAction` et `deleteEntrepriseContactAction` retournent une erreur `errors.conflict()`. Les données du compte sont la source de vérité — elles se synchronisent automatiquement depuis `updateUserAction` (voir §4 ci-dessous). L'UI masque les boutons Modifier/Supprimer/Inviter pour ces contacts.
+
+> **Blocage suppression (lien relation)** : si le contact est lié à au moins une relation (`COUNT(client_prestataire_relation_contacts WHERE contactId = ...)` > 0), la suppression est refusée avec un message explicite. Il faut d'abord le retirer de toutes les relations.
 
 > **Rationale** : les contacts sont un carnet d'adresses de référence. Tout utilisateur avec une adhésion active peut les gérer. Cette page étant réservée à la posture plateforme (`getUserPlateformeAdhesion`), la restriction admin/manager est implicite.
 
 > **Cascade** : si une entreprise est supprimée, ses contacts le sont aussi (`ON DELETE CASCADE`). Mais la suppression unitaire est bloquée si des liens de relation existent.
+
+### 2bis. Badge de statut contact
+
+Chaque contact affiché dans l'UI porte un badge :
+
+| Badge | Condition | Style |
+|-------|-----------|-------|
+| **Utilisateur** | `c.userId` non null | Vert (`border-green-300 bg-green-50 text-green-700`) |
+| **Sans compte** | `c.userId` null | Grisé (`text-muted-foreground`) |
+
+Affiché dans : `EntrepriseDetailsClient`, `ClientDetailClient`, `PrestataireDetailClient`.
 
 ### 3. Permissions — Contacts de relation (`client_prestataire_relation_contacts`)
 
@@ -1295,17 +1308,21 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 
 ### 4. Actions disponibles
 
-| Action                            | Fichier                 | Description                                                    |
-| --------------------------------- | ----------------------- | -------------------------------------------------------------- |
-| `getEntrepriseContactsAction`     | `entreprisesActions.ts` | Liste les contacts d'une entreprise                            |
-| `insertEntrepriseContactAction`   | `entreprisesActions.ts` | Crée un contact (normalizeForSubmit)                           |
-| `updateEntrepriseContactAction`   | `entreprisesActions.ts` | Modifie un contact (normalizeForSubmit)                        |
-| `deleteEntrepriseContactAction`   | `entreprisesActions.ts` | Supprime un contact (DELETE physique)                          |
-| `inviterContactAction`            | `entreprisesActions.ts` | Envoie une invitation par email à un contact sans compte       |
-| `accepterInvitationContactAction` | `entreprisesActions.ts` | Crée le compte user + adhésion collaborateur à partir du token |
-| `getRelationContactsAction`       | `entreprisesActions.ts` | Liste les contacts d'une relation avec détails                 |
-| `insertRelationContactAction`     | `entreprisesActions.ts` | Lie un contact à une relation (normalizeForSubmit)             |
-| `deleteRelationContactAction`     | `entreprisesActions.ts` | Retire un contact d'une relation                               |
+| Action                                            | Fichier                 | Description                                                                            |
+| ------------------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------- |
+| `getEntrepriseContactsAction`                     | `entreprisesActions.ts` | Liste les contacts d'une entreprise                                                    |
+| `insertEntrepriseContactAction`                   | `entreprisesActions.ts` | Crée un contact (normalizeForSubmit)                                                   |
+| `updateEntrepriseContactAction`                   | `entreprisesActions.ts` | Modifie un contact — bloqué si `contact.userId` non null (`errors.conflict()`)         |
+| `deleteEntrepriseContactAction`                   | `entreprisesActions.ts` | Supprime un contact — bloqué si `contact.userId` non null ou lié à une relation        |
+| `inviterContactAction`                            | `entreprisesActions.ts` | Envoie une invitation par email à un contact sans compte                               |
+| `accepterInvitationContactAction`                 | `entreprisesActions.ts` | Crée le compte user + adhésion collaborateur à partir du token                         |
+| `getRelationContactsAction`                       | `entreprisesActions.ts` | Liste les contacts d'une relation avec détails                                         |
+| `getEntrepriseContactsForRelationAction`          | `entreprisesActions.ts` | Liste les contacts de `targetEntrepriseId` **non encore liés** à `relationId` (filtre `notExists`) + `totalContactCount` |
+| `insertRelationContactAction`                     | `entreprisesActions.ts` | Lie un contact à une relation (normalizeForSubmit)                                     |
+| `insertEntrepriseContactAndLinkToRelationAction`  | `entreprisesActions.ts` | Crée un contact + le lie à la relation en une transaction atomique                     |
+| `deleteRelationContactAction`                     | `entreprisesActions.ts` | Retire un contact d'une relation (sans guard userId — retrait relation = sans danger)  |
+
+> **Sync user → contact** : `updateUserAction` (`usersActions.ts`) met à jour en transaction les champs `prenom`, `nom`, `phone` de tous les `entrepriseContacts` où `userId = parsedInput.userId`. Uniquement si au moins un de ces champs est dans le payload. L'email n'est pas synchronisé (il passe par un flow de vérification dédié).
 
 ### 5. Normalisation (`normalizeForSubmit`)
 
@@ -1415,11 +1432,13 @@ Sections :
 
 ### 4. Permissions de modification
 
-| Action                             | Condition                                |
-| ---------------------------------- | ---------------------------------------- |
-| Modifier infos, logo, rôles        | `canEdit = true` (plateforme par défaut) |
-| Ajouter/modifier/supprimer contact | `canEdit = true`                         |
-| Inviter un contact                 | `canEdit && !c.userId && c.email`        |
+| Action                             | Condition                                                             |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| Modifier infos, logo, rôles        | `canEdit = true` (plateforme par défaut)                              |
+| Ajouter/modifier/supprimer contact | `canEditContacts && !c.userId` (`canEditContacts` = `canEdit` par défaut) |
+| Inviter un contact                 | `canInviteContacts && !c.userId && c.email` (`canInviteContacts` = `canEditContacts` par défaut) |
+
+> **`canInviteContacts` indépendant** : prop séparée permettant d'autoriser l'invitation sans autoriser la modification/suppression. Utilisé dans `/app/mon-entreprise` : `canEditContacts={false}`, `canInviteContacts={canEdit}` — les admins peuvent inviter leurs contacts sans pouvoir éditer les fiches.
 
 ### 5. Chargement des contacts (pattern important)
 
@@ -1470,7 +1489,7 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 | Voir la page détail               | Adhésion prestataire active + client dans périmètre                                  |
 | Modifier informations (SIRENE)    | `!client.hasActiveAdmin` + `canManageClientInfosAsProxy` (admin/manager prestataire) |
 | Ajouter un contact à la relation  | `admin` ou `manager` prestataire actif + `relationId` existant                       |
-| Retirer un contact de la relation | Idem                                                                                 |
+| Retirer un contact de la relation | Idem — confirmation AlertDialog "Voulez-vous vraiment retirer **Nom** de vos contacts pour ce client ?" |
 
 ---
 
@@ -1515,7 +1534,7 @@ Synchronisation client : `useEffect([initialContacts])` recharge l'état local a
 | Modifier informations (SIRENE)    | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` (admin/manager client)                       |
 | Modifier services                 | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` via `updatePrestataireServicesAsProxyAction` |
 | Ajouter un contact à la relation  | `admin` ou `manager` client actif + `relationId` existant                                                        |
-| Retirer un contact de la relation | Idem                                                                                                             |
+| Retirer un contact de la relation | Idem — confirmation AlertDialog "Voulez-vous vraiment retirer **Nom** de vos contacts pour ce prestataire ?"    |
 
 ---
 
@@ -1540,7 +1559,11 @@ Utilisé dans `/app/mes-clients/[id]` (`side="client"`) et `/app/mes-prestataire
 Deux onglets :
 
 - **Créer nouveau** : formulaire `newContactFormSchema` (prénom, nom, email, téléphone, fonction, rôle, est_principal). Appelle `insertEntrepriseContactAndLinkToRelationAction` — crée d'abord un `entrepriseContacts` pour `targetEntrepriseId`, puis lie à la relation via `clientPrestataireRelationContacts`. Vérification d'unicité email par entreprise avant insertion.
-- **Choisir existant** : charge tous les contacts de `targetEntrepriseId` via `getEntrepriseContactsForRelationAction`. Si liste vide, affiche uniquement un message (pas de formulaire). Lie le contact sélectionné + rôle + est_principal via `linkExistingContactToRelationAction`.
+- **Choisir existant** : charge via `getEntrepriseContactsForRelationAction` uniquement les contacts de `targetEntrepriseId` **non encore liés** à `relationId` (filtre `notExists` côté serveur). Si liste vide après chargement, bascule automatiquement en mode "Créer nouveau" et affiche un message contextuel :
+  - `totalContactCount > 0` → "Tous les contacts de X ont déjà été ajoutés. Vous pouvez en créer un nouveau."
+  - `totalContactCount === 0` → "X n'a pas encore de contacts. Créez-en un nouveau."
+
+> **Avant** : la liste affichait tous les contacts de l'entreprise sans filtrage, y compris ceux déjà liés à la relation (bug). Corrigé le 2026-03-13.
 
 ---
 

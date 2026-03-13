@@ -7,6 +7,7 @@ import { EntrepriseDetailsClient } from "../entreprises/[entrepriseId]/Entrepris
 import type { EntrepriseWithDetails } from "@/zod-schemas/entreprise.schema";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { EntrepriseContactWithInvitationType } from "@/server/queries/entreprises.query";
 
 type ServiceItemType = { serviceId: string; nom: string };
 
@@ -18,6 +19,7 @@ export function MonEntrepriseClient() {
   const [data, setData] = useState<{
     entreprise: EntrepriseWithDetails;
     services: ServiceItemType[];
+    contacts: EntrepriseContactWithInvitationType[];
   } | null>(null);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,7 @@ export function MonEntrepriseClient() {
     setData({
       entreprise: result.data.entreprise,
       services: result.data.services,
+      contacts: result.data.contacts,
     });
 
     const storageKey = result.data.entreprise.logoStorageKey;
@@ -108,9 +111,12 @@ export function MonEntrepriseClient() {
     <EntrepriseDetailsClient
       entreprise={data.entreprise}
       services={data.services}
+      initialContacts={data.contacts}
       logoUrl={logoUrl}
       logoStorageKey={data.entreprise.logoStorageKey}
       canEdit={canEdit}
+      canEditContacts={false}
+      canInviteContacts={canEdit}
       showBackButton={false}
       onUpdate={loadData}
     />

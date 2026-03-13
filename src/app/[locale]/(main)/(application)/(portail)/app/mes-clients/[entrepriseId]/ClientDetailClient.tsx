@@ -11,6 +11,16 @@ import { deleteRelationContactAction } from "@/server/actions/entreprisesActions
 import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions.query";
 import type { RelationContactWithDetails } from "@/server/queries/entreprises.query";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   AlertTriangle,
   ArrowLeft,
   Building2,
@@ -48,12 +58,15 @@ export function ClientDetailClient({
   const [addContactOpen, setAddContactOpen] = useState(false);
   const [editInfosOpen, setEditInfosOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmRemoveContact, setConfirmRemoveContact] =
+    useState<RelationContactWithDetails | null>(null);
 
   useEffect(() => {
     setContacts(initialContacts);
   }, [initialContacts]);
 
   const handleDeleteContact = async (linkId: string) => {
+    setConfirmRemoveContact(null);
     setDeletingId(linkId);
     const result = await deleteRelationContactAction({ linkId });
     setDeletingId(null);
@@ -289,6 +302,21 @@ export function ClientDetailClient({
                           Interlocuteur principal
                         </Badge>
                       )}
+                      {c.userId ? (
+                        <Badge
+                          variant="outline"
+                          className="border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-950/30 dark:text-green-400 text-xs"
+                        >
+                          Utilisateur
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="text-muted-foreground text-xs"
+                        >
+                          Sans compte
+                        </Badge>
+                      )}
                       {c.role && (
                         <span className="text-muted-foreground text-xs">
                           {c.role}
@@ -325,7 +353,7 @@ export function ClientDetailClient({
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7 text-destructive hover:text-destructive"
-                    onClick={() => handleDeleteContact(c.id)}
+                    onClick={() => setConfirmRemoveContact(c)}
                     disabled={deletingId === c.id}
                   >
                     {deletingId === c.id ? (
@@ -360,6 +388,38 @@ export function ClientDetailClient({
         currentSiret={client.siret}
         onSuccess={() => router.refresh()}
       />
+
+      <AlertDialog
+        open={!!confirmRemoveContact}
+        onOpenChange={(v) => {
+          if (!v) setConfirmRemoveContact(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Retirer ce contact ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Voulez-vous vraiment retirer{" "}
+              <strong>
+                {confirmRemoveContact?.prenom} {confirmRemoveContact?.nom}
+              </strong>{" "}
+              de vos contacts pour ce client ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() =>
+                confirmRemoveContact &&
+                handleDeleteContact(confirmRemoveContact.id)
+              }
+            >
+              Retirer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

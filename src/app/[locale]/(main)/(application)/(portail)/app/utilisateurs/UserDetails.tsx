@@ -350,33 +350,6 @@ export function UserDetails({
               </div>
             )}
 
-            {/* Boutons de promotion — visibles uniquement sur son propre profil, posture client ou prestataire */}
-            {isViewingSelf && postureActive !== "plateforme" && (
-              <div className="mt-2 flex items-center gap-1.5">
-                {user.adhesion?.role !== "admin" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-6 gap-1 px-2 text-xs"
-                    onClick={handleOpenPromotionDialog}
-                  >
-                    <Shield className="h-3 w-3" />
-                    Devenir admin
-                  </Button>
-                )}
-                {user.adhesion?.role === "collaborateur" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-6 gap-1 px-2 text-xs"
-                    onClick={handleOpenPromotionDialog}
-                  >
-                    <Shield className="h-3 w-3" />
-                    Devenir manager
-                  </Button>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
@@ -463,6 +436,33 @@ export function UserDetails({
               {roleClientAdhesionCT.find((r) => r.code === user.adhesion?.role)
                 ?.name || user.adhesion.role}
             </p>
+            {/* Boutons de promotion — visibles uniquement sur son propre profil, posture client ou prestataire */}
+            {isViewingSelf && postureActive !== "plateforme" && (
+              <>
+                {user.adhesion?.role !== "admin" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 gap-1 px-2 text-xs"
+                    onClick={handleOpenPromotionDialog}
+                  >
+                    <Shield className="h-3 w-3" />
+                    Devenir admin
+                  </Button>
+                )}
+                {user.adhesion?.role === "collaborateur" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 gap-1 px-2 text-xs"
+                    onClick={handleOpenPromotionDialog}
+                  >
+                    <Shield className="h-3 w-3" />
+                    Devenir manager
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         ) : null}
       </div>

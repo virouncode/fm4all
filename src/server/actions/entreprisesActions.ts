@@ -73,7 +73,7 @@ import {
   accepterInvitationContactSchema,
   inviterContactSchema,
 } from "@/zod-schemas/inscriptionContact.schema";
-import { and, count, eq, gt, ilike, inArray, isNull } from "drizzle-orm";
+import { and, count, eq, gt, ilike, inArray, isNull, notExists } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { cookies, headers } from "next/headers";
 import { z } from "zod";
@@ -303,11 +303,14 @@ export const getMonEntrepriseDetailsAction = actionClient
     );
     if (!entreprise) throw errors.notFound("Entreprise introuvable.");
 
-    const services = entreprise.roles.includes("prestataire")
-      ? await getServicesByEntrepriseId(parsedInput.entrepriseId)
-      : [];
+    const [services, contacts] = await Promise.all([
+      entreprise.roles.includes("prestataire")
+        ? getServicesByEntrepriseId(parsedInput.entrepriseId)
+        : Promise.resolve([]),
+      getEntrepriseContactsByEntrepriseId(parsedInput.entrepriseId),
+    ]);
 
-    return { entreprise, services };
+    return { entreprise, services, contacts };
   });
 
 // ==================== PROSPECTS PICKER ====================
@@ -1048,9 +1051,14 @@ export const updateEntrepriseContactAction = actionClient
     // Vérifier que le contact existe et récupérer son entrepriseId + email actuel
     const existing = await db.query.entrepriseContacts.findFirst({
       where: eq(entrepriseContacts.id, parsedInput.contactId),
-      columns: { id: true, entrepriseId: true, email: true },
+      columns: { id: true, entrepriseId: true, email: true, userId: true },
     });
     if (!existing) throw errors.notFound("Contact non trouvé.");
+
+    if (existing.userId)
+      throw errors.conflict(
+        "Ce contact possède déjà un compte utilisateur. Modifiez-le depuis le module Utilisateurs.",
+      );
 
     const canAccess = await hasAccessToEntreprise(
       currentUser.id,
@@ -1107,9 +1115,14 @@ export const deleteEntrepriseContactAction = actionClient
 
     const existing = await db.query.entrepriseContacts.findFirst({
       where: eq(entrepriseContacts.id, parsedInput.contactId),
-      columns: { id: true, entrepriseId: true },
+      columns: { id: true, entrepriseId: true, userId: true },
     });
     if (!existing) throw errors.notFound("Contact non trouvé.");
+
+    if (existing.userId)
+      throw errors.conflict(
+        "Ce contact possède déjà un compte utilisateur. Il ne peut pas être supprimé.",
+      );
 
     const canAccess = await hasAccessToEntreprise(
       currentUser.id,
@@ -1298,12 +1311,50 @@ export const getEntrepriseContactsForRelationAction = actionClient
     if (!hasClient && !hasPrestataire)
       throw errors.forbidden("Accès non autorisé.");
 
-    // Tous les contacts de targetEntrepriseId (sans filtre d'exclusion)
-    const contacts = await getEntrepriseContactsByEntrepriseId(
-      parsedInput.targetEntrepriseId,
-    );
+    // Contacts de targetEntrepriseId non encore liés à cette relation
+    const [contacts, [totalRow]] = await Promise.all([
+      db
+        .select({
+          id: entrepriseContacts.id,
+          prenom: entrepriseContacts.prenom,
+          nom: entrepriseContacts.nom,
+          fonction: entrepriseContacts.fonction,
+          email: entrepriseContacts.email,
+          phone: entrepriseContacts.phone,
+        })
+        .from(entrepriseContacts)
+        .where(
+          and(
+            eq(entrepriseContacts.entrepriseId, parsedInput.targetEntrepriseId),
+            notExists(
+              db
+                .select({ _: clientPrestataireRelationContacts.id })
+                .from(clientPrestataireRelationContacts)
+                .where(
+                  and(
+                    eq(
+                      clientPrestataireRelationContacts.relationId,
+                      parsedInput.relationId,
+                    ),
+                    eq(
+                      clientPrestataireRelationContacts.contactId,
+                      entrepriseContacts.id,
+                    ),
+                  ),
+                ),
+            ),
+          ),
+        )
+        .orderBy(entrepriseContacts.nom, entrepriseContacts.prenom),
+      db
+        .select({ total: count() })
+        .from(entrepriseContacts)
+        .where(
+          eq(entrepriseContacts.entrepriseId, parsedInput.targetEntrepriseId),
+        ),
+    ]);
 
-    return { contacts };
+    return { contacts, totalContactCount: totalRow?.total ?? 0 };
   });
 
 /**

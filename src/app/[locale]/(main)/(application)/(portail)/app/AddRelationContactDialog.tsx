@@ -20,7 +20,14 @@ import {
   insertEntrepriseContactAndLinkToRelationAction,
   insertRelationContactAction,
 } from "@/server/actions/entreprisesActions";
-import type { EntrepriseContactSelectType } from "@/zod-schemas/entreprise.schema";
+type ContactOptionType = {
+  id: string;
+  prenom: string;
+  nom: string;
+  fonction: string | null;
+  email: string | null;
+  phone: string | null;
+};
 import { phoneNumberSchemaEmpty } from "@/zod-schemas/phone.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlus } from "lucide-react";
@@ -69,8 +76,9 @@ export function AddRelationContactDialog({
 }: AddRelationContactDialogProps) {
   const [mode, setMode] = useState<"existing" | "new">("existing");
   const [availableContacts, setAvailableContacts] = useState<
-    EntrepriseContactSelectType[]
+    ContactOptionType[]
   >([]);
+  const [totalContactCount, setTotalContactCount] = useState(0);
   const [loadingContacts, setLoadingContacts] = useState(false);
 
   const existingForm = useForm<ExistingContactFormType>({
@@ -113,11 +121,13 @@ export function AddRelationContactDialog({
       estPrincipal: false,
     });
 
+    setTotalContactCount(0);
     setLoadingContacts(true);
     getEntrepriseContactsForRelationAction({ relationId, targetEntrepriseId })
       .then((result) => {
         if (result?.data) {
           setAvailableContacts(result.data.contacts);
+          setTotalContactCount(result.data.totalContactCount);
           if (result.data.contacts.length === 0) setMode("new");
         }
       })
@@ -214,8 +224,9 @@ export function AddRelationContactDialog({
                 </div>
               ) : availableContacts.length === 0 ? (
                 <p className="text-muted-foreground text-sm">
-                  Aucun contact disponible pour {targetNom}. Créez-en un
-                  nouveau.
+                  {totalContactCount > 0
+                    ? `Tous les contacts de ${targetNom} ont déjà été ajoutés. Vous pouvez en créer un nouveau.`
+                    : `${targetNom} n'a pas encore de contacts. Créez-en un nouveau.`}
                 </p>
               ) : (
                 <>
