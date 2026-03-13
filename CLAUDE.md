@@ -976,6 +976,37 @@ function MyComponent() {
 }
 ```
 
+#### `postureActive` côté Frontend — Règle d'or
+
+**✅ Autorisé** : Lire `postureActive` depuis le store (`useAppStore`) pour la **logique d'affichage conditionnel** (boutons visibles/masqués, labels, calcul de permissions UI, etc.).
+
+```typescript
+// ✅ CORRECT — lecture côté client pour affichage
+const postureActive = useAppStore((s) => s.postureActive);
+const activeRole =
+  postureActive === "plateforme" ? rolePlateformeAdhesion
+  : postureActive === "prestataire" ? rolePrestataireAdhesion
+  : roleClientAdhesion;
+const canEdit = postureActive === "plateforme" ? activeRole !== null : activeRole === "admin";
+```
+
+**❌ Interdit** : Envoyer la posture depuis le client vers une server action **et s'y fier côté serveur**.
+
+```typescript
+// ❌ FAUX — la posture vient du client, elle est falsifiable
+export const myAction = action.schema(z.object({
+  posture: z.string(), // ← NE JAMAIS FAIRE CONFIANCE À ÇA
+})).action(async ({ parsedInput }) => {
+  if (parsedInput.posture === "plateforme") { /* bypass ← FAILLE */ }
+});
+
+// ✅ CORRECT — le backend lit TOUJOURS le cookie
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+const platformRole = await getEffectivePlateformeRole(userId); // lit le cookie httpOnly
+```
+
+**Pourquoi ?** Le store Zustand est côté client et modifiable par l'utilisateur. Le cookie `fm4all:postureActive` est httpOnly (inaccessible en JS) et mis à jour uniquement via `setActivePostureAction`.
+
 #### Cookie de Posture (Serveur)
 
 Le cookie `fm4all:postureActive` (httpOnly, sameSite: lax, 180 jours) est la **source de vérité côté serveur** pour la posture active. Il est mis à jour via `setActivePostureAction` (`src/server/actions/activePostureAction.ts`).
