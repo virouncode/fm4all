@@ -169,6 +169,7 @@ export const devisNouveauLigneSchema = z
 export const devisNouveauSchema = z.object({
   proprietaireEntrepriseId: z.string().min(1, "Client obligatoire"),
   siteId: z.string().min(1, "Site obligatoire"),
+  contactId: z.string().optional(),
   titre: z
     .string()
     .min(1, "Titre obligatoire")

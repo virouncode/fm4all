@@ -18,8 +18,8 @@ import {
 import { useRouter } from "@/i18n/navigation";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
-import { getEntreprisesClientesAction, getMonEntrepriseDetailsAction } from "@/server/actions/entreprisesActions";
-import { getSiteResponsableAction, saveDevisWithLignesAction } from "@/server/actions/devisActions";
+import { getEntreprisesClientesAction, getMonEntrepriseDetailsAction, getEntrepriseContactsAction } from "@/server/actions/entreprisesActions";
+import { saveDevisWithLignesAction } from "@/server/actions/devisActions";
 import { getSitesAction } from "@/server/actions/sitesActions";
 import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions.query";
 import {
@@ -47,11 +47,13 @@ import { DevisPreviewCard } from "../DevisPreviewCard";
 
 // ============================= TYPES ==============================//
 
-type SiteResponsableType = {
+type ContactOptionType = {
+  id: string;
   prenom: string;
   nom: string;
-  email: string;
+  email: string | null;
   phone: string | null;
+  fonction: string | null;
 };
 
 type SiteOptionType = {
@@ -144,7 +146,7 @@ function buildPreview(
   selectedSite: SiteOptionType | null,
   values: PreviewValuesType,
   emetteurLogoUrl: string | null,
-  siteResponsable: SiteResponsableType | null,
+  selectedContact: ContactOptionType | null,
 ): DevisPreviewData {
   const lignes = values.lignes ?? [];
   const previewLignes: DevisPreviewLigne[] = lignes.map((l) => ({
@@ -181,14 +183,14 @@ function buildPreview(
     proprietaireEntrepriseNom: selectedClient?.nom ?? "",
     proprietaireEntrepriseSiret: selectedClient?.siret ?? "",
     proprietaireEntrepriseNumeroTva: selectedClient?.numeroTva ?? null,
+    clientContactPrenom: selectedContact?.prenom ?? null,
+    clientContactNom: selectedContact?.nom ?? null,
+    clientContactEmail: selectedContact?.email ?? null,
+    clientContactPhone: selectedContact?.phone ?? null,
     siteNom: selectedSite?.nom ?? "",
     siteAdresse: selectedSite?.adresse ?? "",
     siteCodePostal: selectedSite?.codePostal ?? null,
     siteVille: selectedSite?.ville ?? null,
-    siteContactPrenom: siteResponsable?.prenom ?? null,
-    siteContactNom: siteResponsable?.nom ?? null,
-    siteContactEmail: siteResponsable?.email ?? null,
-    siteContactPhone: siteResponsable?.phone ?? null,
     lignes: previewLignes,
   };
 }
@@ -206,7 +208,9 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
   const [selectedClient, setSelectedClient] =
     useState<ClientAvecDetails | null>(null);
   const [selectedSite, setSelectedSite] = useState<SiteOptionType | null>(null);
-  const [siteResponsable, setSiteResponsable] = useState<SiteResponsableType | null>(null);
+  const [contacts, setContacts] = useState<ContactOptionType[]>([]);
+  const [selectedContact, setSelectedContact] = useState<ContactOptionType | null>(null);
+  const [loadingContacts, setLoadingContacts] = useState(false);
   const [openLines, setOpenLines] = useState<Set<number>>(new Set([0]));
   const [emetteurLogoUrl, setEmetteurLogoUrl] = useState<string | null>(null);
 
@@ -227,6 +231,7 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
     defaultValues: {
       proprietaireEntrepriseId: "",
       siteId: "",
+      contactId: undefined,
       titre: "",
       validTo: "",
       lignes: [{ ...DEFAULT_LIGNE }],
@@ -295,10 +300,34 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
     void load();
   }, [emetteur.id, posture]);
 
-  // ─── Chargement du responsable_site ─────────────────────────────
-  async function loadResponsableForSite(siteId: string, entrepriseId: string) {
-    const result = await getSiteResponsableAction({ siteId, entrepriseId });
-    setSiteResponsable(result?.data?.responsable ?? null);
+  // ─── Chargement des contacts d'un client ─────────────────────────
+  async function loadContactsForClient(clientId: string) {
+    if (!clientId) {
+      setContacts([]);
+      setSelectedContact(null);
+      form.setValue("contactId", undefined);
+      return;
+    }
+    setLoadingContacts(true);
+    try {
+      const result = await getEntrepriseContactsAction({ entrepriseId: clientId });
+      if (result?.data?.contacts) {
+        setContacts(
+          result.data.contacts.map((c) => ({
+            id: c.id,
+            prenom: c.prenom,
+            nom: c.nom,
+            email: c.email ?? null,
+            phone: c.phone ?? null,
+            fonction: c.fonction ?? null,
+          })),
+        );
+      }
+    } catch {
+      // Non bloquant
+    } finally {
+      setLoadingContacts(false);
+    }
   }
 
   // ─── Enrichissement client (plateforme) ─────────────────────────
@@ -324,7 +353,6 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
     if (!clientId) {
       setSites([]);
       setSelectedSite(null);
-      setSiteResponsable(null);
       form.setValue("siteId", "");
       return;
     }
@@ -448,7 +476,7 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
     selectedSite,
     watchedValues,
     emetteurLogoUrl,
-    siteResponsable,
+    selectedContact,
   );
 
   const { isSubmitting } = form.formState;
@@ -493,8 +521,11 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
                       clients.find((c) => c.id === clientId) ?? null;
                     setSelectedClient(client);
                     setSelectedSite(null);
+                    setSelectedContact(null);
                     form.setValue("siteId", "");
+                    form.setValue("contactId", undefined);
                     void loadSitesForClient(clientId);
+                    void loadContactsForClient(clientId);
                     if (posture === "plateforme") {
                       void enrichClientForPlateforme(clientId);
                     }
@@ -502,10 +533,16 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
                   onSiteChange={(siteId) => {
                     const site = sites.find((s) => s.id === siteId) ?? null;
                     setSelectedSite(site);
-                    if (site && selectedClient) {
-                      void loadResponsableForSite(site.id, selectedClient.id);
+                  }}
+                  contacts={contacts}
+                  loadingContacts={loadingContacts}
+                  onContactChange={(contactId) => {
+                    if (contactId === "none") {
+                      setSelectedContact(null);
+                      form.setValue("contactId", undefined);
                     } else {
-                      setSiteResponsable(null);
+                      const contact = contacts.find((c) => c.id === contactId) ?? null;
+                      setSelectedContact(contact);
                     }
                   }}
                   onSetValidToRelative={(days) => {
@@ -562,9 +599,12 @@ type Step1Props = {
   loadingClients: boolean;
   sites: SiteOptionType[];
   loadingSites: boolean;
+  contacts: ContactOptionType[];
+  loadingContacts: boolean;
   posture: "prestataire" | "plateforme";
   onClientChange: (id: string) => void;
   onSiteChange: (id: string) => void;
+  onContactChange: (id: string) => void;
   onSetValidToRelative: (days: number) => void;
   onContinuer: () => void;
 };
@@ -574,9 +614,12 @@ function Step1({
   loadingClients,
   sites,
   loadingSites,
+  contacts,
+  loadingContacts,
   posture,
   onClientChange,
   onSiteChange,
+  onContactChange,
   onSetValidToRelative,
   onContinuer,
 }: Step1Props) {
@@ -632,6 +675,33 @@ function Step1({
             {sites.map((s) => (
               <SelectItem key={s.id} value={s.id}>
                 {s.nom}
+              </SelectItem>
+            ))}
+          </RhfControlledSelect>
+
+          <RhfControlledSelect<DevisNouveauFormType>
+            name="contactId"
+            label="Contact (optionnel)"
+            placeholder={
+              !proprietaireId
+                ? "Choisissez d'abord un client"
+                : loadingContacts
+                  ? "Chargement…"
+                  : contacts.length === 0
+                    ? "Aucun contact disponible"
+                    : "Sélectionnez un contact"
+            }
+            disabled={!proprietaireId || loadingContacts || contacts.length === 0}
+            onChange={(v) => onContactChange(String(v))}
+            selectClassName="w-full"
+          >
+            <SelectItem value="none">
+              <span className="italic text-muted-foreground">Pas de contact</span>
+            </SelectItem>
+            {contacts.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.prenom} {c.nom}
+                {c.fonction ? ` — ${c.fonction}` : ""}
               </SelectItem>
             ))}
           </RhfControlledSelect>

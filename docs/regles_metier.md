@@ -174,7 +174,20 @@ Un devis peut être créé sans demande associée. Dans ce cas, `siteId` est obl
 
 ---
 
-*Dernière mise à jour : 2026-03-11*
+### Contact dans le formulaire de création (`DevisNouveauClient`)
+
+Le formulaire de création de devis propose un sélecteur **Contact (optionnel)** après le sélecteur de site.
+
+- Les contacts sont chargés depuis `entreprise_contacts` pour l'entreprise cliente sélectionnée (`getEntrepriseContactsAction`)
+- Le select affiche `{prenom} {nom} — {fonction}` par item
+- Option **"Pas de contact"** (`value="none"`) disponible → `contactId` envoyé comme `undefined`
+- Le contact sélectionné s'affiche dans `DevisPreviewCard` sous le SIRET du client (section "À"), **pas** dans la section site
+- Les champs affichés dans le preview : prénom+nom, email, téléphone
+- Le `siteId` reste **obligatoire** pour les devis (`.notNull()` en DB) — pas d'option "Pas de site"
+
+---
+
+*Dernière mise à jour : 2026-03-13*
 
 ---
 
@@ -1079,7 +1092,24 @@ FM4ALL est l'émetteur. Les utilisateurs FM4ALL disposent des **mêmes droits qu
 
 ---
 
-*Dernière mise à jour : 2026-03-12*
+### 7. Contact et site dans le formulaire de création (`FactureNouvelleClient`)
+
+Contrairement au devis, le `siteId` est **nullable** en DB (`factures.siteId` sans `.notNull()`).
+
+**Sélecteur Site (optionnel)** :
+- Option **"Pas de site"** (`value="none"`) disponible → `siteId` envoyé comme `""` → `normalizeForSubmit` → `null` en DB
+- Affiché dans `FacturePreviewCard` sous le SIRET du client, avec adresse formatée (`siteAdresse + codePostal + ville` en une seule ligne)
+
+**Sélecteur Contact (optionnel)** :
+- Chargé depuis `entreprise_contacts` pour le client sélectionné (`getEntrepriseContactsAction`)
+- Option **"Pas de contact"** (`value="none"`) → `contactId` envoyé comme `""` → `normalizeForSubmit` → `null`
+- Affiché dans `FacturePreviewCard` sous le SIRET/TVA du destinataire, avant la section site
+
+**Cohérence labels** : les deux champs utilisent `label="X (optionnel)"` — pas d'`(optionnel)` dans le placeholder.
+
+---
+
+*Dernière mise à jour : 2026-03-13*
 
 ---
 
@@ -1294,7 +1324,9 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
    - Marquer `acceptedAt = now()` dans `contacts_invitations`
 4. Email `requestPasswordReset` (non bloquant) → `/auth/reset-password?type=activation`
 
-**Rôle forcé** : toujours `"collaborateur"`. Jamais `"admin"`. C'est la distinction fondamentale avec l'ancien flow `inviterEntrepriseAdminAction` qui continue d'exister pour les invitations d'admin (table partagée via alias backward-compat).
+**Rôle forcé** : toujours `"collaborateur"`. Jamais `"admin"`.
+
+**Cas `contactId = null`** (ancienne invitation admin sans contact source) : au lieu de mettre à jour un contact existant, la transaction crée une nouvelle entrée `entrepriseContacts` avec les données saisies par l'utilisateur (`prenom`, `nom`, `email`, `phone`, `fonction`) et le `userId` du compte fraîchement créé.
 
 **Page publique** : `/auth/inscription?token=xxx`
 - Champs pré-remplis depuis le contact : prenom, nom, phone, fonction (tous modifiables)
@@ -1307,15 +1339,11 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 
 > Les deux flows d'invitation coexistent dans la même table `contacts_invitations` (ex `entreprise_invitations`).
 
-### 1. Invitation Admin (`inviterEntrepriseAdminAction`)
+### 1. Invitation Admin — SUPPRIMÉE
 
-- **Déclencheur** : bouton "Inviter un admin" dans `InviterEntrepriseAdminDialog.tsx` (page `/app/entreprises/[id]`)
-- **Conditions** : pas d'admin actif existant, email non utilisé, appelant admin/manager ou plateforme
-- **Page** : `/auth/inscription-admin?token=xxx` — **SUPPRIMÉE** (voir ci-dessous)
-- **Rôle créé** : `"admin"` dans `userClientAdhesions` ou `userPrestataireAdhesions`
-- **`contactId`** : `null` (legacy — pas de contact source)
-
-> ⚠️ **`/auth/inscription-admin` a été supprimée.** Le flow admin était déjà remplacé. Si ce flow doit être ré-activé, créer une nouvelle page `/auth/inscription-admin` sur le même modèle que `/auth/inscription`, en changeant le rôle forcé à `"admin"`.
+> ⚠️ Les actions `inviterEntrepriseAdminAction`, `inviterPrestataireAdminAction` et `inviterClientAdminAction` ont été **supprimées**. Les dialogs associés (`InviterEntrepriseAdminDialog`, `InviterPrestataireDialog`, `InviterClientDialog`) et le schéma `inscriptionAdmin.schema.ts` sont également supprimés.
+>
+> Le seul flow d'invitation actif est désormais `inviterContactAction` (ci-dessous). Pour inviter un admin, créer d'abord un contact dans `entreprise_contacts`, puis l'inviter via ce flow — le rôle pourra être promu en admin une fois le compte créé.
 
 ### 2. Invitation Contact (`inviterContactAction`)
 
@@ -1350,12 +1378,10 @@ Après création du compte (`signUpEmail`), un email `requestPasswordReset` est 
 Étapes :
 1. Infos générales (nom, SIRET, adresse, forme juridique, TVA)
 2. Rôles et services proposés
-3. Invitation admin optionnelle (via `inviterEntrepriseAdminAction`)
 
 Contraintes :
 - SIRET unique en base
 - Au moins un rôle requis
-- Si invite admin : voir conditions §1 du Module Auth
 
 ### 3. Détail entreprise (`/app/entreprises/[entrepriseId]`)
 
@@ -1372,7 +1398,6 @@ Sections :
 | Modifier infos, logo, rôles | `canEdit = true` (plateforme par défaut) |
 | Ajouter/modifier/supprimer contact | `canEdit = true` |
 | Inviter un contact | `canEdit && !c.userId && c.email` |
-| Inviter un admin | Pas d'admin actif existant |
 
 ### 5. Chargement des contacts (pattern important)
 
@@ -1503,6 +1528,18 @@ Deux onglets :
 - Le composant `CreateUserFormInner` initialise `roleAdhesion: "collaborateur"` dans `defaultValues` et dans `form.reset()`.
 - Le sélecteur de rôle est visible et modifiable par l'admin/manager qui crée l'utilisateur, mais sa valeur par défaut est `"collaborateur"` — jamais `"admin"`.
 - Côté serveur, `insertUserAction` et `addAdhesionToExistingUserAction` n'imposent pas de contrainte sur le rôle soumis (la contrainte est gérée côté formulaire via les options disponibles selon le rôle du créateur).
+
+### 1b. Synchronisation automatique `entreprise_contacts` à la création
+
+**Règle** : Toute création d'utilisateur crée **automatiquement** une entrée dans `entreprise_contacts` dans la même transaction atomique.
+
+Concerné par cette règle :
+- `insertUserAction` (création via UI `/app/utilisateurs`) — insère dans `entrepriseContacts` avec `prenom`, `nom`, `email`, `phone`, `userId`
+- `insertPlateformeUserAction` (création d'un utilisateur plateforme) — idem
+- `accepterInvitationContactAction` — si `contactId` non-null : met à jour le contact existant ; si `contactId` null : crée une nouvelle entrée `entrepriseContacts`
+
+**Non concerné** :
+- `addAdhesionToExistingUserAction` ("Rattacher existant") — l'utilisateur existe déjà, son entrée `entrepriseContacts` également.
 
 ### 2. Boutons "Devenir admin" / "Devenir manager"
 

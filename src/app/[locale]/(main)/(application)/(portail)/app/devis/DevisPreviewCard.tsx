@@ -41,15 +41,16 @@ export type DevisPreviewData = {
   proprietaireEntrepriseNom: string;
   proprietaireEntrepriseSiret: string;
   proprietaireEntrepriseNumeroTva?: string | null;
+  // Contact client
+  clientContactPrenom?: string | null;
+  clientContactNom?: string | null;
+  clientContactEmail?: string | null;
+  clientContactPhone?: string | null;
   // Site
   siteNom: string;
   siteAdresse: string; // adresseLigne1
   siteCodePostal?: string | null;
   siteVille?: string | null;
-  siteContactPrenom?: string | null;
-  siteContactNom?: string | null;
-  siteContactEmail?: string | null;
-  siteContactPhone?: string | null;
   lignes: DevisPreviewLigne[];
 };
 
@@ -272,6 +273,23 @@ export function DevisPreviewCard({ devis, pdfMode = false }: Props) {
                 N° TVA : {devis.proprietaireEntrepriseNumeroTva}
               </p>
             )}
+            {(devis.clientContactPrenom || devis.clientContactNom) && (
+              <p className="text-xs text-gray-600">
+                {[devis.clientContactPrenom, devis.clientContactNom]
+                  .filter(Boolean)
+                  .join(" ")}
+              </p>
+            )}
+            {devis.clientContactEmail && (
+              <p className="text-xs text-gray-500">
+                {devis.clientContactEmail}
+              </p>
+            )}
+            {devis.clientContactPhone && (
+              <p className="text-xs text-gray-500">
+                {devis.clientContactPhone}
+              </p>
+            )}
             {/* Site d'intervention */}
             {devis.siteNom && (
               <div className={pdfMode ? "mt-3 border-t border-gray-100 pt-3" : "mt-2 border-t border-gray-100 pt-2"}>
@@ -283,23 +301,6 @@ export function DevisPreviewCard({ devis, pdfMode = false }: Props) {
                 </p>
                 {siteAdresseComplete && (
                   <p className="text-xs text-gray-500">{siteAdresseComplete}</p>
-                )}
-                {(devis.siteContactPrenom || devis.siteContactNom) && (
-                  <p className="text-xs text-gray-600">
-                    {[devis.siteContactPrenom, devis.siteContactNom]
-                      .filter(Boolean)
-                      .join(" ")}
-                  </p>
-                )}
-                {devis.siteContactEmail && (
-                  <p className="text-xs text-gray-500">
-                    {devis.siteContactEmail}
-                  </p>
-                )}
-                {devis.siteContactPhone && (
-                  <p className="text-xs text-gray-500">
-                    {devis.siteContactPhone}
-                  </p>
                 )}
               </div>
             )}

@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
-import { entreprises } from "@/db/schema/entreprises";
+import { entrepriseContacts, entreprises } from "@/db/schema/entreprises";
 import { userClientAdhesions, userClientSiteAttributions, userPlateformeAdhesions, userPrestataireAdhesions, userPrestataireSiteAttributions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { env } from "@/lib/env";
@@ -472,6 +472,18 @@ export const insertUserAction = actionClient
         createdById: currentUser.id,
         tx,
       });
+
+      // Créer l'entrée dans entrepriseContacts (tout utilisateur est un contact)
+      await tx.insert(entrepriseContacts).values({
+        entrepriseId,
+        prenom: normalized.prenom,
+        nom: normalized.nom,
+        email: normalized.email,
+        phone: normalized.phone ?? null,
+        userId: newUser.id,
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      });
     });
 
     // 4. Envoyer l'email d'activation (reset password) APRÈS la transaction
@@ -606,6 +618,18 @@ export const insertPlateformeUserAction = actionClient
         parentId: null,
         createdById: currentUser.id,
         tx,
+      });
+
+      // Créer l'entrée dans entrepriseContacts (tout utilisateur est un contact)
+      await tx.insert(entrepriseContacts).values({
+        entrepriseId,
+        prenom: normalized.prenom,
+        nom: normalized.nom,
+        email: normalized.email,
+        phone: normalized.phone ?? null,
+        userId: newUser.id,
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
       });
     });
 

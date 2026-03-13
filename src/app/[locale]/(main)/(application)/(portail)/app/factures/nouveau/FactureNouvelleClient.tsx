@@ -15,6 +15,7 @@ import { useRouter } from "@/i18n/navigation";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import {
   getEntreprisesClientesAction,
+  getEntrepriseContactsAction,
   getMonEntrepriseDetailsAction,
 } from "@/server/actions/entreprisesActions";
 import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
@@ -62,6 +63,15 @@ type ClientOptionType = {
   nom: string;
   siret?: string;
   numeroTva?: string | null;
+};
+
+type ContactOptionType = {
+  id: string;
+  prenom: string;
+  nom: string;
+  email: string | null;
+  phone: string | null;
+  fonction: string | null;
 };
 
 type ServiceOptionType = {
@@ -143,6 +153,7 @@ function buildPreview(
   selectedSite: SiteOptionType | null,
   values: PreviewValuesType,
   emetteurLogoUrl: string | null,
+  selectedContact: ContactOptionType | null,
 ): FacturePreviewData {
   const lignes = values.lignes ?? [];
   const previewLignes: FacturePreviewLigne[] = lignes.map((l) => ({
@@ -177,8 +188,12 @@ function buildPreview(
     destinataireEntrepriseNom: selectedClient?.nom ?? "—",
     destinataireEntrepriseSiret: selectedClient?.siret ?? null,
     destinataireEntrepriseNumeroTva: selectedClient?.numeroTva ?? null,
+    clientContactPrenom: selectedContact?.prenom ?? null,
+    clientContactNom: selectedContact?.nom ?? null,
+    clientContactEmail: selectedContact?.email ?? null,
+    clientContactPhone: selectedContact?.phone ?? null,
     siteNom: selectedSite?.nom ?? null,
-    siteAdresseLigne1: selectedSite?.adresseLigne1 ?? null,
+    siteAdresse: selectedSite?.adresseLigne1 ?? null,
     siteCodePostal: selectedSite?.codePostal ?? null,
     siteVille: selectedSite?.ville ?? null,
     lignes: previewLignes,
@@ -204,6 +219,9 @@ export function FactureNouvelleClient({
   const [loadingSites, setLoadingSites] = useState(false);
   const [selectedClient, setSelectedClient] = useState<ClientOptionType | null>(null);
   const [selectedSite, setSelectedSite] = useState<SiteOptionType | null>(null);
+  const [contacts, setContacts] = useState<ContactOptionType[]>([]);
+  const [selectedContact, setSelectedContact] = useState<ContactOptionType | null>(null);
+  const [loadingContacts, setLoadingContacts] = useState(false);
   const [openLines, setOpenLines] = useState<Set<number>>(new Set([0]));
   const [emetteurLogoUrl, setEmetteurLogoUrl] = useState<string | null>(null);
 
@@ -255,6 +273,7 @@ export function FactureNouvelleClient({
           destinataireEntrepriseId: "",
           proprietaireEntrepriseId: "",
           siteId: "",
+          contactId: undefined,
           modeCommercialSnapshot: posture === "plateforme" ? "intermediaire" : "direct",
           titre: "",
           description: "",
@@ -332,6 +351,36 @@ export function FactureNouvelleClient({
     }
   }
 
+  // ─── Chargement des contacts d'un client ─────────────────────────
+  async function loadContactsForClient(clientId: string) {
+    if (!clientId) {
+      setContacts([]);
+      setSelectedContact(null);
+      form.setValue("contactId", undefined);
+      return;
+    }
+    setLoadingContacts(true);
+    try {
+      const result = await getEntrepriseContactsAction({ entrepriseId: clientId });
+      if (result?.data?.contacts) {
+        setContacts(
+          result.data.contacts.map((c) => ({
+            id: c.id,
+            prenom: c.prenom,
+            nom: c.nom,
+            email: c.email ?? null,
+            phone: c.phone ?? null,
+            fonction: c.fonction ?? null,
+          })),
+        );
+      }
+    } catch {
+      // Non bloquant
+    } finally {
+      setLoadingContacts(false);
+    }
+  }
+
   // ─── Changement de client ─────────────────────────────────────────
   // Pour prestataire : clients ont déjà siret/tva (getMesClientsAction)
   // Pour plateforme : enrichissement via getMonEntrepriseDetailsAction
@@ -339,8 +388,11 @@ export function FactureNouvelleClient({
     const clientFromList = clients.find((c) => c.id === clientId) ?? null;
     setSelectedClient(clientFromList);
     setSelectedSite(null);
+    setSelectedContact(null);
     form.setValue("siteId", "");
+    form.setValue("contactId", undefined);
     void loadSitesForClient(clientId);
+    void loadContactsForClient(clientId);
 
     // Enrichir avec siret/TVA si absent (posture plateforme)
     if (clientFromList && clientFromList.siret === undefined) {
@@ -457,6 +509,7 @@ export function FactureNouvelleClient({
     selectedSite,
     watchedValues,
     emetteurLogoUrl,
+    selectedContact,
   );
 
   const { isSubmitting } = form.formState;
@@ -497,7 +550,27 @@ export function FactureNouvelleClient({
                   loadingClients={loadingClients}
                   sites={sites}
                   loadingSites={loadingSites}
+                  contacts={contacts}
+                  loadingContacts={loadingContacts}
                   onClientChange={(clientId) => void handleClientChange(clientId)}
+                  onSiteChange={(siteId) => {
+                    if (siteId === "none") {
+                      setSelectedSite(null);
+                      form.setValue("siteId", "");
+                    } else {
+                      const site = sites.find((s) => s.id === siteId) ?? null;
+                      setSelectedSite(site);
+                    }
+                  }}
+                  onContactChange={(contactId) => {
+                    if (contactId === "none") {
+                      setSelectedContact(null);
+                      form.setValue("contactId", "");
+                    } else {
+                      const contact = contacts.find((c) => c.id === contactId) ?? null;
+                      setSelectedContact(contact);
+                    }
+                  }}
                   onContinuer={handleContinuer}
                 />
               ) : (
@@ -545,7 +618,11 @@ type Step1Props = {
   loadingClients: boolean;
   sites: SiteOptionType[];
   loadingSites: boolean;
+  contacts: ContactOptionType[];
+  loadingContacts: boolean;
   onClientChange: (id: string) => void;
+  onSiteChange: (id: string) => void;
+  onContactChange: (id: string) => void;
   onContinuer: () => void;
 };
 
@@ -556,7 +633,11 @@ function Step1({
   loadingClients,
   sites,
   loadingSites,
+  contacts,
+  loadingContacts,
   onClientChange,
+  onSiteChange,
+  onContactChange,
   onContinuer,
 }: Step1Props) {
   const destinataireId = useWatch<FactureNouvelleFormType, "destinataireEntrepriseId">({
@@ -607,7 +688,7 @@ function Step1({
 
           <RhfControlledSelect<FactureNouvelleFormType>
             name="siteId"
-            label="Site"
+            label="Site (optionnel)"
             placeholder={
               !destinataireId
                 ? "Choisissez d'abord un client"
@@ -615,14 +696,45 @@ function Step1({
                   ? "Chargement…"
                   : sites.length === 0
                     ? "Aucun site disponible"
-                    : "Sélectionnez un site (optionnel)"
+                    : "Sélectionnez un site"
             }
             disabled={!destinataireId || loadingSites}
+            onChange={(v) => onSiteChange(String(v))}
             selectClassName="w-full"
           >
+            <SelectItem value="none">
+              <span className="italic text-muted-foreground">Pas de site</span>
+            </SelectItem>
             {sites.map((s) => (
               <SelectItem key={s.id} value={s.id}>
                 {s.nom}
+              </SelectItem>
+            ))}
+          </RhfControlledSelect>
+
+          <RhfControlledSelect<FactureNouvelleFormType>
+            name="contactId"
+            label="Contact (optionnel)"
+            placeholder={
+              !destinataireId
+                ? "Choisissez d'abord un client"
+                : loadingContacts
+                  ? "Chargement…"
+                  : contacts.length === 0
+                    ? "Aucun contact disponible"
+                    : "Sélectionnez un contact"
+            }
+            disabled={!destinataireId || loadingContacts || contacts.length === 0}
+            onChange={(v) => onContactChange(String(v))}
+            selectClassName="w-full"
+          >
+            <SelectItem value="none">
+              <span className="italic text-muted-foreground">Pas de contact</span>
+            </SelectItem>
+            {contacts.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.prenom} {c.nom}
+                {c.fonction ? ` — ${c.fonction}` : ""}
               </SelectItem>
             ))}
           </RhfControlledSelect>

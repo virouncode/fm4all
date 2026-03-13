@@ -165,6 +165,7 @@ export const factureNouvelleSchema = z.object({
   destinataireEntrepriseId: z.string().min(1, "Destinataire obligatoire"),
   proprietaireEntrepriseId: z.string().min(1, "Propriétaire obligatoire"),
   siteId: z.string().optional(),
+  contactId: z.string().optional(),
   modeCommercialSnapshot: z.string().optional(),
   titre: z
     .string()

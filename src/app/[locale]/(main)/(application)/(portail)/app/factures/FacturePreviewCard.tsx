@@ -40,9 +40,14 @@ export type FacturePreviewData = {
   destinataireEntrepriseNom: string;
   destinataireEntrepriseSiret?: string | null;
   destinataireEntrepriseNumeroTva?: string | null;
+  // Contact client
+  clientContactPrenom?: string | null;
+  clientContactNom?: string | null;
+  clientContactEmail?: string | null;
+  clientContactPhone?: string | null;
   // Site
   siteNom?: string | null;
-  siteAdresseLigne1?: string | null;
+  siteAdresse?: string | null;
   siteCodePostal?: string | null;
   siteVille?: string | null;
   lignes: FacturePreviewLigne[];
@@ -78,6 +83,13 @@ export function FacturePreviewCard({ facture, pdfMode = false }: Props) {
   const lignes = facture.lignes;
 
   type TotauxTvaType = { base: number; tva: number };
+  const siteAdresseComplete = [
+    facture.siteAdresse,
+    [facture.siteCodePostal, facture.siteVille].filter(Boolean).join(" "),
+  ]
+    .filter(Boolean)
+    .join(", ");
+
   const totauxParTaux: Record<number, TotauxTvaType> = {};
 
   let totalHtBrut = 0;
@@ -277,6 +289,23 @@ export function FacturePreviewCard({ facture, pdfMode = false }: Props) {
                 N° TVA : {facture.destinataireEntrepriseNumeroTva}
               </p>
             )}
+            {(facture.clientContactPrenom || facture.clientContactNom) && (
+              <p className="text-xs text-gray-600">
+                {[facture.clientContactPrenom, facture.clientContactNom]
+                  .filter(Boolean)
+                  .join(" ")}
+              </p>
+            )}
+            {facture.clientContactEmail && (
+              <p className="text-xs text-gray-500">
+                {facture.clientContactEmail}
+              </p>
+            )}
+            {facture.clientContactPhone && (
+              <p className="text-xs text-gray-500">
+                {facture.clientContactPhone}
+              </p>
+            )}
             {/* Site d'intervention */}
             {facture.siteNom && (
               <div
@@ -292,17 +321,8 @@ export function FacturePreviewCard({ facture, pdfMode = false }: Props) {
                 <p className="text-xs font-medium text-gray-700">
                   {facture.siteNom}
                 </p>
-                {facture.siteAdresseLigne1 && (
-                  <p className="text-xs text-gray-500">
-                    {facture.siteAdresseLigne1}
-                  </p>
-                )}
-                {(facture.siteCodePostal || facture.siteVille) && (
-                  <p className="text-xs text-gray-500">
-                    {[facture.siteCodePostal, facture.siteVille]
-                      .filter(Boolean)
-                      .join(" ")}
-                  </p>
+                {siteAdresseComplete && (
+                  <p className="text-xs text-gray-500">{siteAdresseComplete}</p>
                 )}
               </div>
             )}

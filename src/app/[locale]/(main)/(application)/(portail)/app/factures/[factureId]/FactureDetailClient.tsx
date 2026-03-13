@@ -89,7 +89,7 @@ function buildPreview(
     destinataireEntrepriseSiret: facture.destinataireEntrepriseSiret,
     destinataireEntrepriseNumeroTva: facture.destinataireEntrepriseNumeroTva,
     siteNom: facture.siteNom,
-    siteAdresseLigne1: facture.siteAdresse,
+    siteAdresse: facture.siteAdresse,
     siteCodePostal: facture.siteCodePostal,
     siteVille: facture.siteVille,
     lignes: facture.lignes.map((l) => ({

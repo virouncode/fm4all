@@ -177,10 +177,10 @@ function buildPreview(
     siteAdresse: devis.siteAdresse,
     siteCodePostal: devis.siteCodePostal,
     siteVille: devis.siteVille,
-    siteContactPrenom: devis.siteResponsablePrenom,
-    siteContactNom: devis.siteResponsableNom,
-    siteContactEmail: devis.siteResponsableEmail,
-    siteContactPhone: devis.siteResponsablePhone,
+    clientContactPrenom: devis.siteResponsablePrenom,
+    clientContactNom: devis.siteResponsableNom,
+    clientContactEmail: devis.siteResponsableEmail,
+    clientContactPhone: devis.siteResponsablePhone,
     lignes: previewLignes,
   };
 }
