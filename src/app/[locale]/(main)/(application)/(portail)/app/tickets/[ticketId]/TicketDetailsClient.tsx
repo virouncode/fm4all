@@ -494,43 +494,6 @@ export function TicketDetailsClient({
                     SIRET: {proprietaireEntreprise.siret}
                   </p>
                 </div>
-                {(proprietaireEntreprise.prenomContact ||
-                  proprietaireEntreprise.nomContact ||
-                  proprietaireEntreprise.phoneContact ||
-                  proprietaireEntreprise.emailContact) && (
-                  <div className="space-y-2">
-                    {(proprietaireEntreprise.prenomContact ||
-                      proprietaireEntreprise.nomContact) && (
-                      <div className="flex items-center gap-2">
-                        <User className="text-primary h-4 w-4 shrink-0" />
-                        <span className="text-sm font-medium">
-                          {proprietaireEntreprise.prenomContact}{" "}
-                          {proprietaireEntreprise.nomContact}
-                        </span>
-                      </div>
-                    )}
-                    {proprietaireEntreprise.phoneContact && (
-                      <a
-                        href={`tel:${proprietaireEntreprise.phoneContact}`}
-                        className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
-                      >
-                        <Phone className="text-primary h-4 w-4 shrink-0" />
-                        <span>{proprietaireEntreprise.phoneContact}</span>
-                      </a>
-                    )}
-                    {proprietaireEntreprise.emailContact && (
-                      <a
-                        href={`mailto:${proprietaireEntreprise.emailContact}`}
-                        className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
-                      >
-                        <Mail className="text-primary h-4 w-4 shrink-0" />
-                        <span className="truncate">
-                          {proprietaireEntreprise.emailContact}
-                        </span>
-                      </a>
-                    )}
-                  </div>
-                )}
               </>
             ) : (
               <p className="text-muted-foreground text-sm italic">
@@ -560,43 +523,6 @@ export function TicketDetailsClient({
                       SIRET: {demandeurEntreprise.siret}
                     </p>
                   </div>
-                  {(demandeurEntreprise.prenomContact ||
-                    demandeurEntreprise.nomContact ||
-                    demandeurEntreprise.phoneContact ||
-                    demandeurEntreprise.emailContact) && (
-                    <div className="space-y-2">
-                      {(demandeurEntreprise.prenomContact ||
-                        demandeurEntreprise.nomContact) && (
-                        <div className="flex items-center gap-2">
-                          <User className="text-primary h-4 w-4 shrink-0" />
-                          <span className="text-sm font-medium">
-                            {demandeurEntreprise.prenomContact}{" "}
-                            {demandeurEntreprise.nomContact}
-                          </span>
-                        </div>
-                      )}
-                      {demandeurEntreprise.phoneContact && (
-                        <a
-                          href={`tel:${demandeurEntreprise.phoneContact}`}
-                          className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
-                        >
-                          <Phone className="text-primary h-4 w-4 shrink-0" />
-                          <span>{demandeurEntreprise.phoneContact}</span>
-                        </a>
-                      )}
-                      {demandeurEntreprise.emailContact && (
-                        <a
-                          href={`mailto:${demandeurEntreprise.emailContact}`}
-                          className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
-                        >
-                          <Mail className="text-primary h-4 w-4 shrink-0" />
-                          <span className="truncate">
-                            {demandeurEntreprise.emailContact}
-                          </span>
-                        </a>
-                      )}
-                    </div>
-                  )}
                 </>
               ) : (
                 <p className="text-muted-foreground text-sm italic">
@@ -638,45 +564,6 @@ export function TicketDetailsClient({
                     SIRET: {assigneEntreprise.siret}
                   </p>
                 </div>
-                {(assigneEntreprise.phoneContact ||
-                  assigneEntreprise.emailContact) && (
-                  <div className="space-y-2">
-                    {assigneEntreprise.phoneContact && (
-                      <a
-                        href={`tel:${assigneEntreprise.phoneContact}`}
-                        className="hover:text-primary group flex items-center gap-2 text-sm transition-colors"
-                      >
-                        <Phone className="text-primary h-4 w-4 shrink-0" />
-                        <span className="group-hover:underline">
-                          {assigneEntreprise.phoneContact}
-                        </span>
-                      </a>
-                    )}
-                    {assigneEntreprise.emailContact && (
-                      <a
-                        href={`mailto:${assigneEntreprise.emailContact}`}
-                        className="hover:text-primary group flex items-center gap-2 text-sm transition-colors"
-                      >
-                        <Mail className="text-primary h-4 w-4 shrink-0" />
-                        <span className="truncate group-hover:underline">
-                          {assigneEntreprise.emailContact}
-                        </span>
-                      </a>
-                    )}
-                  </div>
-                )}
-                {(assigneEntreprise.prenomContact ||
-                  assigneEntreprise.nomContact) && (
-                  <div className="border-t pt-3">
-                    <p className="text-xs">
-                      <span className="text-muted-foreground">Contact :</span>{" "}
-                      <span className="font-medium">
-                        {assigneEntreprise.prenomContact}{" "}
-                        {assigneEntreprise.nomContact}
-                      </span>
-                    </p>
-                  </div>
-                )}
               </>
             ) : (
               <p className="text-muted-foreground text-sm italic">

@@ -1,6 +1,5 @@
 "use client";
 
-import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -13,7 +12,6 @@ import {
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { isValidSIRET } from "@/lib/utils/isValidSIRET";
 import {
@@ -26,6 +24,7 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  Lock,
   RotateCcw,
   Search,
   XCircle,
@@ -34,15 +33,23 @@ import { useEffect, useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { RhfInput } from "@/components/rhf/RhfInput";
+
+type SireneDataType = {
+  nom: string;
+  formeJuridique: string | null;
+  adresseLigne1: string;
+  adresseLigne2: string | null;
+  codePostal: string;
+  ville: string;
+  numeroTva: string;
+  etatActif: boolean;
+};
 
 type SiretStateType =
   | { status: "idle" }
   | { status: "searching" }
-  // Entreprise trouvée, sans rôle prestataire → on peut ajouter le rôle + services
   | { status: "found_new"; entreprise: { id: string; nom: string; siret: string } }
-  // Entreprise trouvée, déjà prestataire :
-  // - hasActiveAdmin=true  → le prestataire gère son profil → services lecture seule pour le client
-  // - hasActiveAdmin=false → géré par le client → services modifiables (pré-cochés)
   | {
       status: "found_prestataire";
       entreprise: { id: string; nom: string; siret: string };
@@ -50,16 +57,18 @@ type SiretStateType =
       hasActiveAdmin: boolean;
     }
   | { status: "already_linked"; entreprise: { id: string; nom: string } }
-  | { status: "self" } // SIRET = propre entreprise du client
-  | { status: "not_found" }
+  | { status: "self" }
+  | { status: "not_found"; sireneData: SireneDataType }
   | { status: "error"; message: string };
 
 const step1FormSchema = z.object({
   nom: z.string().min(1, "Nom de l'entreprise requis"),
-  prenomContact: z.string(),
-  nomContact: z.string(),
-  emailContact: z.string().email("Email invalide").or(z.literal("")),
-  phoneContact: z.string(),
+  adresseLigne1: z.string().optional(),
+  adresseLigne2: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  formeJuridique: z.string().optional(),
+  numeroTva: z.string().optional(),
 });
 
 type Step1FormType = z.infer<typeof step1FormSchema>;
@@ -100,10 +109,12 @@ export function AjouterPrestataireDialog({
     mode: "onTouched",
     defaultValues: {
       nom: "",
-      prenomContact: "",
-      nomContact: "",
-      emailContact: "",
-      phoneContact: "",
+      adresseLigne1: "",
+      adresseLigne2: "",
+      codePostal: "",
+      ville: "",
+      formeJuridique: "",
+      numeroTva: "",
     },
   });
 
@@ -118,15 +129,16 @@ export function AjouterPrestataireDialog({
     setSelectedServiceIds([]);
     form.reset({
       nom: "",
-      prenomContact: "",
-      nomContact: "",
-      emailContact: "",
-      phoneContact: "",
+      adresseLigne1: "",
+      adresseLigne2: "",
+      codePostal: "",
+      ville: "",
+      formeJuridique: "",
+      numeroTva: "",
     });
   }, [open, form]);
 
   // Charger le catalogue de services au passage à l'étape 2
-  // Sauf si l'entreprise est déjà prestataire AVEC admin actif (services en lecture seule, catalogue inutile)
   const skipLoadServices =
     siretState.status === "found_prestataire" && siretState.hasActiveAdmin;
 
@@ -152,10 +164,20 @@ export function AjouterPrestataireDialog({
       setSiretState({ status: "error", message: result.serverError.message });
       return;
     }
+
+    if (result?.data?.sireneUnavailable) {
+      setSiretState({ status: "idle" });
+      toast.error(
+        "Service INSEE indisponible — impossible de vérifier ce SIRET. Réessayez dans quelques instants.",
+      );
+      return;
+    }
+
     if (result?.data?.isSelf) {
       setSiretState({ status: "self" });
       return;
     }
+
     if (result?.data?.entreprise) {
       if (result.data.alreadyLinked) {
         setSiretState({
@@ -169,10 +191,6 @@ export function AjouterPrestataireDialog({
           existingServices: result.data.existingServices,
           hasActiveAdmin: result.data.hasActiveAdmin,
         });
-        form.setValue("nom", result.data.entreprise.nom, {
-          shouldValidate: true,
-        });
-        // Pré-cocher les services existants si le client peut les modifier
         if (!result.data.hasActiveAdmin) {
           setSelectedServiceIds(
             result.data.existingServices.map((s) => s.id),
@@ -183,13 +201,24 @@ export function AjouterPrestataireDialog({
           status: "found_new",
           entreprise: result.data.entreprise,
         });
-        form.setValue("nom", result.data.entreprise.nom, {
-          shouldValidate: true,
-        });
       }
     } else {
-      setSiretState({ status: "not_found" });
-      form.setValue("nom", "");
+      const sireneData = result?.data?.sireneData as SireneDataType | null;
+      if (!sireneData) {
+        setSiretState({
+          status: "error",
+          message: "Impossible de récupérer les données depuis l'API SIRENE.",
+        });
+        return;
+      }
+      setSiretState({ status: "not_found", sireneData });
+      form.setValue("nom", sireneData.nom, { shouldValidate: true });
+      form.setValue("adresseLigne1", sireneData.adresseLigne1 ?? "");
+      form.setValue("adresseLigne2", sireneData.adresseLigne2 ?? "");
+      form.setValue("codePostal", sireneData.codePostal ?? "");
+      form.setValue("ville", sireneData.ville ?? "");
+      form.setValue("formeJuridique", sireneData.formeJuridique ?? "");
+      form.setValue("numeroTva", sireneData.numeroTva ?? "");
     }
   };
 
@@ -198,10 +227,12 @@ export function AjouterPrestataireDialog({
     setSiretState({ status: "idle" });
     form.reset({
       nom: "",
-      prenomContact: "",
-      nomContact: "",
-      emailContact: "",
-      phoneContact: "",
+      adresseLigne1: "",
+      adresseLigne2: "",
+      codePostal: "",
+      ville: "",
+      formeJuridique: "",
+      numeroTva: "",
     });
   };
 
@@ -222,9 +253,6 @@ export function AjouterPrestataireDialog({
   const handleSubmit = async () => {
     const data = form.getValues();
     setCreating(true);
-    // Pour un prestataire avec admin actif, on ne touche pas à ses services (serviceIds vide)
-    // Pour un prestataire sans admin (géré par le client), on envoie les services sélectionnés
-    // → l'action remplacera la liste de services
     const serviceIdsToSubmit =
       siretState.status === "found_prestataire" && siretState.hasActiveAdmin
         ? []
@@ -232,12 +260,14 @@ export function AjouterPrestataireDialog({
     const result = await createOrLinkPrestataireAction({
       siret: siretInput,
       nom: data.nom,
+      adresseLigne1: data.adresseLigne1 || undefined,
+      adresseLigne2: data.adresseLigne2 || undefined,
+      codePostal: data.codePostal || undefined,
+      ville: data.ville || undefined,
+      formeJuridique: data.formeJuridique || undefined,
+      numeroTva: data.numeroTva || undefined,
       serviceIds: serviceIdsToSubmit,
       entrepriseId: clientEntrepriseId,
-      prenomContact: data.prenomContact || undefined,
-      nomContact: data.nomContact || undefined,
-      emailContact: data.emailContact || undefined,
-      phoneContact: data.phoneContact || undefined,
     });
     setCreating(false);
 
@@ -255,7 +285,9 @@ export function AjouterPrestataireDialog({
   const prestataireNom =
     siretState.status === "found_new" || siretState.status === "found_prestataire"
       ? siretState.entreprise.nom
-      : form.getValues("nom");
+      : siretState.status === "not_found"
+        ? siretState.sireneData.nom
+        : form.getValues("nom");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -376,13 +408,13 @@ export function AjouterPrestataireDialog({
                       )}
                       {siretState.status === "not_found" && (
                         <p className="text-muted-foreground text-xs">
-                          Prestataire non trouvé — renseignez les informations
-                          ci-dessous.
+                          Données récupérées depuis l&apos;API SIRENE — non
+                          modifiables.
                         </p>
                       )}
                     </div>
 
-                    {/* Nom (après recherche) */}
+                    {/* Nom affiché en lecture seule si déjà en DB */}
                     {(siretState.status === "found_new" ||
                       siretState.status === "found_prestataire") && (
                       <div className="space-y-1">
@@ -394,42 +426,51 @@ export function AjouterPrestataireDialog({
                         </p>
                       </div>
                     )}
-                    {siretState.status === "not_found" && (
-                      <RhfInput<Step1FormType>
-                        name="nom"
-                        label="Nom de l'entreprise"
-                        requiredMark
-                      />
-                    )}
 
-                    {/* Contact (uniquement si prestataire inconnu du système) */}
+                    {/* Champs SIRENE pré-remplis (création uniquement) */}
                     {siretState.status === "not_found" && (
-                      <>
-                        <Separator />
-                        <p className="text-muted-foreground text-sm">
-                          Contact (optionnel)
-                        </p>
-                        <div className="grid grid-cols-2 gap-3">
-                          <RhfInput<Step1FormType>
-                            name="prenomContact"
-                            label="Prénom"
-                          />
-                          <RhfInput<Step1FormType>
-                            name="nomContact"
-                            label="Nom"
-                          />
-                          <RhfInput<Step1FormType>
-                            name="emailContact"
-                            label="Email"
-                            type="email"
-                          />
-                          <RhfInput<Step1FormType>
-                            name="phoneContact"
-                            label="Téléphone"
-                            type="tel"
-                          />
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                            Nom de l&apos;entreprise
+                            <Lock className="h-3 w-3" />
+                          </label>
+                          <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                            {siretState.sireneData.nom}
+                          </p>
                         </div>
-                      </>
+
+                        {siretState.sireneData.formeJuridique && (
+                          <div className="space-y-1">
+                            <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                              Forme juridique
+                              <Lock className="h-3 w-3" />
+                            </label>
+                            <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                              {siretState.sireneData.formeJuridique}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="space-y-1">
+                          <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                            Adresse
+                            <Lock className="h-3 w-3" />
+                          </label>
+                          <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                            {siretState.sireneData.adresseLigne1}
+                            {", "}
+                            {siretState.sireneData.codePostal}{" "}
+                            {siretState.sireneData.ville}
+                          </p>
+                        </div>
+
+                        <RhfInput<Step1FormType>
+                          name="adresseLigne2"
+                          label="Complément d'adresse"
+                          placeholder="Bâtiment B, étage 3..."
+                        />
+                      </div>
                     )}
                   </>
                 ) : siretState.status === "found_prestataire" &&
@@ -463,7 +504,7 @@ export function AjouterPrestataireDialog({
                     </div>
                   </div>
                 ) : (
-                  /* Étape 2 : Nouveau prestataire ou entreprise sans rôle prestataire — picker services */
+                  /* Étape 2 : Nouveau prestataire ou entreprise sans rôle prestataire */
                   <div className="space-y-3">
                     <div>
                       <Label>
@@ -499,6 +540,19 @@ export function AjouterPrestataireDialog({
                     {!loadingServices && selectedServiceIds.length === 0 && (
                       <p className="text-destructive text-xs">
                         Sélectionnez au moins un service pour ce prestataire.
+                      </p>
+                    )}
+                    {!loadingServices && (
+                      <p className="text-muted-foreground text-xs">
+                        Si vous ne trouvez pas un service, merci de demander
+                        l&apos;ajout du service au{" "}
+                        <a
+                          href="mailto:contact@fm4all.com"
+                          className="underline hover:text-foreground"
+                        >
+                          catalogue
+                        </a>
+                        .
                       </p>
                     )}
                   </div>

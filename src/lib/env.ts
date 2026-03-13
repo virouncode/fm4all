@@ -33,6 +33,7 @@ export const env = {
   MAILGUN_API_KEY: required("MAILGUN_API_KEY"),
   AWS_REGION: required("AWS_REGION"),
   AWS_S3_BUCKET: required("AWS_S3_BUCKET"),
+  INSEE_API_TOKEN: optional("INSEE_API_TOKEN"),
 
   // Optionnels serveur
   MAILGUN_BCC_EMAIL: optional("MAILGUN_BCC_EMAIL"),

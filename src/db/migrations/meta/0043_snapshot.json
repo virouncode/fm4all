@@ -1,6 +1,6 @@
 {
-  "id": "b38ffcb0-cd0c-4eb3-be8c-f1ed8b4256e3",
-  "prevId": "e72d7160-9336-4864-9141-2efe06c32221",
+  "id": "ce19f640-6c77-4b56-bb33-192beeda5933",
+  "prevId": "b38ffcb0-cd0c-4eb3-be8c-f1ed8b4256e3",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -3913,6 +3913,54 @@
           "primaryKey": false,
           "notNull": true
         },
+        "prenom_contact_prestataire": {
+          "name": "prenom_contact_prestataire",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nom_contact_prestataire": {
+          "name": "nom_contact_prestataire",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email_contact_prestataire": {
+          "name": "email_contact_prestataire",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone_contact_prestataire": {
+          "name": "phone_contact_prestataire",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prenom_contact_client": {
+          "name": "prenom_contact_client",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nom_contact_client": {
+          "name": "nom_contact_client",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email_contact_client": {
+          "name": "email_contact_client",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone_contact_client": {
+          "name": "phone_contact_client",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_by_id": {
           "name": "created_by_id",
           "type": "uuid",
@@ -4413,6 +4461,42 @@
         "numero_tva": {
           "name": "numero_tva",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "adresse_ligne1": {
+          "name": "adresse_ligne1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "adresse_ligne2": {
+          "name": "adresse_ligne2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "code_postal": {
+          "name": "code_postal",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ville": {
+          "name": "ville",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "forme_juridique": {
+          "name": "forme_juridique",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sirene_synced_at": {
+          "name": "sirene_synced_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
         },
@@ -14912,12 +14996,12 @@
         "centilitre",
         "litre",
         "millimetre",
-        "centim\u00e8tre",
+        "centimètre",
         "metre",
         "metre_carre",
         "metre_cube",
         "metre_cube_par_heure",
-        "amp\u00e8re",
+        "ampère",
         "gigajoule",
         "gigawatt",
         "gigawatt_par_heure",

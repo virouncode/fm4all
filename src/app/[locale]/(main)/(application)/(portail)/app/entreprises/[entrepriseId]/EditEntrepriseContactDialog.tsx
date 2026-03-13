@@ -4,77 +4,127 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { RhfInput } from "@/components/rhf/RhfInput";
-import { updateEntrepriseContactAction } from "@/server/actions/entreprisesActions";
 import {
+  insertEntrepriseContactAction,
+  updateEntrepriseContactAction,
+} from "@/server/actions/entreprisesActions";
+import {
+  insertEntrepriseContactSchema,
   updateEntrepriseContactSchema,
+  type InsertEntrepriseContactType,
   type UpdateEntrepriseContactType,
 } from "@/zod-schemas/entreprise.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, User } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
 import { useEffect } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
+import type { EntrepriseContactSelectType } from "@/zod-schemas/entreprise.schema";
 
-type Props = {
+type CreateMode = {
+  mode: "create";
+  entrepriseId: string;
+  contact?: never;
+};
+
+type EditMode = {
+  mode: "edit";
+  entrepriseId?: never;
+  contact: EntrepriseContactSelectType;
+};
+
+type Props = (CreateMode | EditMode) & {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  entrepriseId: string;
-  currentPrenomContact: string | null;
-  currentNomContact: string | null;
-  currentEmailContact: string | null;
-  currentPhoneContact: string | null;
   onSuccess: () => void;
 };
 
 export function EditEntrepriseContactDialog({
   open,
   onOpenChange,
-  entrepriseId,
-  currentPrenomContact,
-  currentNomContact,
-  currentEmailContact,
-  currentPhoneContact,
   onSuccess,
+  ...rest
 }: Props) {
-  const form = useForm<UpdateEntrepriseContactType>({
-    resolver: zodResolver(updateEntrepriseContactSchema),
+  const isCreate = rest.mode === "create";
+
+  const insertForm = useForm<InsertEntrepriseContactType>({
+    resolver: zodResolver(insertEntrepriseContactSchema),
     mode: "onTouched",
     defaultValues: {
-      entrepriseId,
-      prenomContact: currentPrenomContact ?? "",
-      nomContact: currentNomContact ?? "",
-      emailContact: currentEmailContact ?? "",
-      phoneContact: currentPhoneContact ?? "",
+      entrepriseId: isCreate ? rest.entrepriseId : "",
+      prenom: "",
+      nom: "",
+      email: "",
+      phone: "",
+      fonction: "",
     },
   });
 
-  const { isSubmitting, isDirty } = useFormState({ control: form.control });
+  const editForm = useForm<UpdateEntrepriseContactType>({
+    resolver: zodResolver(updateEntrepriseContactSchema),
+    mode: "onTouched",
+    defaultValues: {
+      contactId: !isCreate ? rest.contact.id : "",
+      prenom: "",
+      nom: "",
+      email: "",
+      phone: "",
+      fonction: "",
+    },
+  });
+
+  const insertState = useFormState({ control: insertForm.control });
+  const editState = useFormState({ control: editForm.control });
+  const isSubmitting = isCreate ? insertState.isSubmitting : editState.isSubmitting;
+  const isDirty = isCreate ? insertState.isDirty : editState.isDirty;
 
   useEffect(() => {
     if (!open) return;
-    form.reset({
-      entrepriseId,
-      prenomContact: currentPrenomContact ?? "",
-      nomContact: currentNomContact ?? "",
-      emailContact: currentEmailContact ?? "",
-      phoneContact: currentPhoneContact ?? "",
-    });
+    if (isCreate) {
+      insertForm.reset({
+        entrepriseId: rest.entrepriseId,
+        prenom: "",
+        nom: "",
+        email: "",
+        phone: "",
+        fonction: "",
+      });
+    } else {
+      editForm.reset({
+        contactId: rest.contact.id,
+        prenom: rest.contact.prenom,
+        nom: rest.contact.nom,
+        email: rest.contact.email ?? "",
+        phone: rest.contact.phone ?? "",
+        fonction: rest.contact.fonction ?? "",
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const onSubmit = async (data: UpdateEntrepriseContactType) => {
-    const result = await updateEntrepriseContactAction(data);
-
+  const onSubmitCreate = async (data: InsertEntrepriseContactType) => {
+    const result = await insertEntrepriseContactAction(data);
     if (result?.serverError) {
       toast.error(result.serverError.message);
       return;
     }
+    toast.success("Contact créé");
+    onOpenChange(false);
+    onSuccess();
+  };
 
+  const onSubmitEdit = async (data: UpdateEntrepriseContactType) => {
+    const result = await updateEntrepriseContactAction(data);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
     toast.success("Contact mis à jour");
     onOpenChange(false);
     onSuccess();
@@ -85,51 +135,116 @@ export function EditEntrepriseContactDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <User className="h-5 w-5 text-primary" />
-            Modifier le contact
+            <UserPlus className="text-primary h-5 w-5" />
+            {isCreate ? "Ajouter un contact" : "Modifier le contact"}
           </DialogTitle>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <RhfInput<UpdateEntrepriseContactType>
-                name="prenomContact"
-                label="Prénom"
+        {isCreate ? (
+          <Form {...insertForm}>
+            <form
+              onSubmit={insertForm.handleSubmit(onSubmitCreate)}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <RhfInput<InsertEntrepriseContactType>
+                  name="prenom"
+                  label="Prénom"
+                  requiredMark
+                />
+                <RhfInput<InsertEntrepriseContactType>
+                  name="nom"
+                  label="Nom"
+                  requiredMark
+                />
+              </div>
+              <RhfInput<InsertEntrepriseContactType>
+                name="email"
+                label="Email"
+                type="email"
               />
+              <div className="grid grid-cols-2 gap-3">
+                <RhfInput<InsertEntrepriseContactType>
+                  name="phone"
+                  label="Téléphone"
+                  type="tel"
+                />
+                <RhfInput<InsertEntrepriseContactType>
+                  name="fonction"
+                  label="Fonction"
+                />
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isSubmitting}
+                >
+                  Annuler
+                </Button>
+                <Button type="submit" disabled={isSubmitting || !isDirty}>
+                  {isSubmitting && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  Créer
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        ) : (
+          <Form {...editForm}>
+            <form
+              onSubmit={editForm.handleSubmit(onSubmitEdit)}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <RhfInput<UpdateEntrepriseContactType>
+                  name="prenom"
+                  label="Prénom"
+                  requiredMark
+                />
+                <RhfInput<UpdateEntrepriseContactType>
+                  name="nom"
+                  label="Nom"
+                  requiredMark
+                />
+              </div>
               <RhfInput<UpdateEntrepriseContactType>
-                name="nomContact"
-                label="Nom"
+                name="email"
+                label="Email"
+                type="email"
               />
-            </div>
-            <RhfInput<UpdateEntrepriseContactType>
-              name="emailContact"
-              label="Email"
-              type="email"
-            />
-            <RhfInput<UpdateEntrepriseContactType>
-              name="phoneContact"
-              label="Téléphone"
-              type="tel"
-            />
-
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Enregistrer
-              </Button>
-            </div>
-          </form>
-        </Form>
+              <div className="grid grid-cols-2 gap-3">
+                <RhfInput<UpdateEntrepriseContactType>
+                  name="phone"
+                  label="Téléphone"
+                  type="tel"
+                />
+                <RhfInput<UpdateEntrepriseContactType>
+                  name="fonction"
+                  label="Fonction"
+                />
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isSubmitting}
+                >
+                  Annuler
+                </Button>
+                <Button type="submit" disabled={isSubmitting || !isDirty}>
+                  {isSubmitting && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  Enregistrer
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        )}
       </DialogContent>
     </Dialog>
   );

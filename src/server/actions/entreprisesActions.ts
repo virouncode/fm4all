@@ -5,7 +5,10 @@ import { db } from "@/db";
 import { user as userTable } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
 import {
-  entrepriseInvitations,
+  clientPrestataireRelationContacts,
+  clientPrestataireRelations,
+  contactsInvitations,
+  entrepriseContacts,
   entrepriseRoles,
   entreprises,
   serviceEntreprises,
@@ -28,9 +31,11 @@ import {
   countEntreprises,
   getAllEntreprises,
   getEntreprisesClientes,
+  getEntrepriseContactsByEntrepriseId,
   getEntreprisesPaginated,
   getEntreprisesPrestataires,
   getEntrepriseWithDetailsById,
+  getRelationContactsByRelationId,
   getServicesByEntrepriseId,
 } from "@/server/queries/entreprises.query";
 import {
@@ -41,32 +46,41 @@ import { getAllServices } from "@/server/queries/services.query";
 import {
   getUserClientAdhesion,
   getUserPrestataireAdhesion,
+  hasAccessToEntreprise,
 } from "@/server/queries/userAdhesions.query";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import {
   deleteS3Object as deleteS3ObjectFromServer,
   promoteS3Key,
 } from "@/server/s3/s3";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { fetchEntrepriseBySiret } from "@/server/utils/sirene.utils";
 import { insertUserArborescence } from "@/server/utils/usersArborescence.utils";
 import {
-  capitalizeWords,
-  lower,
   normalizeForSubmit,
   upper,
 } from "@/zod-helpers/normalize";
 import {
+  insertEntrepriseContactAndLinkToRelationSchema,
+  insertEntrepriseContactSchema,
   insertEntrepriseFormSchema,
+  insertRelationContactSchema,
   updateEntrepriseContactSchema,
   updateEntrepriseInfosSchema,
   updateEntrepriseLogoSchema,
   updateEntrepriseRolesSchema,
+  updateEntrepriseSireneFieldsSchema,
   type RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
 import {
   accepterInvitationAdminSchema,
   inviterEntrepriseAdminSchema,
 } from "@/zod-schemas/inscriptionAdmin.schema";
-import { and, count, eq, gt, ilike, inArray, isNull, ne } from "drizzle-orm";
+import {
+  accepterInvitationContactSchema,
+  inviterContactSchema,
+} from "@/zod-schemas/inscriptionContact.schema";
+import { and, count, eq, gt, ilike, inArray, isNull } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { cookies, headers } from "next/headers";
 import { z } from "zod";
@@ -410,10 +424,11 @@ export const createEntrepriseAction = actionClient
     const {
       nom,
       siret,
-      prenomContact,
-      nomContact,
-      emailContact,
-      phoneContact,
+      adresseLigne1,
+      adresseLigne2,
+      codePostal,
+      ville,
+      formeJuridique,
       roles,
       serviceIds,
       numeroTva,
@@ -422,11 +437,12 @@ export const createEntrepriseAction = actionClient
     // Normaliser les champs optionnels: "" → null + appliquer la casse
     const normalized = normalizeForSubmit(parsedInput, {
       optionalStrings: [
-        "prenomContact",
-        "nomContact",
-        "emailContact",
-        "phoneContact",
         "numeroTva",
+        "adresseLigne1",
+        "adresseLigne2",
+        "codePostal",
+        "ville",
+        "formeJuridique",
       ] as const,
     });
 
@@ -458,19 +474,15 @@ export const createEntrepriseAction = actionClient
           .values({
             nom: nomClean,
             siret: siretClean,
-            prenomContact: normalized.prenomContact
-              ? capitalizeWords(normalized.prenomContact)
-              : null,
-            nomContact: normalized.nomContact
-              ? capitalizeWords(normalized.nomContact)
-              : null,
-            emailContact: normalized.emailContact
-              ? lower(normalized.emailContact)
-              : null,
-            phoneContact: normalized.phoneContact,
+            adresseLigne1: normalized.adresseLigne1,
+            adresseLigne2: normalized.adresseLigne2,
+            codePostal: normalized.codePostal,
+            ville: normalized.ville,
+            formeJuridique: normalized.formeJuridique,
             numeroTva: normalized.numeroTva
               ? normalized.numeroTva.toUpperCase()
               : null,
+            sireneSyncedAt: new Date(),
             createdById: currentUser.id,
             updatedById: currentUser.id,
           })
@@ -545,7 +557,7 @@ export const updateEntrepriseInfosAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { entrepriseId, nom, siret, numeroTva } = parsedInput;
+    const { entrepriseId, siret, adresseLigne2, numeroTva } = parsedInput;
 
     const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
     if (!plateformeRole) {
@@ -562,30 +574,18 @@ export const updateEntrepriseInfosAction = actionClient
           "Vous n'avez pas les droits pour modifier cette entreprise.",
         );
     }
-    const nomClean = upper(nom);
+
     const siretClean = siret.trim().replace(/\s/g, "");
+    const adresseLigne2Clean = adresseLigne2 && adresseLigne2 !== "" ? adresseLigne2 : null;
     const numeroTvaClean =
       numeroTva && numeroTva !== "" ? numeroTva.toUpperCase() : null;
-
-    // Unicité nom (hors l'entreprise elle-même)
-    const existingByNom = await db
-      .select({ id: entreprises.id })
-      .from(entreprises)
-      .where(
-        and(ilike(entreprises.nom, nomClean), ne(entreprises.id, entrepriseId)),
-      )
-      .limit(1);
-    if (existingByNom.length > 0)
-      throw errors.conflict(
-        `Une entreprise avec le nom "${nomClean}" existe déjà.`,
-      );
 
     try {
       await db
         .update(entreprises)
         .set({
-          nom: nomClean,
           siret: siretClean,
+          adresseLigne2: adresseLigne2Clean,
           numeroTva: numeroTvaClean,
           updatedById: currentUser.id,
         })
@@ -598,76 +598,6 @@ export const updateEntrepriseInfosAction = actionClient
         );
       throw errors.internal(`Erreur lors de la mise à jour: ${msg}`);
     }
-
-    return { success: true };
-  });
-
-/**
- * Met à jour les informations de contact d'une entreprise
- */
-export const updateEntrepriseContactAction = actionClient
-  .metadata({ actionName: "updateEntrepriseContactAction" })
-  .inputSchema(updateEntrepriseContactSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
-
-    const {
-      entrepriseId,
-      prenomContact,
-      nomContact,
-      emailContact,
-      phoneContact,
-    } = parsedInput;
-
-    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
-    if (!plateformeRole) {
-      const [clientAdhesion, prestataireAdhesion] = await Promise.all([
-        getUserClientAdhesion({ userId: currentUser.id, entrepriseId }),
-        getUserPrestataireAdhesion({ userId: currentUser.id }),
-      ]);
-      const isOwnEnterpriseAdmin =
-        clientAdhesion?.role === "admin" ||
-        (prestataireAdhesion?.entrepriseId === entrepriseId &&
-          prestataireAdhesion?.role === "admin");
-      if (!isOwnEnterpriseAdmin)
-        throw errors.forbidden(
-          "Vous n'avez pas les droits pour modifier cette entreprise.",
-        );
-    }
-
-    const normalized = normalizeForSubmit(
-      { prenomContact, nomContact, emailContact, phoneContact },
-      {
-        optionalStrings: [
-          "prenomContact",
-          "nomContact",
-          "emailContact",
-          "phoneContact",
-        ] as const,
-      },
-    );
-
-    await db
-      .update(entreprises)
-      .set({
-        prenomContact: normalized.prenomContact
-          ? capitalizeWords(normalized.prenomContact)
-          : null,
-        nomContact: normalized.nomContact
-          ? capitalizeWords(normalized.nomContact)
-          : null,
-        emailContact: normalized.emailContact
-          ? lower(normalized.emailContact)
-          : null,
-        phoneContact: normalized.phoneContact,
-        updatedById: currentUser.id,
-      })
-      .where(eq(entreprises.id, entrepriseId));
 
     return { success: true };
   });
@@ -816,6 +746,91 @@ export const updateEntrepriseRolesAction = actionClient
           })),
         );
       }
+    });
+
+    return { success: true };
+  });
+
+/**
+ * Met à jour les services d'un prestataire — via proxy client
+ * Autorisé si : prestataire sans admin actif + user est admin/manager client + relation existe
+ */
+export const updatePrestataireServicesAsProxyAction = actionClient
+  .metadata({ actionName: "updatePrestataireServicesAsProxyAction" })
+  .inputSchema(
+    z.object({
+      prestataireEntrepriseId: z.uuid(),
+      serviceIds: z.array(z.uuid()).min(1, "Au moins un service est requis"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { prestataireEntrepriseId, serviceIds } = parsedInput;
+
+    const canManage = await canManagePrestataireInfosAsClient(
+      currentUser.id,
+      prestataireEntrepriseId,
+    );
+    if (!canManage) {
+      throw errors.forbidden(
+        "Vous n'avez pas les droits pour modifier les services de ce prestataire.",
+      );
+    }
+
+    // Récupérer les service_entreprises actuels (id + serviceId)
+    const currentServiceRows = await db
+      .select({
+        id: serviceEntreprises.id,
+        serviceId: serviceEntreprises.serviceId,
+      })
+      .from(serviceEntreprises)
+      .where(eq(serviceEntreprises.entrepriseId, prestataireEntrepriseId));
+
+    // IDs des service_entreprises retirés
+    const removedRows = currentServiceRows.filter(
+      (r) => !serviceIds.includes(r.serviceId),
+    );
+    const serviceEntrepriseIdsToCheck = removedRows.map((r) => r.id);
+
+    // Bloquer si des exécutions actives référencent ces service_entreprises
+    if (serviceEntrepriseIdsToCheck.length > 0) {
+      const [{ value: nbExecutions }] = await db
+        .select({ value: count() })
+        .from(clientServiceExecutions)
+        .where(
+          inArray(
+            clientServiceExecutions.serviceEntrepriseId,
+            serviceEntrepriseIdsToCheck,
+          ),
+        );
+
+      if (nbExecutions > 0) {
+        throw errors.conflict(
+          `Impossible de retirer ${removedRows.length} service${removedRows.length > 1 ? "s" : ""} : ${nbExecutions} exécution${nbExecutions > 1 ? "s" : ""} active${nbExecutions > 1 ? "s" : ""} y sont rattachées.`,
+        );
+      }
+    }
+
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(serviceEntreprises)
+        .where(eq(serviceEntreprises.entrepriseId, prestataireEntrepriseId));
+      await tx.insert(serviceEntreprises).values(
+        serviceIds.map((serviceId) => ({
+          entrepriseId: prestataireEntrepriseId,
+          serviceId,
+          actif: true,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })),
+      );
     });
 
     return { success: true };
@@ -1044,11 +1059,11 @@ export const inviterEntrepriseAdminAction = actionClient
 
     // 4. Annuler les invitations en attente existantes
     await db
-      .delete(entrepriseInvitations)
+      .delete(contactsInvitations)
       .where(
         and(
-          eq(entrepriseInvitations.entrepriseId, parsedInput.entrepriseId),
-          isNull(entrepriseInvitations.acceptedAt),
+          eq(contactsInvitations.entrepriseId, parsedInput.entrepriseId),
+          isNull(contactsInvitations.acceptedAt),
         ),
       );
 
@@ -1057,7 +1072,7 @@ export const inviterEntrepriseAdminAction = actionClient
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const sentAt = new Date();
 
-    await db.insert(entrepriseInvitations).values({
+    await db.insert(contactsInvitations).values({
       entrepriseId: parsedInput.entrepriseId,
       email: parsedInput.email,
       token,
@@ -1098,18 +1113,18 @@ export const accepterInvitationAdminAction = actionClient
     // 1. Valider le token
     const [invitation] = await db
       .select({
-        id: entrepriseInvitations.id,
-        entrepriseId: entrepriseInvitations.entrepriseId,
-        email: entrepriseInvitations.email,
-        typeAdhesion: entrepriseInvitations.typeAdhesion,
-        createdById: entrepriseInvitations.createdById,
+        id: contactsInvitations.id,
+        entrepriseId: contactsInvitations.entrepriseId,
+        email: contactsInvitations.email,
+        typeAdhesion: contactsInvitations.typeAdhesion,
+        createdById: contactsInvitations.createdById,
       })
-      .from(entrepriseInvitations)
+      .from(contactsInvitations)
       .where(
         and(
-          eq(entrepriseInvitations.token, parsedInput.token),
-          isNull(entrepriseInvitations.acceptedAt),
-          gt(entrepriseInvitations.expiresAt, new Date()),
+          eq(contactsInvitations.token, parsedInput.token),
+          isNull(contactsInvitations.acceptedAt),
+          gt(contactsInvitations.expiresAt, new Date()),
         ),
       )
       .limit(1);
@@ -1183,9 +1198,9 @@ export const accepterInvitationAdminAction = actionClient
         }
 
         await tx
-          .update(entrepriseInvitations)
+          .update(contactsInvitations)
           .set({ acceptedAt: new Date(), updatedById: newUserId })
-          .where(eq(entrepriseInvitations.id, invitation.id));
+          .where(eq(contactsInvitations.id, invitation.id));
 
         // Entrée closure table (racine — admin sans parent hiérarchique)
         await insertUserArborescence({
@@ -1220,6 +1235,913 @@ export const accepterInvitationAdminAction = actionClient
       });
     } catch {
       // Email non bloquant — le compte est créé, l'utilisateur peut réinitialiser son mdp
+    }
+
+    return {
+      message:
+        "Votre compte a été créé. Un email vous a été envoyé pour définir votre mot de passe.",
+    };
+  });
+
+// ==================== CONTACTS ENTREPRISE ====================
+
+/**
+ * Liste les contacts d'une entreprise
+ */
+export const getEntrepriseContactsAction = actionClient
+  .metadata({ actionName: "getEntrepriseContactsAction" })
+  .inputSchema(z.object({ entrepriseId: z.uuid() }))
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const [canAccess, platformRole] = await Promise.all([
+      hasAccessToEntreprise(currentUser.id, parsedInput.entrepriseId),
+      getUserPlateformeAdhesion(currentUser.id),
+    ]);
+    if (!canAccess && !platformRole?.role)
+      throw errors.forbidden("Accès non autorisé.");
+
+    const contacts = await getEntrepriseContactsByEntrepriseId(
+      parsedInput.entrepriseId,
+    );
+    return { contacts };
+  });
+
+/**
+ * Crée un contact pour une entreprise
+ */
+export const insertEntrepriseContactAction = actionClient
+  .metadata({ actionName: "insertEntrepriseContactAction" })
+  .inputSchema(insertEntrepriseContactSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const canAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
+    if (!canAccess) throw errors.forbidden("Accès non autorisé.");
+
+    // Normaliser les champs optionnels : "" → null
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["email", "phone", "fonction", "notes"] as const,
+    });
+
+    // Vérifier que l'email n'appartient pas déjà à un compte existant
+    if (normalized.email) {
+      const existingUser = await db.query.user.findFirst({
+        where: eq(userTable.email, normalized.email),
+        columns: { id: true },
+      });
+      if (existingUser) {
+        throw errors.conflict(
+          "Un compte existe déjà avec cet email. Invitez cet utilisateur via le module Utilisateurs.",
+        );
+      }
+    }
+
+    const [contact] = await db
+      .insert(entrepriseContacts)
+      .values({
+        entrepriseId: normalized.entrepriseId,
+        prenom: normalized.prenom,
+        nom: normalized.nom,
+        email: normalized.email,
+        phone: normalized.phone,
+        fonction: normalized.fonction,
+        notes: normalized.notes,
+        userId: parsedInput.userId ?? null,
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      })
+      .returning();
+
+    return { contact };
+  });
+
+/**
+ * Met à jour un contact d'entreprise (champs editables uniquement)
+ */
+export const updateEntrepriseContactAction = actionClient
+  .metadata({ actionName: "updateEntrepriseContactAction" })
+  .inputSchema(updateEntrepriseContactSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    // Vérifier que le contact existe et récupérer son entrepriseId + email actuel
+    const existing = await db.query.entrepriseContacts.findFirst({
+      where: eq(entrepriseContacts.id, parsedInput.contactId),
+      columns: { id: true, entrepriseId: true, email: true },
+    });
+    if (!existing) throw errors.notFound("Contact non trouvé.");
+
+    const canAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      existing.entrepriseId,
+    );
+    if (!canAccess) throw errors.forbidden("Accès non autorisé.");
+
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["email", "phone", "fonction", "notes"] as const,
+    });
+
+    // Vérifier que le nouvel email n'appartient pas déjà à un compte existant
+    // (seulement si l'email a changé par rapport à la valeur actuelle)
+    if (normalized.email && normalized.email !== existing.email) {
+      const existingUser = await db.query.user.findFirst({
+        where: eq(userTable.email, normalized.email),
+        columns: { id: true },
+      });
+      if (existingUser) {
+        throw errors.conflict(
+          "Un compte existe déjà avec cet email. Invitez cet utilisateur via le module Utilisateurs.",
+        );
+      }
+    }
+
+    const [contact] = await db
+      .update(entrepriseContacts)
+      .set({
+        prenom: normalized.prenom,
+        nom: normalized.nom,
+        email: normalized.email,
+        phone: normalized.phone,
+        fonction: normalized.fonction,
+        notes: normalized.notes,
+        updatedById: currentUser.id,
+        updatedAt: new Date(),
+      })
+      .where(eq(entrepriseContacts.id, parsedInput.contactId))
+      .returning();
+
+    return { contact };
+  });
+
+/**
+ * Supprime un contact d'entreprise (DELETE physique)
+ */
+export const deleteEntrepriseContactAction = actionClient
+  .metadata({ actionName: "deleteEntrepriseContactAction" })
+  .inputSchema(z.object({ contactId: z.uuid() }))
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const existing = await db.query.entrepriseContacts.findFirst({
+      where: eq(entrepriseContacts.id, parsedInput.contactId),
+      columns: { id: true, entrepriseId: true },
+    });
+    if (!existing) throw errors.notFound("Contact non trouvé.");
+
+    const canAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      existing.entrepriseId,
+    );
+    if (!canAccess) throw errors.forbidden("Accès non autorisé.");
+
+    // Bloquer si le contact est lié à une relation client↔prestataire
+    const [{ value: nbLinks }] = await db
+      .select({ value: count() })
+      .from(clientPrestataireRelationContacts)
+      .where(
+        eq(clientPrestataireRelationContacts.contactId, parsedInput.contactId),
+      );
+    if (nbLinks > 0)
+      throw errors.conflict(
+        `Impossible de supprimer ce contact : il est référencé dans ${nbLinks} relation${nbLinks > 1 ? "s" : ""} client↔prestataire. Retirez-le d'abord de ces relations.`,
+      );
+
+    await db
+      .delete(entrepriseContacts)
+      .where(eq(entrepriseContacts.id, parsedInput.contactId));
+
+    return { success: true };
+  });
+
+// ==================== CONTACTS RELATION ====================
+
+/**
+ * Liste les contacts liés à une relation client↔prestataire
+ */
+export const getRelationContactsAction = actionClient
+  .metadata({ actionName: "getRelationContactsAction" })
+  .inputSchema(z.object({ relationId: z.uuid() }))
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: eq(clientPrestataireRelations.id, parsedInput.relationId),
+      columns: {
+        id: true,
+        clientEntrepriseId: true,
+        prestataireEntrepriseId: true,
+      },
+    });
+    if (!relation) throw errors.notFound("Relation non trouvée.");
+
+    const [hasClient, hasPrestataire] = await Promise.all([
+      hasAccessToEntreprise(currentUser.id, relation.clientEntrepriseId),
+      hasAccessToEntreprise(currentUser.id, relation.prestataireEntrepriseId),
+    ]);
+    if (!hasClient && !hasPrestataire)
+      throw errors.forbidden("Accès non autorisé.");
+
+    const contacts = await getRelationContactsByRelationId(parsedInput.relationId);
+    return { contacts };
+  });
+
+/**
+ * Lie un contact existant à une relation (avec side, role, estPrincipal)
+ */
+export const insertRelationContactAction = actionClient
+  .metadata({ actionName: "insertRelationContactAction" })
+  .inputSchema(insertRelationContactSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: eq(clientPrestataireRelations.id, parsedInput.relationId),
+      columns: {
+        id: true,
+        clientEntrepriseId: true,
+        prestataireEntrepriseId: true,
+      },
+    });
+    if (!relation) throw errors.notFound("Relation non trouvée.");
+
+    const canManage = await canManageRelationContacts(
+      currentUser.id,
+      relation.clientEntrepriseId,
+      relation.prestataireEntrepriseId,
+    );
+    if (!canManage)
+      throw errors.forbidden(
+        "Seuls les administrateurs et managers peuvent gérer les contacts.",
+      );
+
+    // Normaliser role : "" → null
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["role"] as const,
+    });
+
+    const [link] = await db
+      .insert(clientPrestataireRelationContacts)
+      .values({
+        relationId: normalized.relationId,
+        contactId: normalized.contactId,
+        side: normalized.side,
+        role: normalized.role,
+        estPrincipal: parsedInput.estPrincipal,
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      })
+      .returning();
+
+    return { link };
+  });
+
+/**
+ * Retire un contact d'une relation (DELETE physique du lien junction)
+ */
+export const deleteRelationContactAction = actionClient
+  .metadata({ actionName: "deleteRelationContactAction" })
+  .inputSchema(z.object({ linkId: z.uuid() }))
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const link = await db.query.clientPrestataireRelationContacts.findFirst({
+      where: eq(clientPrestataireRelationContacts.id, parsedInput.linkId),
+      columns: { id: true, relationId: true },
+    });
+    if (!link) throw errors.notFound("Lien de contact non trouvé.");
+
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: eq(clientPrestataireRelations.id, link.relationId),
+      columns: {
+        id: true,
+        clientEntrepriseId: true,
+        prestataireEntrepriseId: true,
+      },
+    });
+    if (!relation) throw errors.notFound("Relation non trouvée.");
+
+    const canManage = await canManageRelationContacts(
+      currentUser.id,
+      relation.clientEntrepriseId,
+      relation.prestataireEntrepriseId,
+    );
+    if (!canManage)
+      throw errors.forbidden(
+        "Seuls les administrateurs et managers peuvent gérer les contacts.",
+      );
+
+    await db
+      .delete(clientPrestataireRelationContacts)
+      .where(eq(clientPrestataireRelationContacts.id, parsedInput.linkId));
+
+    return { success: true };
+  });
+
+/**
+ * Récupère les contacts d'une entreprise accessibles via une relation client↔prestataire.
+ * Retourne les contacts de targetEntrepriseId qui ne sont pas encore liés à la relation.
+ * Permission : accès via la relation (pas via hasAccessToEntreprise direct).
+ */
+export const getEntrepriseContactsForRelationAction = actionClient
+  .metadata({ actionName: "getEntrepriseContactsForRelationAction" })
+  .inputSchema(
+    z.object({ relationId: z.uuid(), targetEntrepriseId: z.uuid() }),
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: eq(clientPrestataireRelations.id, parsedInput.relationId),
+      columns: {
+        id: true,
+        clientEntrepriseId: true,
+        prestataireEntrepriseId: true,
+      },
+    });
+    if (!relation) throw errors.notFound("Relation non trouvée.");
+
+    const [hasClient, hasPrestataire] = await Promise.all([
+      hasAccessToEntreprise(currentUser.id, relation.clientEntrepriseId),
+      hasAccessToEntreprise(currentUser.id, relation.prestataireEntrepriseId),
+    ]);
+    if (!hasClient && !hasPrestataire)
+      throw errors.forbidden("Accès non autorisé.");
+
+    // Tous les contacts de targetEntrepriseId (sans filtre d'exclusion)
+    const contacts = await getEntrepriseContactsByEntrepriseId(
+      parsedInput.targetEntrepriseId,
+    );
+
+    return { contacts };
+  });
+
+/**
+ * Crée un nouveau contact dans entrepriseContacts et le lie à une relation.
+ * Permission : accès via la relation (pas via hasAccessToEntreprise direct sur targetEntrepriseId).
+ * Atomique : les deux insertions se font dans une même transaction.
+ */
+export const insertEntrepriseContactAndLinkToRelationAction = actionClient
+  .metadata({ actionName: "insertEntrepriseContactAndLinkToRelationAction" })
+  .inputSchema(insertEntrepriseContactAndLinkToRelationSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: eq(clientPrestataireRelations.id, parsedInput.relationId),
+      columns: {
+        id: true,
+        clientEntrepriseId: true,
+        prestataireEntrepriseId: true,
+      },
+    });
+    if (!relation) throw errors.notFound("Relation non trouvée.");
+
+    const canManage = await canManageRelationContacts(
+      currentUser.id,
+      relation.clientEntrepriseId,
+      relation.prestataireEntrepriseId,
+    );
+    if (!canManage)
+      throw errors.forbidden(
+        "Seuls les administrateurs et managers peuvent gérer les contacts.",
+      );
+
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["email", "phone", "fonction", "notes", "role"] as const,
+    });
+
+    // Si email fourni, vérifier qu'il n'existe pas déjà dans entrepriseContacts pour cette entreprise
+    if (normalized.email) {
+      const existingContact = await db.query.entrepriseContacts.findFirst({
+        where: and(
+          eq(entrepriseContacts.entrepriseId, normalized.targetEntrepriseId),
+          eq(entrepriseContacts.email, normalized.email),
+        ),
+        columns: { id: true },
+      });
+      if (existingContact)
+        throw errors.conflict(
+          "Ce contact existe déjà pour cette entreprise. Utilisez « Choisir existant ».",
+        );
+    }
+
+    const link = await db.transaction(async (tx) => {
+      const [contact] = await tx
+        .insert(entrepriseContacts)
+        .values({
+          entrepriseId: normalized.targetEntrepriseId,
+          prenom: normalized.prenom,
+          nom: normalized.nom,
+          email: normalized.email,
+          phone: normalized.phone,
+          fonction: normalized.fonction,
+          notes: normalized.notes,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
+        .returning();
+
+      const [relationContact] = await tx
+        .insert(clientPrestataireRelationContacts)
+        .values({
+          relationId: normalized.relationId,
+          contactId: contact.id,
+          side: normalized.side,
+          role: normalized.role,
+          estPrincipal: parsedInput.estPrincipal,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
+        .returning();
+
+      return relationContact;
+    });
+
+    return { link };
+  });
+
+/**
+ * Vérifie si un utilisateur peut gérer les contacts d'une relation (ajouter/supprimer).
+ * Requiert d'être admin ou manager côté client OU côté prestataire.
+ */
+async function canManageRelationContacts(
+  userId: string,
+  clientEntrepriseId: string,
+  prestataireEntrepriseId: string,
+): Promise<boolean> {
+  const plateformeRole = await getEffectivePlateformeRole(userId);
+  if (plateformeRole) return true;
+
+  const [clientAdhesion, prestataireAdhesion] = await Promise.all([
+    getUserClientAdhesion({ userId, entrepriseId: clientEntrepriseId }),
+    getUserPrestataireAdhesion({ userId }),
+  ]);
+
+  const isClientAdminOrManager =
+    (clientAdhesion?.role === "admin" || clientAdhesion?.role === "manager") &&
+    clientAdhesion.statut === "actif";
+
+  const isPrestataireAdminOrManager =
+    prestataireAdhesion?.entrepriseId === prestataireEntrepriseId &&
+    (prestataireAdhesion.role === "admin" ||
+      prestataireAdhesion.role === "manager") &&
+    prestataireAdhesion.statut === "actif";
+
+  return isClientAdminOrManager || isPrestataireAdminOrManager;
+}
+
+/**
+ * Vérifie si un client peut gérer les informations d'un prestataire
+ * (le prestataire n'a pas d'admin actif ET l'utilisateur est admin/manager client lié à ce prestataire)
+ */
+async function canManagePrestataireInfosAsClient(
+  userId: string,
+  prestataireEntrepriseId: string,
+): Promise<boolean> {
+  // 1. Le prestataire a-t-il un admin actif ?
+  const prestataireActiveAdmin =
+    await db.query.userPrestataireAdhesions.findFirst({
+      where: and(
+        eq(userPrestataireAdhesions.entrepriseId, prestataireEntrepriseId),
+        eq(userPrestataireAdhesions.role, "admin"),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+      columns: { id: true },
+    });
+  if (prestataireActiveAdmin) return false;
+
+  // 2. L'utilisateur est-il admin/manager client actif ?
+  const clientAdhesion = await db.query.userClientAdhesions.findFirst({
+    where: and(
+      eq(userClientAdhesions.userId, userId),
+      eq(userClientAdhesions.statut, "actif"),
+      inArray(userClientAdhesions.role, ["admin", "manager"]),
+    ),
+    columns: { entrepriseId: true },
+  });
+  if (!clientAdhesion) return false;
+
+  // 3. Le prestataire est-il lié à ce client ?
+  const relation = await db.query.clientPrestataireRelations.findFirst({
+    where: and(
+      eq(
+        clientPrestataireRelations.prestataireEntrepriseId,
+        prestataireEntrepriseId,
+      ),
+      eq(clientPrestataireRelations.clientEntrepriseId, clientAdhesion.entrepriseId),
+    ),
+    columns: { id: true },
+  });
+  return !!relation;
+}
+
+/**
+ * Vérifie si un prestataire peut gérer les informations d'un client en proxy
+ * (le client n'a pas d'admin actif ET l'utilisateur est admin/manager prestataire lié à ce client)
+ */
+async function canManageClientInfosAsProxy(
+  userId: string,
+  clientEntrepriseId: string,
+): Promise<boolean> {
+  // 1. Le client a-t-il un admin actif ?
+  const clientActiveAdmin = await db.query.userClientAdhesions.findFirst({
+    where: and(
+      eq(userClientAdhesions.entrepriseId, clientEntrepriseId),
+      eq(userClientAdhesions.role, "admin"),
+      eq(userClientAdhesions.statut, "actif"),
+    ),
+    columns: { id: true },
+  });
+  if (clientActiveAdmin) return false;
+
+  // 2. L'utilisateur est-il admin/manager prestataire actif ?
+  const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst(
+    {
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        eq(userPrestataireAdhesions.statut, "actif"),
+        inArray(userPrestataireAdhesions.role, ["admin", "manager"]),
+      ),
+      columns: { entrepriseId: true },
+    },
+  );
+  if (!prestataireAdhesion) return false;
+
+  // 3. Le prestataire est-il lié à ce client ?
+  const relation = await db.query.clientPrestataireRelations.findFirst({
+    where: and(
+      eq(
+        clientPrestataireRelations.prestataireEntrepriseId,
+        prestataireAdhesion.entrepriseId,
+      ),
+      eq(clientPrestataireRelations.clientEntrepriseId, clientEntrepriseId),
+    ),
+    columns: { id: true },
+  });
+  return !!relation;
+}
+
+/**
+ * Récupère les données SIRENE pour un SIRET donné.
+ * Accessible à tout utilisateur authentifié (données publiques).
+ */
+export const getSireneDataAction = actionClient
+  .metadata({ actionName: "getSireneDataAction" })
+  .inputSchema(z.object({ siret: z.string().min(14).max(14) }))
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const sireneData = await fetchEntrepriseBySiret(parsedInput.siret);
+    if (!sireneData) {
+      throw errors.internal(
+        "Impossible de récupérer les données depuis l'API SIRENE. Vérifiez le SIRET ou réessayez dans quelques instants.",
+      );
+    }
+
+    return { sireneData };
+  });
+
+/**
+ * Met à jour les champs issus de SIRENE d'une entreprise
+ * Réservé à la posture plateforme (super_admin_plateforme)
+ */
+export const updateEntrepriseSireneFieldsAction = actionClient
+  .metadata({ actionName: "updateEntrepriseSireneFieldsAction" })
+  .inputSchema(updateEntrepriseSireneFieldsSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const plateformeRole = await getEffectivePlateformeRole(currentUser.id);
+    if (!plateformeRole) {
+      const isClientProxy = await canManagePrestataireInfosAsClient(
+        currentUser.id,
+        parsedInput.entrepriseId,
+      );
+      const isPrestataireProxy = await canManageClientInfosAsProxy(
+        currentUser.id,
+        parsedInput.entrepriseId,
+      );
+      if (!isClientProxy && !isPrestataireProxy)
+        throw errors.forbidden(
+          "Réservé à la posture plateforme ou proxy.",
+        );
+    }
+
+    const { entrepriseId, nom, adresseLigne1, codePostal, ville, formeJuridique, numeroTva } =
+      parsedInput;
+
+    const numeroTvaClean =
+      numeroTva && numeroTva !== "" ? numeroTva.toUpperCase() : null;
+
+    await db
+      .update(entreprises)
+      .set({
+        nom,
+        adresseLigne1: adresseLigne1 || null,
+        codePostal: codePostal || null,
+        ville: ville || null,
+        formeJuridique: formeJuridique || null,
+        numeroTva: numeroTvaClean,
+        sireneSyncedAt: new Date(),
+        updatedById: currentUser.id,
+      })
+      .where(eq(entreprises.id, entrepriseId));
+
+    return { success: true };
+  });
+
+// ==================== INVITATION CONTACT ====================
+
+/**
+ * Envoie une invitation à un contact d'entreprise pour créer son compte.
+ * Crée un token dans contactsInvitations et envoie un email avec le lien.
+ * Rôle forcé à "collaborateur".
+ */
+export const inviterContactAction = actionClient
+  .metadata({ actionName: "inviterContactAction" })
+  .inputSchema(inviterContactSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    // Vérifier accès à l'entreprise (plateforme ou admin/manager de l'entreprise)
+    const [canAccess, platformRole] = await Promise.all([
+      hasAccessToEntreprise(currentUser.id, parsedInput.entrepriseId),
+      getUserPlateformeAdhesion(currentUser.id),
+    ]);
+    if (!canAccess && !platformRole?.role)
+      throw errors.forbidden("Accès non autorisé.");
+
+    // Récupérer le contact
+    const [contact] = await db
+      .select({
+        id: entrepriseContacts.id,
+        email: entrepriseContacts.email,
+        prenom: entrepriseContacts.prenom,
+        nom: entrepriseContacts.nom,
+        entrepriseId: entrepriseContacts.entrepriseId,
+        userId: entrepriseContacts.userId,
+      })
+      .from(entrepriseContacts)
+      .where(eq(entrepriseContacts.id, parsedInput.contactId))
+      .limit(1);
+
+    if (!contact) throw errors.notFound("Contact non trouvé.");
+    if (!contact.email)
+      throw errors.conflict("Ce contact n'a pas d'adresse email.");
+    if (contact.userId)
+      throw errors.conflict("Ce contact possède déjà un compte utilisateur.");
+    if (contact.entrepriseId !== parsedInput.entrepriseId)
+      throw errors.forbidden("Le contact n'appartient pas à cette entreprise.");
+
+    // Vérifier que l'email n'est pas déjà utilisé
+    const existingUser = await db
+      .select({ id: userTable.id })
+      .from(userTable)
+      .where(eq(userTable.email, contact.email))
+      .limit(1);
+
+    if (existingUser.length > 0) {
+      throw errors.conflict(
+        `Un compte existe déjà avec l'adresse "${contact.email}".`,
+      );
+    }
+
+    // Récupérer le nom de l'entreprise et les rôles pour le type d'adhésion
+    const [entreprise] = await db
+      .select({ nom: entreprises.nom })
+      .from(entreprises)
+      .where(eq(entreprises.id, parsedInput.entrepriseId))
+      .limit(1);
+
+    if (!entreprise) throw errors.notFound("Entreprise introuvable.");
+
+    const companyRoles = await db
+      .select({ role: entrepriseRoles.role })
+      .from(entrepriseRoles)
+      .where(eq(entrepriseRoles.entrepriseId, parsedInput.entrepriseId));
+    const roles = companyRoles.map((r) => r.role);
+
+    const typeAdhesion: "client" | "prestataire" = roles.includes("client")
+      ? "client"
+      : "prestataire";
+
+    // Annuler les invitations en attente pour ce contact
+    await db
+      .delete(contactsInvitations)
+      .where(
+        and(
+          eq(contactsInvitations.contactId, parsedInput.contactId),
+          isNull(contactsInvitations.acceptedAt),
+        ),
+      );
+
+    // Créer la nouvelle invitation
+    const token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await db.insert(contactsInvitations).values({
+      entrepriseId: parsedInput.entrepriseId,
+      email: contact.email,
+      token,
+      typeAdhesion,
+      contactId: parsedInput.contactId,
+      expiresAt,
+      createdById: currentUser.id,
+      updatedById: currentUser.id,
+    });
+
+    // Envoyer l'email d'invitation
+    const lien = `${env.APP_URL}/auth/inscription?token=${token}`;
+    await sendEmailDirect({
+      to: contact.email,
+      subject: "Invitation à rejoindre FM4ALL",
+      text: `
+        <h2>Vous avez été invité à rejoindre FM4ALL</h2>
+        <p>Vous avez été invité à créer votre compte pour l'entreprise <strong>${entreprise.nom}</strong>.</p>
+        <p>Cliquez sur le lien ci-dessous pour créer votre compte :</p>
+        <p><a href="${lien}">Créer mon compte</a></p>
+        <p><small>Ce lien est valable 7 jours.</small></p>
+      `,
+      useTemplate: false,
+    });
+
+    return { email: contact.email };
+  });
+
+/**
+ * Accepte une invitation contact : crée le compte utilisateur + adhésion collaborateur
+ * + met à jour entrepriseContacts.userId.
+ * Appelé depuis la page publique /auth/inscription.
+ */
+export const accepterInvitationContactAction = actionClient
+  .metadata({ actionName: "accepterInvitationContactAction" })
+  .inputSchema(accepterInvitationContactSchema)
+  .action(async ({ parsedInput }) => {
+    // 1. Valider le token
+    const [invitation] = await db
+      .select({
+        id: contactsInvitations.id,
+        entrepriseId: contactsInvitations.entrepriseId,
+        email: contactsInvitations.email,
+        typeAdhesion: contactsInvitations.typeAdhesion,
+        contactId: contactsInvitations.contactId,
+        createdById: contactsInvitations.createdById,
+      })
+      .from(contactsInvitations)
+      .where(
+        and(
+          eq(contactsInvitations.token, parsedInput.token),
+          isNull(contactsInvitations.acceptedAt),
+          gt(contactsInvitations.expiresAt, new Date()),
+        ),
+      )
+      .limit(1);
+
+    if (!invitation)
+      throw errors.notFound("Lien d'invitation invalide ou expiré.");
+
+    // 2. Normaliser les données
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["phone", "fonction"] as const,
+    });
+
+    // 3. Créer le compte utilisateur
+    let authResult;
+    try {
+      authResult = await auth.api.signUpEmail({
+        body: {
+          email: invitation.email,
+          password: crypto.randomUUID(),
+          name: `${normalized.prenom} ${normalized.nom}`,
+          prenom: normalized.prenom,
+          nom: normalized.nom,
+          phone: normalized.phone ?? null,
+          avatarId: null,
+          createdById: invitation.createdById ?? undefined,
+          updatedById: invitation.createdById ?? undefined,
+        },
+      });
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (msg.toLowerCase().includes("already exists")) {
+        throw errors.conflict(
+          `Un compte avec l'email "${invitation.email}" existe déjà.`,
+        );
+      }
+      throw errors.internal(`Erreur lors de la création du compte : ${msg}`);
+    }
+
+    if (!authResult?.user)
+      throw errors.internal("Échec de la création du compte.");
+    const newUserId = authResult.user.id;
+
+    // 4. Transaction : adhésion collaborateur + userId contact + arborescence + marquer acceptée
+    try {
+      await db.transaction(async (tx) => {
+        if (invitation.typeAdhesion === "client") {
+          await tx
+            .insert(userClientAdhesions)
+            .values({
+              userId: newUserId,
+              entrepriseId: invitation.entrepriseId,
+              role: "collaborateur",
+              statut: "actif",
+              createdById: invitation.createdById,
+              updatedById: invitation.createdById,
+            })
+            .onConflictDoNothing();
+        } else {
+          await tx
+            .insert(userPrestataireAdhesions)
+            .values({
+              userId: newUserId,
+              entrepriseId: invitation.entrepriseId,
+              role: "collaborateur",
+              statut: "actif",
+              createdById: invitation.createdById,
+              updatedById: invitation.createdById,
+            })
+            .onConflictDoNothing();
+        }
+
+        // Mettre à jour le contact avec le userId + données modifiées
+        if (invitation.contactId) {
+          await tx
+            .update(entrepriseContacts)
+            .set({
+              userId: newUserId,
+              prenom: normalized.prenom,
+              nom: normalized.nom,
+              phone: normalized.phone ?? null,
+              fonction: normalized.fonction ?? null,
+              updatedById: newUserId,
+              updatedAt: new Date(),
+            })
+            .where(eq(entrepriseContacts.id, invitation.contactId));
+        }
+
+        await tx
+          .update(contactsInvitations)
+          .set({ acceptedAt: new Date(), updatedById: newUserId })
+          .where(eq(contactsInvitations.id, invitation.id));
+
+        await insertUserArborescence({
+          entrepriseId: invitation.entrepriseId,
+          userId: newUserId,
+          parentId: null,
+          createdById: invitation.createdById ?? newUserId,
+          tx,
+        });
+      });
+    } catch (txError) {
+      try {
+        const betterAuthCtx = await auth.$context;
+        await betterAuthCtx.internalAdapter.deleteUser(newUserId);
+      } catch {
+        // Ignorer l'erreur de cleanup
+      }
+      throw txError;
+    }
+
+    // 5. Envoyer email pour définir le mot de passe
+    try {
+      await auth.api.requestPasswordReset({
+        body: {
+          email: invitation.email,
+          redirectTo: `${env.APP_URL}/auth/reset-password?type=activation`,
+        },
+        headers: await headers(),
+      });
+    } catch {
+      // Non bloquant
     }
 
     return {

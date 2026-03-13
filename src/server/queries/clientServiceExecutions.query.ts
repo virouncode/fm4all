@@ -80,15 +80,19 @@ export type PrestataireAvecDetails = {
   nom: string;
   siret: string;
   numeroTva: string | null;
-  prenomContact: string | null;
-  nomContact: string | null;
-  emailContact: string | null;
-  phoneContact: string | null;
+  adresseLigne1: string | null;
+  adresseLigne2: string | null;
+  codePostal: string | null;
+  ville: string | null;
+  formeJuridique: string | null;
+  sireneSyncedAt: Date | null;
   createdAt: Date;
   logoStorageKey: string | null;
   roles: string[];
   hasActiveAdmin: boolean;
+  adminEmail: string | null;
   services: Array<{ id: string; nom: string }>;
+  relationId: string | null;
 };
 
 /**
@@ -149,10 +153,12 @@ export async function getClientPrestatairesAvecDetails(
       nom: entreprises.nom,
       siret: entreprises.siret,
       numeroTva: entreprises.numeroTva,
-      prenomContact: entreprises.prenomContact,
-      nomContact: entreprises.nomContact,
-      emailContact: entreprises.emailContact,
-      phoneContact: entreprises.phoneContact,
+      adresseLigne1: entreprises.adresseLigne1,
+      adresseLigne2: entreprises.adresseLigne2,
+      codePostal: entreprises.codePostal,
+      ville: entreprises.ville,
+      formeJuridique: entreprises.formeJuridique,
+      sireneSyncedAt: entreprises.sireneSyncedAt,
       createdAt: entreprises.createdAt,
       logoStorageKey: documents.storageKey,
     })
@@ -178,10 +184,14 @@ export async function getClientPrestatairesAvecDetails(
     rolesByEntrepriseId.get(r.entrepriseId)!.push(r.role);
   }
 
-  // 6. Check hasActiveAdmin (admin prestataire actif dans l'entreprise)
+  // 6. Check hasActiveAdmin + fetch email du premier admin actif prestataire
   const adminRows = await db
-    .select({ entrepriseId: userPrestataireAdhesions.entrepriseId })
+    .select({
+      entrepriseId: userPrestataireAdhesions.entrepriseId,
+      email: user.email,
+    })
     .from(userPrestataireAdhesions)
+    .innerJoin(user, eq(user.id, userPrestataireAdhesions.userId))
     .where(
       and(
         inArray(userPrestataireAdhesions.entrepriseId, allIds),
@@ -190,6 +200,13 @@ export async function getClientPrestatairesAvecDetails(
       ),
     );
   const hasAdminSet = new Set(adminRows.map((r) => r.entrepriseId));
+  // Premier admin actif par entreprise (ordre non garanti, on prend le premier)
+  const adminEmailByEntrepriseId = new Map<string, string>();
+  for (const r of adminRows) {
+    if (!adminEmailByEntrepriseId.has(r.entrepriseId)) {
+      adminEmailByEntrepriseId.set(r.entrepriseId, r.email);
+    }
+  }
 
   // 7. Fetch services offerts par chaque prestataire
   const serviceRows = await db
@@ -221,12 +238,33 @@ export async function getClientPrestatairesAvecDetails(
     });
   }
 
+  // 8. Fetch relation IDs
+  const relationRows = await db
+    .select({
+      prestataireEntrepriseId: clientPrestataireRelations.prestataireEntrepriseId,
+      relationId: clientPrestataireRelations.id,
+    })
+    .from(clientPrestataireRelations)
+    .where(
+      and(
+        eq(clientPrestataireRelations.clientEntrepriseId, clientEntrepriseId),
+        inArray(clientPrestataireRelations.prestataireEntrepriseId, allIds),
+      ),
+    );
+
+  const relationByPrestataireId = new Map<string, string>();
+  for (const r of relationRows) {
+    relationByPrestataireId.set(r.prestataireEntrepriseId, r.relationId);
+  }
+
   return rows.map((p) => ({
     ...p,
     logoStorageKey: p.logoStorageKey ?? null,
     roles: rolesByEntrepriseId.get(p.id) ?? [],
     hasActiveAdmin: hasAdminSet.has(p.id),
+    adminEmail: adminEmailByEntrepriseId.get(p.id) ?? null,
     services: servicesByEntrepriseId.get(p.id) ?? [],
+    relationId: relationByPrestataireId.get(p.id) ?? null,
   }));
 }
 
@@ -980,10 +1018,12 @@ export type ClientAvecDetails = {
   nom: string;
   siret: string;
   numeroTva: string | null;
-  prenomContact: string | null;
-  nomContact: string | null;
-  emailContact: string | null;
-  phoneContact: string | null;
+  adresseLigne1: string | null;
+  adresseLigne2: string | null;
+  codePostal: string | null;
+  ville: string | null;
+  formeJuridique: string | null;
+  sireneSyncedAt: Date | null;
   createdAt: Date;
   logoStorageKey: string | null;
   roles: string[];
@@ -991,6 +1031,7 @@ export type ClientAvecDetails = {
   adminEmail: string | null;
   nbSites: number;
   services: Array<{ id: string; nom: string }>;
+  relationId: string | null;
 };
 
 /**
@@ -1053,10 +1094,12 @@ export async function getMesClients(
       nom: entreprises.nom,
       siret: entreprises.siret,
       numeroTva: entreprises.numeroTva,
-      prenomContact: entreprises.prenomContact,
-      nomContact: entreprises.nomContact,
-      emailContact: entreprises.emailContact,
-      phoneContact: entreprises.phoneContact,
+      adresseLigne1: entreprises.adresseLigne1,
+      adresseLigne2: entreprises.adresseLigne2,
+      codePostal: entreprises.codePostal,
+      ville: entreprises.ville,
+      formeJuridique: entreprises.formeJuridique,
+      sireneSyncedAt: entreprises.sireneSyncedAt,
       createdAt: entreprises.createdAt,
       logoStorageKey: documents.storageKey,
     })
@@ -1151,6 +1194,25 @@ export async function getMesClients(
     nbSitesByEntrepriseId.set(r.entrepriseId, r.nbSites);
   }
 
+  // 9. Fetch relation IDs
+  const relationRows = await db
+    .select({
+      clientEntrepriseId: clientPrestataireRelations.clientEntrepriseId,
+      relationId: clientPrestataireRelations.id,
+    })
+    .from(clientPrestataireRelations)
+    .where(
+      and(
+        eq(clientPrestataireRelations.prestataireEntrepriseId, prestataireEntrepriseId),
+        inArray(clientPrestataireRelations.clientEntrepriseId, allIds),
+      ),
+    );
+
+  const relationByClientId = new Map<string, string>();
+  for (const r of relationRows) {
+    relationByClientId.set(r.clientEntrepriseId, r.relationId);
+  }
+
   return rows.map((c) => ({
     ...c,
     logoStorageKey: c.logoStorageKey ?? null,
@@ -1159,5 +1221,30 @@ export async function getMesClients(
     adminEmail: adminEmailByEntrepriseId.get(c.id) ?? null,
     nbSites: nbSitesByEntrepriseId.get(c.id) ?? 0,
     services: servicesByEntrepriseId.get(c.id) ?? [],
+    relationId: relationByClientId.get(c.id) ?? null,
   }));
+}
+
+/**
+ * Récupère les détails d'un client spécifique pour un prestataire donné.
+ * Utilise getMesClients et filtre par clientEntrepriseId.
+ */
+export async function getClientAvecDetailsById(
+  prestataireEntrepriseId: string,
+  clientEntrepriseId: string,
+): Promise<ClientAvecDetails | null> {
+  const all = await getMesClients(prestataireEntrepriseId);
+  return all.find((c) => c.id === clientEntrepriseId) ?? null;
+}
+
+/**
+ * Récupère les détails d'un prestataire spécifique pour un client donné.
+ * Utilise getClientPrestatairesAvecDetails et filtre par prestataireEntrepriseId.
+ */
+export async function getPrestataireAvecDetailsById(
+  clientEntrepriseId: string,
+  prestataireEntrepriseId: string,
+): Promise<PrestataireAvecDetails | null> {
+  const all = await getClientPrestatairesAvecDetails(clientEntrepriseId);
+  return all.find((p) => p.id === prestataireEntrepriseId) ?? null;
 }

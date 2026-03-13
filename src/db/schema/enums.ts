@@ -234,3 +234,8 @@ export const modeCommercialEnum = pgEnum(
 );
 
 export const modePilotageEnum = pgEnum("mode_pilotage", modePilotageCodes);
+
+export const clientPrestataireContactSideEnum = pgEnum(
+  "client_prestataire_contact_side",
+  ["client", "prestataire"],
+);

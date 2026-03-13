@@ -7,17 +7,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { db } from "@/db";
-import { entrepriseInvitations } from "@/db/schema/entreprises";
-import { entreprises } from "@/db/schema/entreprises";
+import {
+  contactsInvitations,
+  entrepriseContacts,
+  entreprises,
+} from "@/db/schema/entreprises";
 import { Link } from "@/i18n/navigation";
 import { and, eq, gt, isNull } from "drizzle-orm";
-import InscriptionAdminForm from "./InscriptionAdminForm";
+import InscriptionContactForm from "./InscriptionContactForm";
 
 type Props = {
   searchParams: Promise<{ token?: string }>;
 };
 
-export default async function InscriptionAdminPage({ searchParams }: Props) {
+export default async function InscriptionPage({ searchParams }: Props) {
   const { token } = await searchParams;
 
   if (!token) {
@@ -26,20 +29,27 @@ export default async function InscriptionAdminPage({ searchParams }: Props) {
 
   const [invitation] = await db
     .select({
-      email: entrepriseInvitations.email,
-      entrepriseId: entrepriseInvitations.entrepriseId,
+      email: contactsInvitations.email,
       entrepriseNom: entreprises.nom,
+      contactPrenom: entrepriseContacts.prenom,
+      contactNom: entrepriseContacts.nom,
+      contactPhone: entrepriseContacts.phone,
+      contactFonction: entrepriseContacts.fonction,
     })
-    .from(entrepriseInvitations)
+    .from(contactsInvitations)
     .innerJoin(
       entreprises,
-      eq(entreprises.id, entrepriseInvitations.entrepriseId),
+      eq(entreprises.id, contactsInvitations.entrepriseId),
+    )
+    .leftJoin(
+      entrepriseContacts,
+      eq(entrepriseContacts.id, contactsInvitations.contactId),
     )
     .where(
       and(
-        eq(entrepriseInvitations.token, token),
-        isNull(entrepriseInvitations.acceptedAt),
-        gt(entrepriseInvitations.expiresAt, new Date()),
+        eq(contactsInvitations.token, token),
+        isNull(contactsInvitations.acceptedAt),
+        gt(contactsInvitations.expiresAt, new Date()),
       ),
     )
     .limit(1);
@@ -60,15 +70,17 @@ export default async function InscriptionAdminPage({ searchParams }: Props) {
               Créer votre compte
             </CardTitle>
             <CardDescription className="text-xs md:text-sm">
-              Vous rejoignez{" "}
-              <strong>{invitation.entrepriseNom}</strong> en tant
-              qu&apos;administrateur.
+              Vous rejoignez <strong>{invitation.entrepriseNom}</strong>.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <InscriptionAdminForm
+            <InscriptionContactForm
               token={token}
               email={invitation.email}
+              defaultPrenom={invitation.contactPrenom ?? ""}
+              defaultNom={invitation.contactNom ?? ""}
+              defaultPhone={invitation.contactPhone ?? ""}
+              defaultFonction={invitation.contactFonction ?? ""}
             />
           </CardContent>
         </Card>

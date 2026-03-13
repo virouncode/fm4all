@@ -1,6 +1,5 @@
 "use client";
 
-import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,43 +8,57 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { isValidSIRET } from "@/lib/utils/isValidSIRET";
 import {
   createOrLinkClientAction,
   findEntrepriseBySiretAction,
 } from "@/server/actions/clientServiceExecutionsActions";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Building2,
   CheckCircle2,
+  Lock,
   RotateCcw,
   Search,
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useFormState } from "react-hook-form";
+import { Form } from "@/components/ui/form";
+import { RhfInput } from "@/components/rhf/RhfInput";
+
+type SireneDataType = {
+  nom: string;
+  formeJuridique: string | null;
+  adresseLigne1: string;
+  adresseLigne2: string | null;
+  codePostal: string;
+  ville: string;
+  numeroTva: string;
+  etatActif: boolean;
+};
 
 type SiretStateType =
   | { status: "idle" }
   | { status: "searching" }
   | { status: "found"; entreprise: { id: string; nom: string; siret: string } }
-  | { status: "not_found" }
+  | { status: "not_found"; sireneData: SireneDataType }
   | { status: "self" }
   | { status: "error"; message: string };
 
 const addClientFormSchema = z.object({
   nom: z.string().min(1, "Nom de l'entreprise requis"),
-  prenomContact: z.string(),
-  nomContact: z.string(),
-  emailContact: z.string().email("Email invalide").or(z.literal("")),
-  phoneContact: z.string(),
+  adresseLigne1: z.string().optional(),
+  adresseLigne2: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  formeJuridique: z.string().optional(),
+  numeroTva: z.string().optional(),
 });
 
 type AddClientFormType = z.infer<typeof addClientFormSchema>;
@@ -77,10 +90,12 @@ export function AjouterClientDialog({
     mode: "onTouched",
     defaultValues: {
       nom: "",
-      prenomContact: "",
-      nomContact: "",
-      emailContact: "",
-      phoneContact: "",
+      adresseLigne1: "",
+      adresseLigne2: "",
+      codePostal: "",
+      ville: "",
+      formeJuridique: "",
+      numeroTva: "",
     },
   });
 
@@ -90,10 +105,12 @@ export function AjouterClientDialog({
     if (open) {
       form.reset({
         nom: "",
-        prenomContact: "",
-        nomContact: "",
-        emailContact: "",
-        phoneContact: "",
+        adresseLigne1: "",
+        adresseLigne2: "",
+        codePostal: "",
+        ville: "",
+        formeJuridique: "",
+        numeroTva: "",
       });
       setSiretInput("");
       setSiretState({ status: "idle" });
@@ -110,18 +127,38 @@ export function AjouterClientDialog({
       setSiretState({ status: "error", message: result.serverError.message });
       return;
     }
+
+    if (result?.data?.sireneUnavailable) {
+      setSiretState({ status: "idle" });
+      toast.error(
+        "Service INSEE indisponible — impossible de vérifier ce SIRET. Réessayez dans quelques instants.",
+      );
+      return;
+    }
+
     if (result?.data?.isSelf) {
       setSiretState({ status: "self" });
       return;
     }
     if (result?.data?.entreprise) {
       setSiretState({ status: "found", entreprise: result.data.entreprise });
-      form.setValue("nom", result.data.entreprise.nom, {
-        shouldValidate: true,
-      });
     } else {
-      setSiretState({ status: "not_found" });
-      form.setValue("nom", "");
+      const sireneData = result?.data?.sireneData as SireneDataType | null;
+      if (!sireneData) {
+        setSiretState({
+          status: "error",
+          message: "Impossible de récupérer les données depuis l'API SIRENE.",
+        });
+        return;
+      }
+      setSiretState({ status: "not_found", sireneData });
+      form.setValue("nom", sireneData.nom, { shouldValidate: true });
+      form.setValue("adresseLigne1", sireneData.adresseLigne1 ?? "");
+      form.setValue("adresseLigne2", sireneData.adresseLigne2 ?? "");
+      form.setValue("codePostal", sireneData.codePostal ?? "");
+      form.setValue("ville", sireneData.ville ?? "");
+      form.setValue("formeJuridique", sireneData.formeJuridique ?? "");
+      form.setValue("numeroTva", sireneData.numeroTva ?? "");
     }
   };
 
@@ -130,10 +167,12 @@ export function AjouterClientDialog({
     setSiretState({ status: "idle" });
     form.reset({
       nom: "",
-      prenomContact: "",
-      nomContact: "",
-      emailContact: "",
-      phoneContact: "",
+      adresseLigne1: "",
+      adresseLigne2: "",
+      codePostal: "",
+      ville: "",
+      formeJuridique: "",
+      numeroTva: "",
     });
   };
 
@@ -143,11 +182,13 @@ export function AjouterClientDialog({
     const result = await createOrLinkClientAction({
       siret: siretInput,
       nom: data.nom,
+      adresseLigne1: data.adresseLigne1 || undefined,
+      adresseLigne2: data.adresseLigne2 || undefined,
+      codePostal: data.codePostal || undefined,
+      ville: data.ville || undefined,
+      formeJuridique: data.formeJuridique || undefined,
+      numeroTva: data.numeroTva || undefined,
       prestataireEntrepriseId,
-      prenomContact: data.prenomContact || undefined,
-      nomContact: data.nomContact || undefined,
-      emailContact: data.emailContact || undefined,
-      phoneContact: data.phoneContact || undefined,
     });
     setCreating(false);
 
@@ -189,7 +230,7 @@ export function AjouterClientDialog({
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Input
-                        className={`font-mono pr-8${siretResolved ? "bg-muted cursor-default" : ""}`}
+                        className={`font-mono pr-8${siretResolved ? " bg-muted cursor-default" : ""}`}
                         placeholder="14 chiffres"
                         maxLength={14}
                         value={siretInput}
@@ -263,53 +304,68 @@ export function AjouterClientDialog({
                   )}
                   {siretState.status === "not_found" && (
                     <p className="text-muted-foreground text-xs">
-                      Client non trouvé — renseignez les informations
-                      ci-dessous.
+                      Données récupérées depuis l&apos;API SIRENE — non
+                      modifiables.
                     </p>
                   )}
                 </div>
 
-                {/* Nom (après recherche) */}
-                {siretResolved && (
-                  <RhfInput<AddClientFormType>
-                    name="nom"
-                    label="Nom de l'entreprise"
-                    requiredMark
-                    readOnly={siretState.status === "found"}
-                    inputClassName={
-                      siretState.status === "found" ? "bg-muted" : undefined
-                    }
-                  />
+                {/* Nom affiché en lecture seule si déjà en DB */}
+                {siretState.status === "found" && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">
+                      Nom de l&apos;entreprise
+                    </p>
+                    <p className="text-foreground text-sm">
+                      {siretState.entreprise.nom}
+                    </p>
+                  </div>
                 )}
 
-                {/* Contact (uniquement si nouveau client) */}
+                {/* Champs SIRENE pré-remplis (création uniquement) */}
                 {siretState.status === "not_found" && (
-                  <>
-                    <Separator />
-                    <p className="text-muted-foreground text-sm">
-                      Contact (optionnel)
-                    </p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <RhfInput<AddClientFormType>
-                        name="prenomContact"
-                        label="Prénom"
-                      />
-                      <RhfInput<AddClientFormType>
-                        name="nomContact"
-                        label="Nom"
-                      />
-                      <RhfInput<AddClientFormType>
-                        name="emailContact"
-                        label="Email"
-                        type="email"
-                      />
-                      <RhfInput<AddClientFormType>
-                        name="phoneContact"
-                        label="Téléphone"
-                        type="tel"
-                      />
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                        Nom de l&apos;entreprise
+                        <Lock className="h-3 w-3" />
+                      </label>
+                      <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                        {siretState.sireneData.nom}
+                      </p>
                     </div>
-                  </>
+
+                    {siretState.sireneData.formeJuridique && (
+                      <div className="space-y-1">
+                        <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                          Forme juridique
+                          <Lock className="h-3 w-3" />
+                        </label>
+                        <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                          {siretState.sireneData.formeJuridique}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="space-y-1">
+                      <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                        Adresse
+                        <Lock className="h-3 w-3" />
+                      </label>
+                      <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                        {siretState.sireneData.adresseLigne1}
+                        {", "}
+                        {siretState.sireneData.codePostal}{" "}
+                        {siretState.sireneData.ville}
+                      </p>
+                    </div>
+
+                    <RhfInput<AddClientFormType>
+                      name="adresseLigne2"
+                      label="Complément d'adresse"
+                      placeholder="Bâtiment B, étage 3..."
+                    />
+                  </div>
                 )}
               </div>
             </div>

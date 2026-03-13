@@ -4,69 +4,103 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { RhfInput } from "@/components/rhf/RhfInput";
-import { updateEntrepriseInfosAction } from "@/server/actions/entreprisesActions";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import {
-  updateEntrepriseInfosSchema,
-  type UpdateEntrepriseInfosType,
-} from "@/zod-schemas/entreprise.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, Loader2 } from "lucide-react";
-import { useEffect } from "react";
-import { useForm, useFormState } from "react-hook-form";
+  getSireneDataAction,
+  updateEntrepriseSireneFieldsAction,
+} from "@/server/actions/entreprisesActions";
+import type { SireneDataType } from "@/server/utils/sirene.utils";
+import { Building2, Lock, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entrepriseId: string;
-  currentNom: string;
   currentSiret: string;
-  currentNumeroTva: string | null;
   onSuccess: () => void;
 };
+
+type SearchStateType =
+  | { status: "idle" }
+  | { status: "searching" }
+  | { status: "found"; data: SireneDataType }
+  | { status: "error"; message: string };
+
+function ReadOnlyField({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null | undefined;
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+        {label}
+        <Lock className="h-3 w-3" />
+      </label>
+      <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+        {value || "—"}
+      </p>
+    </div>
+  );
+}
 
 export function EditEntrepriseInfosDialog({
   open,
   onOpenChange,
   entrepriseId,
-  currentNom,
   currentSiret,
-  currentNumeroTva,
   onSuccess,
 }: Props) {
-  const form = useForm<UpdateEntrepriseInfosType>({
-    resolver: zodResolver(updateEntrepriseInfosSchema),
-    mode: "onTouched",
-    defaultValues: {
-      entrepriseId,
-      nom: currentNom,
-      siret: currentSiret,
-      numeroTva: currentNumeroTva ?? "",
-    },
+  const [searchState, setSearchState] = useState<SearchStateType>({
+    status: "idle",
   });
-
-  const { isSubmitting, isDirty } = useFormState({ control: form.control });
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
-    form.reset({ entrepriseId, nom: currentNom, siret: currentSiret, numeroTva: currentNumeroTva ?? "" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setSearchState({ status: "idle" });
   }, [open]);
 
-  const onSubmit = async (data: UpdateEntrepriseInfosType) => {
-    const result = await updateEntrepriseInfosAction(data);
+  const handleSearch = async () => {
+    setSearchState({ status: "searching" });
+    const result = await getSireneDataAction({ siret: currentSiret });
+    if (result?.serverError) {
+      setSearchState({ status: "error", message: result.serverError.message });
+      return;
+    }
+    if (result?.data?.sireneData) {
+      setSearchState({ status: "found", data: result.data.sireneData });
+    }
+  };
 
+  const handleSave = async () => {
+    if (searchState.status !== "found") return;
+    setIsSaving(true);
+    const { data } = searchState;
+    const result = await updateEntrepriseSireneFieldsAction({
+      entrepriseId,
+      nom: data.nom,
+      adresseLigne1: data.adresseLigne1 || undefined,
+      codePostal: data.codePostal || undefined,
+      ville: data.ville || undefined,
+      formeJuridique: data.formeJuridique || undefined,
+      numeroTva: data.numeroTva || undefined,
+    });
+    setIsSaving(false);
     if (result?.serverError) {
       toast.error(result.serverError.message);
       return;
     }
-
-    toast.success("Informations mises à jour");
+    toast.success("Informations SIRENE mises à jour");
     onOpenChange(false);
     onSuccess();
   };
@@ -76,48 +110,96 @@ export function EditEntrepriseInfosDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-primary" />
-            Modifier les informations
+            <Building2 className="text-primary h-5 w-5" />
+            Mettre à jour depuis l&apos;API SIRENE
           </DialogTitle>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <RhfInput<UpdateEntrepriseInfosType>
-              name="nom"
-              label="Nom de l'entreprise"
-              requiredMark
-            />
-            <RhfInput<UpdateEntrepriseInfosType>
-              name="siret"
-              label="SIRET"
-              requiredMark
-              placeholder="123 456 789 00000"
-            />
-            <RhfInput<UpdateEntrepriseInfosType>
-              name="numeroTva"
-              label="Numéro de TVA"
-              placeholder="FR71941928640"
-              className="font-mono uppercase"
-            />
+        <Separator />
 
-            <div className="flex justify-end gap-2 pt-2">
+        <div className="space-y-4 py-2">
+          {/* SIRET affiché + bouton Rechercher */}
+          <div className="space-y-1.5">
+            <p className="text-muted-foreground text-sm font-medium">SIRET</p>
+            <div className="flex items-center gap-2">
+              <p className="bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm">
+                {currentSiret}
+              </p>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onOpenChange(false)}
+                size="sm"
+                className="shrink-0"
+                disabled={
+                  searchState.status === "searching" ||
+                  searchState.status === "found"
+                }
+                onClick={handleSearch}
               >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {searchState.status === "searching" ? (
+                  <Spinner />
+                ) : (
+                  <Search className="h-4 w-4" />
                 )}
-                Enregistrer
+                Rechercher
               </Button>
             </div>
-          </form>
-        </Form>
+            {searchState.status === "error" && (
+              <p className="text-destructive text-xs">{searchState.message}</p>
+            )}
+            {searchState.status === "found" && (
+              <p className="text-muted-foreground text-xs">
+                Données récupérées — vérifiez avant d&apos;enregistrer.
+              </p>
+            )}
+          </div>
+
+          {/* Données SIRENE */}
+          {searchState.status === "found" && (
+            <>
+              <ReadOnlyField label="Nom" value={searchState.data.nom} />
+              <ReadOnlyField
+                label="Forme juridique"
+                value={searchState.data.formeJuridique}
+              />
+              <ReadOnlyField
+                label="Adresse"
+                value={[
+                  searchState.data.adresseLigne1,
+                  searchState.data.adresseLigne2,
+                  searchState.data.codePostal && searchState.data.ville
+                    ? `${searchState.data.codePostal} ${searchState.data.ville}`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
+              />
+              <ReadOnlyField
+                label="N° TVA"
+                value={searchState.data.numeroTva}
+              />
+            </>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSaving}
+          >
+            Annuler
+          </Button>
+          <Button
+            type="button"
+            disabled={searchState.status !== "found" || isSaving}
+            onClick={handleSave}
+          >
+            {isSaving && <Spinner />}
+            Enregistrer
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

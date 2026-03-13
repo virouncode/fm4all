@@ -1,6 +1,7 @@
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import {
+  getEntrepriseContactsByEntrepriseId,
   getEntrepriseWithDetailsById,
   getServicesByEntrepriseId,
 } from "@/server/queries/entreprises.query";
@@ -44,6 +45,9 @@ export default async function EntrepriseDetailsPage({
     ? await getServicesByEntrepriseId(entrepriseId)
     : [];
 
+  // 5. Charger les contacts
+  const initialContacts = await getEntrepriseContactsByEntrepriseId(entrepriseId);
+
   // 5. Générer l'URL présignée du logo pour le rendu initial (detail page)
   let logoUrl: string | null = null;
   const logoStorageKey = entreprise.logoStorageKey;
@@ -69,6 +73,7 @@ export default async function EntrepriseDetailsPage({
       services={services}
       logoUrl={logoUrl}
       logoStorageKey={logoStorageKey}
+      initialContacts={initialContacts}
     />
   );
 }

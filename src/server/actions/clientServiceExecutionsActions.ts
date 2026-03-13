@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { user as userTable } from "@/db/schema/auth";
 import {
   clientPrestataireRelations,
-  entrepriseInvitations,
+  contactsInvitations,
   entrepriseRoles,
   entreprises,
   serviceEntreprises,
@@ -35,6 +35,7 @@ import {
   getPrestatairesForService,
   getSitesCouvertsParPrestataire,
 } from "@/server/queries/clientServiceExecutions.query";
+import { fetchEntrepriseBySiret } from "@/server/utils/sirene.utils";
 import { getPrestationById } from "@/server/queries/clientServices.query";
 import { getAllServices } from "@/server/queries/services.query";
 import {
@@ -330,6 +331,18 @@ export const findEntrepriseBySiretAction = actionClient
       }
     }
 
+    // Si l'entreprise n'est pas en DB, appeler l'API SIRENE
+    let sireneData = null;
+    let sireneUnavailable = false;
+    if (!entreprise) {
+      const fetched = await fetchEntrepriseBySiret(siretRaw);
+      if (fetched === null) {
+        sireneUnavailable = true;
+      } else {
+        sireneData = fetched;
+      }
+    }
+
     return {
       entreprise,
       alreadyLinked,
@@ -337,6 +350,8 @@ export const findEntrepriseBySiretAction = actionClient
       existingServices,
       hasActiveAdmin,
       isSelf: false,
+      sireneData,
+      sireneUnavailable,
     };
   });
 
@@ -370,16 +385,20 @@ export const createOrLinkPrestataireAction = actionClient
       }
     }
 
-    const {
-      nom,
-      serviceIds,
-      prenomContact,
-      nomContact,
-      emailContact,
-      phoneContact,
-    } = parsedInput;
+    const { nom, serviceIds } = parsedInput;
     // siretSchema formate en "xxx xxx xxx xxxxx" — on normalise en digits purs pour la DB
     const siret = parsedInput.siret.replace(/\s/g, "");
+
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: [
+        "adresseLigne1",
+        "adresseLigne2",
+        "codePostal",
+        "ville",
+        "formeJuridique",
+        "numeroTva",
+      ] as const,
+    });
 
     const { prestataireEntrepriseId, prestataireNom } = await db.transaction(
       async (tx) => {
@@ -397,10 +416,13 @@ export const createOrLinkPrestataireAction = actionClient
             .values({
               siret,
               nom,
-              prenomContact: prenomContact || null,
-              nomContact: nomContact || null,
-              emailContact: emailContact || null,
-              phoneContact: phoneContact || null,
+              adresseLigne1: normalized.adresseLigne1,
+              adresseLigne2: normalized.adresseLigne2,
+              codePostal: normalized.codePostal,
+              ville: normalized.ville,
+              formeJuridique: normalized.formeJuridique,
+              numeroTva: normalized.numeroTva,
+              sireneSyncedAt: new Date(),
               createdById: currentUser.id,
               updatedById: currentUser.id,
             })
@@ -1530,9 +1552,19 @@ export const createOrLinkClientAction = actionClient
       throw errors.forbidden("Vous devez être au moins manager pour ajouter un client.");
     }
 
-    const { nom, prenomContact, nomContact, emailContact, phoneContact } =
-      parsedInput;
+    const { nom } = parsedInput;
     const siret = parsedInput.siret.replace(/\s/g, "");
+
+    const normalizedClient = normalizeForSubmit(parsedInput, {
+      optionalStrings: [
+        "adresseLigne1",
+        "adresseLigne2",
+        "codePostal",
+        "ville",
+        "formeJuridique",
+        "numeroTva",
+      ] as const,
+    });
 
     const { entrepriseId, entrepriseNom } = await db.transaction(async (tx) => {
       // 1. Trouver ou créer l'entreprise cliente
@@ -1549,10 +1581,13 @@ export const createOrLinkClientAction = actionClient
           .values({
             siret,
             nom,
-            prenomContact: prenomContact || null,
-            nomContact: nomContact || null,
-            emailContact: emailContact || null,
-            phoneContact: phoneContact || null,
+            adresseLigne1: normalizedClient.adresseLigne1,
+            adresseLigne2: normalizedClient.adresseLigne2,
+            codePostal: normalizedClient.codePostal,
+            ville: normalizedClient.ville,
+            formeJuridique: normalizedClient.formeJuridique,
+            numeroTva: normalizedClient.numeroTva,
+            sireneSyncedAt: new Date(),
             createdById: currentUser.id,
             updatedById: currentUser.id,
           })
@@ -1618,9 +1653,19 @@ export const createOrLinkPrestataireSimpleAction = actionClient
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
-    const { nom, prenomContact, nomContact, emailContact, phoneContact } =
-      parsedInput;
+    const { nom } = parsedInput;
     const siret = parsedInput.siret.replace(/\s/g, "");
+
+    const normalizedPrest = normalizeForSubmit(parsedInput, {
+      optionalStrings: [
+        "adresseLigne1",
+        "adresseLigne2",
+        "codePostal",
+        "ville",
+        "formeJuridique",
+        "numeroTva",
+      ] as const,
+    });
 
     const { entrepriseId, entrepriseNom } = await db.transaction(async (tx) => {
       // 1. Trouver ou créer l'entreprise prestataire
@@ -1637,10 +1682,13 @@ export const createOrLinkPrestataireSimpleAction = actionClient
           .values({
             siret,
             nom,
-            prenomContact: prenomContact || null,
-            nomContact: nomContact || null,
-            emailContact: emailContact || null,
-            phoneContact: phoneContact || null,
+            adresseLigne1: normalizedPrest.adresseLigne1,
+            adresseLigne2: normalizedPrest.adresseLigne2,
+            codePostal: normalizedPrest.codePostal,
+            ville: normalizedPrest.ville,
+            formeJuridique: normalizedPrest.formeJuridique,
+            numeroTva: normalizedPrest.numeroTva,
+            sireneSyncedAt: new Date(),
             createdById: currentUser.id,
             updatedById: currentUser.id,
           })
@@ -1768,14 +1816,14 @@ export const inviterPrestataireAdminAction = actionClient
 
     // 6. Annuler les invitations en attente existantes pour ce prestataire
     await db
-      .delete(entrepriseInvitations)
+      .delete(contactsInvitations)
       .where(
         and(
           eq(
-            entrepriseInvitations.entrepriseId,
+            contactsInvitations.entrepriseId,
             parsedInput.prestataireEntrepriseId,
           ),
-          isNull(entrepriseInvitations.acceptedAt),
+          isNull(contactsInvitations.acceptedAt),
         ),
       );
 
@@ -1784,7 +1832,7 @@ export const inviterPrestataireAdminAction = actionClient
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const sentAt = new Date();
 
-    await db.insert(entrepriseInvitations).values({
+    await db.insert(contactsInvitations).values({
       entrepriseId: parsedInput.prestataireEntrepriseId,
       email: parsedInput.email,
       token,
@@ -1910,14 +1958,14 @@ export const inviterClientAdminAction = actionClient
 
     // 6. Annuler les invitations en attente existantes pour ce client
     await db
-      .delete(entrepriseInvitations)
+      .delete(contactsInvitations)
       .where(
         and(
           eq(
-            entrepriseInvitations.entrepriseId,
+            contactsInvitations.entrepriseId,
             parsedInput.clientEntrepriseId,
           ),
-          isNull(entrepriseInvitations.acceptedAt),
+          isNull(contactsInvitations.acceptedAt),
         ),
       );
 
@@ -1926,7 +1974,7 @@ export const inviterClientAdminAction = actionClient
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const sentAt = new Date();
 
-    await db.insert(entrepriseInvitations).values({
+    await db.insert(contactsInvitations).values({
       entrepriseId: parsedInput.clientEntrepriseId,
       email: parsedInput.email,
       token,
@@ -1955,3 +2003,4 @@ export const inviterClientAdminAction = actionClient
       pendingInvitation: { email: parsedInput.email, sentAt },
     };
   });
+

@@ -21,7 +21,6 @@ import { EntrepriseFormDialog } from "./EntrepriseFormDialog";
 import { EntreprisesFiltersDialog } from "./EntreprisesFiltersDialog";
 import { EntreprisesGrid } from "./EntreprisesGrid";
 import { EntreprisesSortDialog } from "./EntreprisesSortDialog";
-import { InviterEntrepriseAdminDialog } from "./InviterEntrepriseAdminDialog";
 
 type SearchParamsType = {
   search?: string;
@@ -82,9 +81,6 @@ export function EntreprisesTable({ searchParams }: EntreprisesTableProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
-  const [inviteTarget, setInviteTarget] =
-    useState<EntrepriseWithDetails | null>(null);
-
   // Filters state (synchronisés depuis searchParams)
   const [filters, setFilters] = useState<FiltersType>({
     search: searchParams.search,
@@ -352,7 +348,6 @@ export function EntreprisesTable({ searchParams }: EntreprisesTableProps) {
             hasMore={hasMore}
             loadMore={loadMore}
             onEntrepriseClick={handleRowClick}
-            onInvite={setInviteTarget}
           />
         )}
       </div>
@@ -377,27 +372,6 @@ export function EntreprisesTable({ searchParams }: EntreprisesTableProps) {
         searchParams={searchParams}
       />
 
-      {inviteTarget && (
-        <InviterEntrepriseAdminDialog
-          open={!!inviteTarget}
-          onOpenChange={(v) => {
-            if (!v) setInviteTarget(null);
-          }}
-          entrepriseId={inviteTarget.id}
-          entrepriseNom={inviteTarget.nom}
-          defaultEmail={inviteTarget.emailContact}
-          onSuccess={(pendingInvitation) => {
-            setEntreprises((prev) =>
-              prev.map((e) =>
-                e.id === inviteTarget.id
-                  ? { ...e, pendingInvitation: pendingInvitation ?? null }
-                  : e,
-              ),
-            );
-            setInviteTarget(null);
-          }}
-        />
-      )}
     </div>
   );
 }

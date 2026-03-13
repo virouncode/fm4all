@@ -1,15 +1,28 @@
 import "server-only";
 
 import { db } from "@/db";
-import { entreprises, entrepriseRoles, serviceEntreprises, entrepriseInvitations } from "@/db/schema/entreprises";
+import {
+  clientPrestataireRelationContacts,
+  contactsInvitations,
+  entrepriseContacts,
+  entreprises,
+  entrepriseRoles,
+  serviceEntreprises,
+  entrepriseInvitations,
+} from "@/db/schema/entreprises";
 import { documents } from "@/db/schema/documents";
 import { services } from "@/db/schema/services";
 import { sites } from "@/db/schema/sites";
-import { eq, and, ilike, or, sql, count } from "drizzle-orm";
+import { eq, and, ilike, or, sql, count, asc, desc } from "drizzle-orm";
 import type {
+  EntrepriseContactSelectType,
   EntrepriseWithDetails,
   RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
+
+export type EntrepriseContactWithInvitationType = EntrepriseContactSelectType & {
+  pendingInvitationSentAt: Date | null;
+};
 
 /**
  * Récupère toutes les entreprises ayant le rôle "client"
@@ -155,7 +168,6 @@ export async function getEntreprisesPaginated({
     ? or(
         ilike(entreprises.nom, `%${search}%`),
         ilike(entreprises.siret, `%${search}%`),
-        ilike(sql`COALESCE(${entreprises.emailContact}, '')`, `%${search}%`),
       )
     : undefined;
 
@@ -171,10 +183,12 @@ export async function getEntreprisesPaginated({
       nom: entreprises.nom,
       siret: entreprises.siret,
       numeroTva: entreprises.numeroTva,
-      prenomContact: entreprises.prenomContact,
-      nomContact: entreprises.nomContact,
-      emailContact: entreprises.emailContact,
-      phoneContact: entreprises.phoneContact,
+      adresseLigne1: entreprises.adresseLigne1,
+      adresseLigne2: entreprises.adresseLigne2,
+      codePostal: entreprises.codePostal,
+      ville: entreprises.ville,
+      formeJuridique: entreprises.formeJuridique,
+      sireneSyncedAt: entreprises.sireneSyncedAt,
       logoId: entreprises.logoId,
       logoStorageKey: sql<string | null>`MAX(${documents.storageKey})`,
       createdAt: entreprises.createdAt,
@@ -223,8 +237,10 @@ export async function getEntreprisesPaginated({
     nbSites: Number(r.nbSites) || 0,
     logoStorageKey: r.logoStorageKey ?? null,
     hasActiveAdmin: Boolean(r.hasActiveAdmin),
+    adminEmail: null,
     services: (r.services ?? []) as Array<{ id: string; nom: string }>,
     pendingInvitation: r.pendingInvitation ?? null,
+    relationId: null,
   }));
 }
 
@@ -250,7 +266,6 @@ export async function countEntreprises({
     ? or(
         ilike(entreprises.nom, `%${search}%`),
         ilike(entreprises.siret, `%${search}%`),
-        ilike(sql`COALESCE(${entreprises.emailContact}, '')`, `%${search}%`),
       )
     : undefined;
 
@@ -277,10 +292,12 @@ export async function getEntrepriseWithDetailsById(
       nom: entreprises.nom,
       siret: entreprises.siret,
       numeroTva: entreprises.numeroTva,
-      prenomContact: entreprises.prenomContact,
-      nomContact: entreprises.nomContact,
-      emailContact: entreprises.emailContact,
-      phoneContact: entreprises.phoneContact,
+      adresseLigne1: entreprises.adresseLigne1,
+      adresseLigne2: entreprises.adresseLigne2,
+      codePostal: entreprises.codePostal,
+      ville: entreprises.ville,
+      formeJuridique: entreprises.formeJuridique,
+      sireneSyncedAt: entreprises.sireneSyncedAt,
       logoId: entreprises.logoId,
       logoStorageKey: sql<string | null>`MAX(${documents.storageKey})`,
       createdAt: entreprises.createdAt,
@@ -330,8 +347,10 @@ export async function getEntrepriseWithDetailsById(
     nbSites: Number(result.nbSites) || 0,
     logoStorageKey: result.logoStorageKey ?? null,
     hasActiveAdmin: Boolean(result.hasActiveAdmin),
+    adminEmail: null,
     services: (result.services ?? []) as Array<{ id: string; nom: string }>,
     pendingInvitation: result.pendingInvitation ?? null,
+    relationId: null,
   };
 }
 
@@ -350,4 +369,101 @@ export async function getServicesByEntrepriseId(
     .innerJoin(services, eq(serviceEntreprises.serviceId, services.id))
     .where(eq(serviceEntreprises.entrepriseId, entrepriseId))
     .orderBy(services.nom);
+}
+
+// ==================== CONTACTS ====================
+
+/**
+ * Récupère les contacts d'une entreprise, ordonnés par nom puis prénom.
+ * Inclut `pendingInvitationSentAt` si une invitation non acceptée et non expirée existe.
+ */
+export async function getEntrepriseContactsByEntrepriseId(
+  entrepriseId: string,
+): Promise<EntrepriseContactWithInvitationType[]> {
+  const rows = await db
+    .select({
+      id: entrepriseContacts.id,
+      entrepriseId: entrepriseContacts.entrepriseId,
+      prenom: entrepriseContacts.prenom,
+      nom: entrepriseContacts.nom,
+      email: entrepriseContacts.email,
+      phone: entrepriseContacts.phone,
+      fonction: entrepriseContacts.fonction,
+      notes: entrepriseContacts.notes,
+      userId: entrepriseContacts.userId,
+      createdAt: entrepriseContacts.createdAt,
+      updatedAt: entrepriseContacts.updatedAt,
+      createdById: entrepriseContacts.createdById,
+      updatedById: entrepriseContacts.updatedById,
+      pendingInvitationSentAt: sql<Date | null>`(
+        SELECT ci.created_at FROM ${contactsInvitations} ci
+        WHERE ci.contact_id = ${entrepriseContacts.id}
+          AND ci.accepted_at IS NULL
+          AND ci.expires_at > NOW()
+        ORDER BY ci.created_at DESC
+        LIMIT 1
+      )`,
+    })
+    .from(entrepriseContacts)
+    .where(eq(entrepriseContacts.entrepriseId, entrepriseId))
+    .orderBy(asc(entrepriseContacts.nom), asc(entrepriseContacts.prenom));
+
+  return rows.map((r) => ({
+    ...r,
+    pendingInvitationSentAt: r.pendingInvitationSentAt ?? null,
+  }));
+}
+
+export type RelationContactWithDetails = {
+  id: string;
+  contactId: string;
+  side: "client" | "prestataire";
+  role: string | null;
+  estPrincipal: boolean;
+  prenom: string;
+  nom: string;
+  email: string | null;
+  phone: string | null;
+  fonction: string | null;
+  notes: string | null;
+  userId: string | null;
+  entrepriseId: string;
+};
+
+/**
+ * Récupère les contacts liés à une relation client↔prestataire,
+ * enrichis avec les données du contact (prenom, nom, etc.)
+ */
+export async function getRelationContactsByRelationId(
+  relationId: string,
+): Promise<RelationContactWithDetails[]> {
+  const rows = await db
+    .select({
+      id: clientPrestataireRelationContacts.id,
+      contactId: clientPrestataireRelationContacts.contactId,
+      side: clientPrestataireRelationContacts.side,
+      role: clientPrestataireRelationContacts.role,
+      estPrincipal: clientPrestataireRelationContacts.estPrincipal,
+      prenom: entrepriseContacts.prenom,
+      nom: entrepriseContacts.nom,
+      email: entrepriseContacts.email,
+      phone: entrepriseContacts.phone,
+      fonction: entrepriseContacts.fonction,
+      notes: entrepriseContacts.notes,
+      userId: entrepriseContacts.userId,
+      entrepriseId: entrepriseContacts.entrepriseId,
+    })
+    .from(clientPrestataireRelationContacts)
+    .innerJoin(
+      entrepriseContacts,
+      eq(entrepriseContacts.id, clientPrestataireRelationContacts.contactId),
+    )
+    .where(eq(clientPrestataireRelationContacts.relationId, relationId))
+    .orderBy(
+      desc(clientPrestataireRelationContacts.estPrincipal),
+      asc(entrepriseContacts.nom),
+      asc(entrepriseContacts.prenom),
+    );
+
+  return rows;
 }

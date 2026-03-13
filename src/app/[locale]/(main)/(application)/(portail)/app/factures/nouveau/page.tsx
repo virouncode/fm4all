@@ -86,10 +86,6 @@ export default async function FactureNouvellePage({ searchParams }: FactureNouve
         nom: entreprise.nom,
         siret: entreprise.siret,
         numeroTva: entreprise.numeroTva ?? null,
-        emailContact: entreprise.emailContact ?? null,
-        phoneContact: entreprise.phoneContact ?? null,
-        prenomContact: entreprise.prenomContact ?? null,
-        nomContact: entreprise.nomContact ?? null,
         logoStorageKey: entreprise.logoStorageKey ?? null,
       };
     }

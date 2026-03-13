@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useRouter } from "@/i18n/navigation";
 import { getMesPrestatairesAction } from "@/server/actions/clientServiceExecutionsActions";
 import type { PrestataireAvecDetails } from "@/server/queries/clientServiceExecutions.query";
 import { useAppStore } from "@/stores/application/appStore";
@@ -8,12 +9,11 @@ import type {
   EntrepriseWithDetails,
   RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
-import { Info, Loader2, Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { EntrepriseCard } from "../entreprises/EntrepriseCard";
 import { AjouterPrestataireDialog } from "./AjouterPrestataireDialog";
-import { InviterPrestataireDialog } from "./InviterPrestataireDialog";
 
 function toEntrepriseCard(p: PrestataireAvecDetails): EntrepriseWithDetails {
   return {
@@ -21,22 +21,27 @@ function toEntrepriseCard(p: PrestataireAvecDetails): EntrepriseWithDetails {
     nom: p.nom,
     siret: p.siret,
     numeroTva: p.numeroTva,
-    prenomContact: p.prenomContact,
-    nomContact: p.nomContact,
-    emailContact: p.emailContact,
-    phoneContact: p.phoneContact,
+    adresseLigne1: p.adresseLigne1,
+    adresseLigne2: p.adresseLigne2,
+    codePostal: p.codePostal,
+    ville: p.ville,
+    formeJuridique: p.formeJuridique,
+    sireneSyncedAt: p.sireneSyncedAt,
     createdAt: p.createdAt,
     logoId: null,
     logoStorageKey: p.logoStorageKey,
     roles: p.roles as RoleEntrepriseType[],
     nbSites: 0,
     hasActiveAdmin: p.hasActiveAdmin,
+    adminEmail: p.adminEmail,
     services: p.services,
     pendingInvitation: null,
+    relationId: p.relationId,
   };
 }
 
 export function MesPrestatairesClient() {
+  const router = useRouter();
   const entreprise = useAppStore((s) => s.entreprise);
   const posture = useAppStore((s) => s.postureActive);
   const roleClientAdhesion = useAppStore((s) => s.roleClientAdhesion);
@@ -49,8 +54,6 @@ export function MesPrestatairesClient() {
   );
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [inviteTarget, setInviteTarget] =
-    useState<PrestataireAvecDetails | null>(null);
 
   const loadPrestataires = useCallback(async () => {
     if (!entreprise?.id || posture !== "client") return;
@@ -95,24 +98,6 @@ export function MesPrestatairesClient() {
         )}
       </div>
 
-      {/* Disclaimer lecture seule */}
-      <div className="text-muted-foreground flex items-start gap-2 rounded-md border px-3 py-2 text-xs">
-        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        <span>
-          Les informations de vos prestataires sont consultables mais non
-          modifiables depuis votre espace. Pour mettre à jour leurs données,
-          invitez-les à créer leur compte s&apos;ils n&apos;en ont pas encore un
-          ou{" "}
-          <a
-            href="mailto:contact@fm4all.com"
-            className="underline underline-offset-2"
-          >
-            contactez FM4ALL
-          </a>
-          .
-        </span>
-      </div>
-
       {/* Contenu */}
       {loading ? (
         <div className="flex flex-1 items-center justify-center">
@@ -131,10 +116,11 @@ export function MesPrestatairesClient() {
               <EntrepriseCard
                 key={p.id}
                 entreprise={toEntrepriseCard(p)}
-                onInvite={
-                  canManage && !p.hasActiveAdmin
-                    ? () => setInviteTarget(p)
-                    : undefined
+                onClick={() =>
+                  router.push({
+                    pathname: "/app/mes-prestataires/[entrepriseId]",
+                    params: { entrepriseId: p.id },
+                  })
                 }
               />
             ))}
@@ -152,23 +138,6 @@ export function MesPrestatairesClient() {
         />
       )}
 
-      {/* Dialog d'invitation */}
-      {entreprise?.id && inviteTarget && (
-        <InviterPrestataireDialog
-          open={!!inviteTarget}
-          onOpenChange={(v) => {
-            if (!v) setInviteTarget(null);
-          }}
-          clientEntrepriseId={entreprise.id}
-          prestataireEntrepriseId={inviteTarget.id}
-          prestataireNom={inviteTarget.nom}
-          defaultEmail={inviteTarget.emailContact}
-          onSuccess={() => {
-            setInviteTarget(null);
-            loadPrestataires();
-          }}
-        />
-      )}
     </div>
   );
 }

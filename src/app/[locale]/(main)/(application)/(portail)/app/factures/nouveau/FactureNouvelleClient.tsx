@@ -46,10 +46,6 @@ export type EmetteurInfoType = {
   nom: string;
   siret: string;
   numeroTva: string | null;
-  emailContact: string | null;
-  phoneContact: string | null;
-  prenomContact: string | null;
-  nomContact: string | null;
   logoStorageKey?: string | null;
 };
 
@@ -173,10 +169,10 @@ function buildPreview(
     emetteurEntrepriseNom: emetteur?.nom ?? "",
     emetteurEntrepriseSiret: emetteur?.siret ?? "",
     emetteurEntrepriseNumeroTva: emetteur?.numeroTva ?? null,
-    emetteurEmailContact: emetteur?.emailContact ?? null,
-    emetteurPhoneContact: emetteur?.phoneContact ?? null,
-    emetteurPrenomContact: emetteur?.prenomContact ?? null,
-    emetteurNomContact: emetteur?.nomContact ?? null,
+    emetteurEmailContact: null,
+    emetteurPhoneContact: null,
+    emetteurPrenomContact: null,
+    emetteurNomContact: null,
     emetteurLogoUrl,
     destinataireEntrepriseNom: selectedClient?.nom ?? "—",
     destinataireEntrepriseSiret: selectedClient?.siret ?? null,

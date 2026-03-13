@@ -33,6 +33,7 @@ import {
   Building2,
   Check,
   CheckCircle2,
+  Lock,
   RotateCcw,
   Search,
   UserCheck,
@@ -45,11 +46,22 @@ import { z } from "zod";
 import { getRoleBadgeStyles } from "./helpers";
 import { ProspectPickerDialog } from "./ProspectPickerDialog";
 
+type SireneDataType = {
+  nom: string;
+  formeJuridique: string | null;
+  adresseLigne1: string;
+  adresseLigne2: string | null;
+  codePostal: string;
+  ville: string;
+  numeroTva: string;
+  etatActif: boolean;
+};
+
 type SiretStateType =
   | { status: "idle" }
   | { status: "searching" }
   | { status: "found"; entreprise: { id: string; nom: string; siret: string } }
-  | { status: "not_found" }
+  | { status: "not_found"; sireneData: SireneDataType }
   | { status: "error"; message: string };
 
 const FR_TVA_REGEX = /^FR[A-HJ-NP-Z0-9]{2}\d{9}$/;
@@ -57,10 +69,12 @@ const FR_TVA_REGEX = /^FR[A-HJ-NP-Z0-9]{2}\d{9}$/;
 const dialogFormSchema = z
   .object({
     nom: z.string().min(1, "Nom de l'entreprise obligatoire"),
-    prenomContact: z.string(),
-    nomContact: z.string(),
-    emailContact: z.string().email("Email invalide").or(z.literal("")),
-    phoneContact: z.string(),
+    // Champs SIRENE
+    adresseLigne1: z.string().optional(),
+    adresseLigne2: z.string().optional(),
+    codePostal: z.string().optional(),
+    ville: z.string().optional(),
+    formeJuridique: z.string().optional(),
     numeroTva: z
       .string()
       .regex(
@@ -134,10 +148,11 @@ export function EntrepriseFormDialog({
     mode: "onTouched",
     defaultValues: {
       nom: "",
-      prenomContact: "",
-      nomContact: "",
-      emailContact: "",
-      phoneContact: "",
+      adresseLigne1: "",
+      adresseLigne2: "",
+      codePostal: "",
+      ville: "",
+      formeJuridique: "",
       numeroTva: "",
       roles: [],
       serviceIds: [],
@@ -160,10 +175,11 @@ export function EntrepriseFormDialog({
     setSiretState({ status: "idle" });
     form.reset({
       nom: "",
-      prenomContact: "",
-      nomContact: "",
-      emailContact: "",
-      phoneContact: "",
+      adresseLigne1: "",
+      adresseLigne2: "",
+      codePostal: "",
+      ville: "",
+      formeJuridique: "",
       numeroTva: "",
       roles: [],
       serviceIds: [],
@@ -192,46 +208,70 @@ export function EntrepriseFormDialog({
       setSiretState({ status: "error", message: result.serverError.message });
       return;
     }
+
+    // SIRENE indisponible → bloquer
+    if (result?.data?.sireneUnavailable) {
+      setSiretState({ status: "idle" });
+      toast.error(
+        "Service INSEE indisponible — impossible de vérifier ce SIRET. Réessayez dans quelques instants.",
+      );
+      return;
+    }
+
     if (result?.data?.entreprise) {
       setSiretState({ status: "found", entreprise: result.data.entreprise });
-      form.setValue("nom", result.data.entreprise.nom, {
-        shouldValidate: true,
-      });
     } else {
-      setSiretState({ status: "not_found" });
+      // SIRET non en DB → utiliser les données SIRENE
+      const sireneData = result?.data?.sireneData as SireneDataType | null;
+      if (!sireneData) {
+        setSiretState({
+          status: "error",
+          message: "Impossible de récupérer les données depuis l'API SIRENE.",
+        });
+        return;
+      }
+      setSiretState({ status: "not_found", sireneData });
+      form.setValue("nom", sireneData.nom, { shouldValidate: true });
+      form.setValue("adresseLigne1", sireneData.adresseLigne1 ?? "");
+      form.setValue("adresseLigne2", sireneData.adresseLigne2 ?? "");
+      form.setValue("codePostal", sireneData.codePostal ?? "");
+      form.setValue("ville", sireneData.ville ?? "");
+      form.setValue("formeJuridique", sireneData.formeJuridique ?? "");
+      form.setValue("numeroTva", sireneData.numeroTva ?? "");
     }
   };
 
   const handleResetSiret = () => {
     setSiretInput("");
     setSiretState({ status: "idle" });
-    form.setValue("nom", "");
+    form.reset({
+      nom: "",
+      adresseLigne1: "",
+      adresseLigne2: "",
+      codePostal: "",
+      ville: "",
+      formeJuridique: "",
+      numeroTva: "",
+      roles: form.getValues("roles"),
+      serviceIds: form.getValues("serviceIds"),
+    });
   };
 
   const handleProspectSelected = (prospect: SelectProspectType) => {
     form.setValue("nom", prospect.nomEntreprise, { shouldValidate: true });
-    form.setValue("prenomContact", prospect.prenomContact);
-    form.setValue("nomContact", prospect.nomContact);
-    form.setValue("emailContact", prospect.emailContact);
-    form.setValue("phoneContact", prospect.phoneContact);
 
     if (prospect.siret) {
       setSiretInput(prospect.siret);
       searchSiret(prospect.siret);
-    } else {
-      setSiretState({ status: "not_found" });
     }
+    // Si pas de SIRET : laisser l'état idle, l'utilisateur saisit le SIRET manuellement
 
     toast.success(
       `Formulaire pré-rempli depuis le prospect "${prospect.nomEntreprise}"`,
     );
   };
 
-  const handleNext = async () => {
-    if (siretState.status === "not_found") {
-      const valid = await form.trigger(["nom"]);
-      if (!valid) return;
-    }
+  const handleNext = () => {
     setStep(2);
   };
 
@@ -259,10 +299,11 @@ export function EntrepriseFormDialog({
     const result = await createEntrepriseAction({
       siret: siretInput,
       nom: data.nom,
-      prenomContact: data.prenomContact || undefined,
-      nomContact: data.nomContact || undefined,
-      emailContact: data.emailContact || undefined,
-      phoneContact: data.phoneContact,
+      adresseLigne1: data.adresseLigne1 || undefined,
+      adresseLigne2: data.adresseLigne2 || undefined,
+      codePostal: data.codePostal || undefined,
+      ville: data.ville || undefined,
+      formeJuridique: data.formeJuridique || undefined,
       numeroTva: data.numeroTva || undefined,
       roles: data.roles,
       serviceIds: data.serviceIds,
@@ -407,54 +448,71 @@ export function EntrepriseFormDialog({
                       {siretState.status === "not_found" && (
                         <p className="text-muted-foreground flex items-center gap-1 text-xs">
                           <CheckCircle2 className="h-3 w-3 text-green-600" />
-                          SIRET disponible — renseignez les informations
-                          ci-dessous.
+                          Données récupérées depuis l&apos;API SIRENE — non
+                          modifiables.
                         </p>
                       )}
                     </div>
 
-                    {/* Champs visibles uniquement si SIRET non trouvé */}
+                    {/* Champs SIRENE pré-remplis (lecture seule) + contact si SIRET non trouvé */}
                     {siretState.status === "not_found" && (
                       <>
-                        <RhfInput<DialogFormType>
-                          name="nom"
-                          label="Nom de l'entreprise"
-                          requiredMark
-                        />
+                        {/* Informations SIRENE — lecture seule */}
+                        <div className="space-y-3">
+                          <div className="space-y-1">
+                            <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                              Nom de l&apos;entreprise
+                              <Lock className="h-3 w-3" />
+                            </label>
+                            <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                              {siretState.sireneData.nom}
+                            </p>
+                          </div>
 
-                        <Separator />
+                          {siretState.sireneData.formeJuridique && (
+                            <div className="space-y-1">
+                              <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                                Forme juridique
+                                <Lock className="h-3 w-3" />
+                              </label>
+                              <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                                {siretState.sireneData.formeJuridique}
+                              </p>
+                            </div>
+                          )}
 
-                        <p className="text-muted-foreground text-sm">
-                          Contact (optionnel)
-                        </p>
-                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                              Adresse
+                              <Lock className="h-3 w-3" />
+                            </label>
+                            <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                              {siretState.sireneData.adresseLigne1}
+                              {", "}
+                              {siretState.sireneData.codePostal}{" "}
+                              {siretState.sireneData.ville}
+                            </p>
+                          </div>
+
                           <RhfInput<DialogFormType>
-                            name="prenomContact"
-                            label="Prénom"
-                            withError={false}
+                            name="adresseLigne2"
+                            label="Complément d'adresse"
+                            placeholder="Bâtiment B, étage 3..."
                           />
-                          <RhfInput<DialogFormType>
-                            name="nomContact"
-                            label="Nom"
-                            withError={false}
-                          />
-                          <RhfInput<DialogFormType>
-                            name="emailContact"
-                            label="Email"
-                            type="email"
-                          />
-                          <RhfInput<DialogFormType>
-                            name="phoneContact"
-                            label="Téléphone"
-                          />
+
+                          {siretState.sireneData.numeroTva && (
+                            <div className="space-y-1">
+                              <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                                N° TVA
+                                <Lock className="h-3 w-3" />
+                              </label>
+                              <p className="bg-muted text-muted-foreground rounded-md border px-3 py-2 font-mono text-sm">
+                                {siretState.sireneData.numeroTva}
+                              </p>
+                            </div>
+                          )}
                         </div>
 
-                        <RhfInput<DialogFormType>
-                          name="numeroTva"
-                          label="Numéro de TVA"
-                          placeholder="FR71941928640"
-                          className="font-mono uppercase"
-                        />
                       </>
                     )}
                   </div>

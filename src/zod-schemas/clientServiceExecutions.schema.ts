@@ -209,13 +209,16 @@ export type UpdateExecutionFormType = z.infer<typeof updateExecutionFormSchema>;
 
 export const createOrLinkPrestataireSchema = z.object({
   siret: siretSchema("Le SIRET est invalide"),
-  nom: z.string().min(1, "Nom de l'entreprise requis").transform((v) => upper(v)),
+  // Champs SIRENE — pré-remplis depuis l'API, soumis tels quels
+  nom: z.string().min(1, "Nom de l'entreprise requis"),
+  adresseLigne1: z.string().optional(),
+  adresseLigne2: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  formeJuridique: z.string().optional(),
+  numeroTva: z.string().optional(),
   serviceIds: z.array(z.uuid()),
   entrepriseId: z.uuid("ID de l'entreprise invalide"),
-  prenomContact: z.string().optional(),
-  nomContact: z.string().optional(),
-  emailContact: z.email("Email invalide").optional().or(z.literal("")),
-  phoneContact: z.string().optional(),
 });
 
 export type CreateOrLinkPrestataireType = z.infer<
@@ -311,12 +314,15 @@ export type UpdateExecutionModePilotageType = z.infer<
 
 export const createOrLinkClientSchema = z.object({
   siret: siretSchema("Le SIRET est invalide"),
-  nom: z.string().min(1, "Nom de l'entreprise requis").transform((v) => upper(v)),
+  // Champs SIRENE — pré-remplis depuis l'API, soumis tels quels
+  nom: z.string().min(1, "Nom de l'entreprise requis"),
+  adresseLigne1: z.string().optional(),
+  adresseLigne2: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  formeJuridique: z.string().optional(),
+  numeroTva: z.string().optional(),
   prestataireEntrepriseId: z.uuid("ID du prestataire invalide"),
-  prenomContact: z.string().optional(),
-  nomContact: z.string().optional(),
-  emailContact: z.email("Email invalide").optional().or(z.literal("")),
-  phoneContact: z.string().optional(),
 });
 export type CreateOrLinkClientType = z.infer<typeof createOrLinkClientSchema>;
 
@@ -324,12 +330,15 @@ export type CreateOrLinkClientType = z.infer<typeof createOrLinkClientSchema>;
 
 export const createOrLinkPrestataireSimpleSchema = z.object({
   siret: siretSchema("Le SIRET est invalide"),
-  nom: z.string().min(1, "Nom de l'entreprise requis").transform((v) => upper(v)),
+  // Champs SIRENE — pré-remplis depuis l'API, soumis tels quels
+  nom: z.string().min(1, "Nom de l'entreprise requis"),
+  adresseLigne1: z.string().optional(),
+  adresseLigne2: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  formeJuridique: z.string().optional(),
+  numeroTva: z.string().optional(),
   clientEntrepriseId: z.uuid("ID de l'entreprise cliente invalide"),
-  prenomContact: z.string().optional(),
-  nomContact: z.string().optional(),
-  emailContact: z.email("Email invalide").optional().or(z.literal("")),
-  phoneContact: z.string().optional(),
 });
 export type CreateOrLinkPrestataireSimpleType = z.infer<
   typeof createOrLinkPrestataireSimpleSchema

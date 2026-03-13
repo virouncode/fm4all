@@ -77,24 +77,9 @@ export const createEntreprisesColumns = (): ColumnDef<EntrepriseWithDetails>[] =
   {
     id: "contact",
     header: () => <span className="text-sm font-medium">Contact</span>,
-    cell: ({ row }) => {
-      const { prenomContact, nomContact, emailContact } = row.original;
-      const name =
-        prenomContact || nomContact
-          ? `${prenomContact ?? ""} ${nomContact ?? ""}`.trim()
-          : null;
+    cell: () => {
       return (
-        <div className="flex flex-col gap-0.5">
-          {name && <span className="text-sm font-medium">{name}</span>}
-          {emailContact && (
-            <span className="text-xs text-muted-foreground truncate max-w-[200px]">
-              {emailContact}
-            </span>
-          )}
-          {!name && !emailContact && (
-            <span className="text-muted-foreground text-sm">—</span>
-          )}
-        </div>
+        <span className="text-muted-foreground text-sm">—</span>
       );
     },
     size: 220,

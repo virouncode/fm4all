@@ -1,6 +1,6 @@
 {
-  "id": "b38ffcb0-cd0c-4eb3-be8c-f1ed8b4256e3",
-  "prevId": "e72d7160-9336-4864-9141-2efe06c32221",
+  "id": "b5c3e5a2-f4ff-485e-8434-5475c2ca25b0",
+  "prevId": "ce19f640-6c77-4b56-bb33-192beeda5933",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -3890,6 +3890,189 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.client_prestataire_relation_contacts": {
+      "name": "client_prestataire_relation_contacts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "relation_id": {
+          "name": "relation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_id": {
+          "name": "contact_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "side": {
+          "name": "side",
+          "type": "client_prestataire_contact_side",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "est_principal": {
+          "name": "est_principal",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "cprc_relation_id_idx": {
+          "name": "cprc_relation_id_idx",
+          "columns": [
+            {
+              "expression": "relation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "cprc_contact_id_idx": {
+          "name": "cprc_contact_id_idx",
+          "columns": [
+            {
+              "expression": "contact_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "cprc_relation_contact_udx": {
+          "name": "cprc_relation_contact_udx",
+          "columns": [
+            {
+              "expression": "relation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "contact_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "client_prestataire_relation_contacts_relation_id_client_prestataire_relations_id_fk": {
+          "name": "client_prestataire_relation_contacts_relation_id_client_prestataire_relations_id_fk",
+          "tableFrom": "client_prestataire_relation_contacts",
+          "tableTo": "client_prestataire_relations",
+          "columnsFrom": [
+            "relation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "client_prestataire_relation_contacts_contact_id_entreprise_contacts_id_fk": {
+          "name": "client_prestataire_relation_contacts_contact_id_entreprise_contacts_id_fk",
+          "tableFrom": "client_prestataire_relation_contacts",
+          "tableTo": "entreprise_contacts",
+          "columnsFrom": [
+            "contact_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "client_prestataire_relation_contacts_created_by_id_user_id_fk": {
+          "name": "client_prestataire_relation_contacts_created_by_id_user_id_fk",
+          "tableFrom": "client_prestataire_relation_contacts",
+          "tableTo": "user",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "client_prestataire_relation_contacts_updated_by_id_user_id_fk": {
+          "name": "client_prestataire_relation_contacts_updated_by_id_user_id_fk",
+          "tableFrom": "client_prestataire_relation_contacts",
+          "tableTo": "user",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.client_prestataire_relations": {
       "name": "client_prestataire_relations",
       "schema": "",
@@ -4036,6 +4219,184 @@
         "client_prestataire_relations_updated_by_id_user_id_fk": {
           "name": "client_prestataire_relations_updated_by_id_user_id_fk",
           "tableFrom": "client_prestataire_relations",
+          "tableTo": "user",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.entreprise_contacts": {
+      "name": "entreprise_contacts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entreprise_id": {
+          "name": "entreprise_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prenom": {
+          "name": "prenom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nom": {
+          "name": "nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fonction": {
+          "name": "fonction",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "entreprise_contacts_entreprise_id_idx": {
+          "name": "entreprise_contacts_entreprise_id_idx",
+          "columns": [
+            {
+              "expression": "entreprise_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "entreprise_contacts_user_id_idx": {
+          "name": "entreprise_contacts_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "entreprise_contacts_entreprise_id_entreprises_id_fk": {
+          "name": "entreprise_contacts_entreprise_id_entreprises_id_fk",
+          "tableFrom": "entreprise_contacts",
+          "tableTo": "entreprises",
+          "columnsFrom": [
+            "entreprise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "entreprise_contacts_user_id_user_id_fk": {
+          "name": "entreprise_contacts_user_id_user_id_fk",
+          "tableFrom": "entreprise_contacts",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "entreprise_contacts_created_by_id_user_id_fk": {
+          "name": "entreprise_contacts_created_by_id_user_id_fk",
+          "tableFrom": "entreprise_contacts",
+          "tableTo": "user",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "entreprise_contacts_updated_by_id_user_id_fk": {
+          "name": "entreprise_contacts_updated_by_id_user_id_fk",
+          "tableFrom": "entreprise_contacts",
           "tableTo": "user",
           "columnsFrom": [
             "updated_by_id"
@@ -4380,30 +4741,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "prenom_contact": {
-          "name": "prenom_contact",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "nom_contact": {
-          "name": "nom_contact",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email_contact": {
-          "name": "email_contact",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "telephone_contact": {
-          "name": "telephone_contact",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "logo_id": {
           "name": "logo_id",
           "type": "uuid",
@@ -4413,6 +4750,42 @@
         "numero_tva": {
           "name": "numero_tva",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "adresse_ligne1": {
+          "name": "adresse_ligne1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "adresse_ligne2": {
+          "name": "adresse_ligne2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "code_postal": {
+          "name": "code_postal",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ville": {
+          "name": "ville",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "forme_juridique": {
+          "name": "forme_juridique",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sirene_synced_at": {
+          "name": "sirene_synced_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
         },
@@ -14815,6 +15188,14 @@
         "exclure"
       ]
     },
+    "public.client_prestataire_contact_side": {
+      "name": "client_prestataire_contact_side",
+      "schema": "public",
+      "values": [
+        "client",
+        "prestataire"
+      ]
+    },
     "public.client_service_mode": {
       "name": "client_service_mode",
       "schema": "public",
@@ -14912,12 +15293,12 @@
         "centilitre",
         "litre",
         "millimetre",
-        "centim\u00e8tre",
+        "centimètre",
         "metre",
         "metre_carre",
         "metre_cube",
         "metre_cube_par_heure",
-        "amp\u00e8re",
+        "ampère",
         "gigajoule",
         "gigawatt",
         "gigawatt_par_heure",

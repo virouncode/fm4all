@@ -302,6 +302,27 @@
       "when": 1773268723756,
       "tag": "0042_rename_document_visibilite_partage_to_public",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1773339779163,
+      "tag": "0043_fantastic_zzzax",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1773392535757,
+      "tag": "0044_square_siren",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1773700000000,
+      "tag": "0045_rename_entreprise_invitations_to_contacts_invitations",
+      "breakpoints": true
     }
   ]
 }

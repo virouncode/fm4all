@@ -457,9 +457,17 @@ export const routing = defineRouting({
       fr: "/app/mes-prestataires",
       en: "/app/mes-prestataires",
     },
+    "/app/mes-prestataires/[entrepriseId]": {
+      fr: "/app/mes-prestataires/[entrepriseId]",
+      en: "/app/mes-prestataires/[entrepriseId]",
+    },
     "/app/mes-clients": {
       fr: "/app/mes-clients",
       en: "/app/mes-clients",
+    },
+    "/app/mes-clients/[entrepriseId]": {
+      fr: "/app/mes-clients/[entrepriseId]",
+      en: "/app/mes-clients/[entrepriseId]",
     },
     "/app/entreprises": {
       fr: "/app/entreprises",

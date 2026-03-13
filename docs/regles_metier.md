@@ -1207,4 +1207,289 @@ Les URLs S3 sont générées via `getPresignedReadUrlAction` avec une durée de 
 
 ---
 
-*Dernière mise à jour : 2026-03-12*
+## Module N — Contacts Entreprise & Contacts Relation
+
+> Introduit lors de la refonte du modèle de contacts (2026-03-13).
+> Remplace les champs inline sur `entreprises` et `client_prestataire_relations`.
+
+### 1. Modèle de données
+
+**Avant** : 4 champs inline sur `entreprises` (prénom/nom/email/téléphone) + 8 champs inline sur `client_prestataire_relations` (4 côté client, 4 côté prestataire). Limité à 1 contact par entité/relation.
+
+**Après** :
+- `entreprise_contacts` — n contacts par entreprise, avec lien optionnel vers un `userId` de la plateforme
+- `client_prestataire_relation_contacts` — table de jonction entre une relation et un contact, avec `side: "client" | "prestataire"`, `role` (texte libre), `est_principal` (booléen)
+
+**Règle de cohérence** : un contact dans `client_prestataire_relation_contacts` DOIT appartenir à l'entreprise correspondant à son `side` (le contact "prestataire" doit être un contact de l'entreprise prestataire, et vice-versa). Cette règle est vérifiée côté applicatif au moment de la liaison.
+
+### 2. Permissions — Contacts d'entreprise (`entreprise_contacts`)
+
+| Action | Condition |
+|--------|-----------|
+| Voir (liste) | `hasAccessToEntreprise(userId, entrepriseId)` |
+| Créer | `hasAccessToEntreprise(userId, entrepriseId)` |
+| Modifier | `hasAccessToEntreprise(userId, entrepriseId)` (ownership vérifié via lookup) |
+| Supprimer (DELETE physique) | `hasAccessToEntreprise(userId, entrepriseId)` + contact non référencé dans `client_prestataire_relation_contacts` |
+
+> **Blocage suppression** : si le contact est lié à au moins une relation (`COUNT(client_prestataire_relation_contacts WHERE contactId = ...)` > 0), la suppression est refusée avec un message explicite. Il faut d'abord le retirer de toutes les relations.
+
+> **Rationale** : les contacts sont un carnet d'adresses de référence. Tout utilisateur avec une adhésion active peut les gérer. Cette page étant réservée à la posture plateforme (`getUserPlateformeAdhesion`), la restriction admin/manager est implicite.
+
+> **Cascade** : si une entreprise est supprimée, ses contacts le sont aussi (`ON DELETE CASCADE`). Mais la suppression unitaire est bloquée si des liens de relation existent.
+
+### 3. Permissions — Contacts de relation (`client_prestataire_relation_contacts`)
+
+| Action | Condition |
+|--------|-----------|
+| Voir (liste) | Accès à l'entreprise cliente OU prestataire de la relation |
+| Lier un contact | `admin` ou `manager` côté client OU côté prestataire (+ plateforme) |
+| Délier (DELETE physique du lien) | `admin` ou `manager` côté client OU côté prestataire (+ plateforme) |
+
+> **Vérification** : via `canManageRelationContacts(userId, clientEntrepriseId, prestataireEntrepriseId)` — vérifie `getUserClientAdhesion` (role admin/manager + statut actif) OU `getUserPrestataireAdhesion` (entrepriseId match + role admin/manager + statut actif) OU `getEffectivePlateformeRole`. Un `collaborateur` ne peut pas gérer les contacts de relation.
+
+### 4. Actions disponibles
+
+| Action | Fichier | Description |
+|--------|---------|-------------|
+| `getEntrepriseContactsAction` | `entreprisesActions.ts` | Liste les contacts d'une entreprise |
+| `insertEntrepriseContactAction` | `entreprisesActions.ts` | Crée un contact (normalizeForSubmit) |
+| `updateEntrepriseContactAction` | `entreprisesActions.ts` | Modifie un contact (normalizeForSubmit) |
+| `deleteEntrepriseContactAction` | `entreprisesActions.ts` | Supprime un contact (DELETE physique) |
+| `inviterContactAction` | `entreprisesActions.ts` | Envoie une invitation par email à un contact sans compte |
+| `accepterInvitationContactAction` | `entreprisesActions.ts` | Crée le compte user + adhésion collaborateur à partir du token |
+| `getRelationContactsAction` | `entreprisesActions.ts` | Liste les contacts d'une relation avec détails |
+| `insertRelationContactAction` | `entreprisesActions.ts` | Lie un contact à une relation (normalizeForSubmit) |
+| `deleteRelationContactAction` | `entreprisesActions.ts` | Retire un contact d'une relation |
+
+### 5. Normalisation (`normalizeForSubmit`)
+
+| Schema | Champs normalisés (`"" → null`) |
+|--------|----------------------------------|
+| `insertEntrepriseContactSchema` | `email`, `phone`, `fonction`, `notes` |
+| `updateEntrepriseContactSchema` | `email`, `phone`, `fonction`, `notes` |
+| `insertRelationContactSchema` | `role` |
+| `accepterInvitationContactSchema` | `phone`, `fonction` |
+
+`userId` sur le contact est un UUID optionnel (`z.uuid().optional()`) — géré avec `?? null` directement, sans passer par `normalizeForSubmit`.
+
+### 6. Flux d'invitation contact — table `contacts_invitations`
+
+> Anciennement `entreprise_invitations`. Renommée et enrichie d'une FK `contact_id` vers `entreprise_contacts`.
+
+**Conditions d'envoi** (`inviterContactAction`) :
+- Appelant : accès à l'entreprise (`hasAccessToEntreprise`) OU rôle plateforme
+- Contact cible : doit avoir un `email`, ne pas avoir de `userId`, appartenir à l'entreprise
+- L'email cible ne doit pas correspondre à un compte utilisateur existant
+- Toute invitation en attente pour le même `contactId` est annulée avant la création
+
+**Données du token** : entreprise, email, typeAdhesion (client|prestataire), contactId, expiresAt (7 jours)
+
+**Acceptation** (`accepterInvitationContactAction`, page `/auth/inscription?token=xxx`) :
+1. Validation du token (non expiré, non accepté)
+2. Création du compte via `auth.api.signUpEmail` (mot de passe aléatoire)
+3. Transaction atomique :
+   - Adhésion `collaborateur` dans `userClientAdhesions` ou `userPrestataireAdhesions` selon `typeAdhesion`
+   - Mise à jour `entrepriseContacts.userId = newUserId` + prenom/nom/phone/fonction modifiés par l'utilisateur
+   - Entrée closure table (`usersArborescence`, `parentId = null`)
+   - Marquer `acceptedAt = now()` dans `contacts_invitations`
+4. Email `requestPasswordReset` (non bloquant) → `/auth/reset-password?type=activation`
+
+**Rôle forcé** : toujours `"collaborateur"`. Jamais `"admin"`. C'est la distinction fondamentale avec l'ancien flow `inviterEntrepriseAdminAction` qui continue d'exister pour les invitations d'admin (table partagée via alias backward-compat).
+
+**Page publique** : `/auth/inscription?token=xxx`
+- Champs pré-remplis depuis le contact : prenom, nom, phone, fonction (tous modifiables)
+- Email en lecture seule (contrôlé par l'invitation)
+- Pas d'upload d'avatar (pas de session — possible depuis les paramètres post-connexion)
+
+---
+
+## Module Auth — Flux d'invitation
+
+> Les deux flows d'invitation coexistent dans la même table `contacts_invitations` (ex `entreprise_invitations`).
+
+### 1. Invitation Admin (`inviterEntrepriseAdminAction`)
+
+- **Déclencheur** : bouton "Inviter un admin" dans `InviterEntrepriseAdminDialog.tsx` (page `/app/entreprises/[id]`)
+- **Conditions** : pas d'admin actif existant, email non utilisé, appelant admin/manager ou plateforme
+- **Page** : `/auth/inscription-admin?token=xxx` — **SUPPRIMÉE** (voir ci-dessous)
+- **Rôle créé** : `"admin"` dans `userClientAdhesions` ou `userPrestataireAdhesions`
+- **`contactId`** : `null` (legacy — pas de contact source)
+
+> ⚠️ **`/auth/inscription-admin` a été supprimée.** Le flow admin était déjà remplacé. Si ce flow doit être ré-activé, créer une nouvelle page `/auth/inscription-admin` sur le même modèle que `/auth/inscription`, en changeant le rôle forcé à `"admin"`.
+
+### 2. Invitation Contact (`inviterContactAction`)
+
+- **Déclencheur** : bouton "Inviter" (icône `Send`) sur chaque carte contact dans `EntrepriseDetailsClient.tsx`
+- **Condition d'affichage** : `canEdit && !c.userId && c.email`
+- **Conditions d'exécution** : voir §6 du Module N ci-dessus
+- **Page** : `/auth/inscription?token=xxx`
+- **Rôle créé** : `"collaborateur"` — jamais configurable, jamais `"admin"`
+- **`contactId`** : FK vers le contact source, utilisé pour mettre à jour `entrepriseContacts.userId` à l'acceptation
+
+### 3. Activation du compte (commun aux deux flows)
+
+Après création du compte (`signUpEmail`), un email `requestPasswordReset` est envoyé vers `/auth/reset-password?type=activation`. Ce n'est pas un reset classique — c'est la définition initiale du mot de passe. L'utilisateur peut aussi demander un nouveau lien depuis la page de login.
+
+---
+
+## Module Entreprises — Posture Plateforme (`/app/entreprises`)
+
+> Page réservée posture plateforme uniquement. Guard serveur : `getUserPlateformeAdhesion`. Redirect → `/auth/unauthorized` si absent.
+
+### 1. Liste des entreprises
+
+| Feature | Détail |
+|---------|--------|
+| Filtres | Nom (ilike), rôle (client/prestataire/plateforme), statut admin |
+| Tri | Nom, date de création, SIRET |
+| Pagination | Infinite scroll |
+| Logos | Chargement côté client via `LogoAvatar` (storageKey → presigned URL) |
+
+### 2. Création d'entreprise (`createEntrepriseAction`)
+
+Étapes :
+1. Infos générales (nom, SIRET, adresse, forme juridique, TVA)
+2. Rôles et services proposés
+3. Invitation admin optionnelle (via `inviterEntrepriseAdminAction`)
+
+Contraintes :
+- SIRET unique en base
+- Au moins un rôle requis
+- Si invite admin : voir conditions §1 du Module Auth
+
+### 3. Détail entreprise (`/app/entreprises/[entrepriseId]`)
+
+Sections :
+- **Informations** : SIRET, forme juridique, TVA, adresse — modifiable via `EditEntrepriseInfosDialog`
+- **Logo** : upload S3 via `EditEntrepriseLogoDialog` (temp → permanent, `documents.storageKey` + `entreprises.logoId`)
+- **Rôles** : ajout/retrait avec guard métier (pas de retrait si `clientServices` ou `clientServiceExecutions` actifs) — `EditEntrepriseRolesDialog`
+- **Contacts** : liste CRUD + bouton "Inviter" conditionnel — voir Module N §6
+
+### 4. Permissions de modification
+
+| Action | Condition |
+|--------|-----------|
+| Modifier infos, logo, rôles | `canEdit = true` (plateforme par défaut) |
+| Ajouter/modifier/supprimer contact | `canEdit = true` |
+| Inviter un contact | `canEdit && !c.userId && c.email` |
+| Inviter un admin | Pas d'admin actif existant |
+
+### 5. Chargement des contacts (pattern important)
+
+Les contacts sont chargés **côté serveur** dans `page.tsx` via `getEntrepriseContactsByEntrepriseId` (requête `.select().from()` standard — **ne pas utiliser la relational API `db.query.entrepriseContacts`** car la table n'est pas enregistrée dans `relations.ts`). Ils sont passés en `initialContacts` au composant client et mis à jour via `router.refresh()` après mutation.
+
+---
+
+## Module Mes Clients — Posture Prestataire (`/app/mes-clients`)
+
+> Page réservée posture prestataire uniquement. Guard serveur : `userPrestataireAdhesions` statut actif. Redirect → `/auth/unauthorized` si absent.
+
+### 1. Périmètre
+
+- Liste les entreprises clientes via `getMesClients(prestataireEntrepriseId)` (`clientServiceExecutions.query.ts`)
+- Les clients apparaissent s'ils ont une relation explicite (`clientPrestataireRelations`) OU au moins une exécution active avec le prestataire
+
+### 2. Politique de modification
+
+**Lecture seule par défaut.** Un prestataire voit les informations de base de ses clients (nom, SIRET, contact) mais ne peut pas les modifier. Aucun disclaimer global — le message contextuel n'apparaît que sur la page détail si le client a un admin actif.
+
+> **Rationale** : un client peut être partagé entre plusieurs prestataires. Autoriser un prestataire à modifier les données d'un client créerait des incohérences pour les autres prestataires et pour la plateforme FM4ALL. Le prestataire contrôle la relation via le module Prestations (`clientServices`).
+
+**Exception — Proxy prestataire** : Si le client n'a pas d'admin actif (`userClientAdhesions.role = "admin" AND statut = "actif"`), le bouton "Modifier" est affiché dans la section Informations de la page détail. Ce bouton ouvre `EditEntrepriseInfosDialog` (mise à jour depuis l'API SIRENE). L'action serveur `updateEntrepriseSireneFieldsAction` autorise cette modification via `canManageClientInfosAsProxy()`. Si le client a un admin actif, un message amber s'affiche : "Ce client a un administrateur actif, vous ne pouvez pas modifier ses informations. Pour tout changement, contacter l'administrateur." (lien `mailto:` sur "administrateur" si `adminEmail` disponible).
+
+**`canManageClientInfosAsProxy(userId, clientEntrepriseId)`** (dans `entreprisesActions.ts`) :
+1. Le client n'a pas d'admin actif → sinon `false`
+2. L'utilisateur est `admin` ou `manager` prestataire actif → sinon `false`
+3. La relation `clientPrestataireRelations` entre le prestataire et ce client existe → sinon `false`
+
+### 3. Page détail (`/app/mes-clients/[clientEntrepriseId]`)
+
+Sections :
+- **Message admin** (conditionnel) : si `client.hasActiveAdmin`, bannière amber "Ce client a un administrateur actif..." avec lien `mailto:` sur "administrateur"
+- **Informations** : SIRET, forme juridique, TVA, adresse — bouton "Modifier" conditionnel (`!client.hasActiveAdmin`) → `EditEntrepriseInfosDialog`
+- **Sites** : compteur `client.nbSites` (lecture seule)
+- **Contacts** : liste des contacts de la relation (`clientPrestataireRelationContacts`, `side = "client"`) avec bouton "Ajouter" → `AddRelationContactDialog`
+
+Query serveur : `getClientAvecDetailsById(prestataireEntrepriseId, clientEntrepriseId)` puis `getRelationContactsByRelationId(relationId).filter(side === "client")`.
+
+Synchronisation client : `useEffect([initialContacts])` recharge l'état local après `router.refresh()`.
+
+### 4. Actions disponibles
+
+| Action | Condition |
+|--------|-----------|
+| Voir la page détail | Adhésion prestataire active + client dans périmètre |
+| Modifier informations (SIRENE) | `!client.hasActiveAdmin` + `canManageClientInfosAsProxy` (admin/manager prestataire) |
+| Ajouter un contact à la relation | `admin` ou `manager` prestataire actif + `relationId` existant |
+| Retirer un contact de la relation | Idem |
+
+---
+
+## Module Mes Prestataires — Posture Client (`/app/mes-prestataires`)
+
+> Page réservée posture client uniquement. Guard serveur : `userClientAdhesions` statut actif. Redirect → `/auth/unauthorized` si absent.
+
+### 1. Périmètre
+
+- Liste les entreprises prestataires via `getClientPrestatairesAvecDetails(clientEntrepriseId)` (`clientServiceExecutions.query.ts`)
+- Les prestataires apparaissent s'ils ont une relation explicite (`clientPrestataireRelations`) OU au moins une exécution active avec le client
+
+### 2. Politique de modification
+
+**Lecture seule par défaut.** Même rationale que Mes Clients : un prestataire peut être partagé entre plusieurs clients. Aucun disclaimer global — le message contextuel n'apparaît que sur la page détail si le prestataire a un admin actif.
+
+**Exception — Proxy client** : Si le prestataire n'a pas d'admin actif (`userPrestataireAdhesions.role = "admin" AND statut = "actif"`), les boutons "Modifier" sont affichés dans les sections Informations et Services. Si le prestataire a un admin actif, un message amber s'affiche : "Ce prestataire a un administrateur actif, vous ne pouvez pas modifier ses informations. Pour tout changement, contacter l'administrateur." (lien `mailto:` sur "administrateur" si `adminEmail` disponible).
+
+**`canManagePrestataireInfosAsClient(userId, prestataireEntrepriseId)`** (dans `entreprisesActions.ts`) :
+1. Le prestataire n'a pas d'admin actif → sinon `false`
+2. L'utilisateur est `admin` ou `manager` client actif → sinon `false`
+3. La relation `clientPrestataireRelations` entre ce prestataire et le client existe → sinon `false`
+
+### 3. Page détail (`/app/mes-prestataires/[prestataireEntrepriseId]`)
+
+Sections :
+- **Informations** : SIRET, forme juridique, TVA, adresse — bouton "Modifier" conditionnel (`!prestataire.hasActiveAdmin`) → `EditEntrepriseInfosDialog`
+- **Services** : badges des services offerts — bouton "Modifier" conditionnel (`!prestataire.hasActiveAdmin`) → `EditPrestataireServicesDialog` (checkboxes, disclaimer blocage retrait si exécutions actives)
+- **Contacts** : liste des contacts de la relation (`clientPrestataireRelationContacts`, `side = "prestataire"`) avec bouton "Ajouter" → `AddRelationContactDialog`
+
+Query serveur : `getPrestataireAvecDetailsById(clientEntrepriseId, prestataireEntrepriseId)` puis `getRelationContactsByRelationId(relationId).filter(side === "prestataire")`.
+
+Synchronisation client : `useEffect([initialContacts])` recharge l'état local après `router.refresh()`.
+
+### 4. Actions disponibles
+
+| Action | Condition |
+|--------|-----------|
+| Voir la page détail | Adhésion client active + prestataire dans périmètre |
+| Modifier informations (SIRENE) | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` (admin/manager client) |
+| Modifier services | `!prestataire.hasActiveAdmin` + `canManagePrestataireInfosAsClient` via `updatePrestataireServicesAsProxyAction` |
+| Ajouter un contact à la relation | `admin` ou `manager` client actif + `relationId` existant |
+| Retirer un contact de la relation | Idem |
+
+---
+
+### `updateEntrepriseSireneFieldsAction` — Autorisations consolidées
+
+Cette action est partagée entre plusieurs contextes :
+
+| Contexte | Condition |
+|----------|-----------|
+| Posture plateforme | `getEffectivePlateformeRole` non-null |
+| Proxy prestataire → client | `canManageClientInfosAsProxy` (prestataire admin/manager + client sans admin actif + relation existante) |
+| Proxy client → prestataire | `canManagePrestataireInfosAsClient` (client admin/manager + prestataire sans admin actif + relation existante) |
+
+`getSireneDataAction` est accessible à tout utilisateur authentifié (données SIRENE = publiques).
+
+---
+
+### `AddRelationContactDialog` — Dialog d'ajout de contacts de relation
+
+Utilisé dans `/app/mes-clients/[id]` (`side="client"`) et `/app/mes-prestataires/[id]` (`side="prestataire"`).
+
+Deux onglets :
+- **Créer nouveau** : formulaire `newContactFormSchema` (prénom, nom, email, téléphone, fonction, rôle, est_principal). Appelle `insertEntrepriseContactAndLinkToRelationAction` — crée d'abord un `entrepriseContacts` pour `targetEntrepriseId`, puis lie à la relation via `clientPrestataireRelationContacts`. Vérification d'unicité email par entreprise avant insertion.
+- **Choisir existant** : charge tous les contacts de `targetEntrepriseId` via `getEntrepriseContactsForRelationAction`. Si liste vide, affiche uniquement un message (pas de formulaire). Lie le contact sélectionné + rôle + est_principal via `linkExistingContactToRelationAction`.
+
+---
+
+*Dernière mise à jour : 2026-03-13*

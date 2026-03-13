@@ -17,11 +17,16 @@ import { contratClientServices, contratDevis, contrats } from "./contrats";
 // DEVIS TABLES
 import { devis, devisDemandes, devisLignes, devisTemporaires } from "./devis";
 // DOCUMENTS TABLES
-import { documentTagLinks, documents, documentsLinks, documentsTags } from "./documents";
+import {
+  documentTagLinks,
+  documents,
+  documentsLinks,
+  documentsTags,
+} from "./documents";
 // ENTREPRISES TABLES
 import {
   clientPrestataireRelations as clientPrestataireRelationsTable,
-  entrepriseInvitations,
+  contactsInvitations,
   entrepriseRoles,
   entreprises,
   serviceEntreprises,
@@ -234,7 +239,7 @@ export const entreprisesRelations = relations(entreprises, ({ one, many }) => ({
   clientPrestataireAsPrestataire: many(clientPrestataireRelationsTable, {
     relationName: "cpRelationPrestataire",
   }),
-  invitations: many(entrepriseInvitations),
+  invitations: many(contactsInvitations),
   // Client services
   clientServices: many(clientServices),
   // Tarifs relations
@@ -312,11 +317,11 @@ export const clientPrestataireRelationsRelations = relations(
   }),
 );
 
-export const entrepriseInvitationsRelations = relations(
-  entrepriseInvitations,
+export const contactsInvitationsRelations = relations(
+  contactsInvitations,
   ({ one }) => ({
     entreprise: one(entreprises, {
-      fields: [entrepriseInvitations.entrepriseId],
+      fields: [contactsInvitations.entrepriseId],
       references: [entreprises.id],
     }),
   }),
@@ -445,24 +450,30 @@ export const documentsLinksRelations = relations(documentsLinks, ({ one }) => ({
   }),
 }));
 
-export const documentsTagsRelations = relations(documentsTags, ({ one, many }) => ({
-  proprietaireEntreprise: one(entreprises, {
-    fields: [documentsTags.proprietaireEntrepriseId],
-    references: [entreprises.id],
+export const documentsTagsRelations = relations(
+  documentsTags,
+  ({ one, many }) => ({
+    proprietaireEntreprise: one(entreprises, {
+      fields: [documentsTags.proprietaireEntrepriseId],
+      references: [entreprises.id],
+    }),
+    tagLinks: many(documentTagLinks),
   }),
-  tagLinks: many(documentTagLinks),
-}));
+);
 
-export const documentTagLinksRelations = relations(documentTagLinks, ({ one }) => ({
-  document: one(documents, {
-    fields: [documentTagLinks.documentId],
-    references: [documents.id],
+export const documentTagLinksRelations = relations(
+  documentTagLinks,
+  ({ one }) => ({
+    document: one(documents, {
+      fields: [documentTagLinks.documentId],
+      references: [documents.id],
+    }),
+    tag: one(documentsTags, {
+      fields: [documentTagLinks.tagId],
+      references: [documentsTags.id],
+    }),
   }),
-  tag: one(documentsTags, {
-    fields: [documentTagLinks.tagId],
-    references: [documentsTags.id],
-  }),
-}));
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SERVICES RELATIONS

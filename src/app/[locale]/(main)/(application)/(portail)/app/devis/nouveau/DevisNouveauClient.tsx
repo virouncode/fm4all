@@ -67,10 +67,6 @@ export type EmetteurInfoType = {
   nom: string;
   siret: string;
   numeroTva: string | null;
-  emailContact: string | null;
-  phoneContact: string | null;
-  prenomContact: string | null;
-  nomContact: string | null;
   logoStorageKey?: string | null;
 };
 
@@ -177,10 +173,10 @@ function buildPreview(
     emetteurEntrepriseNom: emetteur.nom,
     emetteurEntrepriseSiret: emetteur.siret,
     emetteurEntrepriseNumeroTva: emetteur.numeroTva,
-    emetteurEmailContact: emetteur.emailContact,
-    emetteurPhoneContact: emetteur.phoneContact,
-    emetteurPrenomContact: emetteur.prenomContact,
-    emetteurNomContact: emetteur.nomContact,
+    emetteurEmailContact: null,
+    emetteurPhoneContact: null,
+    emetteurPrenomContact: null,
+    emetteurNomContact: null,
     emetteurLogoUrl,
     proprietaireEntrepriseNom: selectedClient?.nom ?? "",
     proprietaireEntrepriseSiret: selectedClient?.siret ?? "",
@@ -263,10 +259,12 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
                 nom: c.nom,
                 siret: "",
                 numeroTva: null,
-                prenomContact: null,
-                nomContact: null,
-                emailContact: null,
-                phoneContact: null,
+                adresseLigne1: null,
+                adresseLigne2: null,
+                codePostal: null,
+                ville: null,
+                formeJuridique: null,
+                sireneSyncedAt: null,
                 createdAt: new Date(),
                 logoStorageKey: null,
                 roles: [],
@@ -274,6 +272,11 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
                 adminEmail: null,
                 nbSites: 0,
                 services: [],
+                relationId: null,
+                relationPrenomContactClient: null,
+                relationNomContactClient: null,
+                relationEmailContactClient: null,
+                relationPhoneContactClient: null,
               })),
             );
           }
@@ -306,10 +309,6 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
       const enriched = {
         siret: e.siret ?? "",
         numeroTva: e.numeroTva ?? null,
-        prenomContact: e.prenomContact ?? null,
-        nomContact: e.nomContact ?? null,
-        emailContact: e.emailContact ?? null,
-        phoneContact: e.phoneContact ?? null,
       };
       setClients((prev) =>
         prev.map((c) => (c.id === clientId ? { ...c, ...enriched } : c)),

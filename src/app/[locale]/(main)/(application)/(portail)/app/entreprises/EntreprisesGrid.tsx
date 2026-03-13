@@ -13,7 +13,6 @@ type EntreprisesGridProps = {
   hasMore: boolean;
   loadMore: () => void;
   onEntrepriseClick?: (entreprise: EntrepriseWithDetails) => void;
-  onInvite?: (entreprise: EntrepriseWithDetails) => void;
 };
 
 export function EntreprisesGrid({
@@ -24,7 +23,6 @@ export function EntreprisesGrid({
   hasMore,
   loadMore,
   onEntrepriseClick,
-  onInvite,
 }: EntreprisesGridProps) {
   const { targetRef } = useIntersection({
     isLoading: isLoadingMore,
@@ -68,7 +66,6 @@ export function EntreprisesGrid({
             key={entreprise.id}
             entreprise={entreprise}
             onClick={() => onEntrepriseClick?.(entreprise)}
-            onInvite={onInvite ? () => onInvite(entreprise) : undefined}
           />
         ))}
       </div>

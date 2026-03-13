@@ -3,46 +3,56 @@
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { accepterInvitationAdminAction } from "@/server/actions/entreprisesActions";
+import { accepterInvitationContactAction } from "@/server/actions/entreprisesActions";
 import {
-  inscriptionAdminFormSchema,
-  type InscriptionAdminFormType,
-} from "@/zod-schemas/inscriptionAdmin.schema";
+  inscriptionContactFormSchema,
+  type InscriptionContactFormType,
+} from "@/zod-schemas/inscriptionContact.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 
-type InscriptionAdminFormProps = {
+type Props = {
   token: string;
   email: string;
+  defaultPrenom: string;
+  defaultNom: string;
+  defaultPhone: string;
+  defaultFonction: string;
 };
 
-export default function InscriptionAdminForm({
+export default function InscriptionContactForm({
   token,
   email,
-}: InscriptionAdminFormProps) {
+  defaultPrenom,
+  defaultNom,
+  defaultPhone,
+  defaultFonction,
+}: Props) {
   const [success, setSuccess] = useState(false);
 
-  const form = useForm<InscriptionAdminFormType>({
-    resolver: zodResolver(inscriptionAdminFormSchema),
+  const form = useForm<InscriptionContactFormType>({
+    resolver: zodResolver(inscriptionContactFormSchema),
     mode: "onTouched",
     defaultValues: {
-      prenom: "",
-      nom: "",
-      phone: "",
+      prenom: defaultPrenom,
+      nom: defaultNom,
+      phone: defaultPhone,
+      fonction: defaultFonction,
     },
   });
 
   const { isSubmitting } = useFormState({ control: form.control });
 
-  const onSubmit = async (data: InscriptionAdminFormType) => {
-    const result = await accepterInvitationAdminAction({
+  const onSubmit = async (data: InscriptionContactFormType) => {
+    const result = await accepterInvitationContactAction({
       token,
       prenom: data.prenom,
       nom: data.nom,
       phone: data.phone,
+      fonction: data.fonction,
     });
 
     if (result?.serverError) {
@@ -83,23 +93,29 @@ export default function InscriptionAdminForm({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <RhfInput<InscriptionAdminFormType>
+            <RhfInput<InscriptionContactFormType>
               name="prenom"
               label="Prénom*"
               placeholder="Jean"
             />
-            <RhfInput<InscriptionAdminFormType>
+            <RhfInput<InscriptionContactFormType>
               name="nom"
               label="Nom*"
               placeholder="Dupont"
             />
           </div>
 
-          <RhfInput<InscriptionAdminFormType>
+          <RhfInput<InscriptionContactFormType>
             name="phone"
             label="Téléphone"
             placeholder="+33 6 12 34 56 78"
             type="tel"
+          />
+
+          <RhfInput<InscriptionContactFormType>
+            name="fonction"
+            label="Fonction"
+            placeholder="Directeur général"
           />
 
           <Button

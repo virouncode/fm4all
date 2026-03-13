@@ -3,7 +3,7 @@ import { isValidSIRET } from "@/lib/utils/isValidSIRET";
 import { phoneNumberSchemaEmpty } from "@/zod-schemas/phone.schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { entrepriseRoles, entreprises } from "../db/schema";
+import { entrepriseContacts, entrepriseRoles, entreprises } from "../db/schema";
 
 // Numéro de TVA français : FR + 2 chars [A-HJ-NP-Z0-9] (pas O ni I) + 9 chiffres
 const FR_TVA_REGEX = /^FR[A-HJ-NP-Z0-9]{2}\d{9}$/;
@@ -32,23 +32,22 @@ export type RoleEntrepriseSelectType = z.infer<
 
 /**
  * Step 1 — Informations entreprise
+ * Les champs SIRENE (nom, adresse, formeJuridique, numeroTva) sont pré-remplis
+ * depuis l'API SIRENE et affichés en lecture seule dans le formulaire.
  */
 export const insertEntrepriseStep1Schema = z
   .object({
+    // Champs SIRENE — pré-remplis et non-éditables dans le formulaire
     nom: z.string().min(1, "Nom de l'entreprise obligatoire"),
     siret: z
       .string()
       .min(1, "Le SIRET est obligatoire")
       .refine(isValidSIRET, "Le SIRET est invalide"),
-    prenomContact: z.string().optional(),
-    nomContact: z.string().optional(),
-    // Accepte "" (vide) ou un email valide — normalisation "" → null faite dans l'action
-    emailContact: z
-      .string()
-      .email("Email de contact invalide")
-      .or(z.literal(""))
-      .optional(),
-    phoneContact: phoneNumberSchemaEmpty("Numéro de téléphone invalide"),
+    adresseLigne1: z.string().optional(),
+    adresseLigne2: z.string().optional(),
+    codePostal: z.string().optional(),
+    ville: z.string().optional(),
+    formeJuridique: z.string().optional(),
     numeroTva: numeroTvaSchema,
     roles: z
       .array(roleEntrepriseSchema)
@@ -82,32 +81,30 @@ export type InsertEntrepriseFormType = z.infer<
 
 export const updateEntrepriseInfosSchema = z.object({
   entrepriseId: z.uuid(),
-  nom: z.string().min(1, "Nom de l'entreprise obligatoire"),
+  // nom est immuable (source SIRENE) — non modifiable via ce schema
   siret: z
     .string()
     .min(1, "Le SIRET est obligatoire")
     .refine(isValidSIRET, "Le SIRET est invalide"),
+  adresseLigne2: z.string().optional(),
   numeroTva: numeroTvaSchema,
 });
 export type UpdateEntrepriseInfosType = z.infer<
   typeof updateEntrepriseInfosSchema
 >;
 
-export const updateEntrepriseContactSchema = z.object({
+// Schema pour la mise à jour des champs SIRENE (super_admin_plateforme uniquement)
+export const updateEntrepriseSireneFieldsSchema = z.object({
   entrepriseId: z.uuid(),
-  prenomContact: z.string().optional(),
-  nomContact: z.string().optional(),
-  emailContact: z
-    .string()
-    .email("Email de contact invalide")
-    .or(z.literal(""))
-    .optional(),
-  phoneContact: phoneNumberSchemaEmpty(
-    "Numéro de téléphone invalide",
-  ).optional(),
+  nom: z.string().min(1, "Nom de l'entreprise obligatoire"),
+  adresseLigne1: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  formeJuridique: z.string().optional(),
+  numeroTva: numeroTvaSchema,
 });
-export type UpdateEntrepriseContactType = z.infer<
-  typeof updateEntrepriseContactSchema
+export type UpdateEntrepriseSireneFieldsType = z.infer<
+  typeof updateEntrepriseSireneFieldsSchema
 >;
 
 export const updateEntrepriseRolesSchema = z
@@ -159,19 +156,80 @@ export type EntrepriseWithDetails = {
   nom: string;
   siret: string;
   numeroTva: string | null;
-  prenomContact: string | null;
-  nomContact: string | null;
-  emailContact: string | null;
-  phoneContact: string | null;
+  adresseLigne1: string | null;
+  adresseLigne2: string | null;
+  codePostal: string | null;
+  ville: string | null;
+  formeJuridique: string | null;
+  sireneSyncedAt: Date | null;
   logoId: string | null;
   logoStorageKey: string | null;
   createdAt: Date;
   roles: RoleEntrepriseType[];
   nbSites: number;
   hasActiveAdmin: boolean;
+  adminEmail: string | null;
   services: Array<{ id: string; nom: string }>;
   pendingInvitation: { email: string; sentAt: Date } | null;
+  // Relation client↔prestataire (présent uniquement dans les vues mes-prestataires / mes-clients)
+  relationId: string | null;
 };
+
+// ==================== ENTREPRISE CONTACTS ====================
+
+export const entrepriseContactSelectSchema = createSelectSchema(entrepriseContacts);
+export type EntrepriseContactSelectType = z.infer<typeof entrepriseContactSelectSchema>;
+
+export const insertEntrepriseContactSchema = z.object({
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  prenom: z.string().min(1, "Prénom obligatoire"),
+  nom: z.string().min(1, "Nom obligatoire"),
+  email: z.string().email("Email invalide").or(z.literal("")).optional(),
+  phone: phoneNumberSchemaEmpty("Numéro de téléphone invalide").optional(),
+  fonction: z.string().optional(),
+  notes: z.string().optional(),
+  userId: z.uuid().optional(),
+});
+export type InsertEntrepriseContactType = z.infer<typeof insertEntrepriseContactSchema>;
+
+export const updateEntrepriseContactSchema = z.object({
+  contactId: z.uuid("ID du contact invalide"),
+  prenom: z.string().min(1, "Prénom obligatoire"),
+  nom: z.string().min(1, "Nom obligatoire"),
+  email: z.string().email("Email invalide").or(z.literal("")).optional(),
+  phone: phoneNumberSchemaEmpty("Numéro de téléphone invalide").optional(),
+  fonction: z.string().optional(),
+  notes: z.string().optional(),
+});
+export type UpdateEntrepriseContactType = z.infer<typeof updateEntrepriseContactSchema>;
+
+// ==================== RELATION CONTACTS ====================
+
+export const insertRelationContactSchema = z.object({
+  relationId: z.uuid("ID de relation invalide"),
+  contactId: z.uuid("ID du contact invalide"),
+  side: z.enum(["client", "prestataire"]),
+  role: z.string().optional(),
+  estPrincipal: z.boolean().default(false),
+});
+export type InsertRelationContactType = z.infer<typeof insertRelationContactSchema>;
+
+export const insertEntrepriseContactAndLinkToRelationSchema = z.object({
+  relationId: z.uuid("ID de relation invalide"),
+  targetEntrepriseId: z.uuid("ID entreprise invalide"),
+  side: z.enum(["client", "prestataire"]),
+  role: z.string().optional(),
+  estPrincipal: z.boolean().default(false),
+  prenom: z.string().min(1, "Prénom obligatoire"),
+  nom: z.string().min(1, "Nom obligatoire"),
+  email: z.string().email("Email invalide").or(z.literal("")).optional(),
+  phone: phoneNumberSchemaEmpty("Numéro de téléphone invalide").optional(),
+  fonction: z.string().optional(),
+  notes: z.string().optional(),
+});
+export type InsertEntrepriseContactAndLinkToRelationType = z.infer<
+  typeof insertEntrepriseContactAndLinkToRelationSchema
+>;
 
 // ==================== PROSPECT SCHEMA ====================
 
