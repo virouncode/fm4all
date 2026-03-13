@@ -1,6 +1,5 @@
 "use server";
 
-import { env } from "@/lib/env";
 import { db } from "@/db";
 import { user as userTable } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
@@ -20,6 +19,7 @@ import {
 } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
+import { env } from "@/lib/env";
 import { auth } from "@/server/auth/auth";
 import { getSession } from "@/server/auth/get-session";
 import { sendEmailDirect } from "@/server/email/mailgunDirect";
@@ -30,8 +30,8 @@ import {
 import {
   countEntreprises,
   getAllEntreprises,
-  getEntreprisesClientes,
   getEntrepriseContactsByEntrepriseId,
+  getEntreprisesClientes,
   getEntreprisesPaginated,
   getEntreprisesPrestataires,
   getEntrepriseWithDetailsById,
@@ -56,10 +56,7 @@ import {
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
 import { fetchEntrepriseBySiret } from "@/server/utils/sirene.utils";
 import { insertUserArborescence } from "@/server/utils/usersArborescence.utils";
-import {
-  normalizeForSubmit,
-  upper,
-} from "@/zod-helpers/normalize";
+import { normalizeForSubmit, upper } from "@/zod-helpers/normalize";
 import {
   insertEntrepriseContactAndLinkToRelationSchema,
   insertEntrepriseContactSchema,
@@ -572,7 +569,8 @@ export const updateEntrepriseInfosAction = actionClient
     }
 
     const siretClean = siret.trim().replace(/\s/g, "");
-    const adresseLigne2Clean = adresseLigne2 && adresseLigne2 !== "" ? adresseLigne2 : null;
+    const adresseLigne2Clean =
+      adresseLigne2 && adresseLigne2 !== "" ? adresseLigne2 : null;
     const numeroTvaClean =
       numeroTva && numeroTva !== "" ? numeroTva.toUpperCase() : null;
 
@@ -1168,7 +1166,9 @@ export const getRelationContactsAction = actionClient
     if (!hasClient && !hasPrestataire)
       throw errors.forbidden("Accès non autorisé.");
 
-    const contacts = await getRelationContactsByRelationId(parsedInput.relationId);
+    const contacts = await getRelationContactsByRelationId(
+      parsedInput.relationId,
+    );
     return { contacts };
   });
 
@@ -1275,9 +1275,7 @@ export const deleteRelationContactAction = actionClient
  */
 export const getEntrepriseContactsForRelationAction = actionClient
   .metadata({ actionName: "getEntrepriseContactsForRelationAction" })
-  .inputSchema(
-    z.object({ relationId: z.uuid(), targetEntrepriseId: z.uuid() }),
-  )
+  .inputSchema(z.object({ relationId: z.uuid(), targetEntrepriseId: z.uuid() }))
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -1463,7 +1461,10 @@ async function canManagePrestataireInfosAsClient(
         clientPrestataireRelations.prestataireEntrepriseId,
         prestataireEntrepriseId,
       ),
-      eq(clientPrestataireRelations.clientEntrepriseId, clientAdhesion.entrepriseId),
+      eq(
+        clientPrestataireRelations.clientEntrepriseId,
+        clientAdhesion.entrepriseId,
+      ),
     ),
     columns: { id: true },
   });
@@ -1561,13 +1562,18 @@ export const updateEntrepriseSireneFieldsAction = actionClient
         parsedInput.entrepriseId,
       );
       if (!isClientProxy && !isPrestataireProxy)
-        throw errors.forbidden(
-          "Réservé à la posture plateforme ou proxy.",
-        );
+        throw errors.forbidden("Réservé à la posture plateforme ou proxy.");
     }
 
-    const { entrepriseId, nom, adresseLigne1, codePostal, ville, formeJuridique, numeroTva } =
-      parsedInput;
+    const {
+      entrepriseId,
+      nom,
+      adresseLigne1,
+      codePostal,
+      ville,
+      formeJuridique,
+      numeroTva,
+    } = parsedInput;
 
     const numeroTvaClean =
       numeroTva && numeroTva !== "" ? numeroTva.toUpperCase() : null;
@@ -1695,15 +1701,17 @@ export const inviterContactAction = actionClient
     const lien = `${env.APP_URL}/auth/inscription?token=${token}`;
     await sendEmailDirect({
       to: contact.email,
-      subject: "Invitation à rejoindre FM4ALL",
+      from: "noreply@mg.fm4all.com",
+      subject: "Invitation à rejoindre le logiciel FM4ALL",
       text: `
-        <h2>Vous avez été invité à rejoindre FM4ALL</h2>
+        <h2>Vous avez été invité à rejoindre le logiciel FM4ALL</h2>
         <p>Vous avez été invité à créer votre compte pour l'entreprise <strong>${entreprise.nom}</strong>.</p>
         <p>Cliquez sur le lien ci-dessous pour créer votre compte :</p>
         <p><a href="${lien}">Créer mon compte</a></p>
         <p><small>Ce lien est valable 7 jours.</small></p>
       `,
-      useTemplate: false,
+      nomDestinataire: `${contact.prenom ?? ""} ${contact.nom ?? ""}`.trim() || undefined,
+      useTemplate: true,
     });
 
     return { email: contact.email };

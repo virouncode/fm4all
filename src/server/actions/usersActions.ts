@@ -4,15 +4,23 @@ import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
 import { entrepriseContacts, entreprises } from "@/db/schema/entreprises";
-import { userClientAdhesions, userClientSiteAttributions, userPlateformeAdhesions, userPrestataireAdhesions, userPrestataireSiteAttributions } from "@/db/schema/users";
+import {
+  userClientAdhesions,
+  userClientSiteAttributions,
+  userPlateformeAdhesions,
+  userPrestataireAdhesions,
+  userPrestataireSiteAttributions,
+  usersArborescence,
+} from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
-import { env } from "@/lib/env";
 import { actionClient } from "@/lib/action/safe-actions";
+import { env } from "@/lib/env";
 import { getSession } from "@/server/auth/get-session";
 import {
   getUserById,
   getUsers,
   getUsersByEntrepriseId,
+  getUsersEligibleForAdhesion,
   userBelongsToEntreprise,
 } from "@/server/queries/users.query";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
@@ -22,7 +30,6 @@ import {
   isUserDescendant,
   userHasChildren,
 } from "@/server/utils/usersArborescence.utils";
-import { getUsersEligibleForAdhesion } from "@/server/queries/users.query";
 import {
   addAdhesionFormSchema,
   insertPlateformeUserFormSchema,
@@ -40,10 +47,14 @@ import { z } from "zod";
 
 import { auth } from "@/server/auth/auth";
 import { getDocumentById } from "@/server/queries/documents.query";
+import {
+  capitalizeWords,
+  lower,
+  normalizeForSubmit,
+} from "@/zod-helpers/normalize";
 import crypto from "crypto";
-import { deleteS3Object, promoteS3Key } from "../s3/s3";
-import { capitalizeWords, lower, normalizeForSubmit } from "@/zod-helpers/normalize";
 import { sendEmailDirect } from "../email/mailgunDirect";
+import { deleteS3Object, promoteS3Key } from "../s3/s3";
 
 // ==================== HELPERS PARTAGÉS ====================
 
@@ -141,7 +152,9 @@ export const getUsersAction = actionClient
     if (posture === "plateforme") {
       const platformRole = await getEffectivePlateformeRole(currentUser.id);
       if (!platformRole?.role) {
-        throw errors.forbidden("Accès réservé aux utilisateurs de la plateforme.");
+        throw errors.forbidden(
+          "Accès réservé aux utilisateurs de la plateforme.",
+        );
       }
     } else if (posture === "prestataire") {
       const row = await db.query.userPrestataireAdhesions.findFirst({
@@ -155,7 +168,9 @@ export const getUsersAction = actionClient
       if (!row) {
         const platformRole = await getEffectivePlateformeRole(currentUser.id);
         if (!platformRole?.role) {
-          throw errors.forbidden("Vous n'avez pas accès à cette entreprise en posture prestataire.");
+          throw errors.forbidden(
+            "Vous n'avez pas accès à cette entreprise en posture prestataire.",
+          );
         }
       }
     } else {
@@ -340,10 +355,7 @@ export const insertUserAction = actionClient
 
     // 3. Vérifier que le rôle attribué est autorisé
     // Manager ne peut créer que des collaborateurs
-    if (
-      currentUserRole === "manager" &&
-      roleAdhesion !== "collaborateur"
-    ) {
+    if (currentUserRole === "manager" && roleAdhesion !== "collaborateur") {
       throw errors.forbidden(
         "Vous ne pouvez créer que des utilisateurs avec le rôle collaborateur.",
       );
@@ -761,10 +773,11 @@ export const updateUserAction = actionClient
       collaborateur: 1,
     };
 
-    const currentLevel =
-      platformRole?.role // Tout rôle plateforme = niveau 4
-        ? 4
-        : currentUserRole ? roleHierarchy[currentUserRole] : 0;
+    const currentLevel = platformRole?.role // Tout rôle plateforme = niveau 4
+      ? 4
+      : currentUserRole
+        ? roleHierarchy[currentUserRole]
+        : 0;
     const targetLevel = roleHierarchy[targetUserRole];
 
     const isEditingSelf = currentUser.id === userId;
@@ -843,7 +856,9 @@ export const updateUserAction = actionClient
     // si c'est le seul admin actif de l'entreprise.
     // ⚠️ Impact FM4ALL : l'absence d'admin client actif active le proxy prestataire.
     const wouldLoseAdminStatus =
-      (isRoleChanging && targetUserRole === "admin" && roleAdhesion !== "admin") ||
+      (isRoleChanging &&
+        targetUserRole === "admin" &&
+        roleAdhesion !== "admin") ||
       (isStatutChanging && targetUserRole === "admin" && statut !== "actif");
 
     if (wouldLoseAdminStatus) {
@@ -856,6 +871,16 @@ export const updateUserAction = actionClient
     if (!oldUser) {
       throw errors.notFound("Utilisateur");
     }
+
+    // Normaliser prenom/nom ici (avant email + transaction) pour usage aux deux endroits
+    const prenomNormalized = parsedInput.prenom
+      ? capitalizeWords(parsedInput.prenom)
+      : undefined;
+    const nomNormalized = parsedInput.nom
+      ? capitalizeWords(parsedInput.nom)
+      : undefined;
+    const nomDestinataire =
+      `${prenomNormalized ?? oldUser.prenom} ${nomNormalized ?? oldUser.nom}`.trim();
 
     // ===== GESTION DU CHANGEMENT D'EMAIL =====
     let emailChanged = false;
@@ -904,7 +929,8 @@ export const updateUserAction = actionClient
                  <p>La nouvelle adresse de connexion est : <strong>${emailNormalized}</strong></p>
                  <p>Un email de vérification a été envoyé à cette nouvelle adresse pour activer la connexion.</p>
                  <p>Si vous n'êtes pas à l'origine de cette modification, contactez votre administrateur.</p>`,
-          useTemplate: false,
+          nomDestinataire,
+          useTemplate: true,
         }).catch(() => {
           // Non-bloquant : la mise à jour continue même si la notification échoue
         });
@@ -956,7 +982,9 @@ export const updateUserAction = actionClient
           }
 
           // 2b. Créer le nouveau document avatar
-          const promotedKey = await promoteS3Key({ tempKey: avatar.storageKey });
+          const promotedKey = await promoteS3Key({
+            tempKey: avatar.storageKey,
+          });
 
           const [doc] = await tx
             .insert(documents)
@@ -988,9 +1016,7 @@ export const updateUserAction = actionClient
         optionalStrings: ["phone"] as const,
       });
 
-      // Normalisation des champs texte (fait dans l'action car .transform() interdit sur optionnels)
-      const prenomNormalized = normalized.prenom ? capitalizeWords(normalized.prenom) : normalized.prenom;
-      const nomNormalized = normalized.nom ? capitalizeWords(normalized.nom) : normalized.nom;
+      // prenomNormalized/nomNormalized calculés en dehors de la transaction (réutilisés pour l'email)
       // emailNormalized est calculé en dehors de la transaction (utilisé aussi pour le changeEmail)
 
       let name: string | undefined = undefined;
@@ -1171,12 +1197,13 @@ export const permanentlyDeleteUserAction = actionClient
     }
 
     // 4. Garde-fou : dernier admin actif
-    const targetAdhesionForDelete = await db.query.userClientAdhesions.findFirst({
-      where: and(
-        eq(userClientAdhesions.userId, userId),
-        eq(userClientAdhesions.entrepriseId, entrepriseId),
-      ),
-    });
+    const targetAdhesionForDelete =
+      await db.query.userClientAdhesions.findFirst({
+        where: and(
+          eq(userClientAdhesions.userId, userId),
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+        ),
+      });
     if (targetAdhesionForDelete?.role === "admin") {
       await assertNotLastActiveAdmin({ entrepriseId, posture: "client" });
     }
@@ -1249,21 +1276,34 @@ export const getUsersEligibleForAdhesionAction = actionClient
           eq(userClientAdhesions.statut, "actif"),
         ),
       });
-      const isPrestataireAdmin = await db.query.userPrestataireAdhesions.findFirst({
-        where: and(
-          eq(userPrestataireAdhesions.userId, currentUser.id),
-          eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
-          eq(userPrestataireAdhesions.role, "admin"),
-          eq(userPrestataireAdhesions.statut, "actif"),
-        ),
-      });
+      const isPrestataireAdmin =
+        await db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+            eq(userPrestataireAdhesions.role, "admin"),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        });
       if (!isClientAdmin && !isPrestataireAdmin) {
         throw errors.forbidden("Accès administrateur requis.");
       }
     }
 
-    const users = await getUsersEligibleForAdhesion(parsedInput);
-    return { users };
+    const [users, totalResult] = await Promise.all([
+      getUsersEligibleForAdhesion(parsedInput),
+      db
+        .select({ total: count() })
+        .from(usersArborescence)
+        .where(
+          and(
+            eq(usersArborescence.ancetreId, usersArborescence.descendantId),
+            eq(usersArborescence.entrepriseId, parsedInput.entrepriseId),
+          ),
+        ),
+    ]);
+    const totalUsersInEntreprise = totalResult[0]?.total ?? 0;
+    return { users, totalUsersInEntreprise };
   });
 
 // ==================== ADD ADHESION TO EXISTING USER ====================
@@ -1295,14 +1335,15 @@ export const addAdhesionToExistingUserAction = actionClient
           eq(userClientAdhesions.statut, "actif"),
         ),
       });
-      const isPrestataireAdmin = await db.query.userPrestataireAdhesions.findFirst({
-        where: and(
-          eq(userPrestataireAdhesions.userId, currentUser.id),
-          eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
-          eq(userPrestataireAdhesions.role, "admin"),
-          eq(userPrestataireAdhesions.statut, "actif"),
-        ),
-      });
+      const isPrestataireAdmin =
+        await db.query.userPrestataireAdhesions.findFirst({
+          where: and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+            eq(userPrestataireAdhesions.role, "admin"),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        });
       if (!isClientAdmin && !isPrestataireAdmin) {
         throw errors.forbidden(
           "Seul un administrateur peut rattacher un utilisateur existant.",
@@ -1325,7 +1366,9 @@ export const addAdhesionToExistingUserAction = actionClient
         ),
       });
       if (existing) {
-        throw errors.conflict("Cet utilisateur a déjà une adhésion client pour cette entreprise.");
+        throw errors.conflict(
+          "Cet utilisateur a déjà une adhésion client pour cette entreprise.",
+        );
       }
 
       await db.insert(userClientAdhesions).values({
@@ -1344,7 +1387,9 @@ export const addAdhesionToExistingUserAction = actionClient
         ),
       });
       if (existing) {
-        throw errors.conflict("Cet utilisateur a déjà une adhésion prestataire pour cette entreprise.");
+        throw errors.conflict(
+          "Cet utilisateur a déjà une adhésion prestataire pour cette entreprise.",
+        );
       }
 
       await db.insert(userPrestataireAdhesions).values({
@@ -1361,7 +1406,9 @@ export const addAdhesionToExistingUserAction = actionClient
         where: eq(userPlateformeAdhesions.userId, targetUserId),
       });
       if (existing) {
-        throw errors.conflict("Cet utilisateur a déjà une adhésion plateforme.");
+        throw errors.conflict(
+          "Cet utilisateur a déjà une adhésion plateforme.",
+        );
       }
 
       await db.insert(userPlateformeAdhesions).values({
@@ -1432,7 +1479,8 @@ export const getActiveAdminEmailAction = actionClient
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
-    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    if (!session?.user)
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     const { entrepriseId, posture } = parsedInput;
 
