@@ -22,6 +22,14 @@ import {
   SelectUserSiteAttributionWithInheritanceType,
 } from "@/zod-schemas/userSiteAttribution.schema";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
+import { getActiveAdminEmailAction } from "@/server/actions/usersActions";
+import {
   Calendar,
   Mail,
   MapPin,
@@ -58,6 +66,12 @@ export function UserDetails({
   );
   const postureActive = useAppStore((state) => state.postureActive);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  // Dialog "Devenir admin / manager"
+  const [promotionDialogOpen, setPromotionDialogOpen] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string | null | undefined>(
+    undefined,
+  ); // undefined = pas encore chargé, null = pas d'admin
   const [refreshKey, setRefreshKey] = useState(0);
   const [isSendingEmail, startSendingEmail] = useTransition();
 
@@ -129,6 +143,19 @@ export function UserDetails({
     currentUserRole === "admin" ||
     (currentUserRole === "manager" &&
       (isViewingSelf || user.adhesion?.role === "collaborateur"));
+
+  // Ouvre la dialog de promotion et charge l'email de l'admin actif
+  const handleOpenPromotionDialog = async () => {
+    setAdminEmail(undefined);
+    setPromotionDialogOpen(true);
+    if (!entreprise?.id || !postureActive || postureActive === "plateforme")
+      return;
+    const result = await getActiveAdminEmailAction({
+      entrepriseId: entreprise.id,
+      posture: postureActive as "client" | "prestataire",
+    });
+    setAdminEmail(result?.data?.adminEmail ?? null);
+  };
 
   // Force refresh quand l'utilisateur change
   useEffect(() => {
@@ -322,11 +349,39 @@ export function UserDetails({
                 </span>
               </div>
             )}
+
+            {/* Boutons de promotion — visibles uniquement sur son propre profil, posture client ou prestataire */}
+            {isViewingSelf && postureActive !== "plateforme" && (
+              <div className="mt-2 flex items-center gap-1.5">
+                {user.adhesion?.role !== "admin" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 gap-1 px-2 text-xs"
+                    onClick={handleOpenPromotionDialog}
+                  >
+                    <Shield className="h-3 w-3" />
+                    Devenir admin
+                  </Button>
+                )}
+                {user.adhesion?.role === "collaborateur" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 gap-1 px-2 text-xs"
+                    onClick={handleOpenPromotionDialog}
+                  >
+                    <Shield className="h-3 w-3" />
+                    Devenir manager
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {postureActive === "plateforme" && (
+          {postureActive === "plateforme" && !user.emailVerified && (
             <Button
               variant="outline"
               size="sm"
@@ -341,9 +396,7 @@ export function UserDetails({
                       result.serverError.message ?? "Une erreur est survenue.",
                     );
                   } else {
-                    toast.success(
-                      `Email d'activation envoyé à ${user.email}.`,
-                    );
+                    toast.success(`Email d'activation envoyé à ${user.email}.`);
                   }
                 })
               }
@@ -477,6 +530,50 @@ export function UserDetails({
           )}
         </>
       )}
+
+      {/* Dialog promotion de rôle */}
+      <Dialog open={promotionDialogOpen} onOpenChange={setPromotionDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Shield className="text-primary h-4 w-4" />
+                Changer de rôle
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="text-sm">
+            {adminEmail === undefined ? (
+              <div className="flex items-center gap-2 py-2">
+                <Spinner className="h-4 w-4" />
+                <span className="text-muted-foreground">Chargement...</span>
+              </div>
+            ) : adminEmail ? (
+              <p>
+                Veuillez vous adresser à votre{" "}
+                <a
+                  href={`mailto:${adminEmail}`}
+                  className="text-primary underline underline-offset-2"
+                >
+                  administrateur
+                </a>{" "}
+                pour changer de rôle.
+              </p>
+            ) : (
+              <p>
+                Veuillez vous adresser à{" "}
+                <a
+                  href="mailto:contact@fm4all.com"
+                  className="text-primary underline underline-offset-2"
+                >
+                  FM4ALL
+                </a>
+                .
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

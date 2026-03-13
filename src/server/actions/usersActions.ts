@@ -1392,3 +1392,53 @@ export const resendVerificationEmailAction = actionClient
 
     return { success: true };
   });
+
+/**
+ * Retourne l'email du premier admin actif d'une entreprise (selon posture).
+ * Utilisé pour le dialog "Devenir admin / manager".
+ * Accessible à tout utilisateur authentifié ayant accès à l'entreprise.
+ */
+export const getActiveAdminEmailAction = actionClient
+  .metadata({ actionName: "getActiveAdminEmailAction" })
+  .inputSchema(
+    z.object({
+      entrepriseId: z.string().uuid(),
+      posture: z.enum(["client", "prestataire"]),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { entrepriseId, posture } = parsedInput;
+
+    if (posture === "prestataire") {
+      const row = await db
+        .select({ email: user.email })
+        .from(userPrestataireAdhesions)
+        .innerJoin(user, eq(user.id, userPrestataireAdhesions.userId))
+        .where(
+          and(
+            eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+            eq(userPrestataireAdhesions.role, "admin"),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        )
+        .limit(1);
+      return { adminEmail: row[0]?.email ?? null };
+    }
+
+    const row = await db
+      .select({ email: user.email })
+      .from(userClientAdhesions)
+      .innerJoin(user, eq(user.id, userClientAdhesions.userId))
+      .where(
+        and(
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+          eq(userClientAdhesions.role, "admin"),
+          eq(userClientAdhesions.statut, "actif"),
+        ),
+      )
+      .limit(1);
+    return { adminEmail: row[0]?.email ?? null };
+  });

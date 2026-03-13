@@ -1492,4 +1492,60 @@ Deux onglets :
 
 ---
 
+---
+
+## Module Utilisateurs — Règles de rôle et d'auto-promotion (`/app/utilisateurs`)
+
+### 1. Rôle par défaut à la création
+
+**Règle** : Tout utilisateur créé ou onboardé reçoit **toujours** le rôle `"collaborateur"` par défaut.
+
+- Le composant `CreateUserFormInner` initialise `roleAdhesion: "collaborateur"` dans `defaultValues` et dans `form.reset()`.
+- Le sélecteur de rôle est visible et modifiable par l'admin/manager qui crée l'utilisateur, mais sa valeur par défaut est `"collaborateur"` — jamais `"admin"`.
+- Côté serveur, `insertUserAction` et `addAdhesionToExistingUserAction` n'imposent pas de contrainte sur le rôle soumis (la contrainte est gérée côté formulaire via les options disponibles selon le rôle du créateur).
+
+### 2. Boutons "Devenir admin" / "Devenir manager"
+
+Visibles **uniquement** dans le panneau de détail de l'utilisateur courant (`isViewingSelf = true`) en posture **client** ou **prestataire** (jamais en posture plateforme).
+
+| Bouton | Condition d'affichage |
+|--------|----------------------|
+| "Devenir admin" | `user.adhesion?.role !== "admin"` |
+| "Devenir manager" | `user.adhesion?.role === "collaborateur"` |
+
+Ces boutons ouvrent une Dialog d'information — ils ne déclenchent aucune mutation directe.
+
+### 3. Dialog de demande de promotion
+
+La dialog affiche un message contextuel selon la présence d'un admin actif dans l'entreprise :
+
+| Cas | Message |
+|-----|---------|
+| Admin actif trouvé | "Veuillez vous adresser à votre [administrateur](mailto:admin@...) pour changer de rôle." |
+| Aucun admin actif | "Veuillez vous adresser à [FM4ALL](mailto:contact@fm4all.com)." |
+
+L'action serveur `getActiveAdminEmailAction` (`usersActions.ts`) :
+- Paramètres : `entrepriseId: uuid`, `posture: "client" | "prestataire"`
+- Requête : `userClientAdhesions` (posture client) ou `userPrestataireAdhesions` (posture prestataire), filtre `role = "admin"` ET `statut = "actif"`, jointure `user` pour récupérer l'email
+- Retour : `{ adminEmail: string | null }`
+
+### 4. Fix création d'utilisateur en posture plateforme
+
+**Règle** : Quand un super admin plateforme crée un utilisateur depuis la vue "Type Client" ou "Type Prestataire" (sélecteur `viewType` dans `UsersClient`), le formulaire doit :
+
+1. Afficher les rôles `admin | manager | collaborateur` (pas les rôles plateforme)
+2. Créer l'utilisateur dans l'entreprise sélectionnée (`viewEntrepriseId`), **pas** dans l'entreprise FM4ALL
+
+**Implémentation** :
+- `UsersClient` passe `targetPosture` et `targetEntrepriseId` à `UserFormDialog`
+- `UserFormDialog` route vers `CreateOrLinkUserForm` avec `entrepriseId=targetEntrepriseId` et `posture=targetPosture` (et non `"plateforme"`)
+
+### 5. Bouton "Renvoyer l'email d'activation"
+
+**Règle** : Ce bouton (posture plateforme uniquement) est masqué si `user.emailVerified === true`.
+
+Raison : si l'email est déjà vérifié, l'utilisateur a déjà un compte actif. Renvoyer un email d'activation enverrait en réalité un email de "réinitialisation de mot de passe", ce qui est confus et non souhaité.
+
+---
+
 *Dernière mise à jour : 2026-03-13*

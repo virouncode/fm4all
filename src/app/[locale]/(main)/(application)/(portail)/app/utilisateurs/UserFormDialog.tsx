@@ -58,6 +58,10 @@ type UserFormDialogProps = {
   parentId?: string | null;
   defaultValues?: Partial<InsertUserFormType | UpdateUserFormType>;
   onSuccess?: () => void;
+  /** Posture cible — utilisé par la plateforme pour créer des users client/prestataire */
+  targetPosture?: "client" | "prestataire" | "plateforme";
+  /** ID de l'entreprise cible — utilisé par la plateforme au lieu de l'entreprise du store */
+  targetEntrepriseId?: string;
 };
 
 export function UserFormDialog({
@@ -67,6 +71,8 @@ export function UserFormDialog({
   parentId,
   defaultValues,
   onSuccess,
+  targetPosture,
+  targetEntrepriseId,
 }: UserFormDialogProps) {
   const entreprise = useAppStore((state) => state.entreprise);
   const postureActive = useAppStore((state) => state.postureActive);
@@ -89,7 +95,26 @@ export function UserFormDialog({
     );
   }
 
-  // Posture plateforme → formulaire de création utilisateur plateforme
+  // Posture plateforme avec type client/prestataire sélectionné
+  // → utiliser l'entreprise cible et la posture cible (pas "plateforme")
+  if (
+    postureActive === "plateforme" &&
+    (targetPosture === "client" || targetPosture === "prestataire") &&
+    targetEntrepriseId
+  ) {
+    return (
+      <CreateOrLinkUserForm
+        open={open}
+        onOpenChange={onOpenChange}
+        parentId={parentId}
+        entrepriseId={targetEntrepriseId}
+        posture={targetPosture}
+        onSuccess={onSuccess}
+      />
+    );
+  }
+
+  // Posture plateforme vue "plateforme" → formulaire utilisateur plateforme
   if (postureActive === "plateforme") {
     return (
       <CreateOrLinkUserForm

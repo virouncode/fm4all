@@ -375,6 +375,16 @@ export function UsersClient() {
         onOpenChange={setFormDialogOpen}
         userId={formMode === "edit" ? selectedUserId : null}
         parentId={parentIdForCreate}
+        targetPosture={
+          postureActive === "plateforme"
+            ? (viewType as "client" | "prestataire" | "plateforme")
+            : undefined
+        }
+        targetEntrepriseId={
+          postureActive === "plateforme" && viewType !== "plateforme"
+            ? viewEntrepriseId
+            : undefined
+        }
         defaultValues={
           formMode === "edit" && selectedUser
             ? {
