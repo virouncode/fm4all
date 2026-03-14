@@ -6,10 +6,8 @@ import { type PrestationListItem } from "@/zod-schemas/clientServices.schema";
 import { type ColumnDef } from "@tanstack/react-table";
 import {
   formatDate,
-  formatDuree,
-  getFrequenceLabel,
+  getFamillePlanificationBadge,
   getModeCommercialBadge,
-  getModePlanningBadge,
   getPrestationStatutBadge,
 } from "./helpers";
 
@@ -17,12 +15,12 @@ export const prestationsIdLabelMap = new Map<string, string>([
   ["serviceNom", "Service"],
   ["entrepriseNom", "Client"],
   ["siteNom", "Site"],
-  ["frequence", "Fréquence"],
-  ["modePlanning", "Mode"],
+  ["famillePlanification", "Mode de planification"],
   ["modeCommercial", "Mode commercial"],
   ["statut", "Statut"],
   ["dateDebut", "Date début"],
-  ["dureeEstimeeMinutes", "Durée"],
+  ["createdAt", "Créé le"],
+  ["updatedAt", "Modifié le"],
 ]);
 
 export function createPrestationsColumns(
@@ -67,29 +65,18 @@ export function createPrestationsColumns(
       size: 160,
     },
     {
-      accessorKey: "frequence",
-      header: "Fréquence",
-      cell: ({ row }) => {
-        const label = getFrequenceLabel(
-          row.original.frequence,
-          row.original.frequenceParPeriode,
-          row.original.intervalleJours,
-        );
-        return <span className="text-sm">{label}</span>;
-      },
-      size: 160,
-    },
-    {
-      accessorKey: "modePlanning",
-      header: "Mode",
+      accessorKey: "famillePlanification",
+      header: ({ column }) => (
+        <SortableHeader column={column} label="Mode de planification" sortKey="famillePlanification" />
+      ),
       cell: ({ getValue }) => {
-        const mode = getValue() as PrestationListItem["modePlanning"];
-        const badge = getModePlanningBadge(mode);
+        const famille = getValue() as PrestationListItem["famillePlanification"];
+        const badge = getFamillePlanificationBadge(famille);
         return (
           <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
         );
       },
-      size: 120,
+      size: 160,
     },
     {
       accessorKey: "modeCommercial",
@@ -133,17 +120,34 @@ export function createPrestationsColumns(
       size: 110,
     },
     {
-      accessorKey: "dureeEstimeeMinutes",
-      header: "Durée",
+      accessorKey: "createdAt",
+      header: ({ column }) => (
+        <SortableHeader column={column} label="Créé le" sortKey="createdAt" />
+      ),
       cell: ({ getValue }) => {
-        const minutes = getValue() as number | null;
+        const date = getValue() as Date;
         return (
           <span className="text-sm text-muted-foreground">
-            {formatDuree(minutes)}
+            {formatDate(date)}
           </span>
         );
       },
-      size: 80,
+      size: 110,
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <SortableHeader column={column} label="Modifié le" sortKey="updatedAt" />
+      ),
+      cell: ({ getValue }) => {
+        const date = getValue() as Date;
+        return (
+          <span className="text-sm text-muted-foreground">
+            {formatDate(date)}
+          </span>
+        );
+      },
+      size: 110,
     },
   );
 

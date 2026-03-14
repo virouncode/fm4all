@@ -25,6 +25,7 @@ const filtersSchema = z.object({
   serviceId: z.string().optional(),
   siteId: z.string().optional(),
   modeCommercial: z.string().optional(),
+  famillePlanification: z.string().optional(),
 });
 
 type PrestationsFiltersType = z.infer<typeof filtersSchema>;
@@ -35,6 +36,7 @@ type AppliedFiltersType = {
   serviceId?: string;
   siteId?: string;
   modeCommercial?: string;
+  famillePlanification?: string;
 };
 
 type PrestationsFiltersDialogProps = {
@@ -73,6 +75,7 @@ export function PrestationsFiltersDialog({
       serviceId: currentFilters.serviceId || "all",
       siteId: currentFilters.siteId || "all",
       modeCommercial: currentFilters.modeCommercial ?? "all",
+      famillePlanification: currentFilters.famillePlanification ?? "all",
     },
   });
 
@@ -171,6 +174,8 @@ export function PrestationsFiltersDialog({
       siteId: filters.siteId === "all" ? undefined : filters.siteId,
       modeCommercial:
         filters.modeCommercial === "all" ? undefined : filters.modeCommercial,
+      famillePlanification:
+        filters.famillePlanification === "all" ? undefined : filters.famillePlanification,
     };
     onApply(cleaned);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -179,6 +184,7 @@ export function PrestationsFiltersDialog({
     filters.serviceId,
     filters.siteId,
     filters.modeCommercial,
+    filters.famillePlanification,
   ]);
 
   const activeFiltersCount = useMemo(() => {
@@ -187,6 +193,7 @@ export function PrestationsFiltersDialog({
     if (filters.serviceId && filters.serviceId !== "all") count++;
     if (filters.siteId && filters.siteId !== "all") count++;
     if (filters.modeCommercial && filters.modeCommercial !== "all") count++;
+    if (filters.famillePlanification && filters.famillePlanification !== "all") count++;
     return count;
   }, [filters]);
 
@@ -196,6 +203,7 @@ export function PrestationsFiltersDialog({
       serviceId: "all",
       siteId: "all",
       modeCommercial: "all",
+      famillePlanification: "all",
     });
   };
 
@@ -257,6 +265,19 @@ export function PrestationsFiltersDialog({
                 </SelectItem>
               </RhfControlledSelect>
 
+              {/* Mode de planification */}
+              <RhfControlledSelect<PrestationsFiltersType>
+                name="famillePlanification"
+                label="Mode de planification"
+                selectClassName="w-full"
+                withError={false}
+              >
+                <SelectItem value="all">Tous les modes</SelectItem>
+                <SelectItem value="recurrence_auto">Récurrence auto</SelectItem>
+                <SelectItem value="quota_manuel">Quota manuel</SelectItem>
+                <SelectItem value="ponctuel">Ponctuel</SelectItem>
+              </RhfControlledSelect>
+
               {/* Site — disabled si plateforme sans client sélectionné */}
               <RhfControlledSelect<PrestationsFiltersType>
                 name="siteId"
@@ -283,7 +304,6 @@ export function PrestationsFiltersDialog({
           <div className="flex justify-end">
             <Button
               type="button"
-              variant="outline"
               onClick={handleReset}
               disabled={activeFiltersCount === 0}
             >

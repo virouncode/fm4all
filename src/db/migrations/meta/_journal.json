@@ -323,6 +323,13 @@
       "when": 1773700000000,
       "tag": "0045_rename_entreprise_invitations_to_contacts_invitations",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1773451276493,
+      "tag": "0046_thick_firedrake",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,6 @@
 import {
-  type ClientServiceModePlanningType,
   type ClientServiceStatutType,
-  type FrequenceType,
+  type FamillePlanificationType,
   type ModeCommercialType,
 } from "@/zod-schemas/clientServices.schema";
 import { format } from "date-fns";
@@ -47,74 +46,49 @@ export function getPrestationStatutBadge(statut: ClientServiceStatutType): {
   }
 }
 
-// ==================== FREQUENCE ====================
+// ==================== FAMILLE PLANIFICATION ====================
 
-export function getFrequenceLabel(
-  frequence: FrequenceType,
-  frequenceParPeriode?: number | null,
-  intervalleJours?: number | null,
+export function getFamillePlanificationLabel(
+  famille: FamillePlanificationType,
 ): string {
-  switch (frequence) {
-    case "one_shot":
+  switch (famille) {
+    case "recurrence_auto":
+      return "Récurrence automatique";
+    case "quota_manuel":
+      return "Quota à planifier";
+    case "ponctuel":
       return "Ponctuel";
-    case "tous_les_x_jours":
-      return intervalleJours
-        ? `Tous les ${intervalleJours} jours`
-        : "Intervalle personnalisé";
-    case "hebdomadaire":
-      return frequenceParPeriode && frequenceParPeriode > 1
-        ? `${frequenceParPeriode}× / semaine`
-        : "Hebdomadaire";
-    case "mensuelle":
-      return frequenceParPeriode && frequenceParPeriode > 1
-        ? `${frequenceParPeriode}× / mois`
-        : "Mensuelle";
-    case "trimestrielle":
-      return "Trimestrielle";
-    case "semestrielle":
-      return "Semestrielle";
-    case "annuelle":
-      return "Annuelle";
     default:
-      return frequence;
+      return famille;
   }
 }
 
-// ==================== MODE PLANNING ====================
-
-export function getModePlanningLabel(
-  mode: ClientServiceModePlanningType,
-): string {
-  switch (mode) {
-    case "planifie":
-      return "Planifié";
-    case "a_la_demande":
-      return "À la demande";
-    default:
-      return mode;
-  }
-}
-
-export function getModePlanningBadge(mode: ClientServiceModePlanningType): {
+export function getFamillePlanificationBadge(famille: FamillePlanificationType): {
   label: string;
   className: string;
 } {
-  switch (mode) {
-    case "planifie":
+  switch (famille) {
+    case "recurrence_auto":
       return {
-        label: "Mode : Planifié",
+        label: "Récurrence auto",
         className:
           "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
       };
-    case "a_la_demande":
+    case "quota_manuel":
       return {
-        label: "Mode : À la demande",
+        label: "Quota manuel",
         className:
           "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
       };
+    case "ponctuel":
+      return {
+        label: "Ponctuel",
+        className:
+          "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+      };
     default:
       return {
-        label: mode,
+        label: famille,
         className:
           "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
       };

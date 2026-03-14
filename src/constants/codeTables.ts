@@ -709,6 +709,101 @@ export const executionPeriodeFacturationCodes =
     ...(typeof executionPeriodeFacturationCT)[number]["code"][],
   ];
 
+// ---------------------------------------------------------------------------
+// PLANIFICATION DES PRESTATIONS — NOUVELLE ARCHITECTURE (2026-03-14)
+// ---------------------------------------------------------------------------
+
+/**
+ * Famille de planification d'une prestation.
+ * Dérivée automatiquement de la fréquence — jamais choisie directement par l'utilisateur.
+ *   recurrence_auto  → fréquences hautes (hebdo, mensuel) → RRULE + cron J+7
+ *   quota_manuel     → fréquences basses (trimestre, semestre, annuel) → quota à placer manuellement
+ *   ponctuel         → one_shot
+ */
+export const famillePlanificationCT = [
+  { code: "recurrence_auto", name: "Récurrence automatique" },
+  { code: "quota_manuel", name: "Quota à planifier" },
+  { code: "ponctuel", name: "Ponctuel" },
+] as const;
+
+export const famillePlanificationCodes = famillePlanificationCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof famillePlanificationCT)[number]["code"],
+  ...(typeof famillePlanificationCT)[number]["code"][],
+];
+
+/**
+ * Origine d'une occurrence matérialisée.
+ *   regle_recurrence → générée depuis une règle RRULE (clientServiceReglesRecurrence)
+ *   quota_manuel     → créée manuellement dans le cadre d'un quota
+ *   ponctuel         → one-shot explicite
+ */
+export const typeSourceOccurrenceCT = [
+  { code: "regle_recurrence", name: "Règle de récurrence" },
+  { code: "quota_manuel", name: "Quota manuel" },
+  { code: "ponctuel", name: "Ponctuel" },
+] as const;
+
+export const typeSourceOccurrenceCodes = typeSourceOccurrenceCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof typeSourceOccurrenceCT)[number]["code"],
+  ...(typeof typeSourceOccurrenceCT)[number]["code"][],
+];
+
+/**
+ * Période de référence pour les quotas à planifier manuellement.
+ */
+export const periodeQuotaCT = [
+  { code: "trimestre", name: "Trimestre" },
+  { code: "semestre", name: "Semestre" },
+  { code: "annee", name: "Année" },
+] as const;
+
+export const periodeQuotaCodes = periodeQuotaCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof periodeQuotaCT)[number]["code"],
+  ...(typeof periodeQuotaCT)[number]["code"][],
+];
+
+/**
+ * Mode d'ancrage de la période pour le calcul du quota.
+ *   contrat → la période démarre à clientServices.dateDebut (défaut recommandé)
+ *   civil   → la période suit le calendrier civil (1er jan, 1er jul, etc.)
+ */
+export const modeAncragePeriodeCT = [
+  { code: "contrat", name: "Date de contrat" },
+  { code: "civil", name: "Calendrier civil" },
+] as const;
+
+export const modeAncragePeriodeCodes = modeAncragePeriodeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof modeAncragePeriodeCT)[number]["code"],
+  ...(typeof modeAncragePeriodeCT)[number]["code"][],
+];
+
+/**
+ * Type d'exception sur une série récurrente.
+ *   supprimee → occurrence sautée (pas générée)
+ *   deplacee  → occurrence déplacée (EXDATE sur l'originale + occurrence one-shot en DB)
+ *   modifiee  → occurrence existe mais certains attributs diffèrent de la série
+ */
+export const typeExceptionRecurrenceCT = [
+  { code: "supprimee", name: "Occurrence supprimée" },
+  { code: "deplacee", name: "Occurrence déplacée" },
+  { code: "modifiee", name: "Occurrence modifiée" },
+] as const;
+
+export const typeExceptionRecurrenceCodes = typeExceptionRecurrenceCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof typeExceptionRecurrenceCT)[number]["code"],
+  ...(typeof typeExceptionRecurrenceCT)[number]["code"][],
+];
+
 export const toCodeTableName = (
   code: string,
   table: readonly { code: string; name: string }[],

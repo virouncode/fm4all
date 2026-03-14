@@ -146,6 +146,40 @@
     --fm4all-essential: hsl(171 27% 51%);
     --fm4all-comfort: hsl(200 75% 25%);
     --fm4all-excellence: hsl(238 38% 16%);
+
+    /* fullcalendar */
+    --fc-small-font-size: 0.85em;
+    --fc-page-bg-color: var(--background);
+    --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
+    --fc-neutral-text-color: #808080;
+
+    --fc-border-color: var(--border);
+    --fc-button-text-color: var(--foreground);
+    --fc-button-bg-color: var(--background);
+    --fc-button-border-color: var(--border);
+    --fc-button-hover-bg-color: var(--accent);
+    --fc-button-hover-border-color: var(--border);
+    --fc-button-active-bg-color: var(--ring);
+    --fc-button-active-border-color: var(--ring);
+
+    --fc-event-bg-color: var(--primary);
+    --fc-event-border-color: var(--primary);
+    --fc-event-text-color: var(--primary-foreground);
+    --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
+
+    --fc-more-link-bg-color: #d0d0d0;
+    --fc-more-link-text-color: inherit;
+
+    --fc-event-resizer-thickness: 8px;
+    --fc-event-resizer-dot-total-width: 8px;
+    --fc-event-resizer-dot-border-width: 1px;
+
+    --fc-non-business-color: rgba(215, 215, 215, 0.3);
+    --fc-bg-event-color: rgb(143, 223, 130);
+    --fc-bg-event-opacity: 0.3;
+    --fc-highlight-color: rgba(188, 232, 241, 0.3);
+    --fc-today-bg-color: var(--background);
+    --fc-now-indicator-color: red;
   }
 
   .dark {
@@ -184,6 +218,40 @@
     --fm4all-essential: hsl(171 27% 51%);
     --fm4all-comfort: hsl(200 75% 25%);
     --fm4all-excellence: hsl(238 38% 16%);
+
+    /* fullcalendar */
+    --fc-small-font-size: 0.85em;
+    --fc-page-bg-color: var(--background);
+    --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
+    --fc-neutral-text-color: #808080;
+
+    --fc-border-color: var(--border);
+    --fc-button-text-color: var(--foreground);
+    --fc-button-bg-color: var(--background);
+    --fc-button-border-color: var(--border);
+    --fc-button-hover-bg-color: var(--accent);
+    --fc-button-hover-border-color: var(--border);
+    --fc-button-active-bg-color: var(--ring);
+    --fc-button-active-border-color: var(--ring);
+
+    --fc-event-bg-color: var(--primary);
+    --fc-event-border-color: var(--primary);
+    --fc-event-text-color: var(--primary-foreground);
+    --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
+
+    --fc-more-link-bg-color: #d0d0d0;
+    --fc-more-link-text-color: inherit;
+
+    --fc-event-resizer-thickness: 8px;
+    --fc-event-resizer-dot-total-width: 8px;
+    --fc-event-resizer-dot-border-width: 1px;
+
+    --fc-non-business-color: rgba(215, 215, 215, 0.3);
+    --fc-bg-event-color: rgb(143, 223, 130);
+    --fc-bg-event-opacity: 0.3;
+    --fc-highlight-color: rgba(188, 232, 241, 0.3);
+    --fc-today-bg-color: var(--background);
+    --fc-now-indicator-color: red;
   }
 
   body > div:last-child > span + img {
@@ -228,4 +296,139 @@
 }
 @utility list-smile {
   @apply relative list-none items-start pl-6 before:absolute before:left-0 before:content-['😊'];
+}
+
+/* ========================================
+   FULLCALENDAR STYLES
+   ======================================== */
+
+/* Container principal */
+.fc {
+  font-family: inherit;
+  font-size: 0.875rem;
+  height: 100%;
+}
+.fc .fc-button {
+  outline: none;
+  box-shadow: none;
+}
+
+.fc .fc-button:focus,
+.fc .fc-button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.fc .fc-today-button {
+  padding: 0.2rem 1rem;
+}
+.fc .fc-today-button:disabled {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  opacity: 1;
+}
+/* Prev/Next : jamais de style "active" FullCalendar */
+.fc .fc-prev-button.fc-button-active,
+.fc .fc-next-button.fc-button-active,
+.fc .fc-prev-button:active,
+.fc .fc-next-button:active {
+  background-color: transparent !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+}
+.fc .fc-calendarsView-button,
+.fc .fc-roomsView-button,
+.fc .fc-resourceTimeGridDay-button,
+.fc .fc-timeGridWeek-button,
+.fc .fc-dayGridMonth-button {
+  border-radius: 6px;
+  padding: 6px 12px;
+  width: 100px;
+}
+
+.fc .fc-header-toolbar.fc-toolbar {
+  padding: 0.875rem;
+  margin: 0;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.fc .fc-button.is-active,
+.fc .fc-button.fc-button-active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* taille de la poice des slots horaires */
+.fc .fc-scrollgrid-shrink-cushion {
+  font-size: var(--text-xs);
+}
+/* taille de la police des en-têtes de colonnes */
+.fc .fc-col-header-cell-cushion {
+  font-size: var(--text-xs);
+}
+/* tzille de la police de la date dans le header */
+.fc .fc-toolbar-title {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--foreground);
+}
+.fc .fc-license-message {
+  visibility: hidden !important;
+}
+/* Hauteur globale des headers (ligne du haut) */
+.fc .fc-col-header-cell {
+  vertical-align: middle;
+  padding: 10px 0;
+}
+
+.fc .fc-header-toolbar {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  height: 250px;
+}
+
+.fc .fc-toolbar-chunk {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (min-width: 1200px) {
+  .fc .fc-header-toolbar {
+    flex-direction: row;
+    justify-content: space-between;
+    height: auto;
+    gap: 0;
+  }
+}
+@media (min-width: 640px) {
+  .fc .fc-toolbar-chunk {
+    flex-direction: row;
+    gap: none;
+  }
+  .fc .fc-header-toolbar {
+    height: 170px;
+  }
+}
+
+@media (min-width: 800px) {
+  .fc .fc-header-toolbar {
+    flex-direction: row;
+    align-items: flex-start;
+    height: 115px;
+  }
+}
+@media (min-width: 1024px) {
+  .fc .fc-header-toolbar {
+    align-items: center;
+    justify-content: space-between;
+    height: auto;
+  }
 }

@@ -2,7 +2,6 @@ import {
   adhesionStatutCodes,
   attributionModeCodes,
   clientServiceModeCodes,
-  clientServiceModePlanningCodes,
   clientServiceStatutCodes,
   contratDealModeCodes,
   modeCommercialCodes,
@@ -22,7 +21,6 @@ import {
   factureLigneTypeSourceCodes,
   factureModeCommercialSnapshotCodes,
   factureStatutCodes,
-  frequenceCodes,
   invitationTypeAdhesionCodes,
   occurrenceStatutCodes,
   occurrenceTacheStatutCodes,
@@ -43,6 +41,12 @@ import {
   typeBatimentCodes,
   typeOccupationCodes,
   userRoleCodes,
+  // Nouvelle architecture planification prestations (2026-03-14)
+  famillePlanificationCodes,
+  typeSourceOccurrenceCodes,
+  periodeQuotaCodes,
+  modeAncragePeriodeCodes,
+  typeExceptionRecurrenceCodes,
 } from "@/constants/codeTables";
 import { pgEnum } from "drizzle-orm/pg-core";
 
@@ -113,10 +117,6 @@ export const clientServiceStatutEnum = pgEnum(
   "client_service_statut",
   clientServiceStatutCodes,
 );
-export const clientServiceModePlanningEnum = pgEnum(
-  "client_service_mode_planning",
-  clientServiceModePlanningCodes,
-);
 export const perimetreModeEnum = pgEnum("perimetre_mode", perimetreModeCodes);
 export const occurrenceStatutEnum = pgEnum(
   "occurrence_statut",
@@ -180,8 +180,6 @@ export const adhesionStatutEnum = pgEnum(
   adhesionStatutCodes,
 );
 
-export const frequenceEnum = pgEnum("frequence", frequenceCodes);
-
 export const invitationTypeAdhesionEnum = pgEnum(
   "invitation_type_adhesion",
   invitationTypeAdhesionCodes,
@@ -238,4 +236,33 @@ export const modePilotageEnum = pgEnum("mode_pilotage", modePilotageCodes);
 export const clientPrestataireContactSideEnum = pgEnum(
   "client_prestataire_contact_side",
   ["client", "prestataire"],
+);
+
+// ---------------------------------------------------------------------------
+// Nouvelle architecture planification prestations (2026-03-14)
+// ---------------------------------------------------------------------------
+
+export const famillePlanificationEnum = pgEnum(
+  "famille_planification",
+  famillePlanificationCodes,
+);
+
+export const typeSourceOccurrenceEnum = pgEnum(
+  "type_source_occurrence",
+  typeSourceOccurrenceCodes,
+);
+
+export const periodeQuotaEnum = pgEnum(
+  "periode_quota",
+  periodeQuotaCodes,
+);
+
+export const modeAncragePeriodeEnum = pgEnum(
+  "mode_ancrage_periode",
+  modeAncragePeriodeCodes,
+);
+
+export const typeExceptionRecurrenceEnum = pgEnum(
+  "type_exception_recurrence",
+  typeExceptionRecurrenceCodes,
 );

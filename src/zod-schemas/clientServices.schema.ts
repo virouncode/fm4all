@@ -1,8 +1,7 @@
 import { clientServices } from "@/db/schema/services";
 import {
-  clientServiceModePlanningEnum,
   clientServiceStatutEnum,
-  frequenceEnum,
+  famillePlanificationEnum,
   modeCommercialEnum,
 } from "@/db/schema/enums";
 import {
@@ -75,20 +74,17 @@ export type UpdateClientServiceToDbType = z.infer<
 
 // ==================== ENUM SCHEMAS ====================
 
-export const frequenceSchema = z.enum(frequenceEnum.enumValues);
-export type FrequenceType = z.infer<typeof frequenceSchema>;
+export const famillePlanificationSchema = z.enum(
+  famillePlanificationEnum.enumValues,
+);
+export type FamillePlanificationType = z.infer<
+  typeof famillePlanificationSchema
+>;
 
 export const clientServiceStatutSchema = z.enum(
   clientServiceStatutEnum.enumValues,
 );
 export type ClientServiceStatutType = z.infer<typeof clientServiceStatutSchema>;
-
-export const clientServiceModePlanningSchema = z.enum(
-  clientServiceModePlanningEnum.enumValues,
-);
-export type ClientServiceModePlanningType = z.infer<
-  typeof clientServiceModePlanningSchema
->;
 
 export const modeCommercialSchema = z.enum(modeCommercialEnum.enumValues);
 export type ModeCommercialType = z.infer<typeof modeCommercialSchema>;
@@ -102,58 +98,15 @@ export const insertPrestationFormSchema = z.object({
   siteId: z.uuid("Site obligatoire"),
   serviceId: z.uuid("Service obligatoire"),
 
-  // Fréquence
-  frequence: frequenceSchema,
-  frequenceParPeriode: z
-    .string()
-    .optional()
-    .refine(
-      (v) =>
-        v === undefined ||
-        v === "" ||
-        (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
-      "La fréquence par période doit être un nombre entre 1 et 365",
-    ),
-  intervalleJours: z
-    .string()
-    .optional()
-    .refine(
-      (v) =>
-        v === undefined ||
-        v === "" ||
-        (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
-      "L'intervalle doit être un nombre entre 1 et 365 jours",
-    ),
+  // Famille de planification (dérivée automatiquement, jamais saisie directement)
+  famillePlanification: famillePlanificationSchema,
 
   // Dates (ISO strings dans le form, Date en DB)
   dateDebut: z.string().optional(),
   dateFin: z.string().optional(),
 
-  // Préférences de planification
-  joursPreference: z.array(z.number().int().min(1).max(7)).optional(),
-  // ISO 8601 : 1=lundi … 7=dimanche
-  heureDebutPreference: z
-    .string()
-    .optional()
-    .refine(
-      (v) =>
-        v === undefined || v === "" || /^([0-1]?\d|2[0-3]):[0-5]\d$/.test(v),
-      "Format invalide (ex: 08:00)",
-    ),
-  dureeEstimeeMinutes: z
-    .string()
-    .optional()
-    .refine(
-      (v) =>
-        v === undefined ||
-        v === "" ||
-        (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 720),
-      "La durée doit être un nombre entre 1 et 720 minutes",
-    ),
-
-  // Planning
+  // Statut & mode commercial
   statut: clientServiceStatutSchema.optional(),
-  modePlanning: clientServiceModePlanningSchema.optional(),
   modeCommercial: modeCommercialSchema.optional(),
 
   // Commentaires
@@ -173,7 +126,6 @@ export const updatePrestationFormSchema = insertPrestationFormSchema
   .extend({
     id: z.uuid("ID de la prestation invalide"),
     statut: clientServiceStatutSchema.optional(),
-    modePlanning: clientServiceModePlanningSchema.optional(),
     modeCommercial: modeCommercialSchema.optional(),
   });
 export type UpdatePrestationFormType = z.infer<typeof updatePrestationFormSchema>;
@@ -192,10 +144,11 @@ export type UpdatePrestationStatutType = z.infer<
 
 export const prestationsOrderBySchema = z.enum([
   "createdAt",
+  "updatedAt",
   "serviceNom",
   "siteNom",
   "statut",
-  "frequence",
+  "famillePlanification",
   "dateDebut",
 ]);
 export type PrestationsOrderByType = z.infer<typeof prestationsOrderBySchema>;
@@ -206,6 +159,7 @@ export const getPrestationsQuerySchema = z.object({
   // Posture prestataire : ID du prestataire (filtre via clientServiceExecutions → serviceEntreprises)
   prestataireEntrepriseId: z.uuid("ID du prestataire invalide").optional(),
   statut: clientServiceStatutSchema.optional(),
+  famillePlanification: famillePlanificationSchema.optional(),
   serviceId: z.uuid().optional(),
   siteId: z.uuid().optional(),
   modeCommercial: modeCommercialSchema.optional(),
@@ -323,16 +277,10 @@ export type PrestationListItem = {
   siteNom: string;
   serviceId: string;
   serviceNom: string;
-  frequence: FrequenceType;
-  frequenceParPeriode: number | null;
-  intervalleJours: number | null;
+  famillePlanification: FamillePlanificationType;
   dateDebut: Date | null;
   dateFin: Date | null;
-  joursPreference: number[] | null;
-  heureDebutPreference: string | null;
-  dureeEstimeeMinutes: number | null;
   statut: ClientServiceStatutType;
-  modePlanning: ClientServiceModePlanningType;
   modeCommercial: ModeCommercialType;
   notes: string | null;
   createdAt: Date;
@@ -348,16 +296,10 @@ export const prestationListItemSchema: z.ZodType<PrestationListItem> = z.object(
     siteNom: z.string(),
     serviceId: z.string(),
     serviceNom: z.string(),
-    frequence: frequenceSchema,
-    frequenceParPeriode: z.number().nullable(),
-    intervalleJours: z.number().nullable(),
+    famillePlanification: famillePlanificationSchema,
     dateDebut: z.date().nullable(),
     dateFin: z.date().nullable(),
-    joursPreference: z.array(z.number()).nullable(),
-    heureDebutPreference: z.string().nullable(),
-    dureeEstimeeMinutes: z.number().nullable(),
     statut: clientServiceStatutSchema,
-    modePlanning: clientServiceModePlanningSchema,
     modeCommercial: modeCommercialSchema,
     notes: z.string().nullable(),
     createdAt: z.date(),

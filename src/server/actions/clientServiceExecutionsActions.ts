@@ -677,7 +677,7 @@ export const insertExecutionWithPrixAction = actionClient
     // Resync : régénère la fenêtre glissante pour assigner l'exécution + snapshot des tâches
     if (
       prestation.statut === "actif" &&
-      prestation.modePlanning === "planifie"
+      prestation.famillePlanification === "recurrence_auto"
     ) {
       await onClientServiceChanged({
         clientServiceId: prestationId,
@@ -795,7 +795,7 @@ export const toggleExecutionActifAction = actionClient
     if (
       parsedInput.actif &&
       prestation.statut === "actif" &&
-      prestation.modePlanning === "planifie"
+      prestation.famillePlanification === "recurrence_auto"
     ) {
       await onClientServiceChanged({
         clientServiceId: prestationId,
@@ -1273,7 +1273,7 @@ export const updateExecutionAction = actionClient
     // Resync : régénère la fenêtre glissante
     if (
       prestation.statut === "actif" &&
-      prestation.modePlanning === "planifie"
+      prestation.famillePlanification === "recurrence_auto"
     ) {
       await onClientServiceChanged({
         clientServiceId: prestationId,

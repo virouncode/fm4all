@@ -24,11 +24,12 @@ type PrestationsSortDialogProps = {
 }
 
 const SORT_OPTIONS = [
-  { value: "createdAt", label: "Date de création" },
+  { value: "createdAt", label: "Créé le" },
+  { value: "updatedAt", label: "Modifié le" },
   { value: "serviceNom", label: "Service" },
   { value: "siteNom", label: "Site" },
   { value: "statut", label: "Statut" },
-  { value: "frequence", label: "Fréquence" },
+  { value: "famillePlanification", label: "Mode de planification" },
   { value: "dateDebut", label: "Date de début" },
 ] as const;
 

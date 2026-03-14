@@ -87,7 +87,7 @@ export function OccurrenceOnDemandDialog({
     }
   };
 
-  const isExceptionnel = prestation.modePlanning === "planifie";
+  const isRecurrenceAuto = prestation.famillePlanification === "recurrence_auto";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -101,7 +101,7 @@ export function OccurrenceOnDemandDialog({
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4 py-2"
           >
-            {isExceptionnel && (
+            {isRecurrenceAuto && (
               <Alert className="border-amber-200 bg-amber-50">
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
                 <AlertTitle className="text-amber-800">

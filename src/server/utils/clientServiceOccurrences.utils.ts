@@ -1,17 +1,31 @@
-import "server-only";
 import { db } from "@/db";
 import {
+  clientServiceExceptionsRecurrence,
   clientServiceExecutionPrix,
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServicePerimetre,
   clientServicePrixAppliques,
+  clientServiceReglesRecurrence,
   clientServices,
   occurrenceTaches,
   tacheListeItems,
 } from "@/db/schema/services";
 import { sitesArborescence } from "@/db/schema/sites";
-import { and, asc, count, eq, gte, inArray, isNull, lte, or, gt } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNull,
+  lte,
+  or,
+} from "drizzle-orm";
+import { rrulestr } from "rrule";
+import "server-only";
 
 type DbOrTransactionType =
   | typeof db
@@ -55,9 +69,7 @@ export async function getEffectiveSitesForService({
    * Résout un tableau de lignes de périmètre en un Set de siteIds.
    * scope=self → seulement le site ; scope=subtree → site + tous les descendants.
    */
-  async function resolveRows(
-    rows: typeof perimetreRows,
-  ): Promise<Set<string>> {
+  async function resolveRows(rows: typeof perimetreRows): Promise<Set<string>> {
     const result = new Set<string>();
     for (const row of rows) {
       result.add(row.siteId);
@@ -203,274 +215,113 @@ export async function pickExecutionForOccurrence({
 }
 
 // ---------------------------------------------------------------------------
-// 3. GÉNÉRATION DES DATES D'OCCURRENCES (logique pure, pas de DB)
+// 3. GÉNÉRATION DES DATES VIA RRULE
 // ---------------------------------------------------------------------------
 
-type ClientServiceForGenType = {
-  frequence: string;
-  frequenceParPeriode: number | null;
-  intervalleJours: number | null;
-  dateDebut: Date | null;
-  dateFin: Date | null;
-  joursPreference: number[] | null;
-  heureDebutPreference: string | null;
+type GeneratedOccurrenceType = {
+  regleRecurrenceId: string;
+  dateDebutOriginale: Date;
+  dateDebutPrevue: Date;
+  dateFinPrevue: Date | null;
 };
 
 /**
- * Parse "HH:mm" → { hours, minutes }. Défaut : 08:00.
+ * Formate une date JS en chaîne DTSTART compatible rrule : "YYYYMMDDTHHMMSSZ"
  */
-function parseHeure(h: string | null): { hours: number; minutes: number } {
-  if (!h) return { hours: 8, minutes: 0 };
-  const parts = h.split(":");
-  return {
-    hours: parseInt(parts[0] ?? "8", 10),
-    minutes: parseInt(parts[1] ?? "0", 10),
-  };
+function formatDtstartForRrule(date: Date): string {
+  return date.toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
 }
 
 /**
- * Applique l'heure de préférence à une date (sans muter l'original).
- */
-function withTime(d: Date, heurePreference: string | null): Date {
-  const { hours, minutes } = parseHeure(heurePreference);
-  const result = new Date(d);
-  result.setHours(hours, minutes, 0, 0);
-  return result;
-}
-
-/**
- * Calcule le numéro ISO du jour (1=lundi … 7=dimanche) depuis un objet Date.
- */
-function isoWeekday(d: Date): number {
-  const day = d.getDay(); // 0=dimanche
-  return day === 0 ? 7 : day;
-}
-
-/**
- * Génère toutes les dates d'occurrences planifiées dans une fenêtre temporelle,
- * en tenant compte de la fréquence, des préférences de jours/heure et des bornes du contrat.
+ * Génère les occurrences dans une fenêtre temporelle à partir des règles RRULE
+ * actives d'un service client.
  *
- * Règles générales :
- *   - windowStart/windowEnd = fenêtre cible (ex: now … now+90j)
- *   - dateDebut/dateFin = bornes du contrat
- *   - Génération dans l'intersection des deux intervalles
- *   - heureDebutPreference appliquée sur chaque date
+ * Algorithme :
+ *   1. Charge les clientServiceReglesRecurrence actives (triées par ordre)
+ *   2. Charge les clientServiceExceptionsRecurrence de type "supprimee"
+ *   3. Pour chaque règle : RRule.between(windowStart, windowEnd) → dates
+ *   4. Exclut les dates supprimées par une exception
+ *   5. dateFinPrevue = dateDebutPrevue + dureePrevueMinutes si non null
  */
-export function generateOccurrenceDates(
-  cs: ClientServiceForGenType,
+async function generateDatesFromRrules(
+  clientServiceId: string,
   windowStart: Date,
   windowEnd: Date,
-): Date[] {
-  const contractStart = cs.dateDebut ?? windowStart;
-  const contractEnd = cs.dateFin ?? windowEnd;
+  tx?: DbOrTransactionType,
+): Promise<GeneratedOccurrenceType[]> {
+  const dbClient = tx ?? db;
 
-  const start = new Date(
-    Math.max(contractStart.getTime(), windowStart.getTime()),
-  );
-  const end = new Date(Math.min(contractEnd.getTime(), windowEnd.getTime()));
+  // 1. Règles actives
+  const regles = await dbClient
+    .select()
+    .from(clientServiceReglesRecurrence)
+    .where(
+      and(
+        eq(clientServiceReglesRecurrence.clientServiceId, clientServiceId),
+        eq(clientServiceReglesRecurrence.actif, true),
+      ),
+    )
+    .orderBy(asc(clientServiceReglesRecurrence.ordre));
 
-  if (start > end) return [];
+  if (regles.length === 0) return [];
 
-  const dates: Date[] = [];
+  // 2. Exceptions de type "supprimee" pour ce service
+  const exceptions = await dbClient
+    .select({
+      regleRecurrenceId: clientServiceExceptionsRecurrence.regleRecurrenceId,
+      dateOriginale: clientServiceExceptionsRecurrence.dateOriginale,
+      typeException: clientServiceExceptionsRecurrence.typeException,
+    })
+    .from(clientServiceExceptionsRecurrence)
+    .where(
+      eq(clientServiceExceptionsRecurrence.clientServiceId, clientServiceId),
+    );
 
-  switch (cs.frequence) {
-    // ------------------------------------------------------------------
-    case "one_shot": {
-      // Une seule occurrence à la date de début du contrat
-      const d = withTime(contractStart, cs.heureDebutPreference);
-      if (d >= start && d <= end) {
-        dates.push(d);
-      }
-      break;
-    }
-
-    // ------------------------------------------------------------------
-    case "tous_les_x_jours": {
-      const interval = cs.intervalleJours ?? 1;
-      const cursor = new Date(start);
-      while (cursor <= end) {
-        dates.push(withTime(cursor, cs.heureDebutPreference));
-        cursor.setDate(cursor.getDate() + interval);
-      }
-      break;
-    }
-
-    // ------------------------------------------------------------------
-    case "hebdomadaire": {
-      // frequenceParPeriode fois par semaine
-      // joursPreference contient les jours ISO souhaités
-      const timesPerWeek = cs.frequenceParPeriode ?? 1;
-      let preferredDays: number[];
-
-      if (
-        cs.joursPreference &&
-        cs.joursPreference.length >= timesPerWeek
-      ) {
-        preferredDays = cs.joursPreference
-          .slice(0, timesPerWeek)
-          .sort((a, b) => a - b);
-      } else {
-        // Défaut : premiers N jours de semaine (lun, mar, …)
-        preferredDays = [1, 2, 3, 4, 5].slice(0, timesPerWeek);
-      }
-
-      const cursor = new Date(start);
-      while (cursor <= end) {
-        if (preferredDays.includes(isoWeekday(cursor))) {
-          dates.push(withTime(cursor, cs.heureDebutPreference));
-        }
-        cursor.setDate(cursor.getDate() + 1);
-      }
-      break;
-    }
-
-    // ------------------------------------------------------------------
-    case "mensuelle": {
-      const timesPerMonth = cs.frequenceParPeriode ?? 1;
-      // Si joursPreference fourni → traité comme jours du mois (1..31)
-      // Sinon distribution uniforme
-      const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
-
-      while (cursor <= end) {
-        const year = cursor.getFullYear();
-        const month = cursor.getMonth();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        let occurrenceDays: number[];
-        if (
-          cs.joursPreference &&
-          cs.joursPreference.length >= timesPerMonth
-        ) {
-          occurrenceDays = cs.joursPreference
-            .slice(0, timesPerMonth)
-            .sort((a, b) => a - b);
-        } else {
-          occurrenceDays = [];
-          for (let i = 0; i < timesPerMonth; i++) {
-            occurrenceDays.push(
-              Math.floor((daysInMonth / timesPerMonth) * i) + 1,
-            );
-          }
-        }
-
-        for (const day of occurrenceDays) {
-          const d = withTime(
-            new Date(year, month, day),
-            cs.heureDebutPreference,
-          );
-          if (d >= start && d <= end) {
-            dates.push(d);
-          }
-        }
-        cursor.setMonth(cursor.getMonth() + 1);
-      }
-      break;
-    }
-
-    // ------------------------------------------------------------------
-    case "trimestrielle": {
-      const timesPerQuarter = cs.frequenceParPeriode ?? 1;
-      // Normalise au début du trimestre courant
-      const startMonth = Math.floor(start.getMonth() / 3) * 3;
-      const cursor = new Date(start.getFullYear(), startMonth, 1);
-
-      while (cursor <= end) {
-        const qStart = new Date(cursor);
-        const qEnd = new Date(
-          cursor.getFullYear(),
-          cursor.getMonth() + 3,
-          0,
-          23,
-          59,
-          59,
-        );
-        const qDuration = qEnd.getTime() - qStart.getTime();
-
-        for (let i = 0; i < timesPerQuarter; i++) {
-          const d = withTime(
-            new Date(
-              qStart.getTime() + (qDuration / timesPerQuarter) * i,
-            ),
-            cs.heureDebutPreference,
-          );
-          if (d >= start && d <= end) {
-            dates.push(d);
-          }
-        }
-        cursor.setMonth(cursor.getMonth() + 3);
-      }
-      break;
-    }
-
-    // ------------------------------------------------------------------
-    case "semestrielle": {
-      const timesPerSemester = cs.frequenceParPeriode ?? 1;
-      const startMonth = start.getMonth() < 6 ? 0 : 6;
-      const cursor = new Date(start.getFullYear(), startMonth, 1);
-
-      while (cursor <= end) {
-        const sStart = new Date(cursor);
-        const sEnd = new Date(
-          cursor.getFullYear(),
-          cursor.getMonth() + 6,
-          0,
-          23,
-          59,
-          59,
-        );
-        const sDuration = sEnd.getTime() - sStart.getTime();
-
-        for (let i = 0; i < timesPerSemester; i++) {
-          const d = withTime(
-            new Date(
-              sStart.getTime() + (sDuration / timesPerSemester) * i,
-            ),
-            cs.heureDebutPreference,
-          );
-          if (d >= start && d <= end) {
-            dates.push(d);
-          }
-        }
-        cursor.setMonth(cursor.getMonth() + 6);
-      }
-      break;
-    }
-
-    // ------------------------------------------------------------------
-    case "annuelle": {
-      const timesPerYear = cs.frequenceParPeriode ?? 1;
-      const cursor = new Date(start.getFullYear(), 0, 1);
-
-      while (cursor <= end) {
-        const yStart = new Date(cursor.getFullYear(), 0, 1);
-        const yEnd = new Date(
-          cursor.getFullYear(),
-          11,
-          31,
-          23,
-          59,
-          59,
-        );
-        const yDuration = yEnd.getTime() - yStart.getTime();
-
-        for (let i = 0; i < timesPerYear; i++) {
-          const d = withTime(
-            new Date(
-              yStart.getTime() + (yDuration / timesPerYear) * i,
-            ),
-            cs.heureDebutPreference,
-          );
-          if (d >= start && d <= end) {
-            dates.push(d);
-          }
-        }
-        cursor.setFullYear(cursor.getFullYear() + 1);
-      }
-      break;
+  // Clé d'exclusion rapide : "regleId|dateISO"
+  const suppressedKeys = new Set<string>();
+  for (const exc of exceptions) {
+    if (exc.typeException === "supprimee" && exc.regleRecurrenceId) {
+      suppressedKeys.add(
+        `${exc.regleRecurrenceId}|${exc.dateOriginale.toISOString()}`,
+      );
     }
   }
 
-  return dates;
+  const results: GeneratedOccurrenceType[] = [];
+
+  // 3. Génération par règle
+  for (const regle of regles) {
+    let rrule: ReturnType<typeof rrulestr>;
+    try {
+      const fullStr = `DTSTART:${formatDtstartForRrule(regle.dtstartLocal)}\n${regle.regleRrule}`;
+      rrule = rrulestr(fullStr);
+    } catch {
+      // Règle malformée → skip silencieux (le validator UI empêche ça normalement)
+      continue;
+    }
+
+    const dates = rrule.between(windowStart, windowEnd, true);
+
+    for (const date of dates) {
+      const key = `${regle.id}|${date.toISOString()}`;
+      if (suppressedKeys.has(key)) continue;
+
+      const dateFinPrevue =
+        regle.dureePrevueMinutes !== null &&
+        regle.dureePrevueMinutes !== undefined
+          ? new Date(date.getTime() + regle.dureePrevueMinutes * 60 * 1000)
+          : null;
+
+      results.push({
+        regleRecurrenceId: regle.id,
+        dateDebutOriginale: date,
+        dateDebutPrevue: date,
+        dateFinPrevue,
+      });
+    }
+  }
+
+  return results;
 }
 
 // ---------------------------------------------------------------------------
@@ -549,8 +400,12 @@ export async function ensureOccurrencesWindow({
     .from(clientServices)
     .where(eq(clientServices.id, clientServiceId));
 
-  // Génération uniquement si actif + planification automatique activée
-  if (!cs || cs.statut !== "actif" || cs.modePlanning !== "planifie") {
+  // Génération uniquement si actif + recurrence_auto
+  if (
+    !cs ||
+    cs.statut !== "actif" ||
+    cs.famillePlanification !== "recurrence_auto"
+  ) {
     return { created: 0, skipped: 0 };
   }
 
@@ -567,88 +422,84 @@ export async function ensureOccurrencesWindow({
 
   if (effectiveSiteIds.length === 0) return { created: 0, skipped: 0 };
 
-  // Occurrences existantes dans la fenêtre pour construire le Set d'idempotence
+  // Génération des dates depuis les règles RRULE
+  const generated = await generateDatesFromRrules(
+    clientServiceId,
+    now,
+    windowEnd,
+    tx,
+  );
+
+  if (generated.length === 0) return { created: 0, skipped: 0 };
+
+  // Occurrences existantes issues d'une règle dans la fenêtre (clé d'idempotence)
   const existing = await dbClient
     .select({
+      regleRecurrenceId: clientServiceOccurrences.regleRecurrenceId,
       siteId: clientServiceOccurrences.siteId,
-      dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
+      dateDebutOriginale: clientServiceOccurrences.dateDebutOriginale,
     })
     .from(clientServiceOccurrences)
     .where(
       and(
         eq(clientServiceOccurrences.clientServiceId, clientServiceId),
+        eq(clientServiceOccurrences.typeSource, "regle_recurrence"),
         inArray(clientServiceOccurrences.siteId, effectiveSiteIds),
-        gte(clientServiceOccurrences.dateDebutPrevue, now),
-        lte(clientServiceOccurrences.dateDebutPrevue, windowEnd),
+        gte(clientServiceOccurrences.dateDebutOriginale, now),
+        lte(clientServiceOccurrences.dateDebutOriginale, windowEnd),
       ),
     );
 
-  // Clé d'idempotence : "siteId|ISO8601"
+  // Clé d'idempotence : "regleId|siteId|dateOriginaleISO"
   const existingKeys = new Set(
     existing
-      .filter((o) => o.dateDebutPrevue !== null)
-      .map((o) => `${o.siteId}|${o.dateDebutPrevue!.toISOString()}`),
+      .filter((o) => o.regleRecurrenceId && o.dateDebutOriginale)
+      .map(
+        (o) =>
+          `${o.regleRecurrenceId}|${o.siteId}|${o.dateDebutOriginale!.toISOString()}`,
+      ),
   );
-
-  const csForGen: ClientServiceForGenType = {
-    frequence: cs.frequence,
-    frequenceParPeriode: cs.frequenceParPeriode,
-    intervalleJours: cs.intervalleJours,
-    dateDebut: cs.dateDebut,
-    dateFin: cs.dateFin,
-    joursPreference: cs.joursPreference as number[] | null,
-    heureDebutPreference: cs.heureDebutPreference,
-  };
 
   let created = 0;
   let skipped = 0;
 
-  // Données intermédiaires pour résoudre le pack de tâches après insertion
   const toInsert: (typeof clientServiceOccurrences.$inferInsert)[] = [];
   const toInsertExecutionIds: (string | null)[] = [];
 
   for (const siteId of effectiveSiteIds) {
-    const dates = generateOccurrenceDates(csForGen, now, windowEnd);
-
-    for (const dateDebutPrevue of dates) {
-      const key = `${siteId}|${dateDebutPrevue.toISOString()}`;
+    for (const gen of generated) {
+      const key = `${gen.regleRecurrenceId}|${siteId}|${gen.dateDebutOriginale.toISOString()}`;
 
       if (existingKeys.has(key)) {
         skipped++;
         continue;
       }
 
-      // dateFinPrevue : null si dureeEstimeeMinutes non renseigné (règle métier)
-      const dateFinPrevue =
-        cs.dureeEstimeeMinutes !== null && cs.dureeEstimeeMinutes !== undefined
-          ? new Date(
-              dateDebutPrevue.getTime() + cs.dureeEstimeeMinutes * 60 * 1000,
-            )
-          : null;
-
       // Exécution gagnante figée au moment de la génération
       const executionId = await pickExecutionForOccurrence({
         clientServiceId,
         entrepriseId: cs.entrepriseId,
         siteId,
-        targetDate: dateDebutPrevue,
+        targetDate: gen.dateDebutPrevue,
         tx,
       });
 
-      // Aucune exécution active ne couvre cette date → on ne génère pas d'occurrence orpheline
+      // Aucune exécution active → occurrence orpheline → skip
       if (executionId === null) continue;
 
       toInsert.push({
         clientServiceId,
         siteId,
-        dateDebutPrevue,
-        dateFinPrevue,
+        typeSource: "regle_recurrence",
+        regleRecurrenceId: gen.regleRecurrenceId,
+        dateDebutOriginale: gen.dateDebutOriginale,
+        dateDebutPrevue: gen.dateDebutPrevue,
+        dateFinPrevue: gen.dateFinPrevue,
         executionId,
         statut: "planifiee",
       });
       toInsertExecutionIds.push(executionId);
 
-      // Prévenir les doublons au sein du même batch
       existingKeys.add(key);
       created++;
     }
@@ -657,7 +508,9 @@ export async function ensureOccurrencesWindow({
   if (toInsert.length > 0) {
     // Pré-charger le tacheListeTemplateId des exécutions concernées
     const uniqueExecIds = [
-      ...new Set(toInsertExecutionIds.filter((id): id is string => id !== null)),
+      ...new Set(
+        toInsertExecutionIds.filter((id): id is string => id !== null),
+      ),
     ];
     const executionPackMap = new Map<string, string | null>();
     if (uniqueExecIds.length > 0) {
@@ -679,10 +532,12 @@ export async function ensureOccurrencesWindow({
       .values(toInsert)
       .returning({ id: clientServiceOccurrences.id });
 
-    // Snapshot des tâches pour chaque occurrence — pack vient uniquement de l'exécution
+    // Snapshot des tâches pour chaque occurrence
     for (let i = 0; i < inserted.length; i++) {
       const execId = toInsertExecutionIds[i];
-      const resolvedPackId = execId ? (executionPackMap.get(execId) ?? null) : null;
+      const resolvedPackId = execId
+        ? (executionPackMap.get(execId) ?? null)
+        : null;
 
       if (resolvedPackId) {
         await snapshotOccurrenceTaches({
@@ -777,7 +632,11 @@ export async function backfillOccurrencesWithExecution({
     .from(clientServices)
     .where(eq(clientServices.id, clientServiceId));
 
-  if (!cs || cs.statut !== "actif" || cs.modePlanning !== "planifie") {
+  if (
+    !cs ||
+    cs.statut !== "actif" ||
+    cs.famillePlanification !== "recurrence_auto"
+  ) {
     return { updated: 0 };
   }
 
@@ -855,14 +714,12 @@ export async function deleteFuturePlanifieeOccurrences({
     );
 
   if (toDelete.length > 0) {
-    await dbClient
-      .delete(clientServiceOccurrences)
-      .where(
-        inArray(
-          clientServiceOccurrences.id,
-          toDelete.map((o) => o.id),
-        ),
-      );
+    await dbClient.delete(clientServiceOccurrences).where(
+      inArray(
+        clientServiceOccurrences.id,
+        toDelete.map((o) => o.id),
+      ),
+    );
   }
 
   return { deleted: toDelete.length };
@@ -1005,7 +862,10 @@ export async function insertPrixAppliquesForOccurrence({
 
   // 3. Insérer une ligne par prix selon la règle
   for (const prix of prixActifs) {
-    if (prix.typePrix === "par_occurrence" || prix.typePrix === "frais_livraison") {
+    if (
+      prix.typePrix === "par_occurrence" ||
+      prix.typePrix === "frais_livraison"
+    ) {
       // 1 ligne par occurrence — anti-doublon via unique(executionPrixId, occurrenceId)
       await dbClient
         .insert(clientServicePrixAppliques)

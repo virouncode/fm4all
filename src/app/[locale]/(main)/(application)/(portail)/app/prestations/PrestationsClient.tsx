@@ -17,6 +17,7 @@ import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
 import {
   type ClientServiceStatutType,
+  type FamillePlanificationType,
   type ModeCommercialType,
   type PrestationListItem,
   type PrestationsOrderByType,
@@ -38,6 +39,7 @@ type SearchParamsType = {
   serviceId?: string;
   siteId?: string;
   modeCommercial?: string;
+  famillePlanification?: string;
   clientEntrepriseId?: string;
   orderBy?: string;
   orderDir?: string;
@@ -49,6 +51,7 @@ type FiltersType = {
   serviceId?: string;
   siteId?: string;
   modeCommercial?: string;
+  famillePlanification?: string;
 };
 
 type PrestationsClientProps = {
@@ -87,6 +90,7 @@ export default function PrestationsClient({
     serviceId: searchParams.serviceId,
     siteId: searchParams.siteId,
     modeCommercial: searchParams.modeCommercial,
+    famillePlanification: searchParams.famillePlanification,
   });
 
   const showEntreprise = posture === "plateforme";
@@ -97,6 +101,7 @@ export default function PrestationsClient({
     searchParams.serviceId,
     searchParams.siteId,
     searchParams.modeCommercial,
+    searchParams.famillePlanification,
   ].filter(Boolean).length;
 
   // Chargement des clients (plateforme ou prestataire)
@@ -116,7 +121,7 @@ export default function PrestationsClient({
 
   // Chargement des prestations
   const loadPrestations = useCallback(async () => {
-    const validOrderByValues = ["createdAt", "serviceNom", "siteNom", "statut", "frequence", "dateDebut"];
+    const validOrderByValues = ["createdAt", "updatedAt", "serviceNom", "siteNom", "statut", "famillePlanification", "dateDebut"];
     const orderByParam = (searchParams.orderBy && validOrderByValues.includes(searchParams.orderBy)
       ? searchParams.orderBy
       : undefined) as PrestationsOrderByType | undefined;
@@ -128,6 +133,7 @@ export default function PrestationsClient({
       serviceId: searchParams.serviceId || undefined,
       siteId: searchParams.siteId || undefined,
       modeCommercial: (searchParams.modeCommercial as ModeCommercialType) || undefined,
+      famillePlanification: (searchParams.famillePlanification as FamillePlanificationType) || undefined,
       orderBy: orderByParam,
       orderDir: orderDirParam,
     };
@@ -209,8 +215,9 @@ export default function PrestationsClient({
       serviceId: searchParams.serviceId,
       siteId: searchParams.siteId,
       modeCommercial: searchParams.modeCommercial,
+      famillePlanification: searchParams.famillePlanification,
     });
-  }, [searchParams.statut, searchParams.serviceId, searchParams.siteId, searchParams.modeCommercial]);
+  }, [searchParams.statut, searchParams.serviceId, searchParams.siteId, searchParams.modeCommercial, searchParams.famillePlanification]);
 
   const handlePrestationClick = (p: PrestationListItem) => {
     router.push({
@@ -234,6 +241,7 @@ export default function PrestationsClient({
     if (searchParams.statut) params.statut = searchParams.statut;
     if (searchParams.serviceId) params.serviceId = searchParams.serviceId;
     if (searchParams.modeCommercial) params.modeCommercial = searchParams.modeCommercial;
+    if (searchParams.famillePlanification) params.famillePlanification = searchParams.famillePlanification;
     // Pas de siteId : reset au changement de client (les sites sont propres à chaque client)
     if (clientId !== "all") params.clientEntrepriseId = clientId;
     replaceWithParams(params);
@@ -249,6 +257,7 @@ export default function PrestationsClient({
     if (newFilters.serviceId) params.serviceId = newFilters.serviceId;
     if (newFilters.siteId) params.siteId = newFilters.siteId;
     if (newFilters.modeCommercial) params.modeCommercial = newFilters.modeCommercial;
+    if (newFilters.famillePlanification) params.famillePlanification = newFilters.famillePlanification;
     // Préserver le filtre client (géré par le sélecteur dédié, pas le dialog)
     if (searchParams.clientEntrepriseId)
       params.clientEntrepriseId = searchParams.clientEntrepriseId;

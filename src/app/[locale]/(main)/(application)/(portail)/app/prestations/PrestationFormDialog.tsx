@@ -60,8 +60,7 @@ import {
   type InsertExecutionPrixFormType,
 } from "@/zod-schemas/clientServiceExecutions.schema";
 import {
-  clientServiceModePlanningSchema,
-  frequenceSchema,
+  famillePlanificationSchema,
   modeCommercialSchema,
   type ModeCommercialType,
   type PrestationListItem,
@@ -71,7 +70,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, HandPlatter, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Controller,
   useFieldArray,
   useForm,
   useFormState,
@@ -90,49 +88,9 @@ const prestationFormSchema = z
     entrepriseId: z.string().optional(),
     serviceId: z.string().optional(),
     siteAnchorId: z.string().optional(),
-    frequence: frequenceSchema.optional(),
-    frequenceParPeriode: z
-      .string()
-      .optional()
-      .refine(
-        (v) =>
-          v === undefined ||
-          v === "" ||
-          (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
-        "La fréquence par période doit être un nombre entre 1 et 365",
-      ),
-    intervalleJours: z
-      .string()
-      .optional()
-      .refine(
-        (v) =>
-          v === undefined ||
-          v === "" ||
-          (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
-        "L'intervalle doit être un nombre entre 1 et 365 jours",
-      ),
+    famillePlanification: famillePlanificationSchema.optional(),
     dateDebut: z.string().optional(),
     dateFin: z.string().optional(),
-    joursPreference: z.array(z.number().int().min(1).max(7)).optional(),
-    heureDebutPreference: z
-      .string()
-      .optional()
-      .refine(
-        (v) =>
-          v === undefined || v === "" || /^([0-1]?\d|2[0-3]):[0-5]\d$/.test(v),
-        "Format invalide (ex: 08:00)",
-      ),
-    dureeEstimeeMinutes: z
-      .string()
-      .optional()
-      .refine(
-        (v) =>
-          v === undefined ||
-          v === "" ||
-          (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 720),
-        "La durée doit être un nombre entre 1 et 720 minutes",
-      ),
-    modePlanning: clientServiceModePlanningSchema.optional(),
     modeCommercial: modeCommercialSchema.optional(),
     notes: z.string().optional(),
   })
@@ -214,16 +172,6 @@ type ExecutionStep2ValuesType = z.infer<typeof executionStep2Schema>;
 // ──────────────────────────────────────────────
 // Constantes
 // ──────────────────────────────────────────────
-
-const JOURS_SEMAINE = [
-  { value: 1, label: "Lun" },
-  { value: 2, label: "Mar" },
-  { value: 3, label: "Mer" },
-  { value: 4, label: "Jeu" },
-  { value: 5, label: "Ven" },
-  { value: 6, label: "Sam" },
-  { value: 7, label: "Dim" },
-] as const;
 
 const TYPE_PRIX_OPTIONS = [
   { value: "abonnement", label: "Abonnement (récurrent)" },
@@ -370,19 +318,13 @@ export function PrestationFormDialog({
       ? {
           id: prestation.id,
           entrepriseId: prestation.entrepriseId,
-          frequence: prestation.frequence,
-          frequenceParPeriode: prestation.frequenceParPeriode?.toString() ?? "",
-          intervalleJours: prestation.intervalleJours?.toString() ?? "",
+          famillePlanification: prestation.famillePlanification,
           dateDebut: prestation.dateDebut
             ? prestation.dateDebut.toISOString().split("T")[0]
             : "",
           dateFin: prestation.dateFin
             ? prestation.dateFin.toISOString().split("T")[0]
             : "",
-          joursPreference: prestation.joursPreference ?? [],
-          heureDebutPreference: prestation.heureDebutPreference ?? "",
-          dureeEstimeeMinutes: prestation.dureeEstimeeMinutes?.toString() ?? "",
-          modePlanning: prestation.modePlanning ?? "planifie",
           modeCommercial: prestation.modeCommercial ?? "direct",
           notes: prestation.notes ?? "",
         }
@@ -392,15 +334,9 @@ export function PrestationFormDialog({
               ? ""
               : (entreprise?.id ?? ""),
           serviceId: "",
-          frequence: "hebdomadaire",
-          frequenceParPeriode: "",
-          intervalleJours: "",
+          famillePlanification: "recurrence_auto" as const,
           dateDebut: "",
           dateFin: "",
-          joursPreference: [],
-          heureDebutPreference: "",
-          dureeEstimeeMinutes: "",
-          modePlanning: "planifie",
           modeCommercial: "direct" as ModeCommercialType,
           notes: "",
         },
@@ -436,29 +372,7 @@ export function PrestationFormDialog({
     name: "prix",
   });
 
-  const frequenceValue = useWatch({ control: form.control, name: "frequence" });
-  const modePlanningValue = useWatch({ control: form.control, name: "modePlanning" });
   const watchedPrix = useWatch({ control: execForm.control, name: "prix" });
-
-  const showFrequenceParPeriode =
-    frequenceValue !== undefined &&
-    frequenceValue !== "one_shot" &&
-    frequenceValue !== "tous_les_x_jours";
-  const showIntervalleJours = frequenceValue === "tous_les_x_jours";
-
-  const frequenceParPeriodeLabel =
-    frequenceValue === "hebdomadaire"
-      ? "Interventions par semaine"
-      : frequenceValue === "mensuelle"
-        ? "Interventions par mois"
-        : frequenceValue === "trimestrielle"
-          ? "Interventions par trimestre"
-          : frequenceValue === "semestrielle"
-            ? "Interventions par semestre"
-            : frequenceValue === "annuelle"
-              ? "Interventions par an"
-              : "Interventions par cycle";
-  const showPlanificationDetails = modePlanningValue === "planifie";
 
   // ── Sites visibles (responsables + ancêtres + descendants) ──
   const visibleSites = useMemo((): SelectSiteType[] => {
@@ -572,19 +486,13 @@ export function PrestationFormDialog({
       form.reset({
         id: prestation.id,
         entrepriseId: prestation.entrepriseId,
-        frequence: prestation.frequence,
-        frequenceParPeriode: prestation.frequenceParPeriode?.toString() ?? "",
-        intervalleJours: prestation.intervalleJours?.toString() ?? "",
+        famillePlanification: prestation.famillePlanification,
         dateDebut: prestation.dateDebut
           ? prestation.dateDebut.toISOString().split("T")[0]
           : "",
         dateFin: prestation.dateFin
           ? prestation.dateFin.toISOString().split("T")[0]
           : "",
-        joursPreference: prestation.joursPreference ?? [],
-        heureDebutPreference: prestation.heureDebutPreference ?? "",
-        dureeEstimeeMinutes: prestation.dureeEstimeeMinutes?.toString() ?? "",
-        modePlanning: prestation.modePlanning ?? "planifie",
         modeCommercial: prestation.modeCommercial ?? "direct",
         notes: prestation.notes ?? "",
       });
@@ -597,15 +505,9 @@ export function PrestationFormDialog({
         entrepriseId: defaultClientId,
         serviceId: "",
         siteAnchorId: "",
-        frequence: "hebdomadaire",
-        frequenceParPeriode: "",
-        intervalleJours: "",
+        famillePlanification: "recurrence_auto",
         dateDebut: "",
         dateFin: "",
-        joursPreference: [],
-        heureDebutPreference: "",
-        dureeEstimeeMinutes: "",
-        modePlanning: "planifie",
         modeCommercial: "direct",
         notes: "",
       });
@@ -742,15 +644,9 @@ export function PrestationFormDialog({
       const result = await updatePrestationAction({
         id: data.id!,
         entrepriseId: data.entrepriseId!,
-        frequence: data.frequence,
-        frequenceParPeriode: data.frequenceParPeriode,
-        intervalleJours: data.intervalleJours,
+        famillePlanification: data.famillePlanification,
         dateDebut: data.dateDebut,
         dateFin: data.dateFin,
-        joursPreference: data.joursPreference,
-        heureDebutPreference: data.heureDebutPreference,
-        dureeEstimeeMinutes: data.dureeEstimeeMinutes,
-        modePlanning: data.modePlanning,
         modeCommercial: data.modeCommercial,
         notes: data.notes,
       });
@@ -769,15 +665,9 @@ export function PrestationFormDialog({
         entrepriseId: data.entrepriseId!,
         siteId: anchorId!,
         serviceId: data.serviceId!,
-        frequence: data.frequence!,
-        frequenceParPeriode: data.frequenceParPeriode,
-        intervalleJours: data.intervalleJours,
+        famillePlanification: data.famillePlanification!,
         dateDebut: data.dateDebut,
         dateFin: data.dateFin,
-        joursPreference: data.joursPreference,
-        heureDebutPreference: data.heureDebutPreference,
-        dureeEstimeeMinutes: data.dureeEstimeeMinutes,
-        modePlanning: data.modePlanning,
         modeCommercial: data.modeCommercial,
         notes: data.notes,
         perimetre,
@@ -805,15 +695,10 @@ export function PrestationFormDialog({
         siteId: anchorId!,
         serviceId: step1Data.serviceId!,
         serviceEntrepriseId: selectedServiceEntrepriseId,
-        frequence: step1Data.frequence!,
-        frequenceParPeriode: step1Data.frequenceParPeriode,
-        intervalleJours: step1Data.intervalleJours,
+        famillePlanification: step1Data.famillePlanification!,
         dateDebut: step1Data.dateDebut,
         dateFin: step1Data.dateFin,
-        joursPreference: step1Data.joursPreference,
-        heureDebutPreference: step1Data.heureDebutPreference,
-        dureeEstimeeMinutes: step1Data.dureeEstimeeMinutes,
-        modePlanning: step1Data.modePlanning,
+        modeCommercial: step1Data.modeCommercial,
         notes: step1Data.notes,
         perimetre,
         dateDebutValidite: execData.dateDebutValidite,
@@ -1324,11 +1209,9 @@ export function PrestationFormDialog({
 
                 <Separator />
 
-                {/* ── FRÉQUENCE & MODE ── */}
+                {/* ── FAMILLE DE PLANIFICATION & MODE ── */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-semibold">
-                    Fréquence &amp; planification
-                  </h3>
+                  <h3 className="text-sm font-semibold">Planification</h3>
 
                   {posture === "plateforme" && (
                     <RhfControlledSelect<PrestationFormValuesType>
@@ -1343,55 +1226,17 @@ export function PrestationFormDialog({
                     </RhfControlledSelect>
                   )}
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <RhfControlledSelect<PrestationFormValuesType>
-                      name="frequence"
-                      label="Fréquence"
-                      requiredMark
-                      selectClassName="w-full"
-                    >
-                      <SelectItem value="one_shot">One shot</SelectItem>
-                      <SelectItem value="hebdomadaire">Hebdomadaire</SelectItem>
-                      <SelectItem value="mensuelle">Mensuelle</SelectItem>
-                      <SelectItem value="trimestrielle">
-                        Trimestrielle
-                      </SelectItem>
-                      <SelectItem value="semestrielle">Semestrielle</SelectItem>
-                      <SelectItem value="annuelle">Annuelle</SelectItem>
-                      <SelectItem value="tous_les_x_jours">
-                        Tous les X jours
-                      </SelectItem>
-                    </RhfControlledSelect>
-
-                    <RhfControlledSelect<PrestationFormValuesType>
-                      name="modePlanning"
-                      label="Mode de planification"
-                      selectClassName="w-full"
-                    >
-                      <SelectItem value="planifie">Planifié</SelectItem>
-                      <SelectItem value="a_la_demande">À la demande</SelectItem>
-                    </RhfControlledSelect>
-                  </div>
-
-                  {showFrequenceParPeriode && (
-                    <RhfInput<PrestationFormValuesType>
-                      name="frequenceParPeriode"
-                      label={frequenceParPeriodeLabel}
-                      placeholder="Ex: 2"
-                      type="number"
-                      inputClassName="w-full"
-                    />
-                  )}
-
-                  {showIntervalleJours && (
-                    <RhfInput<PrestationFormValuesType>
-                      name="intervalleJours"
-                      label="Intervalle (en jours)"
-                      placeholder="Ex: 14"
-                      type="number"
-                      inputClassName="w-full"
-                    />
-                  )}
+                  <RhfControlledSelect<PrestationFormValuesType>
+                    name="famillePlanification"
+                    label="Mode de planification"
+                    requiredMark
+                    selectClassName="w-full"
+                    description="Déterminée automatiquement selon la fréquence. La configuration détaillée (RRULE / quota) se fait ensuite."
+                  >
+                    <SelectItem value="recurrence_auto">Récurrence automatique (quotidien, hebdo, mensuel)</SelectItem>
+                    <SelectItem value="quota_manuel">Quota à planifier (trimestriel, semestriel, annuel)</SelectItem>
+                    <SelectItem value="ponctuel">Ponctuel (one-shot)</SelectItem>
+                  </RhfControlledSelect>
                 </div>
 
                 <Separator />
@@ -1413,75 +1258,6 @@ export function PrestationFormDialog({
                   </div>
                 </div>
 
-                {/* ── PRÉFÉRENCES DE PLANIFICATION ── */}
-                {showPlanificationDetails && (
-                  <>
-                    <Separator />
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-semibold">
-                        Préférences de planification
-                      </h3>
-
-                      <div>
-                        <label className="text-sm font-medium">
-                          Jours préférés
-                        </label>
-                        <Controller
-                          control={form.control}
-                          name="joursPreference"
-                          render={({ field }) => {
-                            const current: number[] = Array.isArray(field.value)
-                              ? field.value
-                              : [];
-                            return (
-                              <div className="mt-2 mb-6 flex flex-wrap gap-3">
-                                {JOURS_SEMAINE.map((jour) => {
-                                  const checked = current.includes(jour.value);
-                                  return (
-                                    <label
-                                      key={jour.value}
-                                      className="flex cursor-pointer items-center gap-1.5"
-                                    >
-                                      <Checkbox
-                                        checked={checked}
-                                        onCheckedChange={(c) => {
-                                          const next = c
-                                            ? [...current, jour.value]
-                                            : current.filter(
-                                                (v) => v !== jour.value,
-                                              );
-                                          field.onChange(next);
-                                        }}
-                                      />
-                                      <span className="text-sm">
-                                        {jour.label}
-                                      </span>
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            );
-                          }}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <RhfInput<PrestationFormValuesType>
-                          name="heureDebutPreference"
-                          label="Heure de début préférée"
-                          placeholder="Ex: 08:00"
-                          description="Format HH:MM"
-                        />
-                        <RhfInput<PrestationFormValuesType>
-                          name="dureeEstimeeMinutes"
-                          label="Durée estimée (min)"
-                          placeholder="Ex: 120"
-                          type="number"
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
 
                 <Separator />
 

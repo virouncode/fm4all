@@ -162,7 +162,9 @@ export default async function PrestationDetailPage({
   // Référence : docs/regles_metier.md — Exécutions §3b & §4b
   const canSeeFinancials = isPlateforme || canManage;
 
-  const defaultTab = resolvedSearchParams.tab ?? "parametres";
+  const VALID_TABS = ["parametres", "planification", "execution", "interventions"] as const;
+  const rawTab = resolvedSearchParams.tab;
+  const defaultTab = VALID_TABS.includes(rawTab as (typeof VALID_TABS)[number]) ? rawTab! : "parametres";
 
   // 6. Charger les exécutions (toujours visible) ; prix inclus uniquement si accès financier
   // Tous les rôles ayant accès à la prestation peuvent voir les infos fonctionnelles (§3a, §4a).

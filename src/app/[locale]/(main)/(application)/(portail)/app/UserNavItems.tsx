@@ -18,6 +18,7 @@ import {
   BriefcaseBusiness,
   Building,
   Building2,
+  CalendarDays,
   ClipboardList,
   Euro,
   HandPlatter,
@@ -73,6 +74,13 @@ const NAV: Record<RoleEntrepriseType, NavSectionType[]> = {
           label: "Prestations",
           href: "/app/prestations",
           icon: HandPlatter,
+          match: "startsWith",
+        },
+        {
+          key: "calendrier",
+          label: "Calendrier",
+          href: "/app/calendrier",
+          icon: CalendarDays,
           match: "startsWith",
         },
         {
@@ -192,6 +200,13 @@ const NAV: Record<RoleEntrepriseType, NavSectionType[]> = {
           match: "startsWith",
         },
         {
+          key: "calendrier",
+          label: "Calendrier",
+          href: "/app/calendrier",
+          icon: CalendarDays,
+          match: "startsWith",
+        },
+        {
           key: "checklists",
           label: "Checklists",
           href: "/app/checklists",
@@ -305,6 +320,13 @@ const NAV: Record<RoleEntrepriseType, NavSectionType[]> = {
           label: "Prestations",
           href: "/app/prestations",
           icon: HandPlatter,
+          match: "startsWith",
+        },
+        {
+          key: "calendrier",
+          label: "Calendrier",
+          href: "/app/calendrier",
+          icon: CalendarDays,
           match: "startsWith",
         },
         {

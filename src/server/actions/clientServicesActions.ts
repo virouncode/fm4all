@@ -169,6 +169,7 @@ export const getPrestationsAction = actionClient
       entrepriseId,
       prestataireEntrepriseId,
       statut,
+      famillePlanification,
       serviceId,
       siteId,
       modeCommercial,
@@ -203,7 +204,7 @@ export const getPrestationsAction = actionClient
 
       const prestations = await getPrestationsByPrestataire(
         prestataireEntrepriseId,
-        { clientEntrepriseId: entrepriseId, statut, serviceId, siteId, modeCommercial, orderBy, orderDir, attributedSiteIds },
+        { clientEntrepriseId: entrepriseId, statut, famillePlanification, serviceId, siteId, modeCommercial, orderBy, orderDir, attributedSiteIds },
       );
       return { prestations };
     }
@@ -218,6 +219,7 @@ export const getPrestationsAction = actionClient
       }
       const prestations = await getAllPrestations({
         statut,
+        famillePlanification,
         serviceId,
         siteId,
         modeCommercial,
@@ -247,6 +249,7 @@ export const getPrestationsAction = actionClient
 
     const prestations = await getPrestationsByEntreprise(entrepriseId, {
       statut,
+      famillePlanification,
       serviceId,
       siteId,
       modeCommercial,
@@ -344,13 +347,8 @@ export const insertPrestationAction = actionClient
 
     // Normaliser les données (strings → types corrects, "" → null)
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalNumbers: [
-        "frequenceParPeriode",
-        "intervalleJours",
-        "dureeEstimeeMinutes",
-      ] as const,
       optionalDates: ["dateDebut", "dateFin"] as const,
-      optionalStrings: ["heureDebutPreference", "notes"] as const,
+      optionalStrings: ["notes"] as const,
     });
 
     // Préparer le payload DB
@@ -358,16 +356,10 @@ export const insertPrestationAction = actionClient
       entrepriseId: normalized.entrepriseId,
       siteId: normalized.siteId,
       serviceId: normalized.serviceId,
-      frequence: normalized.frequence,
-      frequenceParPeriode: normalized.frequenceParPeriode,
-      intervalleJours: normalized.intervalleJours,
+      famillePlanification: normalized.famillePlanification,
       dateDebut: normalized.dateDebut,
       dateFin: normalized.dateFin,
-      joursPreference: normalized.joursPreference ?? null,
-      heureDebutPreference: normalized.heureDebutPreference,
-      dureeEstimeeMinutes: normalized.dureeEstimeeMinutes,
       statut: "brouillon", // toujours brouillon à la création
-      modePlanning: normalized.modePlanning ?? "planifie",
       modeCommercial,
       notes: normalized.notes,
       createdById: currentUser.id,
@@ -401,11 +393,11 @@ export const insertPrestationAction = actionClient
       return selectClientServiceSchema.parse(inserted);
     });
 
-    // Si la prestation est directement créée en statut "actif" + mode "planifie",
+    // Si la prestation est directement créée en statut "actif" + recurrence_auto,
     // déclencher la génération des occurrences
     if (
       parsedPrestation.statut === "actif" &&
-      parsedPrestation.modePlanning === "planifie"
+      parsedPrestation.famillePlanification === "recurrence_auto"
     ) {
       const { onClientServiceChanged } = await import(
         "@/server/utils/clientServiceOccurrences.utils"
@@ -493,35 +485,18 @@ export const updatePrestationAction = actionClient
 
     // Normaliser les données
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalNumbers: [
-        "frequenceParPeriode",
-        "intervalleJours",
-        "dureeEstimeeMinutes",
-      ] as const,
       optionalDates: ["dateDebut", "dateFin"] as const,
-      optionalStrings: ["heureDebutPreference", "notes"] as const,
+      optionalStrings: ["notes"] as const,
     });
 
     // Construire l'objet de mise à jour avec seulement les champs fournis
     const updateFields: Record<string, unknown> = {};
-    if (normalized.frequence !== undefined)
-      updateFields.frequence = normalized.frequence;
-    if (normalized.frequenceParPeriode !== undefined)
-      updateFields.frequenceParPeriode = normalized.frequenceParPeriode;
-    if (normalized.intervalleJours !== undefined)
-      updateFields.intervalleJours = normalized.intervalleJours;
+    if (normalized.famillePlanification !== undefined)
+      updateFields.famillePlanification = normalized.famillePlanification;
     if (normalized.dateDebut !== undefined)
       updateFields.dateDebut = normalized.dateDebut;
     if (normalized.dateFin !== undefined)
       updateFields.dateFin = normalized.dateFin;
-    if (normalized.joursPreference !== undefined)
-      updateFields.joursPreference = normalized.joursPreference ?? null;
-    if (normalized.heureDebutPreference !== undefined)
-      updateFields.heureDebutPreference = normalized.heureDebutPreference;
-    if (normalized.dureeEstimeeMinutes !== undefined)
-      updateFields.dureeEstimeeMinutes = normalized.dureeEstimeeMinutes;
-    if (normalized.modePlanning !== undefined)
-      updateFields.modePlanning = normalized.modePlanning;
     if (parsedInput.modeCommercial !== undefined)
       updateFields.modeCommercial = parsedInput.modeCommercial;
     if (normalized.notes !== undefined) updateFields.notes = normalized.notes;
@@ -543,10 +518,10 @@ export const updatePrestationAction = actionClient
 
     const parsedPrestation = selectClientServiceSchema.parse(updated);
 
-    // Si la prestation est active + planifiée, re-générer les occurrences
+    // Si la prestation est active + recurrence_auto, re-générer les occurrences
     if (
       parsedPrestation.statut === "actif" &&
-      parsedPrestation.modePlanning === "planifie"
+      parsedPrestation.famillePlanification === "recurrence_auto"
     ) {
       const { onClientServiceChanged } = await import(
         "@/server/utils/clientServiceOccurrences.utils"
@@ -680,8 +655,8 @@ export const updatePrestationStatutAction = actionClient
 
     const parsedPrestation = selectClientServiceSchema.parse(updated);
 
-    // Effets de bord sur les occurrences selon la transition (mode planifie uniquement)
-    if (parsedPrestation.modePlanning === "planifie") {
+    // Effets de bord sur les occurrences selon la transition (recurrence_auto uniquement)
+    if (parsedPrestation.famillePlanification === "recurrence_auto") {
       const now = new Date();
 
       if (newStatut === "actif") {
@@ -827,31 +802,20 @@ export const insertPrestationWithExecutionAction = actionClient
     }
 
     const normalized = normalizeForSubmit(parsedInput, {
-      optionalNumbers: [
-        "frequenceParPeriode",
-        "intervalleJours",
-        "dureeEstimeeMinutes",
-      ] as const,
       optionalDates: ["dateDebut", "dateFin", "dateFinValidite"] as const,
       requiredDates: ["dateDebutValidite"] as const,
       requiredNumbers: ["priorite"] as const,
-      optionalStrings: ["heureDebutPreference", "notes"] as const,
+      optionalStrings: ["notes"] as const,
     });
 
     const payload = insertClientServiceToDbSchema.parse({
       entrepriseId: normalized.entrepriseId,
       siteId: normalized.siteId,
       serviceId: normalized.serviceId,
-      frequence: normalized.frequence,
-      frequenceParPeriode: normalized.frequenceParPeriode,
-      intervalleJours: normalized.intervalleJours,
+      famillePlanification: normalized.famillePlanification,
       dateDebut: normalized.dateDebut,
       dateFin: normalized.dateFin,
-      joursPreference: normalized.joursPreference ?? null,
-      heureDebutPreference: normalized.heureDebutPreference,
-      dureeEstimeeMinutes: normalized.dureeEstimeeMinutes,
       statut: "brouillon",
-      modePlanning: normalized.modePlanning ?? "planifie",
       modeCommercial: "direct", // Toujours direct en posture prestataire
       notes: normalized.notes,
       createdById: currentUser.id,

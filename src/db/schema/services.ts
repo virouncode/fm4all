@@ -4,7 +4,6 @@ import {
   date,
   index,
   integer,
-  jsonb,
   pgTable,
   smallint,
   text,
@@ -24,17 +23,20 @@ import {
 import { user } from "./auth";
 import { entreprises, serviceEntreprises } from "./entreprises";
 import {
-  clientServiceModePlanningEnum,
   clientServiceStatutEnum,
   executionPeriodeFacturationEnum,
   executionTypePrixEnum,
-  frequenceEnum,
+  famillePlanificationEnum,
+  modeAncragePeriodeEnum,
   modeCommercialEnum,
   modePilotageEnum,
   occurrenceStatutEnum,
   occurrenceTacheStatutEnum,
   perimetreModeEnum,
+  periodeQuotaEnum,
   siteAttributionScopeEnum,
+  typeExceptionRecurrenceEnum,
+  typeSourceOccurrenceEnum,
 } from "./enums";
 import { sites } from "./sites";
 
@@ -55,6 +57,16 @@ export const services = pgTable(
   ],
 );
 
+/**
+ * Contrat de prestation : lien entre un client, un site racine et un type de service.
+ *
+ * Les colonnes de fréquence (frequence, frequenceParPeriode, intervalleJours,
+ * joursPreference, heureDebutPreference, dureeEstimeeMinutes, modePlanning)
+ * ont été supprimées dans la refonte 2026-03-14.
+ * Elles sont remplacées par :
+ *   - clientServiceReglesRecurrence    (famille recurrence_auto)
+ *   - clientServiceQuotasPlanification (famille quota_manuel)
+ */
 export const clientServices = pgTable(
   "client_services",
   {
@@ -70,31 +82,19 @@ export const clientServices = pgTable(
     serviceId: uuid("service_id")
       .notNull()
       .references(() => services.id, { onDelete: "cascade" }),
-    frequence: frequenceEnum("frequence").notNull(),
-    frequenceParPeriode: integer("frequence_par_periode"),
-    intervalleJours: integer("intervalle_jours"), //si tous les X jours
-    dateDebut: timestamp("date_debut", {
-      //début du contrat de service, à partir duquel les occurrences seront générées
-      withTimezone: true,
-      mode: "date",
-      precision: 3,
-    }),
-    dateFin: timestamp("date_fin", {
-      //fin du contrat de service, après lequel les occurrences ne seront plus générées
-      withTimezone: true,
-      mode: "date",
-      precision: 3,
-    }),
-    joursPreference: jsonb("jours_preference").$type<number[]>(),
-    // jours ISO 8601 : 1=lundi … 7=dimanche ; utilisé quand frequenceParPeriode > 1
-    heureDebutPreference: varchar("heure_debut_preference", { length: 5 }),
-    // format "HH:mm" (ex: "08:00") — heure de début par défaut des occurrences
-    dureeEstimeeMinutes: smallint("duree_estimee_minutes"),
-    // durée d'une intervention en minutes — sert à calculer dateFinPrevue
-    statut: clientServiceStatutEnum("statut").notNull().default("brouillon"),
-    modePlanning: clientServiceModePlanningEnum("mode_planning")
+    /**
+     * Famille de planification — dérivée automatiquement à la création :
+     *   hebdomadaire / mensuelle / tous_les_x_jours → recurrence_auto
+     *   trimestrielle / semestrielle / annuelle      → quota_manuel
+     *   one_shot                                     → ponctuel
+     * Ne jamais exposer comme champ de saisie directe.
+     */
+    famillePlanification: famillePlanificationEnum("famille_planification")
       .notNull()
-      .default("planifie"),
+      .default("recurrence_auto"),
+    dateDebut: timestamptz("date_debut"),
+    dateFin: timestamptz("date_fin"),
+    statut: clientServiceStatutEnum("statut").notNull().default("brouillon"),
     modeCommercial: modeCommercialEnum("mode_commercial")
       .notNull()
       .default("direct"),
@@ -109,10 +109,181 @@ export const clientServices = pgTable(
     index("client_services_site_idx").on(t.siteId),
     index("client_services_service_idx").on(t.serviceId),
     index("client_services_statut_idx").on(t.statut),
+    index("client_services_famille_idx").on(t.famillePlanification),
     index("client_services_dates_idx").on(t.dateDebut, t.dateFin),
   ],
 );
 
+// ---------------------------------------------------------------------------
+// RÈGLES DE RÉCURRENCE (famille recurrence_auto)
+// ---------------------------------------------------------------------------
+
+/**
+ * Sous-série RRULE d'une prestation récurrente automatique.
+ *
+ * Une prestation peut avoir N règles (ex: "Lundi 08h", "Mercredi 14h", "Vendredi 09h").
+ *
+ * IMPORTANT — Convention stockage :
+ *   dtstartLocal   = timestamp WITHOUT timezone = première occurrence locale de la sous-série.
+ *                    Calculée automatiquement depuis clientServices.dateDebut + premier jour compatible.
+ *                    Ne jamais exposer comme champ de saisie de premier niveau.
+ *   fuseauHoraire  = identifiant IANA (ex: "Europe/Paris"), obligatoire, validé côté app.
+ *                    Permet l'expansion RRULE avec gestion DST correcte via rrule.js + luxon.
+ *   regleRrule     = RRULE pure SANS DTSTART (ex: "FREQ=WEEKLY;BYDAY=MO").
+ *                    Ne jamais inclure DTSTART dans cette string — dtstartLocal et fuseauHoraire
+ *                    servent à reconstruire : DTSTART;TZID=<fuseauHoraire>:<dtstartLocal>
+ *
+ * Les occurrences matérialisées (clientServiceOccurrences) sont en timestamptz (instant UTC).
+ */
+export const clientServiceReglesRecurrence = pgTable(
+  "client_service_regles_recurrence",
+  {
+    id: id(),
+    clientServiceId: uuid("client_service_id")
+      .notNull()
+      .references(() => clientServices.id, { onDelete: "cascade" }),
+    libelle: varchar("libelle", { length: 255 }),
+    // timestamp WITHOUT timezone = heure locale murale, pas d'instant UTC
+    dtstartLocal: timestamp("dtstart_local", {
+      withTimezone: false,
+      mode: "date",
+      precision: 0,
+    }).notNull(),
+    fuseauHoraire: varchar("fuseau_horaire", { length: 64 })
+      .notNull()
+      .default("Europe/Paris"),
+    // RRULE pure sans DTSTART — ex: "FREQ=WEEKLY;BYDAY=MO,WE,FR"
+    regleRrule: text("regle_rrule").notNull(),
+    dureePrevueMinutes: smallint("duree_prevue_minutes"),
+    actif: boolean("actif").notNull().default(true),
+    ordre: smallint("ordre").notNull().default(0),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("csrr_client_service_idx").on(t.clientServiceId),
+    index("csrr_actif_idx").on(t.actif),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// QUOTAS À PLANIFIER (famille quota_manuel)
+// ---------------------------------------------------------------------------
+
+/**
+ * Politique de quota pour une prestation à planification manuelle.
+ * Une seule ligne par prestation (UNIQUE sur clientServiceId).
+ *
+ * Logique :
+ *   nbOccurrencesParPeriode = 2, periodeQuota = "annee"
+ *   → l'utilisateur doit placer 2 occurrences dans la période
+ *   → UI : "Il vous reste X passages à planifier avant le [fin de période]"
+ *
+ * modeAncragePeriode :
+ *   "contrat" (défaut) → période départ = clientServices.dateDebut
+ *   "civil"            → période suit le calendrier civil (1er jan, 1er jul, etc.)
+ */
+export const clientServiceQuotasPlanification = pgTable(
+  "client_service_quotas_planification",
+  {
+    id: id(),
+    clientServiceId: uuid("client_service_id")
+      .notNull()
+      .references(() => clientServices.id, { onDelete: "cascade" })
+      .unique(),
+    nbOccurrencesParPeriode: smallint("nb_occurrences_par_periode").notNull(),
+    periodeQuota: periodeQuotaEnum("periode_quota").notNull(),
+    modeAncragePeriode: modeAncragePeriodeEnum("mode_ancrage_periode")
+      .notNull()
+      .default("contrat"),
+    // Calculée depuis clientServices.dateDebut (mode contrat) ou début période civile (mode civil)
+    dateAncragePeriode: date("date_ancrage_periode").notNull(),
+    notes: text("notes"),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("csqp_client_service_idx").on(t.clientServiceId)],
+);
+
+// ---------------------------------------------------------------------------
+// EXCEPTIONS DE RÉCURRENCE
+// ---------------------------------------------------------------------------
+
+/**
+ * Exceptions sur une série récurrente : occurrences supprimées, déplacées ou modifiées.
+ *
+ * Stockée en table dédiée (pas en EXDATE dans la RRULE string) pour la requêtabilité et l'audit.
+ * EXDATE peut être produit comme format de sortie vers FullCalendar/iCal si besoin.
+ *
+ * dateOriginale = instant UTC de l'occurrence théorique d'origine (clé métier stable).
+ *
+ * Niveaux de modification exposés selon permissions / modePilotage :
+ *   Agent     → "cette occurrence" seulement
+ *   Manager   → "celle-ci et les suivantes"
+ *   Admin     → "toute la série"
+ */
+export const clientServiceExceptionsRecurrence = pgTable(
+  "client_service_exceptions_recurrence",
+  {
+    id: id(),
+    clientServiceId: uuid("client_service_id")
+      .notNull()
+      .references(() => clientServices.id, { onDelete: "cascade" }),
+    regleRecurrenceId: uuid("regle_recurrence_id").references(
+      () => clientServiceReglesRecurrence.id,
+      { onDelete: "set null" },
+    ),
+    siteId: uuid("site_id").references(() => sites.id, {
+      onDelete: "set null",
+    }),
+    // Instant UTC de l'occurrence théorique d'origine — jamais modifié
+    dateOriginale: timestamptz("date_originale").notNull(),
+    typeException: typeExceptionRecurrenceEnum("type_exception").notNull(),
+    // Renseignée si type = "deplacee" ou "modifiee"
+    nouvelleDateDebut: timestamptz("nouvelle_date_debut"),
+    nouvelleHeureFin: timestamptz("nouvelle_heure_fin"),
+    motif: text("motif"),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("cser_client_service_idx").on(t.clientServiceId),
+    index("cser_regle_recurrence_idx").on(t.regleRecurrenceId),
+    index("cser_date_originale_idx").on(t.dateOriginale),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// OCCURRENCES (instances matérialisées)
+// ---------------------------------------------------------------------------
+
+/**
+ * Instance matérialisée d'une occurrence.
+ *
+ * Matérialisée seulement quand elle devient opérationnelle :
+ *   - Cron J+7 (occurrences proches)
+ *   - Action utilisateur sur un event virtuel FullCalendar
+ *   - Cron de réconciliation nightly (passé non encore matérialisé → audit/analytics)
+ *
+ * Identité métier pour les occurrences issues d'une règle RRULE :
+ *   Contrainte unique partielle : (clientServiceId, regleRecurrenceId, siteId, dateDebutOriginale)
+ *   WHERE type_source = 'regle_recurrence'
+ *
+ * dateDebutOriginale = date théorique d'origine, figée à la matérialisation, JAMAIS modifiée.
+ *   Si l'occurrence est déplacée : dateDebutOriginale = lundi 23, dateDebutPrevue = mardi 24.
+ *
+ * executionId : figé au passage statut → "en_cours" (plus à la génération).
+ *   Résolvable dynamiquement tant que l'occurrence est "planifiee".
+ *
+ * Tâches (occurrenceTaches) : snapshotées à J-1 ou au passage → "en_cours".
+ *   Plus à la génération de l'occurrence (ancienne logique supprimée).
+ */
 export const clientServiceOccurrences = pgTable(
   "client_service_occurrences",
   {
@@ -123,15 +294,27 @@ export const clientServiceOccurrences = pgTable(
     siteId: uuid("site_id")
       .notNull()
       .references(() => sites.id, { onDelete: "cascade" }),
+    // Origine de l'occurrence
+    typeSource: typeSourceOccurrenceEnum("type_source")
+      .notNull()
+      .default("ponctuel"),
+    regleRecurrenceId: uuid("regle_recurrence_id").references(
+      () => clientServiceReglesRecurrence.id,
+      { onDelete: "set null" },
+    ),
+    // Date théorique d'origine — figée à la matérialisation, jamais modifiée
+    dateDebutOriginale: timestamptz("date_debut_originale"),
+    // Dates planifiées (peuvent évoluer si occurrence déplacée)
     dateDebutPrevue: timestamptz("date_debut_prevue"),
     dateFinPrevue: timestamptz("date_fin_prevue"),
+    // Dates réelles (renseignées à l'exécution)
     dateDebutReelle: timestamptz("date_debut_reelle"),
     dateFinReelle: timestamptz("date_fin_reelle"),
+    // Exécution gagnante — figée au passage → "en_cours", pas à la génération
     executionId: uuid("execution_id").references(
       () => clientServiceExecutions.id,
       { onDelete: "set null" },
     ),
-    // execution gagnante figée à la génération (prestataire + tarif applicables)
     statut: occurrenceStatutEnum("statut").notNull().default("planifiee"),
     assigneeUserId: uuid("assignee_user_id").references(() => user.id, {
       onDelete: "set null",
@@ -146,19 +329,29 @@ export const clientServiceOccurrences = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("client_service_occurrences_client_service_idx").on(
-      t.clientServiceId,
-    ),
-    index("client_service_occurrences_site_idx").on(t.siteId),
-    index("client_service_occurrences_statut_idx").on(t.statut),
-    index("client_service_occurrences_execution_idx").on(t.executionId),
-    index("client_service_occurrences_assignee_idx").on(t.assigneeUserId),
-    index("client_service_occurrences_dates_prevues_idx").on(
-      t.dateDebutPrevue,
-      t.dateFinPrevue,
-    ),
+    index("cso_client_service_idx").on(t.clientServiceId),
+    index("cso_site_idx").on(t.siteId),
+    index("cso_statut_idx").on(t.statut),
+    index("cso_execution_idx").on(t.executionId),
+    index("cso_assignee_idx").on(t.assigneeUserId),
+    index("cso_type_source_idx").on(t.typeSource),
+    index("cso_regle_recurrence_idx").on(t.regleRecurrenceId),
+    index("cso_dates_prevues_idx").on(t.dateDebutPrevue, t.dateFinPrevue),
+    // Contrainte unique partielle — une seule occurrence matérialisée par (règle, site, date originale)
+    uniqueIndex("cso_regle_recurrence_udx")
+      .on(
+        t.clientServiceId,
+        t.regleRecurrenceId,
+        t.siteId,
+        t.dateDebutOriginale,
+      )
+      .where(sql`type_source = 'regle_recurrence'`),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// EXÉCUTIONS (prestataire assigné)
+// ---------------------------------------------------------------------------
 
 export const clientServiceExecutions = pgTable(
   "client_service_executions",
@@ -174,28 +367,24 @@ export const clientServiceExecutions = pgTable(
       () => serviceEntreprises.id,
       { onDelete: "set null" },
     ),
-    // prestataire responsable (nullable = non encore assigné)
     dateDebutValidite: timestamptz("date_debut_validite").notNull(),
     dateFinValidite: timestamptz("date_fin_validite"),
-    // null = pas de fin (règle perpétuelle jusqu'à désactivation)
     priorite: smallint("priorite").notNull(),
-    // plus grand = gagne ; convention : 0=global, 10=bâtiment, 20=zone
     actif: boolean("actif").notNull().default(true),
     modePilotage: modePilotageEnum("mode_pilotage").notNull().default("client"),
     tacheListeTemplateId: uuid("tache_liste_template_id").references(
       () => tacheListesTemplates.id,
       { onDelete: "set null" },
     ),
-    // checklist override du prestataire (prioritaire sur celle de la prestation)
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
   },
   (t) => [
-    index("client_service_executions_client_service_idx").on(t.clientServiceId),
-    index("client_service_executions_site_idx").on(t.siteId),
-    index("client_service_executions_actif_idx").on(t.actif),
+    index("cse_client_service_idx").on(t.clientServiceId),
+    index("cse_site_idx").on(t.siteId),
+    index("cse_actif_idx").on(t.actif),
   ],
 );
 
@@ -207,17 +396,11 @@ export const clientServiceExecutionPrix = pgTable(
       .notNull()
       .references(() => clientServiceExecutions.id, { onDelete: "cascade" }),
     typePrix: executionTypePrixEnum("type_prix").notNull(),
-    // abonnement | par_occurrence | installation | frais_livraison
     montantHt: integer("montant_ht").notNull(),
-    // prix facturé au client (HT *100) — source de vérité pour la facturation
     coutPrestataireHt: integer("cout_prestataire_ht"),
-    // coût réel payé au prestataire (HT *100) — nullable si inconnu / standalone
     margePourcent: integer("marge_pourcent"),
-    // marge FM4ALL en % (*100, ex: 12.5% = 1250) — nullable si non applicable
     periodeFacturation: executionPeriodeFacturationEnum("periode_facturation"),
-    // requis si typePrix = abonnement (semaine | mois | annee)
     nbOccurrencesIncluses: integer("nb_occurrences_incluses"),
-    // optionnel : quota d'occurrences incluses (au-delà → facturation par_occurrence)
     actif: boolean("actif").notNull().default(true),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
@@ -225,12 +408,10 @@ export const clientServiceExecutionPrix = pgTable(
     updatedById: updatedById(() => user),
   },
   (t) => [
-    index("client_service_execution_prix_execution_idx").on(t.executionId),
-    index("client_service_execution_prix_type_idx").on(t.typePrix),
-    index("client_service_execution_prix_actif_idx").on(t.actif),
-    // Index partiel : n'empêche les doublons que sur les lignes actives.
-    // Les lignes soft-deleted (actif=false) peuvent coexister avec la même clé.
-    uniqueIndex("client_service_execution_prix_udx")
+    index("csep_execution_idx").on(t.executionId),
+    index("csep_type_idx").on(t.typePrix),
+    index("csep_actif_idx").on(t.actif),
+    uniqueIndex("csep_actif_udx")
       .on(t.executionId, t.typePrix, t.periodeFacturation)
       .where(sql`actif = true`),
   ],
@@ -242,39 +423,34 @@ export const clientServicePerimetre = pgTable(
     id: id(),
     clientServiceId: uuid("client_service_id")
       .notNull()
-      .references(() => clientServices.id, {
-        onDelete: "cascade",
-      }),
+      .references(() => clientServices.id, { onDelete: "cascade" }),
     siteId: uuid("site_id")
       .notNull()
-      .references(() => sites.id, {
-        onDelete: "cascade",
-      }),
+      .references(() => sites.id, { onDelete: "cascade" }),
     mode: perimetreModeEnum("mode").notNull(),
     scope: siteAttributionScopeEnum("scope").notNull().default("subtree"),
     ordreAffichage: smallint("ordre_affichage").notNull().default(0),
-    // tri UI uniquement — pas de logique métier sur cet ordre
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("client_service_perimetre_client_service_idx").on(t.clientServiceId),
-    index("client_service_perimetre_site_idx").on(t.siteId),
-    index("client_service_perimetre_mode_idx").on(t.mode),
-    uniqueIndex("client_service_perimetre_udx").on(
-      t.clientServiceId,
-      t.siteId,
-      t.mode,
-      t.scope,
-    ),
+    index("csp_client_service_idx").on(t.clientServiceId),
+    index("csp_site_idx").on(t.siteId),
+    index("csp_mode_idx").on(t.mode),
+    uniqueIndex("csp_udx").on(t.clientServiceId, t.siteId, t.mode, t.scope),
   ],
 );
 
+// ---------------------------------------------------------------------------
+// CHECKLISTS (templates de tâches)
+// ---------------------------------------------------------------------------
+
 /**
  * Pack de tâches nommé (checklist header).
- * Appartient à une entreprise (FM4ALL = pack système, client = pack client, prestataire = pack prestataire).
+ * proprietaireEntrepriseId = null → pack système FM4ALL (accessible à tous)
+ * proprietaireEntrepriseId = uuid → pack entreprise (client ou prestataire)
  */
 export const tacheListesTemplates = pgTable(
   "tache_listes_templates",
@@ -283,8 +459,10 @@ export const tacheListesTemplates = pgTable(
     serviceId: uuid("service_id")
       .notNull()
       .references(() => services.id, { onDelete: "cascade" }),
-    proprietaireEntrepriseId: uuid("proprietaire_entreprise_id")
-      .references(() => entreprises.id, { onDelete: "set null" }),
+    proprietaireEntrepriseId: uuid("proprietaire_entreprise_id").references(
+      () => entreprises.id,
+      { onDelete: "set null" },
+    ),
     nom: varchar("nom", { length: 255 }).notNull(),
     actif: boolean("actif").notNull().default(true),
     createdById: createdById(() => user),
@@ -293,18 +471,12 @@ export const tacheListesTemplates = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("tache_listes_templates_service_idx").on(t.serviceId),
-    index("tache_listes_templates_proprietaire_idx").on(
-      t.proprietaireEntrepriseId,
-    ),
-    index("tache_listes_templates_actif_idx").on(t.actif),
+    index("tlt_service_idx").on(t.serviceId),
+    index("tlt_proprietaire_idx").on(t.proprietaireEntrepriseId),
+    index("tlt_actif_idx").on(t.actif),
   ],
 );
 
-/**
- * Item d’un pack de tâches (anciennement services_taches_templates).
- * Renommé + refonte : les items appartiennent maintenant à un pack (tacheListesTemplates).
- */
 export const tacheListeItems = pgTable(
   "tache_liste_items",
   {
@@ -323,12 +495,25 @@ export const tacheListeItems = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("tache_liste_items_liste_template_idx").on(t.listeTemplateId),
-    index("tache_liste_items_actif_idx").on(t.actif),
-    uniqueIndex("tache_liste_items_order_udx").on(t.listeTemplateId, t.ordre),
+    index("tli_liste_template_idx").on(t.listeTemplateId),
+    index("tli_actif_idx").on(t.actif),
+    uniqueIndex("tli_order_udx").on(t.listeTemplateId, t.ordre),
   ],
 );
 
+// ---------------------------------------------------------------------------
+// TÂCHES D'OCCURRENCE
+// ---------------------------------------------------------------------------
+
+/**
+ * Snapshot immuable des items d'une checklist pour une occurrence donnée.
+ *
+ * Matérialisées seulement à J-1 (cron) ou au passage statut → "en_cours".
+ * Plus à la génération de l'occurrence (ancienne logique snapshotOccurrenceTaches supprimée
+ * de ensureOccurrencesWindow).
+ *
+ * Tâches ad-hoc : listeItemId = null.
+ */
 export const occurrenceTaches = pgTable(
   "occurrence_taches",
   {
@@ -339,7 +524,6 @@ export const occurrenceTaches = pgTable(
     listeItemId: uuid("liste_item_id").references(() => tacheListeItems.id, {
       onDelete: "set null",
     }),
-    // item d'origine du snapshot (null si tâche ad-hoc ou item supprimé)
     ordre: smallint("ordre").notNull(),
     titre: varchar("titre", { length: 255 }).notNull(),
     description: text("description"),
@@ -349,9 +533,7 @@ export const occurrenceTaches = pgTable(
     }),
     completeeParUserId: uuid("completee_par_user_id").references(
       () => user.id,
-      {
-        onDelete: "set null",
-      },
+      { onDelete: "set null" },
     ),
     tempsPasseSecondes: integer("temps_passe_secondes"),
     notes: text("notes"),
@@ -363,16 +545,20 @@ export const occurrenceTaches = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("occurrence_taches_occurrence_idx").on(t.occurrenceId),
-    index("occurrence_taches_statut_idx").on(t.statut),
-    index("occurrence_taches_liste_item_idx").on(t.listeItemId),
-    uniqueIndex("occurrence_taches_order_udx").on(t.occurrenceId, t.ordre),
+    index("ot_occurrence_idx").on(t.occurrenceId),
+    index("ot_statut_idx").on(t.statut),
+    index("ot_liste_item_idx").on(t.listeItemId),
+    uniqueIndex("ot_order_udx").on(t.occurrenceId, t.ordre),
   ],
 );
 
+// ---------------------------------------------------------------------------
+// FACTURATION — LEDGER IMMUABLE
+// ---------------------------------------------------------------------------
+
 /**
  * Table de traçabilité : enregistre chaque application d'un tarif à un événement.
- * Sert de base pour la facturation future sans jamais modifier l'historique.
+ * Snapshot immuable — ne jamais modifier une ligne existante.
  *
  * Règles de déclenchement :
  *   ABONNEMENT      → 1 ligne par période (periodeStart/periodeEnd renseignés, occurrenceId null)
@@ -397,15 +583,10 @@ export const clientServicePrixAppliques = pgTable(
       () => clientServiceOccurrences.id,
       { onDelete: "cascade" },
     ),
-    // Snapshot immuable : ne jamais modifier, même si le tarif source change
     typePrix: executionTypePrixEnum("type_prix").notNull(),
     montantHtSnapshot: integer("montant_ht_snapshot").notNull(),
-    // montant facturé au client (centimes, HT)
     coutPrestataireHtSnapshot: integer("cout_prestataire_ht_snapshot"),
-    // coût réel prestataire (centimes, HT) — null si non renseigné
     margePourcentSnapshot: integer("marge_pourcent_snapshot"),
-    // marge FM4ALL (%) — null si direct
-    // Pour les abonnements : plage de la période facturée
     periodeStart: date("periode_start"),
     periodeEnd: date("periode_end"),
     createdAt: createdAt(),
@@ -414,18 +595,13 @@ export const clientServicePrixAppliques = pgTable(
     updatedById: updatedById(() => user),
   },
   (t) => [
-    index("csp_appliques_execution_prix_idx").on(t.executionPrixId),
-    index("csp_appliques_client_service_idx").on(t.clientServiceId),
-    index("csp_appliques_occurrence_idx").on(t.occurrenceId),
-    // Anti double-facturation : un tarif ne peut être appliqué qu'une fois par occurrence
-    uniqueIndex("csp_appliques_par_occurrence_udx").on(
+    index("cspa_execution_prix_idx").on(t.executionPrixId),
+    index("cspa_client_service_idx").on(t.clientServiceId),
+    index("cspa_occurrence_idx").on(t.occurrenceId),
+    uniqueIndex("cspa_par_occurrence_udx").on(
       t.executionPrixId,
       t.occurrenceId,
     ),
-    // Anti double-facturation : un abonnement ne peut être appliqué qu'une fois par période
-    uniqueIndex("csp_appliques_par_periode_udx").on(
-      t.executionPrixId,
-      t.periodeStart,
-    ),
+    uniqueIndex("cspa_par_periode_udx").on(t.executionPrixId, t.periodeStart),
   ],
 );

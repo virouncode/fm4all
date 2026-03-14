@@ -87,9 +87,12 @@ import { prospects } from "./prospects";
 import {
   clientServiceExecutionPrix,
   clientServiceExecutions,
+  clientServiceExceptionsRecurrence,
   clientServiceOccurrences,
   clientServicePerimetre,
   clientServicePrixAppliques,
+  clientServiceQuotasPlanification,
+  clientServiceReglesRecurrence,
   clientServices,
   occurrenceTaches,
   services,
@@ -506,6 +509,9 @@ export const clientServicesRelations = relations(
     occurrences: many(clientServiceOccurrences),
     executions: many(clientServiceExecutions),
     perimetres: many(clientServicePerimetre),
+    reglesRecurrence: many(clientServiceReglesRecurrence),
+    quotasPlanification: many(clientServiceQuotasPlanification),
+    exceptionsRecurrence: many(clientServiceExceptionsRecurrence),
     contratClientServices: many(contratClientServices),
     factures: many(factures),
     factureLigneAllocations: many(factureLigneAllocations),
@@ -528,6 +534,10 @@ export const clientServiceOccurrencesRelations = relations(
     execution: one(clientServiceExecutions, {
       fields: [clientServiceOccurrences.executionId],
       references: [clientServiceExecutions.id],
+    }),
+    regleRecurrence: one(clientServiceReglesRecurrence, {
+      fields: [clientServiceOccurrences.regleRecurrenceId],
+      references: [clientServiceReglesRecurrence.id],
     }),
     assigneeUser: one(user, {
       fields: [clientServiceOccurrences.assigneeUserId],
@@ -672,6 +682,76 @@ export const occurrenceTachesRelations = relations(
     }),
     tickets: many(tickets),
     documentsLinks: many(documentsLinks),
+  }),
+);
+
+export const clientServiceReglesRecurrenceRelations = relations(
+  clientServiceReglesRecurrence,
+  ({ one, many }) => ({
+    clientService: one(clientServices, {
+      fields: [clientServiceReglesRecurrence.clientServiceId],
+      references: [clientServices.id],
+    }),
+    createdBy: one(user, {
+      fields: [clientServiceReglesRecurrence.createdById],
+      references: [user.id],
+      relationName: "regleRecurrenceCreatedBy",
+    }),
+    updatedBy: one(user, {
+      fields: [clientServiceReglesRecurrence.updatedById],
+      references: [user.id],
+      relationName: "regleRecurrenceUpdatedBy",
+    }),
+    occurrences: many(clientServiceOccurrences),
+    exceptions: many(clientServiceExceptionsRecurrence),
+  }),
+);
+
+export const clientServiceQuotasPlanificationRelations = relations(
+  clientServiceQuotasPlanification,
+  ({ one }) => ({
+    clientService: one(clientServices, {
+      fields: [clientServiceQuotasPlanification.clientServiceId],
+      references: [clientServices.id],
+    }),
+    createdBy: one(user, {
+      fields: [clientServiceQuotasPlanification.createdById],
+      references: [user.id],
+      relationName: "quotaPlanifCreatedBy",
+    }),
+    updatedBy: one(user, {
+      fields: [clientServiceQuotasPlanification.updatedById],
+      references: [user.id],
+      relationName: "quotaPlanifUpdatedBy",
+    }),
+  }),
+);
+
+export const clientServiceExceptionsRecurrenceRelations = relations(
+  clientServiceExceptionsRecurrence,
+  ({ one }) => ({
+    clientService: one(clientServices, {
+      fields: [clientServiceExceptionsRecurrence.clientServiceId],
+      references: [clientServices.id],
+    }),
+    regleRecurrence: one(clientServiceReglesRecurrence, {
+      fields: [clientServiceExceptionsRecurrence.regleRecurrenceId],
+      references: [clientServiceReglesRecurrence.id],
+    }),
+    site: one(sites, {
+      fields: [clientServiceExceptionsRecurrence.siteId],
+      references: [sites.id],
+    }),
+    createdBy: one(user, {
+      fields: [clientServiceExceptionsRecurrence.createdById],
+      references: [user.id],
+      relationName: "exceptionRecurrenceCreatedBy",
+    }),
+    updatedBy: one(user, {
+      fields: [clientServiceExceptionsRecurrence.updatedById],
+      references: [user.id],
+      relationName: "exceptionRecurrenceUpdatedBy",
+    }),
   }),
 );
 

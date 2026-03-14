@@ -7,6 +7,7 @@ type SearchParamsType = {
   serviceId?: string;
   siteId?: string;
   modeCommercial?: string;
+  famillePlanification?: string;
   clientEntrepriseId?: string;
   orderBy?: string;
   orderDir?: string;

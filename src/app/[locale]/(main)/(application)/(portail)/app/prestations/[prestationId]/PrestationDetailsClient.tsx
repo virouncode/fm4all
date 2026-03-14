@@ -42,6 +42,11 @@ import {
 } from "@/server/actions/clientServiceExecutionsActions";
 import { getOccurrencesPageAction } from "@/server/actions/clientServiceOccurrencesActions";
 import {
+  deleteRegleRecurrenceAction,
+  getQuotaPlanificationAction,
+  getReglesRecurrenceByPrestationAction,
+} from "@/server/actions/clientServiceReglesRecurrenceActions";
+import {
   deletePrestationAction,
   updatePrestationStatutAction,
 } from "@/server/actions/clientServicesActions";
@@ -50,6 +55,7 @@ import {
   type ExecutionWithPrix,
   type OccurrenceListItem,
 } from "@/server/queries/clientServiceExecutions.query";
+import type { SelectRegleRecurrenceType } from "@/zod-schemas/clientServiceReglesRecurrence.schema";
 import {
   type ClientServiceStatutType,
   type PrestationListItem,
@@ -61,13 +67,12 @@ import {
   ArrowUpAZ,
   Building,
   Calendar,
+  Clock,
   CalendarCheck,
-  CalendarDays,
   CalendarPlus,
   CalendarX,
   ChevronDown,
   ChevronRight,
-  Clock,
   Filter,
   HandPlatter,
   Info,
@@ -83,26 +88,26 @@ import {
   RotateCcw,
   Settings,
   Tag,
-  Timer,
   Trash2,
   TriangleAlert,
   Zap,
 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PrestationFormDialog } from "../PrestationFormDialog";
 import {
   formatDate,
   formatDateTime,
-  formatDuree,
-  getFrequenceLabel,
+  getFamillePlanificationBadge,
+  getFamillePlanificationLabel,
   getModeCommercialBadge,
-  getModePlanningBadge,
   getPrestationStatutBadge,
 } from "../helpers";
 import { ExecutionEditDialog } from "./ExecutionEditDialog";
 import { ExecutionFormDialog } from "./ExecutionFormDialog";
 import { OccurrenceOnDemandDialog } from "./OccurrenceOnDemandDialog";
+import { QuotaPlanificationFormDialog } from "./QuotaPlanificationFormDialog";
+import { RegleRecurrenceFormDialog } from "./RegleRecurrenceFormDialog";
 import { TacheListeManagerDialog } from "./TacheListeManagerDialog";
 import { TacheListePickerDialog } from "./TacheListePickerDialog";
 
@@ -122,16 +127,6 @@ type PrestationDetailsClientProps = {
   totalNonAssigned: number;
   availableSites: Array<{ id: string; nom: string }>;
   defaultTab?: string;
-};
-
-const JOUR_LABELS: Record<number, string> = {
-  1: "Lundi",
-  2: "Mardi",
-  3: "Mercredi",
-  4: "Jeudi",
-  5: "Vendredi",
-  6: "Samedi",
-  7: "Dimanche",
 };
 
 export function PrestationDetailsClient({
@@ -181,12 +176,6 @@ export function PrestationDetailsClient({
       router.refresh();
     }
   };
-
-  const frequenceLabel = getFrequenceLabel(
-    prestation.frequence,
-    prestation.frequenceParPeriode,
-    prestation.intervalleJours,
-  );
 
   const handleEditSuccess = () => {
     setEditDialogOpen(false);
@@ -264,10 +253,10 @@ export function PrestationDetailsClient({
             </Badge>
             <Badge
               className={
-                getModePlanningBadge(prestation.modePlanning).className
+                getFamillePlanificationBadge(prestation.famillePlanification).className
               }
             >
-              {getModePlanningBadge(prestation.modePlanning).label}
+              {getFamillePlanificationBadge(prestation.famillePlanification).label}
             </Badge>
             <Badge
               className={
@@ -364,7 +353,7 @@ export function PrestationDetailsClient({
                       : "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Activez d'abord une exécution, puis activez la prestation."
                 : "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Contactez un administrateur pour l'activer.")}
             {prestation.statut === "actif" &&
-              "Cette prestation est active. Les interventions sont planifiées selon la fréquence configurée."}
+              "Cette prestation est active. Les occurrences sont générées selon le mode de planification configuré."}
             {prestation.statut === "en_pause" &&
               "Cette prestation est en pause. Aucune nouvelle intervention ne sera générée jusqu'à la reprise."}
             {prestation.statut === "termine" &&
@@ -383,14 +372,13 @@ export function PrestationDetailsClient({
             <AlertDialogTitle>Activer la prestation ?</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3 text-sm">
-                {prestation.modePlanning === "planifie" && (
+                {prestation.famillePlanification === "recurrence_auto" && (
                   <p>
-                    Les interventions seront générées automatiquement pour les{" "}
-                    <strong>90 prochains jours</strong> selon la fréquence
-                    configurée.
+                    Les interventions seront générées automatiquement selon la
+                    règle de récurrence configurée.
                   </p>
                 )}
-                {prestation.modePlanning === "planifie" &&
+                {prestation.famillePlanification === "recurrence_auto" &&
                   !hasActiveExecution && (
                     <div className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2">
                       <p className="font-medium text-orange-800">
@@ -405,7 +393,7 @@ export function PrestationDetailsClient({
                       </p>
                     </div>
                   )}
-                {prestation.modePlanning === "planifie" &&
+                {prestation.famillePlanification === "recurrence_auto" &&
                   hasActiveExecution && (
                     <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2">
                       <p className="font-medium text-green-800">
@@ -458,23 +446,27 @@ export function PrestationDetailsClient({
         }}
         className="flex min-h-0 flex-1 flex-col"
       >
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="parametres" className="gap-2">
-            <Settings className="h-4 w-4" />
-            Paramètres
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="parametres" className="gap-1.5 text-xs sm:text-sm">
+            <Settings className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Paramètres</span>
           </TabsTrigger>
-          <TabsTrigger value="execution" className="gap-2">
-            <Zap className="h-4 w-4" />
-            Exécution & Tarifs
+          <TabsTrigger value="planification" className="gap-1.5 text-xs sm:text-sm">
+            <Repeat className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Planning</span>
+          </TabsTrigger>
+          <TabsTrigger value="execution" className="gap-1.5 text-xs sm:text-sm">
+            <Zap className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Exécution</span>
             {executions.length > 0 && (
               <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
                 {executions.length}
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="interventions" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            Interventions
+          <TabsTrigger value="interventions" className="gap-1.5 text-xs sm:text-sm">
+            <CalendarCheck className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Interventions</span>
             {interventionsCount > 0 && (
               <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
                 {interventionsCount}
@@ -482,7 +474,7 @@ export function PrestationDetailsClient({
             )}
             {totalNonAssigned > 0 && (
               <span className="rounded-full bg-orange-100 px-1.5 text-xs text-orange-700">
-                {totalNonAssigned} à attribuer
+                {totalNonAssigned}
               </span>
             )}
           </TabsTrigger>
@@ -512,31 +504,28 @@ export function PrestationDetailsClient({
                         Activer la prestation
                       </p>
                       <p>
-                        <strong>Mode Planifié</strong> — Déclenche la
-                        génération des interventions via une{" "}
-                        <strong>fenêtre glissante</strong> : le système crée
-                        automatiquement les interventions à venir jusqu&apos;à
-                        un horizon configurable (ex. 8 semaines), puis continue
-                        à en générer de nouvelles au fil du temps. Les
-                        interventions sont attribuées à l&apos;exécution active
-                        du moment. Sans exécution active, aucune intervention
-                        n&apos;est générée.
+                        <strong>Récurrence auto</strong> — Les occurrences sont
+                        générées automatiquement sur une{" "}
+                        <strong>fenêtre glissante de 7 jours</strong> à partir
+                        des règles RRULE définies. Une exécution active est
+                        obligatoire pour que les occurrences soient créées.
                       </p>
                       <p>
-                        <strong>Mode À la demande</strong> — Aucune
-                        intervention n&apos;est générée automatiquement. Les
-                        interventions sont créées manuellement au cas par cas.
-                        Dans les deux modes, une{" "}
-                        <strong>exécution active est obligatoire</strong> pour
-                        créer une intervention : sans prestataire couvrant la
-                        date visée, la création est bloquée.
+                        <strong>Quota manuel</strong> — Un nombre fixe
+                        d&apos;occurrences par période (trimestre, semestre,
+                        année) est alloué. Les occurrences sont créées
+                        manuellement dans l&apos;enveloppe disponible.
+                      </p>
+                      <p>
+                        <strong>Ponctuel</strong> — Aucune occurrence
+                        automatique. Chaque occurrence est créée manuellement à
+                        la demande.
                       </p>
                     </div>
 
                     <div className="space-y-1">
                       <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
-                        Modifier la configuration (fréquence, dates,
-                        planification)
+                        Modifier la configuration (mode, dates, règles)
                       </p>
                       <p>
                         Les interventions{" "}
@@ -605,22 +594,16 @@ export function PrestationDetailsClient({
                 label="Service"
                 value={prestation.serviceNom}
               />
-              <InfoRow icon={Repeat} label="Fréquence" value={frequenceLabel} />
+              <InfoRow
+                icon={Repeat}
+                label="Planification"
+                value={getFamillePlanificationLabel(prestation.famillePlanification)}
+              />
               <InfoRow
                 icon={CalendarCheck}
                 label="Date de début"
                 value={formatDate(prestation.dateDebut)}
               />
-              {prestation.joursPreference &&
-                prestation.joursPreference.length > 0 && (
-                  <InfoRow
-                    icon={CalendarDays}
-                    label="Jours préférés"
-                    value={prestation.joursPreference
-                      .map((j) => JOUR_LABELS[j] ?? `Jour ${j}`)
-                      .join(", ")}
-                  />
-                )}
               <InfoRow
                 icon={CalendarX}
                 label="Date de fin"
@@ -630,25 +613,11 @@ export function PrestationDetailsClient({
                     : "∞ Sans échéance"
                 }
               />
-              {prestation.heureDebutPreference && (
-                <InfoRow
-                  icon={Clock}
-                  label="Heure de début"
-                  value={prestation.heureDebutPreference}
-                />
-              )}
               <InfoRow
                 icon={CalendarPlus}
                 label="Créée le"
                 value={formatDate(prestation.createdAt)}
               />
-              {prestation.dureeEstimeeMinutes && (
-                <InfoRow
-                  icon={Timer}
-                  label="Durée estimée"
-                  value={formatDuree(prestation.dureeEstimeeMinutes)}
-                />
-              )}
               <InfoRow
                 icon={PencilLine}
                 label="Modifiée le"
@@ -707,6 +676,14 @@ export function PrestationDetailsClient({
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        {/* ============ TAB: PLANIFICATION ============ */}
+        <TabsContent
+          value="planification"
+          className="mt-6 min-h-0 flex-1 overflow-y-auto pb-6"
+        >
+          <PlanificationTab prestation={prestation} canManage={canManage} />
         </TabsContent>
 
         {/* ============ TAB: EXÉCUTION & TARIFS ============ */}
@@ -797,6 +774,342 @@ function InfoRow({
       </span>
       <span className="text-right font-medium">{value}</span>
     </div>
+  );
+}
+
+// ==================== TAB: PLANIFICATION ====================
+
+function PlanificationTab({
+  prestation,
+  canManage,
+}: {
+  prestation: PrestationListItem;
+  canManage: boolean;
+}) {
+  const [regles, setRegles] = useState<SelectRegleRecurrenceType[]>([]);
+  const [quota, setQuota] = useState<{
+    nbOccurrencesParPeriode: number;
+    periodeQuota: "trimestre" | "semestre" | "annee";
+    modeAncragePeriode: "contrat" | "civil";
+    notes: string | null;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingRegle, setEditingRegle] = useState<SelectRegleRecurrenceType | null>(null);
+  const [quotaDialogOpen, setQuotaDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const famille = prestation.famillePlanification;
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    if (famille === "recurrence_auto") {
+      const result = await getReglesRecurrenceByPrestationAction({
+        clientServiceId: prestation.id,
+        entrepriseId: prestation.entrepriseId,
+      });
+      if (result?.data?.regles) {
+        setRegles(result.data.regles);
+      }
+    } else if (famille === "quota_manuel") {
+      const result = await getQuotaPlanificationAction({
+        clientServiceId: prestation.id,
+        entrepriseId: prestation.entrepriseId,
+      });
+      if (result?.data !== undefined) {
+        setQuota(result.data.quota);
+      }
+    }
+    setIsLoading(false);
+  }, [famille, prestation.id, prestation.entrepriseId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const handleDeleteRegle = async (id: string) => {
+    setDeletingId(id);
+    const result = await deleteRegleRecurrenceAction({
+      id,
+      clientServiceId: prestation.id,
+      entrepriseId: prestation.entrepriseId,
+    });
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+    } else {
+      setRegles((prev) => prev.filter((r) => r.id !== id));
+      toast.success("Règle supprimée.");
+    }
+    setDeletingId(null);
+  };
+
+  const PERIODE_LABELS: Record<string, string> = {
+    trimestre: "trimestre",
+    semestre: "semestre",
+    annee: "an",
+  };
+
+  const MODE_ANCRAGE_LABELS: Record<string, string> = {
+    contrat: "date de contrat",
+    civil: "calendrier civil",
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-32 items-center justify-center">
+        <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+      </div>
+    );
+  }
+
+  // ===== PONCTUEL =====
+  if (famille === "ponctuel") {
+    return (
+      <div className="bg-muted/40 flex items-start gap-3 rounded-lg border p-4">
+        <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
+        <div className="text-muted-foreground text-sm">
+          <p className="text-foreground font-medium">Prestation ponctuelle</p>
+          <p className="mt-1">
+            Cette prestation est de type <strong>ponctuel</strong>. Les
+            interventions sont créées manuellement depuis l&apos;onglet{" "}
+            <strong>Interventions</strong>.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ===== QUOTA MANUEL =====
+  if (famille === "quota_manuel") {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-medium">Quota de planification</h3>
+            <p className="text-muted-foreground text-sm mt-0.5">
+              Nombre d&apos;interventions à planifier manuellement par période.
+            </p>
+          </div>
+          {canManage && (
+            <Button
+              size="sm"
+              variant={quota ? "outline" : "default"}
+              onClick={() => setQuotaDialogOpen(true)}
+            >
+              <Pencil className="h-4 w-4" />
+              {quota ? "Modifier" : "Configurer"}
+            </Button>
+          )}
+        </div>
+
+        {quota ? (
+          <Card>
+            <CardContent className="pt-6 grid gap-y-3 text-sm sm:grid-cols-2">
+              <InfoRow
+                icon={Repeat}
+                label="Occurrences par période"
+                value={`${quota.nbOccurrencesParPeriode} / ${PERIODE_LABELS[quota.periodeQuota] ?? quota.periodeQuota}`}
+              />
+              <InfoRow
+                icon={CalendarCheck}
+                label="Mode d'ancrage"
+                value={MODE_ANCRAGE_LABELS[quota.modeAncragePeriode] ?? quota.modeAncragePeriode}
+              />
+              {quota.notes && (
+                <div className="sm:col-span-2">
+                  <p className="text-muted-foreground whitespace-pre-wrap text-xs">
+                    {quota.notes}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="bg-muted/40 rounded-lg border p-4 text-sm text-muted-foreground">
+            Aucun quota configuré. Cliquez sur &quot;Configurer&quot; pour
+            définir le nombre d&apos;interventions à planifier.
+          </div>
+        )}
+
+        <QuotaPlanificationFormDialog
+          open={quotaDialogOpen}
+          onOpenChange={setQuotaDialogOpen}
+          prestation={prestation}
+          quota={quota}
+          onSuccess={load}
+        />
+      </div>
+    );
+  }
+
+  // ===== RÉCURRENCE AUTO =====
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-medium">Règles de récurrence</h3>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            Chaque règle génère automatiquement des interventions selon la
+            planification RRULE définie.
+          </p>
+        </div>
+        {canManage && (
+          <Button size="sm" onClick={() => setAddDialogOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Ajouter une règle
+          </Button>
+        )}
+      </div>
+
+      {regles.length === 0 ? (
+        <div className="bg-muted/40 rounded-lg border p-4 text-sm text-muted-foreground">
+          Aucune règle configurée. Ajoutez une règle pour que les interventions
+          soient générées automatiquement.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {regles.map((regle) => (
+            <RegleCard
+              key={regle.id}
+              regle={regle}
+              canManage={canManage}
+              isDeleting={deletingId === regle.id}
+              onEdit={() => {
+                setEditingRegle(regle);
+                setEditDialogOpen(true);
+              }}
+              onDelete={() => handleDeleteRegle(regle.id)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Dialogs */}
+      <RegleRecurrenceFormDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        prestation={prestation}
+        onSuccess={(newRegle) => setRegles((prev) => [...prev, newRegle])}
+      />
+      <RegleRecurrenceFormDialog
+        open={editDialogOpen}
+        onOpenChange={(v) => {
+          setEditDialogOpen(v);
+          if (!v) setEditingRegle(null);
+        }}
+        prestation={prestation}
+        regle={editingRegle ?? undefined}
+        onSuccess={(updated) =>
+          setRegles((prev) =>
+            prev.map((r) => (r.id === updated.id ? updated : r)),
+          )
+        }
+      />
+    </div>
+  );
+}
+
+function RegleCard({
+  regle,
+  canManage,
+  isDeleting,
+  onEdit,
+  onDelete,
+}: {
+  regle: SelectRegleRecurrenceType;
+  canManage: boolean;
+  isDeleting: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const rule = regle.regleRrule;
+  const parts = Object.fromEntries(
+    rule.split(";").map((p) => {
+      const [k, v] = p.split("=");
+      return [k!, v ?? ""];
+    }),
+  );
+
+  const FREQ_LABELS: Record<string, string> = {
+    DAILY: "Quotidien",
+    WEEKLY: "Hebdomadaire",
+    MONTHLY: "Mensuel",
+  };
+  const DAY_LABELS: Record<string, string> = {
+    MO: "Lun",
+    TU: "Mar",
+    WE: "Mer",
+    TH: "Jeu",
+    FR: "Ven",
+    SA: "Sam",
+    SU: "Dim",
+  };
+
+  const freq = FREQ_LABELS[parts["FREQ"] ?? ""] ?? parts["FREQ"] ?? "";
+  const interval = parts["INTERVAL"] ? `× ${parts["INTERVAL"]}` : "";
+  const byDay = parts["BYDAY"]
+    ? parts["BYDAY"]
+        .split(",")
+        .map((d) => DAY_LABELS[d] ?? d)
+        .join(", ")
+    : null;
+  const byMonthDay = parts["BYMONTHDAY"]
+    ? `le ${parts["BYMONTHDAY"]}`
+    : null;
+
+  const dtstartJs = regle.dtstartLocal as Date;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const heureStr = `${pad(dtstartJs.getHours())}:${pad(dtstartJs.getMinutes())}`;
+
+  return (
+    <Card className={!regle.actif ? "opacity-60" : undefined}>
+      <CardContent className="flex items-start justify-between gap-4 pt-4 pb-4">
+        <div className="space-y-1 text-sm">
+          {regle.libelle && (
+            <p className="font-medium">{regle.libelle}</p>
+          )}
+          <p className="text-muted-foreground">
+            {freq}
+            {interval && ` ${interval}`}
+            {byDay && ` — ${byDay}`}
+            {byMonthDay && ` — ${byMonthDay}`}
+            {" · "}à {heureStr} ({regle.fuseauHoraire})
+          </p>
+          {regle.dureePrevueMinutes != null && (
+            <p className="text-muted-foreground text-xs">
+              <Clock className="mr-1 inline h-3 w-3" />
+              {regle.dureePrevueMinutes} min
+            </p>
+          )}
+          {!regle.actif && (
+            <span className="text-muted-foreground text-xs italic">
+              (inactive)
+            </span>
+          )}
+        </div>
+        {canManage && (
+          <div className="flex shrink-0 gap-2">
+            <Button variant="ghost" size="sm" onClick={onEdit}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onDelete}
+              disabled={isDeleting}
+              className="text-destructive hover:text-destructive"
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -1516,7 +1829,7 @@ function InterventionsTab({
   });
 
   const canGenerate =
-    prestation.statut === "actif" && prestation.modePlanning === "planifie";
+    prestation.statut === "actif" && prestation.famillePlanification === "recurrence_auto";
 
   const applyFilters = async (
     newFilters: OccurrenceFiltersStateType,
@@ -1582,7 +1895,7 @@ function InterventionsTab({
             >
               <Plus className="h-3 w-3" />
               Ajouter une intervention
-              {prestation.modePlanning === "planifie" && (
+              {prestation.famillePlanification === "recurrence_auto" && (
                 <span className="ml-1 opacity-70">(exceptionnel)</span>
               )}
             </Button>

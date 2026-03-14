@@ -6,6 +6,7 @@ import { clientServiceExecutions, clientServices, services } from "@/db/schema/s
 import { sites } from "@/db/schema/sites";
 import { userClientAdhesions } from "@/db/schema/users";
 import {
+  type FamillePlanificationType,
   type ModeCommercialType,
   type PrestationListItem,
   prestationListItemSchema,
@@ -72,10 +73,12 @@ function buildOrderBy(
       return dir(sites.nom);
     case "statut":
       return dir(clientServices.statut);
-    case "frequence":
-      return dir(clientServices.frequence);
+    case "famillePlanification":
+      return dir(clientServices.famillePlanification);
     case "dateDebut":
       return dir(clientServices.dateDebut);
+    case "updatedAt":
+      return dir(clientServices.updatedAt);
     case "createdAt":
     default:
       return dir(clientServices.createdAt);
@@ -92,6 +95,7 @@ export async function getPrestationsByEntreprise(
   entrepriseId: string,
   options?: {
     statut?: SelectClientServiceType["statut"];
+    famillePlanification?: FamillePlanificationType;
     serviceId?: string;
     siteId?: string;
     modeCommercial?: ModeCommercialType;
@@ -105,6 +109,9 @@ export async function getPrestationsByEntreprise(
 
   if (options?.statut) {
     conditions.push(eq(clientServices.statut, options.statut));
+  }
+  if (options?.famillePlanification) {
+    conditions.push(eq(clientServices.famillePlanification, options.famillePlanification));
   }
   if (options?.serviceId) {
     conditions.push(eq(clientServices.serviceId, options.serviceId));
@@ -129,16 +136,10 @@ export async function getPrestationsByEntreprise(
       siteNom: sites.nom,
       serviceId: clientServices.serviceId,
       serviceNom: services.nom,
-      frequence: clientServices.frequence,
-      frequenceParPeriode: clientServices.frequenceParPeriode,
-      intervalleJours: clientServices.intervalleJours,
+      famillePlanification: clientServices.famillePlanification,
       dateDebut: clientServices.dateDebut,
       dateFin: clientServices.dateFin,
-      joursPreference: clientServices.joursPreference,
-      heureDebutPreference: clientServices.heureDebutPreference,
-      dureeEstimeeMinutes: clientServices.dureeEstimeeMinutes,
       statut: clientServices.statut,
-      modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
       createdAt: clientServices.createdAt,
@@ -164,6 +165,7 @@ export async function getPrestationsByPrestataire(
   options?: {
     clientEntrepriseId?: string;
     statut?: SelectClientServiceType["statut"];
+    famillePlanification?: FamillePlanificationType;
     serviceId?: string;
     siteId?: string;
     modeCommercial?: ModeCommercialType;
@@ -183,6 +185,9 @@ export async function getPrestationsByPrestataire(
 
   if (options?.statut) {
     conditions.push(eq(clientServices.statut, options.statut));
+  }
+  if (options?.famillePlanification) {
+    conditions.push(eq(clientServices.famillePlanification, options.famillePlanification));
   }
   if (options?.serviceId) {
     conditions.push(eq(clientServices.serviceId, options.serviceId));
@@ -207,16 +212,10 @@ export async function getPrestationsByPrestataire(
       siteNom: sites.nom,
       serviceId: clientServices.serviceId,
       serviceNom: services.nom,
-      frequence: clientServices.frequence,
-      frequenceParPeriode: clientServices.frequenceParPeriode,
-      intervalleJours: clientServices.intervalleJours,
+      famillePlanification: clientServices.famillePlanification,
       dateDebut: clientServices.dateDebut,
       dateFin: clientServices.dateFin,
-      joursPreference: clientServices.joursPreference,
-      heureDebutPreference: clientServices.heureDebutPreference,
-      dureeEstimeeMinutes: clientServices.dureeEstimeeMinutes,
       statut: clientServices.statut,
-      modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
       createdAt: clientServices.createdAt,
@@ -246,6 +245,7 @@ export async function getPrestationsByPrestataire(
  */
 export async function getAllPrestations(options?: {
   statut?: SelectClientServiceType["statut"];
+  famillePlanification?: FamillePlanificationType;
   serviceId?: string;
   siteId?: string;
   modeCommercial?: ModeCommercialType;
@@ -261,16 +261,10 @@ export async function getAllPrestations(options?: {
       siteNom: sites.nom,
       serviceId: clientServices.serviceId,
       serviceNom: services.nom,
-      frequence: clientServices.frequence,
-      frequenceParPeriode: clientServices.frequenceParPeriode,
-      intervalleJours: clientServices.intervalleJours,
+      famillePlanification: clientServices.famillePlanification,
       dateDebut: clientServices.dateDebut,
       dateFin: clientServices.dateFin,
-      joursPreference: clientServices.joursPreference,
-      heureDebutPreference: clientServices.heureDebutPreference,
-      dureeEstimeeMinutes: clientServices.dureeEstimeeMinutes,
       statut: clientServices.statut,
-      modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
       createdAt: clientServices.createdAt,
@@ -291,6 +285,9 @@ export async function getAllPrestations(options?: {
           : undefined,
         options?.modeCommercial
           ? eq(clientServices.modeCommercial, options.modeCommercial)
+          : undefined,
+        options?.famillePlanification
+          ? eq(clientServices.famillePlanification, options.famillePlanification)
           : undefined,
       ),
     )
@@ -331,16 +328,10 @@ export async function getPrestationWithJoinsById(
       siteNom: sites.nom,
       serviceId: clientServices.serviceId,
       serviceNom: services.nom,
-      frequence: clientServices.frequence,
-      frequenceParPeriode: clientServices.frequenceParPeriode,
-      intervalleJours: clientServices.intervalleJours,
+      famillePlanification: clientServices.famillePlanification,
       dateDebut: clientServices.dateDebut,
       dateFin: clientServices.dateFin,
-      joursPreference: clientServices.joursPreference,
-      heureDebutPreference: clientServices.heureDebutPreference,
-      dureeEstimeeMinutes: clientServices.dureeEstimeeMinutes,
       statut: clientServices.statut,
-      modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
       createdAt: clientServices.createdAt,

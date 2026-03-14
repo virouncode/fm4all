@@ -3,13 +3,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { type PrestationListItem } from "@/zod-schemas/clientServices.schema";
-import { Building, Calendar, Clock, MapPin } from "lucide-react";
+import { Building, Calendar, MapPin } from "lucide-react";
 import {
   formatDate,
-  formatDuree,
-  getFrequenceLabel,
+  getFamillePlanificationBadge,
   getModeCommercialBadge,
-  getModePlanningBadge,
   getPrestationStatutBadge,
 } from "./helpers";
 
@@ -25,13 +23,8 @@ export function PrestationCard({
   onClick,
 }: PrestationCardProps) {
   const statutBadge = getPrestationStatutBadge(prestation.statut);
-  const modeBadge = getModePlanningBadge(prestation.modePlanning);
+  const familleBadge = getFamillePlanificationBadge(prestation.famillePlanification);
   const modeCommercialBadge = getModeCommercialBadge(prestation.modeCommercial);
-  const frequenceLabel = getFrequenceLabel(
-    prestation.frequence,
-    prestation.frequenceParPeriode,
-    prestation.intervalleJours,
-  );
 
   return (
     <Card
@@ -78,11 +71,10 @@ export function PrestationCard({
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col gap-3">
-        {/* Fréquence + Mode planning + Mode commercial */}
+        {/* Famille planification + Mode commercial */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm">{frequenceLabel}</span>
-          <Badge className={`text-xs ${modeBadge.className}`}>
-            {modeBadge.label}
+          <Badge className={`text-xs ${familleBadge.className}`}>
+            {familleBadge.label}
           </Badge>
           <Badge className={`text-xs ${modeCommercialBadge.className}`}>
             {modeCommercialBadge.label}
@@ -98,14 +90,6 @@ export function PrestationCard({
               {" → "}
               {prestation.dateFin ? formatDate(prestation.dateFin) : "∞"}
             </span>
-          </div>
-        )}
-
-        {/* Durée */}
-        {prestation.dureeEstimeeMinutes && (
-          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
-            <Clock className="h-4 w-4 flex-shrink-0" />
-            <span>{formatDuree(prestation.dureeEstimeeMinutes)}</span>
           </div>
         )}
 
