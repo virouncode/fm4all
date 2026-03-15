@@ -41,7 +41,12 @@ export function FilterMultiSelect({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1 text-sm">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1 text-sm"
+          title={count > 0 ? `${label} — ${count} sélectionné${count > 1 ? "s" : ""}` : `Filtrer par ${label.toLowerCase()}`}
+        >
           {label}
           {count > 0 && (
             <span className="ml-1 rounded-full bg-primary px-1.5 text-xs text-primary-foreground">

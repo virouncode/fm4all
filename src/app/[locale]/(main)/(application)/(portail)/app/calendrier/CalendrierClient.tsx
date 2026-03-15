@@ -302,7 +302,7 @@ export function CalendrierClient() {
         <div className="text-muted-foreground flex flex-shrink-0 items-center gap-1.5 text-xs">
           <span>De</span>
           <Select value={slotMinTime} onValueChange={handleSlotMinTimeChange}>
-            <SelectTrigger className="h-8 w-18 text-xs">
+            <SelectTrigger className="h-8 w-18 text-xs" title="Heure de début">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="min-w-0 w-18">
@@ -315,7 +315,7 @@ export function CalendrierClient() {
           </Select>
           <span>à</span>
           <Select value={slotMaxTime} onValueChange={setCalendarSlotMaxTime}>
-            <SelectTrigger className="h-8 w-18 text-xs">
+            <SelectTrigger className="h-8 w-18 text-xs" title="Heure de fin">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="min-w-0 w-18">
@@ -346,7 +346,7 @@ export function CalendrierClient() {
             setCalendarSlotDuration(v as CalendarSlotDurationType)
           }
         >
-          <SelectTrigger className="h-8 w-22 flex-shrink-0 text-xs">
+          <SelectTrigger className="h-8 w-22 flex-shrink-0 text-xs" title="Intervalle des créneaux">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
