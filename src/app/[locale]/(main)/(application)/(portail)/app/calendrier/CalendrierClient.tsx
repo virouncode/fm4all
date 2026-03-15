@@ -1,28 +1,72 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useRouter } from "@/i18n/navigation";
 import {
   getCalendarEventsAction,
   getCalendarFilterOptionsAction,
   getCalendarSitesForFilterAction,
 } from "@/server/actions/calendrierActions";
 import { useAppStore } from "@/stores/application/appStore";
-import FullCalendar from "@fullcalendar/react";
+import type {
+  CalendarSlotDurationType,
+  CalendarViewType,
+} from "@/stores/ui/uiStore";
+import { useUiStore } from "@/stores/ui/uiStore";
+import type { EventInput } from "@fullcalendar/core";
+import frLocale from "@fullcalendar/core/locales/fr";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import type { EventInput } from "@fullcalendar/core";
-import frLocale from "@fullcalendar/core/locales/fr";
-import { useRouter } from "@/i18n/navigation";
-import { Calendar, CalendarClock, LayoutGrid, List } from "lucide-react";
+import { fr } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FilterMultiSelect } from "./FilterMultiSelect";
+import "./fullcalendar-overrides.css";
 
 // ==================== TYPES ====================
 
-type ViewType = "dayGridMonth" | "timeGridWeek" | "timeGridDay" | "listMonth";
 type OptionType = { id: string; nom: string };
+
+// ==================== OPTIONS TEMPS ====================
+
+const START_HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => ({
+  value: `${String(i).padStart(2, "0")}:00:00`,
+  label: `${String(i).padStart(2, "0")}H`,
+}));
+
+const END_HOUR_OPTIONS = [
+  ...Array.from({ length: 23 }, (_, i) => ({
+    value: `${String(i + 1).padStart(2, "0")}:00:00`,
+    label: `${String(i + 1).padStart(2, "0")}H`,
+  })),
+  { value: "24:00:00", label: "24H" },
+];
+
+const DURATION_OPTIONS = [
+  { value: "00:15:00", label: "15 min" },
+  { value: "00:30:00", label: "30 min" },
+  { value: "01:00:00", label: "1h" },
+];
+
+// ==================== SCROLL SESSION ====================
+
+let sessionScrollTop = 0;
 
 // ==================== COMPONENT ====================
 
@@ -31,8 +75,6 @@ export function CalendrierClient() {
   const entreprise = useAppStore((s) => s.entreprise);
   const posture = useAppStore((s) => s.postureActive);
   const calendarRef = useRef<FullCalendar>(null);
-
-  const [currentView, setCurrentView] = useState<ViewType>("dayGridMonth");
 
   // Sélections multi-filtres
   const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
@@ -146,11 +188,6 @@ export function CalendrierClient() {
     [],
   );
 
-  const changeView = useCallback((view: ViewType) => {
-    setCurrentView(view);
-    calendarRef.current?.getApi().changeView(view);
-  }, []);
-
   // Changement de client (admin prestataire) : recharge dynamiquement les sites disponibles
   const handleClientChange = useCallback(
     async (ids: string[]) => {
@@ -174,67 +211,72 @@ export function CalendrierClient() {
     [isAdmin, posture],
   );
 
+  const calendarView = useUiStore((s) => s.CalendarViewType);
+  const slotMinTime = useUiStore((s) => s.CalendarSlotMinTime);
+  const slotMaxTime = useUiStore((s) => s.CalendarSlotMaxTime);
+  const slotDuration = useUiStore((s) => s.CalendarSlotDuration);
+  const setCalendarViewType = useUiStore((s) => s.setCalendarViewType);
+  const setCalendarSlotMinTime = useUiStore((s) => s.setCalendarSlotMinTime);
+  const setCalendarSlotMaxTime = useUiStore((s) => s.setCalendarSlotMaxTime);
+  const setCalendarSlotDuration = useUiStore((s) => s.setCalendarSlotDuration);
+
+  const handleSlotMinTimeChange = (value: string) => {
+    setCalendarSlotMinTime(value);
+    if (slotMaxTime <= value) {
+      const nextValid = END_HOUR_OPTIONS.find((o) => o.value > value);
+      if (nextValid) setCalendarSlotMaxTime(nextValid.value);
+    }
+  };
+
+  // Sync la vue FC quand le store rehydrate (initialView est one-shot au montage)
+  useEffect(() => {
+    const api = calendarRef.current?.getApi();
+    if (!api || api.view.type === calendarView) return;
+    api.changeView(calendarView);
+  }, [calendarView]);
+
+  // Nettoie le listener de scroll au démontage
+  useEffect(() => {
+    const cleanup = scrollCleanupRef.current;
+    return () => {
+      cleanup?.();
+    };
+  }, []);
+
+  const scrollCleanupRef = useRef<(() => void) | null>(null);
+
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [pickerDate, setPickerDate] = useState<Date>(new Date());
+
+  const handleDatePick = (date: Date | undefined) => {
+    if (!date) return;
+    setPickerDate(date);
+    calendarRef.current?.getApi().gotoDate(date);
+    setDatePickerOpen(false);
+  };
+
   const isClient = posture === "client";
   const isPlateforme = posture === "plateforme";
   const isPrestataire = posture === "prestataire";
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Toolbar : vues + filtres */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Boutons de vue */}
-        <div className="flex gap-1">
-          <Button
-            variant={currentView === "dayGridMonth" ? "default" : "outline"}
-            size="sm"
-            onClick={() => changeView("dayGridMonth")}
-          >
-            <LayoutGrid className="h-4 w-4" />
-            Mois
-          </Button>
-          <Button
-            variant={currentView === "timeGridWeek" ? "default" : "outline"}
-            size="sm"
-            onClick={() => changeView("timeGridWeek")}
-          >
-            <Calendar className="h-4 w-4" />
-            Semaine
-          </Button>
-          <Button
-            variant={currentView === "timeGridDay" ? "default" : "outline"}
-            size="sm"
-            onClick={() => changeView("timeGridDay")}
-          >
-            <CalendarClock className="h-4 w-4" />
-            Jour
-          </Button>
-          <Button
-            variant={currentView === "listMonth" ? "default" : "outline"}
-            size="sm"
-            onClick={() => changeView("listMonth")}
-          >
-            <List className="h-4 w-4" />
-            Liste
-          </Button>
-        </div>
-
+    <div className="flex h-full flex-col gap-3">
+      {/* Barre de filtres + contrôles de vue */}
+      <div className="flex flex-shrink-0 items-center gap-3 rounded-lg border px-3 py-2">
         {/* Filtres multi-select */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-1 flex-wrap items-center gap-2">
           <FilterMultiSelect
             label="Sites"
             options={sites.map((s) => ({ id: s.id, label: s.nom }))}
             selectedIds={selectedSiteIds}
             onChange={setSelectedSiteIds}
           />
-
           <FilterMultiSelect
             label="Services"
             options={services.map((s) => ({ id: s.id, label: s.nom }))}
             selectedIds={selectedServiceIds}
             onChange={setSelectedServiceIds}
           />
-
-          {/* Prestataires — client et plateforme uniquement */}
           {(isClient || isPlateforme) && prestataires.length > 0 && (
             <FilterMultiSelect
               label="Prestataires"
@@ -243,8 +285,6 @@ export function CalendrierClient() {
               onChange={setSelectedPrestataireIds}
             />
           )}
-
-          {/* Clients — prestataire uniquement */}
           {isPrestataire && clients.length > 0 && (
             <FilterMultiSelect
               label="Clients"
@@ -254,34 +294,103 @@ export function CalendrierClient() {
             />
           )}
         </div>
-      </div>
 
-      {/* Légende */}
-      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-indigo-500" />
-          Virtuelle
+        {/* Séparateur */}
+        <div className="bg-border h-5 w-px flex-shrink-0" />
+
+        {/* Plage horaire */}
+        <div className="text-muted-foreground flex flex-shrink-0 items-center gap-1.5 text-xs">
+          <span>De</span>
+          <Select value={slotMinTime} onValueChange={handleSlotMinTimeChange}>
+            <SelectTrigger className="h-8 w-18 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="min-w-0 w-18">
+              {START_HOUR_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value} className="text-xs">
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span>à</span>
+          <Select value={slotMaxTime} onValueChange={setCalendarSlotMaxTime}>
+            <SelectTrigger className="h-8 w-18 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="min-w-0 w-18">
+              {END_HOUR_OPTIONS.map((o) => (
+                <SelectItem
+                  key={o.value}
+                  value={o.value}
+                  className="text-xs"
+                  disabled={o.value <= slotMinTime}
+                >
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Séparateur */}
+        <div className="bg-border h-5 w-px flex-shrink-0" />
+
+        {/* Durée des slots */}
+        <span className="text-muted-foreground flex-shrink-0 text-xs">
+          Intervalle
         </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-400" />
-          Planifiée
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-blue-500" />
-          En cours
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-green-500" />
-          Terminée
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
-          Non honorée
-        </span>
+        <Select
+          value={slotDuration}
+          onValueChange={(v) =>
+            setCalendarSlotDuration(v as CalendarSlotDurationType)
+          }
+        >
+          <SelectTrigger className="h-8 w-22 flex-shrink-0 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {DURATION_OPTIONS.map((o) => (
+              <SelectItem key={o.value} value={o.value} className="text-xs">
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Séparateur */}
+        <div className="bg-border h-5 w-px flex-shrink-0" />
+
+        {/* Raccourci date */}
+        <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 flex-shrink-0"
+              aria-label="Aller à une date"
+              title="Aller à une date"
+            >
+              <CalendarIcon className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <Calendar
+              mode="single"
+              selected={pickerDate}
+              onSelect={handleDatePick}
+              defaultMonth={pickerDate}
+              locale={fr}
+              captionLayout="dropdown"
+              startMonth={new Date(2015, 0)}
+              endMonth={new Date(2040, 11)}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Calendrier */}
-      <div className="overflow-hidden rounded-lg border">
+      <div className="min-h-0 flex-1 overflow-hidden rounded-lg border">
         <FullCalendar
           ref={calendarRef}
           plugins={[
@@ -290,22 +399,52 @@ export function CalendrierClient() {
             listPlugin,
             interactionPlugin,
           ]}
-          initialView="dayGridMonth"
+          initialView={calendarView}
+          datesSet={(info) =>
+            setCalendarViewType(info.view.type as CalendarViewType)
+          }
+          viewDidMount={() => {
+            requestAnimationFrame(() => {
+              const scroller = document.querySelector<HTMLElement>(
+                ".fc-scroller-liquid-absolute",
+              );
+              if (!scroller) return;
+              if (sessionScrollTop > 0) {
+                scroller.scrollTop = sessionScrollTop;
+              }
+              scrollCleanupRef.current?.();
+              const handleScroll = () => {
+                sessionScrollTop = scroller.scrollTop;
+              };
+              scroller.addEventListener("scroll", handleScroll, {
+                passive: true,
+              });
+              scrollCleanupRef.current = () =>
+                scroller.removeEventListener("scroll", handleScroll);
+            });
+          }}
           locale={frLocale}
           events={fetchEvents}
           headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "",
+            left: "title",
+            center: "timeGridDay,timeGridWeek,dayGridMonth,listMonth",
+            right: "prev,today,next",
           }}
-          height="auto"
+          buttonText={{
+            day: "Jour",
+            week: "Semaine",
+            month: "Mois",
+            list: "Liste",
+          }}
+          height="100%"
+          stickyHeaderDates
           eventClick={(info) => {
-            const { type, occurrenceId, prestationId } =
-              info.event.extendedProps as {
-                type: string;
-                occurrenceId?: string;
-                prestationId?: string;
-              };
+            const { type, occurrenceId, prestationId } = info.event
+              .extendedProps as {
+              type: string;
+              occurrenceId?: string;
+              prestationId?: string;
+            };
             if (type === "materialized" && occurrenceId && prestationId) {
               router.push({
                 pathname:
@@ -323,12 +462,16 @@ export function CalendrierClient() {
               info.el.style.textDecoration = "line-through";
             }
           }}
+          slotLabelInterval="01:00:00"
+          slotLabelFormat={{ hour: "2-digit", hour12: false }}
+          allDaySlot={false}
           nowIndicator
           weekNumbers
           weekText="S"
           firstDay={1}
-          slotMinTime="06:00:00"
-          slotMaxTime="22:00:00"
+          slotMinTime={slotMinTime}
+          slotMaxTime={slotMaxTime}
+          slotDuration={slotDuration}
           listDayFormat={{ weekday: "long", month: "long", day: "numeric" }}
           noEventsContent="Aucune intervention sur cette période"
         />

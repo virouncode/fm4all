@@ -5,66 +5,93 @@ import { persist } from "zustand/middleware";
 
 const UI_STORE_KEY = "fm4all:ui";
 
-export type TicketView = "list" | "grid";
-export type PrestationView = "list" | "grid";
-export type EntrepriseView = "list" | "grid";
-export type DevisDemandeView = "list" | "grid";
-export type DevisView = "list" | "grid";
-export type FactureView = "list" | "grid";
-export type DocumentView = "list" | "grid";
+export type TicketViewType = "list" | "grid";
+export type PrestationViewType = "list" | "grid";
+export type EntrepriseViewType = "list" | "grid";
+export type DevisDemandeViewType = "list" | "grid";
+export type DevisViewType = "list" | "grid";
+export type FactureViewType = "list" | "grid";
+export type DocumentViewType = "list" | "grid";
+export type CalendarViewType =
+  | "dayGridMonth"
+  | "timeGridWeek"
+  | "timeGridDay"
+  | "listMonth";
+export type CalendarSlotDurationType = "00:15:00" | "00:30:00" | "01:00:00";
 
 type UiStoreType = {
   // state
-  ticketView: TicketView;
-  prestationView: PrestationView;
-  entrepriseView: EntrepriseView;
-  devisDemandeView: DevisDemandeView;
-  devisView: DevisView;
-  factureView: FactureView;
-  documentView: DocumentView;
+  TicketViewType: TicketViewType;
+  PrestationViewType: PrestationViewType;
+  EntrepriseViewType: EntrepriseViewType;
+  DevisDemandeViewType: DevisDemandeViewType;
+  DevisViewType: DevisViewType;
+  FactureViewType: FactureViewType;
+  DocumentViewType: DocumentViewType;
+  CalendarViewType: CalendarViewType;
+  CalendarSlotMinTime: string;
+  CalendarSlotMaxTime: string;
+  CalendarSlotDuration: CalendarSlotDurationType;
 
   // actions
-  setTicketView: (view: TicketView) => void;
-  setPrestationView: (view: PrestationView) => void;
-  setEntrepriseView: (view: EntrepriseView) => void;
-  setDevisDemandeView: (view: DevisDemandeView) => void;
-  setDevisView: (view: DevisView) => void;
-  setFactureView: (view: FactureView) => void;
-  setDocumentView: (view: DocumentView) => void;
+  setTicketViewType: (view: TicketViewType) => void;
+  setPrestationViewType: (view: PrestationViewType) => void;
+  setEntrepriseViewType: (view: EntrepriseViewType) => void;
+  setDevisDemandeViewType: (view: DevisDemandeViewType) => void;
+  setDevisViewType: (view: DevisViewType) => void;
+  setFactureViewType: (view: FactureViewType) => void;
+  setDocumentViewType: (view: DocumentViewType) => void;
+  setCalendarViewType: (view: CalendarViewType) => void;
+  setCalendarSlotMinTime: (time: string) => void;
+  setCalendarSlotMaxTime: (time: string) => void;
+  setCalendarSlotDuration: (duration: CalendarSlotDurationType) => void;
 };
 
 export const useUiStore = create<UiStoreType>()(
   persist(
     (set) => ({
       // default state
-      ticketView: "list",
-      prestationView: "list",
-      entrepriseView: "list",
-      devisDemandeView: "list",
-      devisView: "list",
-      factureView: "list",
-      documentView: "grid",
+      TicketViewType: "list",
+      PrestationViewType: "list",
+      EntrepriseViewType: "list",
+      DevisDemandeViewType: "list",
+      DevisViewType: "list",
+      FactureViewType: "list",
+      DocumentViewType: "grid",
+      CalendarViewType: "timeGridDay",
+      CalendarSlotMinTime: "06:00:00",
+      CalendarSlotMaxTime: "20:00:00",
+      CalendarSlotDuration: "00:15:00",
 
       // actions
-      setTicketView: (view) => set({ ticketView: view }),
-      setPrestationView: (view) => set({ prestationView: view }),
-      setEntrepriseView: (view) => set({ entrepriseView: view }),
-      setDevisDemandeView: (view) => set({ devisDemandeView: view }),
-      setDevisView: (view) => set({ devisView: view }),
-      setFactureView: (view) => set({ factureView: view }),
-      setDocumentView: (view) => set({ documentView: view }),
+      setTicketViewType: (view) => set({ TicketViewType: view }),
+      setPrestationViewType: (view) => set({ PrestationViewType: view }),
+      setEntrepriseViewType: (view) => set({ EntrepriseViewType: view }),
+      setDevisDemandeViewType: (view) => set({ DevisDemandeViewType: view }),
+      setDevisViewType: (view) => set({ DevisViewType: view }),
+      setFactureViewType: (view) => set({ FactureViewType: view }),
+      setDocumentViewType: (view) => set({ DocumentViewType: view }),
+      setCalendarViewType: (view) => set({ CalendarViewType: view }),
+      setCalendarSlotMinTime: (time) => set({ CalendarSlotMinTime: time }),
+      setCalendarSlotMaxTime: (time) => set({ CalendarSlotMaxTime: time }),
+      setCalendarSlotDuration: (duration) =>
+        set({ CalendarSlotDuration: duration }),
     }),
     {
       name: UI_STORE_KEY,
       partialize: (state) => ({
-        ticketView: state.ticketView,
-        prestationView: state.prestationView,
-        entrepriseView: state.entrepriseView,
-        devisDemandeView: state.devisDemandeView,
-        devisView: state.devisView,
-        factureView: state.factureView,
-        documentView: state.documentView,
+        TicketViewType: state.TicketViewType,
+        PrestationViewType: state.PrestationViewType,
+        EntrepriseViewType: state.EntrepriseViewType,
+        DevisDemandeViewType: state.DevisDemandeViewType,
+        DevisViewType: state.DevisViewType,
+        FactureViewType: state.FactureViewType,
+        DocumentViewType: state.DocumentViewType,
+        CalendarViewType: state.CalendarViewType,
+        CalendarSlotMinTime: state.CalendarSlotMinTime,
+        CalendarSlotMaxTime: state.CalendarSlotMaxTime,
+        CalendarSlotDuration: state.CalendarSlotDuration,
       }),
-    }
-  )
+    },
+  ),
 );

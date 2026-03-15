@@ -9,7 +9,7 @@ export default function CalendrierPage() {
         <h1 className="flex-shrink-0 text-2xl font-bold">Calendrier</h1>
       </div>
 
-      <div className="flex-1 overflow-auto">
+      <div className="min-h-0 flex-1 overflow-hidden">
         <CalendrierClient />
       </div>
     </div>
