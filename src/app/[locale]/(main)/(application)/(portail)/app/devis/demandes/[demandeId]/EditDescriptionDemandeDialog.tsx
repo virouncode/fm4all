@@ -3,11 +3,15 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
 import { Textarea } from "@/components/ui/textarea";
 import { updateDevisDemandeAction } from "@/server/actions/devisDemandesActions";
 import { FileText, Pencil } from "lucide-react";
@@ -71,15 +75,17 @@ export function EditDescriptionDemandeDialog({
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="text-primary h-4 w-4" />
-              Modifier la description
-            </DialogTitle>
-          </DialogHeader>
+        <DialogStyledContent className="sm:max-w-2xl">
+          <DialogStyledHeader>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FileText className="text-primary h-4 w-4" />
+                Modifier la description
+              </DialogTitle>
+            </DialogHeader>
+          </DialogStyledHeader>
 
-          <div className="py-4">
+          <DialogStyledBody>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -87,9 +93,9 @@ export function EditDescriptionDemandeDialog({
               className="min-h-[200px] resize-none"
               disabled={isUpdating}
             />
-          </div>
+          </DialogStyledBody>
 
-          <DialogFooter>
+          <DialogStyledFooter>
             <Button
               variant="outline"
               onClick={() => setOpen(false)}
@@ -100,8 +106,8 @@ export function EditDescriptionDemandeDialog({
             <Button onClick={() => void handleSubmit()} disabled={isUpdating}>
               {isUpdating ? "Enregistrement..." : "Enregistrer"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
+          </DialogStyledFooter>
+        </DialogStyledContent>
       </Dialog>
     </>
   );

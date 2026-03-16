@@ -3,10 +3,7 @@
 import { RhfDateTimePicker } from "@/components/rhf/RhfDateTimePicker";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -882,28 +879,30 @@ export function OccurrenceDetailClient({
 
       {/* ==================== CANCEL DIALOG ==================== */}
       <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Annuler cette intervention ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              L&apos;intervention passera au statut <strong>Annulée</strong>.
-              Cette action est irréversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isUpdatingStatut}>
+        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Annuler cette intervention ?</AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="px-5 py-4 text-sm">
+            L&apos;intervention passera au statut <strong>Annulée</strong>.
+            Cette action est irréversible.
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button variant="outline" onClick={() => setCancelDialogOpen(false)} disabled={isUpdatingStatut}>
               Conserver
-            </AlertDialogCancel>
-            <AlertDialogAction
+            </Button>
+            <Button
+              variant="destructive"
               onClick={() => {
                 setCancelDialogOpen(false);
                 void handleTransition("annulee");
               }}
               disabled={isUpdatingStatut}
-              variant="destructive"
             >
               Confirmer l&apos;annulation
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -1430,18 +1429,20 @@ function TacheRow({
         </div>
       )}
 
-      {/* AlertDialog annulation tâche ad-hoc */}
+      {/* Dialog annulation tâche ad-hoc */}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Annuler cette tâche ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              La tâche sera marquée comme annulée. Elle restera visible dans la liste avec le statut &quot;annulée&quot;.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Retour</AlertDialogCancel>
-            <AlertDialogAction
+        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Annuler cette tâche ?</AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="px-5 py-4 text-sm">
+            La tâche sera marquée comme annulée. Elle restera visible dans la liste avec le statut &quot;annulée&quot;.
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)} disabled={isDeleting}>Retour</Button>
+            <Button
               disabled={isDeleting}
               onClick={async (e) => {
                 e.preventDefault();
@@ -1466,7 +1467,7 @@ function TacheRow({
               className="bg-red-600 hover:bg-red-700"
             >
               {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Annuler la tâche"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

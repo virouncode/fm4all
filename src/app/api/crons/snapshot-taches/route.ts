@@ -2,6 +2,7 @@ import { db } from "@/db";
 import {
   clientServiceExecutions,
   clientServiceOccurrences,
+  clientServiceReglesRecurrence,
   occurrenceTaches,
 } from "@/db/schema/services";
 import { env } from "@/lib/env";
@@ -10,15 +11,18 @@ import { and, count, eq, gte, isNotNull, lt } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 
 /**
- * Cron J-1 — Snapshot des tâches.
+ * Cron — Snapshot des tâches.
  *
- * Pour chaque occurrence planifiée dont le début est dans les prochaines 24h,
- * snapshot les items de la checklist associée (si pas encore fait).
+ * Pour chaque occurrence planifiée dont le début est dans les prochaines 8 jours
+ * (aligné sur la fenêtre de matérialisation J+7), snapshot les items de la checklist
+ * associée (si pas encore fait).
+ *
+ * Priorité : regle.tacheListeTemplateId > execution.tacheListeTemplateId
  *
  * Idempotent : si occurrenceTaches existe déjà pour une occurrence, on skip.
  * Aucune occurrence sans executionId ou sans tacheListeTemplateId n'est touchée.
  *
- * Schedule : "0 21 * * *" (UTC) → 22h heure de Paris (hiver) = J-1 pour le lendemain
+ * Schedule : "0 21 * * *" (UTC) → 22h heure de Paris (hiver)
  */
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
@@ -27,15 +31,20 @@ export async function GET(request: NextRequest) {
   }
 
   const now = new Date();
-  // Fenêtre : prochaines 24h (couvre toutes les occurrences de demain quelle que soit la timezone)
-  const windowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  // Fenêtre : prochains 8 jours — aligné sur ensureOccurrencesWindow (daysAhead=7)
+  const windowEnd = new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000);
 
   const occurrences = await db
     .select({
       id: clientServiceOccurrences.id,
       executionId: clientServiceOccurrences.executionId,
+      regleTemplateId: clientServiceReglesRecurrence.tacheListeTemplateId,
     })
     .from(clientServiceOccurrences)
+    .leftJoin(
+      clientServiceReglesRecurrence,
+      eq(clientServiceReglesRecurrence.id, clientServiceOccurrences.regleRecurrenceId),
+    )
     .where(
       and(
         eq(clientServiceOccurrences.statut, "planifiee"),
@@ -63,17 +72,19 @@ export async function GET(request: NextRequest) {
       continue;
     }
 
-    const [execution] = await db
+    // Priorité : regle.tacheListeTemplateId > execution.tacheListeTemplateId
+    const templateId = occ.regleTemplateId ?? (await db
       .select({ tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId })
       .from(clientServiceExecutions)
-      .where(eq(clientServiceExecutions.id, occ.executionId));
+      .where(eq(clientServiceExecutions.id, occ.executionId))
+      .then((rows) => rows[0]?.tacheListeTemplateId ?? null));
 
-    if (!execution?.tacheListeTemplateId) continue;
+    if (!templateId) continue;
 
     try {
       await snapshotOccurrenceTaches({
         occurrenceId: occ.id,
-        tacheListeTemplateId: execution.tacheListeTemplateId,
+        tacheListeTemplateId: templateId,
       });
       snapshotted++;
     } catch {

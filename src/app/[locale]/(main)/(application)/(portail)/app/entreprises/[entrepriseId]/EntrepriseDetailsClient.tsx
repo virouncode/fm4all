@@ -2,14 +2,22 @@
 
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -570,44 +578,46 @@ export function EntrepriseDetailsClient({
 
       {/* Dialog confirmation invitation — visible si canInviteContacts */}
       {canInviteContacts && (
-        <AlertDialog
+        <Dialog
           open={!!confirmInviteContact}
           onOpenChange={(v) => {
             if (!v) setConfirmInviteContact(null);
           }}
         >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Envoyer une invitation ?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Un email sera envoyé à{" "}
-                <strong>{confirmInviteContact?.email}</strong> pour inviter{" "}
-                {confirmInviteContact?.prenom} {confirmInviteContact?.nom} à créer
-                son compte.
-                {confirmInviteContact?.pendingInvitationSentAt && (
-                  <span className="mt-1 block">
-                    Une invitation précédente avait été envoyée le{" "}
-                    {formatEntrepriseDate(
-                      confirmInviteContact.pendingInvitationSentAt,
-                    )}
-                    . Elle sera remplacée par la nouvelle.
-                  </span>
-                )}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Annuler</AlertDialogCancel>
-              <AlertDialogAction
+          <DialogStyledContent className="max-w-md">
+            <DialogStyledHeader>
+              <DialogHeader>
+                <DialogTitle>Envoyer une invitation ?</DialogTitle>
+              </DialogHeader>
+            </DialogStyledHeader>
+            <DialogStyledBody>
+              Un email sera envoyé à{" "}
+              <strong>{confirmInviteContact?.email}</strong> pour inviter{" "}
+              {confirmInviteContact?.prenom} {confirmInviteContact?.nom} à créer
+              son compte.
+              {confirmInviteContact?.pendingInvitationSentAt && (
+                <span className="mt-1 block">
+                  Une invitation précédente avait été envoyée le{" "}
+                  {formatEntrepriseDate(
+                    confirmInviteContact.pendingInvitationSentAt,
+                  )}
+                  . Elle sera remplacée par la nouvelle.
+                </span>
+              )}
+            </DialogStyledBody>
+            <DialogStyledFooter>
+              <Button variant="outline" onClick={() => setConfirmInviteContact(null)}>Annuler</Button>
+              <Button
                 onClick={() =>
                   confirmInviteContact &&
                   handleInviterContact(confirmInviteContact.id)
                 }
               >
                 Envoyer l&apos;invitation
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              </Button>
+            </DialogStyledFooter>
+          </DialogStyledContent>
+        </Dialog>
       )}
 
       {/* Dialogs contacts — masqués si canEditContacts=false (ex: page Mon Entreprise) */}
@@ -620,23 +630,25 @@ export function EntrepriseDetailsClient({
               if (!v) setConfirmDeleteContact(null);
             }}
           >
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Supprimer ce contact ?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {confirmDeleteContact?.prenom} {confirmDeleteContact?.nom} sera
-                  définitivement supprimé de la liste des contacts.
-                  {confirmDeleteContact?.pendingInvitationSentAt && (
-                    <span className="text-destructive mt-1 block font-medium">
-                      Une invitation est en attente pour ce contact. Elle deviendra
-                      caduque si vous supprimez le contact.
-                    </span>
-                  )}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                <AlertDialogAction
+            <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+              <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Supprimer ce contact ?</AlertDialogTitle>
+                </AlertDialogHeader>
+              </div>
+              <div className="px-5 py-4 text-sm">
+                {confirmDeleteContact?.prenom} {confirmDeleteContact?.nom} sera
+                définitivement supprimé de la liste des contacts.
+                {confirmDeleteContact?.pendingInvitationSentAt && (
+                  <span className="text-destructive mt-1 block font-medium">
+                    Une invitation est en attente pour ce contact. Elle deviendra
+                    caduque si vous supprimez le contact.
+                  </span>
+                )}
+              </div>
+              <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+                <Button variant="outline" onClick={() => setConfirmDeleteContact(null)}>Annuler</Button>
+                <Button
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   onClick={() =>
                     confirmDeleteContact &&
@@ -644,7 +656,7 @@ export function EntrepriseDetailsClient({
                   }
                 >
                   Supprimer
-                </AlertDialogAction>
+                </Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

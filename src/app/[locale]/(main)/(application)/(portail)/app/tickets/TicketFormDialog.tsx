@@ -7,11 +7,15 @@ import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { getEntreprisesClientesAction, getEntreprisesPrestatairesAction } from "@/server/actions/entreprisesActions";
@@ -267,15 +271,17 @@ export function TicketFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <Ticket className="text-primary" />
-              Nouveau ticket
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Ticket className="text-primary" />
+                Nouveau ticket
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
           <form
@@ -283,7 +289,8 @@ export function TicketFormDialog({
             className="flex flex-1 flex-col overflow-hidden"
           >
             {/* Contenu scrollable */}
-            <div className="flex-1 space-y-4 overflow-y-auto p-6">
+            <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+              <div className="space-y-4">
               {/* Si posture plateforme ou prestataire : Select Client */}
               {(posture === "plateforme" || posture === "prestataire") && (
                 <RhfControlledSelect<InsertTicketFormType>
@@ -409,9 +416,9 @@ export function TicketFormDialog({
                 )}
               </div>
             </div>
+            </DialogStyledBody>
 
-            {/* Footer sticky */}
-            <DialogFooter className="bg-background sticky bottom-0 flex shrink-0 justify-end gap-2 border-t px-6 pt-4 pb-6">
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -422,10 +429,10 @@ export function TicketFormDialog({
               <Button type="submit" disabled={isSubmitting || !isDirty}>
                 {isSubmitting ? "Création..." : "Créer le ticket"}
               </Button>
-            </DialogFooter>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

@@ -4,10 +4,14 @@ import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { getServicesByPrestataireAction, getServicesAction } from "@/server/actions/servicesActions";
@@ -209,110 +213,114 @@ export function PrestationsFiltersDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <Filter className="text-primary size-5" />
-              Filtrer les prestations
+      <DialogStyledContent className="sm:max-w-2xl">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Filter className="text-primary size-5" />
+                Filtrer les prestations
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
+
+        <DialogStyledBody>
+          <div className="space-y-6">
+            <Form {...form}>
+              <form className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {/* Statut */}
+                <RhfControlledSelect<PrestationsFiltersType>
+                  name="statut"
+                  label="Statut"
+                  selectClassName="w-full"
+                  withError={false}
+                >
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="brouillon">Brouillon</SelectItem>
+                  <SelectItem value="actif">Actif</SelectItem>
+                  <SelectItem value="en_pause">En pause</SelectItem>
+                  <SelectItem value="termine">Terminé</SelectItem>
+                </RhfControlledSelect>
+
+                {/* Service */}
+                <RhfControlledSelect<PrestationsFiltersType>
+                  name="serviceId"
+                  label="Service"
+                  selectClassName="w-full"
+                  withError={false}
+                >
+                  <SelectItem value="all">Tous les services</SelectItem>
+                  {services.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.nom}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
+
+                {/* Mode commercial */}
+                <RhfControlledSelect<PrestationsFiltersType>
+                  name="modeCommercial"
+                  label="Mode commercial"
+                  selectClassName="w-full"
+                  withError={false}
+                >
+                  <SelectItem value="all">Tous les modes</SelectItem>
+                  <SelectItem value="direct">Direct</SelectItem>
+                  <SelectItem value="intermediaire_fm4all">
+                    Intermédiaire FM4ALL
+                  </SelectItem>
+                </RhfControlledSelect>
+
+                {/* Mode de planification */}
+                <RhfControlledSelect<PrestationsFiltersType>
+                  name="famillePlanification"
+                  label="Mode de planification"
+                  selectClassName="w-full"
+                  withError={false}
+                >
+                  <SelectItem value="all">Tous les modes</SelectItem>
+                  <SelectItem value="recurrence_auto">Récurrence auto</SelectItem>
+                  <SelectItem value="quota_manuel">Quota manuel</SelectItem>
+                  <SelectItem value="ponctuel">Ponctuel</SelectItem>
+                </RhfControlledSelect>
+
+                {/* Site — disabled si plateforme sans client sélectionné */}
+                <RhfControlledSelect<PrestationsFiltersType>
+                  name="siteId"
+                  label="Site"
+                  selectClassName="w-full"
+                  withError={false}
+                  disabled={
+                    loadingSites ||
+                    ((postureActive === "plateforme" || postureActive === "prestataire") && !clientEntrepriseId)
+                  }
+                >
+                  <SelectItem value="all">
+                    {loadingSites ? "Chargement..." : "Tous les sites"}
+                  </SelectItem>
+                  {sites.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.nom}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
+              </form>
+            </Form>
+
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                onClick={handleReset}
+                disabled={activeFiltersCount === 0}
+              >
+                <RotateCcw className="h-4 w-4" />
+                Réinitialiser ({activeFiltersCount})
+              </Button>
             </div>
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          <Form {...form}>
-            <form className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-              {/* Statut */}
-              <RhfControlledSelect<PrestationsFiltersType>
-                name="statut"
-                label="Statut"
-                selectClassName="w-full"
-                withError={false}
-              >
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="brouillon">Brouillon</SelectItem>
-                <SelectItem value="actif">Actif</SelectItem>
-                <SelectItem value="en_pause">En pause</SelectItem>
-                <SelectItem value="termine">Terminé</SelectItem>
-              </RhfControlledSelect>
-
-              {/* Service */}
-              <RhfControlledSelect<PrestationsFiltersType>
-                name="serviceId"
-                label="Service"
-                selectClassName="w-full"
-                withError={false}
-              >
-                <SelectItem value="all">Tous les services</SelectItem>
-                {services.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.nom}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
-
-              {/* Mode commercial */}
-              <RhfControlledSelect<PrestationsFiltersType>
-                name="modeCommercial"
-                label="Mode commercial"
-                selectClassName="w-full"
-                withError={false}
-              >
-                <SelectItem value="all">Tous les modes</SelectItem>
-                <SelectItem value="direct">Direct</SelectItem>
-                <SelectItem value="intermediaire_fm4all">
-                  Intermédiaire FM4ALL
-                </SelectItem>
-              </RhfControlledSelect>
-
-              {/* Mode de planification */}
-              <RhfControlledSelect<PrestationsFiltersType>
-                name="famillePlanification"
-                label="Mode de planification"
-                selectClassName="w-full"
-                withError={false}
-              >
-                <SelectItem value="all">Tous les modes</SelectItem>
-                <SelectItem value="recurrence_auto">Récurrence auto</SelectItem>
-                <SelectItem value="quota_manuel">Quota manuel</SelectItem>
-                <SelectItem value="ponctuel">Ponctuel</SelectItem>
-              </RhfControlledSelect>
-
-              {/* Site — disabled si plateforme sans client sélectionné */}
-              <RhfControlledSelect<PrestationsFiltersType>
-                name="siteId"
-                label="Site"
-                selectClassName="w-full"
-                withError={false}
-                disabled={
-                  loadingSites ||
-                  ((postureActive === "plateforme" || postureActive === "prestataire") && !clientEntrepriseId)
-                }
-              >
-                <SelectItem value="all">
-                  {loadingSites ? "Chargement..." : "Tous les sites"}
-                </SelectItem>
-                {sites.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.nom}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
-            </form>
-          </Form>
-
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              onClick={handleReset}
-              disabled={activeFiltersCount === 0}
-            >
-              <RotateCcw className="h-4 w-4" />
-              Réinitialiser ({activeFiltersCount})
-            </Button>
           </div>
-        </div>
-      </DialogContent>
+        </DialogStyledBody>
+      </DialogStyledContent>
     </Dialog>
   );
 }

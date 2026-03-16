@@ -4,10 +4,15 @@ import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
 import { Input } from "@/components/ui/input";
 import { getProspectsAction } from "@/server/actions/entreprisesActions";
 import type { SelectProspectType } from "@/zod-schemas/entreprise.schema";
@@ -195,56 +200,60 @@ export function ProspectPickerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col gap-4 p-6">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <UserCheck className="text-primary size-6" />
-              Sélectionner un prospect
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="max-w-4xl max-h-[80vh] flex flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <UserCheck className="text-primary size-6" />
+                Sélectionner un prospect
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-        <p className="text-sm text-muted-foreground -mt-2">
-          Cliquez sur un prospect pour auto-remplir le formulaire.
-          {total > 0 && (
-            <span className="ml-1 font-medium">{total} prospect{total > 1 ? "s" : ""}</span>
-          )}
-        </p>
+        <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">
+            Cliquez sur un prospect pour auto-remplir le formulaire.
+            {total > 0 && (
+              <span className="ml-1 font-medium">{total} prospect{total > 1 ? "s" : ""}</span>
+            )}
+          </p>
 
-        {/* Barre de recherche */}
-        <div className="relative flex-shrink-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher par nom, email, ville..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
+          {/* Barre de recherche */}
+          <div className="relative flex-shrink-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher par nom, email, ville..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
 
-        {/* Table infinite scroll */}
-        <div className="flex-1 overflow-hidden min-h-[300px]">
-          <InfiniteDataTable<SelectProspectType>
-            columns={prospectsColumns}
-            items={prospects}
-            total={total}
-            isLoading={isLoading}
-            isLoadingMore={isLoadingMore}
-            isError={isError}
-            hasMore={hasMore}
-            loadMore={loadMore}
-            idLabelMap={prospectsIdLabelMap}
-            onRowClick={handleRowClick}
-          />
-        </div>
+          {/* Table infinite scroll */}
+          <div className="flex-1 overflow-hidden min-h-[300px]">
+            <InfiniteDataTable<SelectProspectType>
+              columns={prospectsColumns}
+              items={prospects}
+              total={total}
+              isLoading={isLoading}
+              isLoadingMore={isLoadingMore}
+              isError={isError}
+              hasMore={hasMore}
+              loadMore={loadMore}
+              idLabelMap={prospectsIdLabelMap}
+              onRowClick={handleRowClick}
+            />
+          </div>
+        </DialogStyledBody>
 
-        <div className="flex justify-end flex-shrink-0">
+        <DialogStyledFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
-        </div>
-      </DialogContent>
+        </DialogStyledFooter>
+      </DialogStyledContent>
     </Dialog>
   );
 }

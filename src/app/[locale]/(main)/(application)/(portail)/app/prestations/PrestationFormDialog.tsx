@@ -14,12 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import {
   Form,
   FormControl,
@@ -1051,7 +1054,7 @@ export function PrestationFormDialog({
           </div>
         </div>
 
-        <DialogFooter className="bg-background sticky bottom-0 flex shrink-0 items-center justify-between gap-2 border-t px-6 pt-4 pb-6">
+        <DialogStyledFooter className="justify-between">
           <Button
             type="button"
             variant="ghost"
@@ -1065,7 +1068,7 @@ export function PrestationFormDialog({
             {isSubmittingStep2 && <Spinner />}
             Créer prestation + exécution
           </Button>
-        </DialogFooter>
+        </DialogStyledFooter>
       </form>
     </Form>
   );
@@ -1076,22 +1079,24 @@ export function PrestationFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <HandPlatter className="text-primary" />
-              {isEdit ? "Modifier la prestation" : "Nouvelle prestation"}
-            </div>
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? "Modifiez les paramètres de planification de cette prestation."
-              : isPrestataireCreate
-                ? "Définissez la prestation et son exécution en deux étapes."
-                : "Définissez un service récurrent ou ponctuel assigné à un site client."}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <HandPlatter className="text-primary" />
+                {isEdit ? "Modifier la prestation" : "Nouvelle prestation"}
+              </div>
+            </DialogTitle>
+            <DialogDescription>
+              {isEdit
+                ? "Modifiez les paramètres de planification de cette prestation."
+                : isPrestataireCreate
+                  ? "Définissez la prestation et son exécution en deux étapes."
+                  : "Définissez un service récurrent ou ponctuel assigné à un site client."}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         {stepIndicator}
 
@@ -1109,7 +1114,7 @@ export function PrestationFormDialog({
               }
               className="flex flex-1 flex-col overflow-hidden"
             >
-              <div className="flex-1 space-y-5 overflow-y-auto px-6 py-2">
+              <div className="flex-1 space-y-5 overflow-y-auto px-5 py-4">
                 {/* ── CLIENT / SITE / SERVICE ── */}
                 {isEdit ? (
                   <div className="bg-muted/50 space-y-1.5 rounded-md px-4 py-3 text-sm">
@@ -1376,7 +1381,7 @@ export function PrestationFormDialog({
               </div>
 
               {/* ── FOOTER step 1 ── */}
-              <DialogFooter className="bg-background sticky bottom-0 flex shrink-0 justify-end gap-2 border-t px-6 pt-4 pb-6">
+              <DialogStyledFooter>
                 <Button
                   type="button"
                   variant="outline"
@@ -1397,11 +1402,11 @@ export function PrestationFormDialog({
                       ? "Suivant →"
                       : "Créer la prestation"}
                 </Button>
-              </DialogFooter>
+              </DialogStyledFooter>
             </form>
           </Form>
         )}
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 

@@ -36,6 +36,8 @@ type UiStoreType = {
   CalendarSelectedClientIds: string[];
   CalendarSelectedSiteIds: string[];
   CalendarSelectedServiceIds: string[];
+  /** Date de début de la vue courante (ISO), restaurée à la réouverture */
+  CalendarCurrentDate: string;
 
   // actions
   setTicketViewType: (view: TicketViewType) => void;
@@ -52,6 +54,7 @@ type UiStoreType = {
   setCalendarSelectedClientIds: (ids: string[]) => void;
   setCalendarSelectedSiteIds: (ids: string[]) => void;
   setCalendarSelectedServiceIds: (ids: string[]) => void;
+  setCalendarCurrentDate: (date: string) => void;
 };
 
 export const useUiStore = create<UiStoreType>()(
@@ -72,6 +75,7 @@ export const useUiStore = create<UiStoreType>()(
       CalendarSelectedClientIds: [],
       CalendarSelectedSiteIds: [],
       CalendarSelectedServiceIds: [],
+      CalendarCurrentDate: "",
 
       // actions
       setTicketViewType: (view) => set({ TicketViewType: view }),
@@ -92,6 +96,7 @@ export const useUiStore = create<UiStoreType>()(
         set({ CalendarSelectedSiteIds: ids }),
       setCalendarSelectedServiceIds: (ids) =>
         set({ CalendarSelectedServiceIds: ids }),
+      setCalendarCurrentDate: (date) => set({ CalendarCurrentDate: date }),
     }),
     {
       name: UI_STORE_KEY,
@@ -110,6 +115,7 @@ export const useUiStore = create<UiStoreType>()(
         CalendarSelectedClientIds: state.CalendarSelectedClientIds,
         CalendarSelectedSiteIds: state.CalendarSelectedSiteIds,
         CalendarSelectedServiceIds: state.CalendarSelectedServiceIds,
+        CalendarCurrentDate: state.CalendarCurrentDate,
       }),
     },
   ),

@@ -7,6 +7,7 @@ import {
   clientServiceOccurrences,
   clientServiceReglesRecurrence,
   occurrenceTaches,
+  tacheListeItems,
 } from "@/db/schema/services";
 import { tickets } from "@/db/schema/tickets";
 import { errors } from "@/lib/action/errors";
@@ -28,12 +29,9 @@ import {
   getUserPrestataireAdhesion,
 } from "@/server/queries/userAdhesions.query";
 import {
-  getActivePosture,
-  getEffectivePlateformeRole,
-  resolvePostureAwareSiteRole,
-} from "@/server/utils/permissions.utils";
-import type { ModePilotageType } from "@/zod-schemas/clientServiceExecutions.schema";
-import { getUsersByEntrepriseId, getUsersByPrestataireEntrepriseId } from "@/server/queries/users.query";
+  getUsersByEntrepriseId,
+  getUsersByPrestataireEntrepriseId,
+} from "@/server/queries/users.query";
 import { promoteS3Key, s3, S3_BUCKET } from "@/server/s3/s3";
 import {
   deleteFuturePlanifieeOccurrences,
@@ -42,6 +40,12 @@ import {
   pickExecutionForOccurrence,
   snapshotOccurrenceTaches,
 } from "@/server/utils/clientServiceOccurrences.utils";
+import {
+  getActivePosture,
+  getEffectivePlateformeRole,
+  resolvePostureAwareSiteRole,
+} from "@/server/utils/permissions.utils";
+import type { ModePilotageType } from "@/zod-schemas/clientServiceExecutions.schema";
 import {
   addTachePieceJointeSchema,
   deleteAdHocTacheSchema,
@@ -64,18 +68,10 @@ import {
   updateTacheTempsPasseSchema,
 } from "@/zod-schemas/clientServiceOccurrences.schema";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import {
-  and,
-  asc,
-  count,
-  eq,
-  inArray,
-  isNull,
-  max,
-  or,
-} from "drizzle-orm";
+import { and, asc, count, eq, isNull, max, or } from "drizzle-orm";
 import { DateTime } from "luxon";
 import { flattenValidationErrors } from "next-safe-action";
+import { z } from "zod";
 
 // ==================== HELPERS ====================
 
@@ -108,16 +104,8 @@ function isSameDayAsToday(date: Date | null): boolean {
     month: "2-digit",
     day: "2-digit",
   });
-  const todayStr = formatter
-    .format(new Date())
-    .split("/")
-    .reverse()
-    .join("-"); // → "YYYY-MM-DD"
-  const dateStr = formatter
-    .format(date)
-    .split("/")
-    .reverse()
-    .join("-"); // → "YYYY-MM-DD"
+  const todayStr = formatter.format(new Date()).split("/").reverse().join("-"); // → "YYYY-MM-DD"
+  const dateStr = formatter.format(date).split("/").reverse().join("-"); // → "YYYY-MM-DD"
   return dateStr === todayStr;
 }
 
@@ -140,19 +128,32 @@ async function canManageOccurrence(
   const posture = await getActivePosture();
 
   if (posture === "client") {
-    if (modePilotage !== "client" && modePilotage !== "collaboration") return false;
-    const adhesion = await getUserClientAdhesion({ userId, entrepriseId: clientEntrepriseId });
+    if (modePilotage !== "client" && modePilotage !== "collaboration")
+      return false;
+    const adhesion = await getUserClientAdhesion({
+      userId,
+      entrepriseId: clientEntrepriseId,
+    });
     if (adhesion?.role === "admin") return true;
-    const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId: clientEntrepriseId });
+    const siteRole = await resolvePostureAwareSiteRole({
+      userId,
+      siteId,
+      entrepriseId: clientEntrepriseId,
+    });
     return siteRole === "responsable_site";
   }
 
   if (posture === "prestataire") {
-    if (modePilotage !== "prestataire" && modePilotage !== "collaboration") return false;
+    if (modePilotage !== "prestataire" && modePilotage !== "collaboration")
+      return false;
     const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
     if (!prestataireAdhesion) return false;
     if (prestataireAdhesion.role === "admin") return true;
-    const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId: prestataireAdhesion.entrepriseId });
+    const siteRole = await resolvePostureAwareSiteRole({
+      userId,
+      siteId,
+      entrepriseId: prestataireAdhesion.entrepriseId,
+    });
     return siteRole === "responsable_site";
   }
 
@@ -179,19 +180,32 @@ async function canExecuteOccurrence(
   const posture = await getActivePosture();
 
   if (posture === "client") {
-    if (modePilotage !== "client" && modePilotage !== "collaboration") return false;
-    const adhesion = await getUserClientAdhesion({ userId, entrepriseId: clientEntrepriseId });
+    if (modePilotage !== "client" && modePilotage !== "collaboration")
+      return false;
+    const adhesion = await getUserClientAdhesion({
+      userId,
+      entrepriseId: clientEntrepriseId,
+    });
     if (adhesion?.role === "admin") return true;
-    const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId: clientEntrepriseId });
+    const siteRole = await resolvePostureAwareSiteRole({
+      userId,
+      siteId,
+      entrepriseId: clientEntrepriseId,
+    });
     return siteRole === "responsable_site" || siteRole === "demandeur_site";
   }
 
   if (posture === "prestataire") {
-    if (modePilotage !== "prestataire" && modePilotage !== "collaboration") return false;
+    if (modePilotage !== "prestataire" && modePilotage !== "collaboration")
+      return false;
     const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
     if (!prestataireAdhesion) return false;
     if (prestataireAdhesion.role === "admin") return true;
-    const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId: prestataireAdhesion.entrepriseId });
+    const siteRole = await resolvePostureAwareSiteRole({
+      userId,
+      siteId,
+      entrepriseId: prestataireAdhesion.entrepriseId,
+    });
     return siteRole === "responsable_site" || siteRole === "intervenant_site";
   }
 
@@ -363,9 +377,17 @@ export const updateOccurrenceStatutAction = actionClient
 
           if (occurrence.regleRecurrenceId) {
             const [regle] = await tx
-              .select({ tacheListeTemplateId: clientServiceReglesRecurrence.tacheListeTemplateId })
+              .select({
+                tacheListeTemplateId:
+                  clientServiceReglesRecurrence.tacheListeTemplateId,
+              })
               .from(clientServiceReglesRecurrence)
-              .where(eq(clientServiceReglesRecurrence.id, occurrence.regleRecurrenceId))
+              .where(
+                eq(
+                  clientServiceReglesRecurrence.id,
+                  occurrence.regleRecurrenceId,
+                ),
+              )
               .limit(1);
             resolvedTacheListeTemplateId = regle?.tacheListeTemplateId ?? null;
           }
@@ -373,7 +395,10 @@ export const updateOccurrenceStatutAction = actionClient
           // 2. Fallback sur la checklist de l'exécution
           if (!resolvedTacheListeTemplateId) {
             const [exec] = await tx
-              .select({ tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId })
+              .select({
+                tacheListeTemplateId:
+                  clientServiceExecutions.tacheListeTemplateId,
+              })
               .from(clientServiceExecutions)
               .where(eq(clientServiceExecutions.id, resolvedExecutionId))
               .limit(1);
@@ -432,16 +457,26 @@ export const getOccurrencesPageAction = actionClient
     if (!platformRole?.role) {
       const posture = await getActivePosture();
       if (posture === "prestataire") {
-        const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
-        if (!prestataireAdhesion) throw errors.forbidden("Vous n'avez pas accès.");
+        const prestataireAdhesion = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
+        if (!prestataireAdhesion)
+          throw errors.forbidden("Vous n'avez pas accès.");
         const hasExecution = await prestataireHasExecutionOnPrestation({
           prestationId,
           prestataireEntrepriseId: prestataireAdhesion.entrepriseId,
         });
-        if (!hasExecution) throw errors.forbidden("Vous n'avez pas d'exécution sur cette prestation.");
+        if (!hasExecution)
+          throw errors.forbidden(
+            "Vous n'avez pas d'exécution sur cette prestation.",
+          );
       } else {
-        const adhesion = await getUserClientAdhesion({ userId: currentUser.id, entrepriseId });
-        if (!adhesion) throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        const adhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        if (!adhesion)
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
     }
 
@@ -487,22 +522,36 @@ export const getOccurrenceTachesAction = actionClient
     if (!platformRole?.role) {
       const posture = await getActivePosture();
       if (posture === "prestataire") {
-        const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
-        if (!prestataireAdhesion) throw errors.forbidden("Vous n'avez pas accès.");
+        const prestataireAdhesion = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
+        if (!prestataireAdhesion)
+          throw errors.forbidden("Vous n'avez pas accès.");
         const hasExecution = await prestataireHasExecutionOnPrestation({
           prestationId,
           prestataireEntrepriseId: prestataireAdhesion.entrepriseId,
         });
-        if (!hasExecution) throw errors.forbidden("Vous n'avez pas d'exécution sur cette prestation.");
+        if (!hasExecution)
+          throw errors.forbidden(
+            "Vous n'avez pas d'exécution sur cette prestation.",
+          );
       } else {
-        const adhesion = await getUserClientAdhesion({ userId: currentUser.id, entrepriseId });
-        if (!adhesion) throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        const adhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        if (!adhesion)
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
     }
 
-    // Vérifier que l'occurrence appartient à la prestation
+    // Vérifier que l'occurrence appartient à la prestation + récupérer executionId et regleId
     const [occurrence] = await db
-      .select({ id: clientServiceOccurrences.id })
+      .select({
+        id: clientServiceOccurrences.id,
+        executionId: clientServiceOccurrences.executionId,
+        regleRecurrenceId: clientServiceOccurrences.regleRecurrenceId,
+      })
       .from(clientServiceOccurrences)
       .where(
         and(
@@ -514,13 +563,108 @@ export const getOccurrenceTachesAction = actionClient
 
     if (!occurrence) throw errors.notFound("Intervention");
 
+    // 1. Tâches réelles snapshotées
     const taches = await db
       .select()
       .from(occurrenceTaches)
       .where(eq(occurrenceTaches.occurrenceId, occurrenceId))
       .orderBy(asc(occurrenceTaches.ordre));
 
-    return { taches };
+    if (taches.length > 0) return { taches, isPreview: false };
+
+    // 2. Fallback : récupérer le templateId (priorité règle > exécution)
+    let templateId: string | null = null;
+
+    if (occurrence.regleRecurrenceId) {
+      const [regle] = await db
+        .select({
+          tacheListeTemplateId:
+            clientServiceReglesRecurrence.tacheListeTemplateId,
+        })
+        .from(clientServiceReglesRecurrence)
+        .where(
+          eq(clientServiceReglesRecurrence.id, occurrence.regleRecurrenceId),
+        )
+        .limit(1);
+      templateId = regle?.tacheListeTemplateId ?? null;
+    }
+
+    if (!templateId && occurrence.executionId) {
+      const [execution] = await db
+        .select({
+          tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
+        })
+        .from(clientServiceExecutions)
+        .where(eq(clientServiceExecutions.id, occurrence.executionId))
+        .limit(1);
+      templateId = execution?.tacheListeTemplateId ?? null;
+    }
+
+    if (!templateId) return { taches: [], isPreview: false };
+
+    // 3. Items du template comme preview
+    const items = await db
+      .select({
+        id: tacheListeItems.id,
+        titre: tacheListeItems.titre,
+        ordre: tacheListeItems.ordre,
+      })
+      .from(tacheListeItems)
+      .where(
+        and(
+          eq(tacheListeItems.listeTemplateId, templateId),
+          eq(tacheListeItems.actif, true),
+        ),
+      )
+      .orderBy(asc(tacheListeItems.ordre));
+
+    // Mapper les items en pseudo-tâches avec statut "a_faire" pour la preview
+    const previewTaches = items.map((item) => ({
+      id: item.id,
+      titre: item.titre,
+      ordre: item.ordre,
+      statut: "a_faire" as const,
+    }));
+
+    return { taches: previewTaches, isPreview: true };
+  });
+
+// ==================== GET TACHE ITEMS BY TEMPLATE (events virtuels) ====================
+
+export const getTacheItemsByTemplateAction = actionClient
+  .metadata({ actionName: "getTacheItemsByTemplateAction" })
+  .inputSchema(z.object({ tacheListeTemplateId: z.uuid() }), {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (!session?.user)
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const items = await db
+      .select({
+        id: tacheListeItems.id,
+        titre: tacheListeItems.titre,
+        ordre: tacheListeItems.ordre,
+      })
+      .from(tacheListeItems)
+      .where(
+        and(
+          eq(tacheListeItems.listeTemplateId, parsedInput.tacheListeTemplateId),
+          eq(tacheListeItems.actif, true),
+        ),
+      )
+      .orderBy(asc(tacheListeItems.ordre));
+
+    return {
+      taches: items.map((item) => ({
+        id: item.id,
+        titre: item.titre,
+        ordre: item.ordre,
+        statut: "a_faire" as const,
+      })),
+    };
   });
 
 // ==================== UPDATE OCCURRENCE DATES ====================
@@ -659,7 +803,9 @@ export const updateOccurrenceTacheStatutAction = actionClient
       .where(eq(clientServiceOccurrences.id, occurrenceId))
       .limit(1);
 
-    const modePilotage = await getExecutionContext(occurrenceCtx?.executionId ?? null);
+    const modePilotage = await getExecutionContext(
+      occurrenceCtx?.executionId ?? null,
+    );
 
     // Charger la tâche AVANT le check de permission (nécessaire pour isAssignee sur terminee)
     const [tache] = await db
@@ -824,7 +970,9 @@ export const addTachePieceJointeAction = actionClient
       .where(eq(clientServiceOccurrences.id, occurrenceId))
       .limit(1);
 
-    const modePilotage = await getExecutionContext(occurrenceCtxPj?.executionId ?? null);
+    const modePilotage = await getExecutionContext(
+      occurrenceCtxPj?.executionId ?? null,
+    );
     // BUG-8 fix: canManage est aussi autorisé à ajouter des PJ (spec §9).
     const canExecute = await canExecuteOccurrence(
       currentUser.id,
@@ -952,7 +1100,9 @@ export const deleteTachePieceJointeAction = actionClient
       .where(eq(clientServiceOccurrences.id, occurrenceId))
       .limit(1);
 
-    const modePilotageDel = await getExecutionContext(occurrenceCtxDel?.executionId ?? null);
+    const modePilotageDel = await getExecutionContext(
+      occurrenceCtxDel?.executionId ?? null,
+    );
     // BUG-8 fix: canManage est aussi autorisé à supprimer des PJ (spec §9).
     const canExecuteDel = await canExecuteOccurrence(
       currentUser.id,
@@ -1162,7 +1312,9 @@ export const updateAdHocTacheAction = actionClient
       .where(eq(clientServiceOccurrences.id, occurrenceId))
       .limit(1);
 
-    const modePilotageAdh = await getExecutionContext(occurrenceCtxAdh?.executionId ?? null);
+    const modePilotageAdh = await getExecutionContext(
+      occurrenceCtxAdh?.executionId ?? null,
+    );
     const canManageAdHocUpdate = await canManageOccurrence(
       currentUser.id,
       entrepriseId,
@@ -1247,7 +1399,9 @@ export const deleteAdHocTacheAction = actionClient
       .where(eq(clientServiceOccurrences.id, occurrenceId))
       .limit(1);
 
-    const modePilotageDltTache = await getExecutionContext(occurrenceCtxDltTache?.executionId ?? null);
+    const modePilotageDltTache = await getExecutionContext(
+      occurrenceCtxDltTache?.executionId ?? null,
+    );
     const canManageDltTache = await canManageOccurrence(
       currentUser.id,
       entrepriseId,
@@ -1281,7 +1435,7 @@ export const deleteAdHocTacheAction = actionClient
     // 4. Guard : uniquement les tâches ad-hoc
     if (tache.listeItemId !== null) {
       throw errors.conflict(
-        "Seules les tâches ad-hoc peuvent être annulées. Utilisez \"non applicable\" pour les tâches de la checklist.",
+        'Seules les tâches ad-hoc peuvent être annulées. Utilisez "non applicable" pour les tâches de la checklist.',
       );
     }
 
@@ -1295,7 +1449,11 @@ export const deleteAdHocTacheAction = actionClient
     // 6. Annulation logique — jamais de DELETE (règle doctrine)
     const [updated] = await db
       .update(occurrenceTaches)
-      .set({ statut: "annulee", updatedById: currentUser.id, updatedAt: new Date() })
+      .set({
+        statut: "annulee",
+        updatedById: currentUser.id,
+        updatedAt: new Date(),
+      })
       .where(eq(occurrenceTaches.id, tacheId))
       .returning();
 
@@ -1324,7 +1482,9 @@ export const updateTacheAssigneeAction = actionClient
     if (!platformRole?.role) {
       const postureTa = await getActivePosture();
       if (postureTa === "prestataire") {
-        const prestataireAdhesionTa = await getUserPrestataireAdhesion({ userId: currentUser.id });
+        const prestataireAdhesionTa = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
         if (!prestataireAdhesionTa) {
           throw errors.forbidden("Vous n'avez pas accès.");
         }
@@ -1437,13 +1597,20 @@ export const getAssignableUsersForOccurrenceAction = actionClient
 
     if (!platformRole?.role) {
       if (posture === "prestataire") {
-        const prestataireAdhesion = await getUserPrestataireAdhesion({ userId: currentUser.id });
-        if (!prestataireAdhesion) throw errors.forbidden("Vous n'avez pas accès.");
+        const prestataireAdhesion = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
+        if (!prestataireAdhesion)
+          throw errors.forbidden("Vous n'avez pas accès.");
         targetEntrepriseId = prestataireAdhesion.entrepriseId;
         isPrestatairePosture = true;
       } else {
-        const adhesion = await getUserClientAdhesion({ userId: currentUser.id, entrepriseId });
-        if (!adhesion) throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+        const adhesion = await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId,
+        });
+        if (!adhesion)
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
     }
 
@@ -1480,15 +1647,19 @@ export const linkTicketToOccurrenceAction = actionClient
     if (!platformRole?.role) {
       const postureLinkTicket = await getActivePosture();
       if (postureLinkTicket === "prestataire") {
-        const prestataireAdhesionLink = await getUserPrestataireAdhesion({ userId: currentUser.id });
-        if (!prestataireAdhesionLink) throw errors.forbidden("Vous n'avez pas accès.");
+        const prestataireAdhesionLink = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
+        if (!prestataireAdhesionLink)
+          throw errors.forbidden("Vous n'avez pas accès.");
         const occ = await getOccurrenceWithDetailsById(occurrenceId);
         if (!occ) throw errors.notFound("Occurrence");
         const canAccess = await prestataireHasExecutionOnPrestation({
           prestationId: occ.clientServiceId,
           prestataireEntrepriseId: prestataireAdhesionLink.entrepriseId,
         });
-        if (!canAccess) throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
+        if (!canAccess)
+          throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
       } else {
         const adhesion = await getUserClientAdhesion({
           userId: currentUser.id,
@@ -1548,15 +1719,19 @@ export const unlinkTicketFromOccurrenceAction = actionClient
     if (!platformRole?.role) {
       const postureUnlinkTicket = await getActivePosture();
       if (postureUnlinkTicket === "prestataire") {
-        const prestataireAdhesionUnlink = await getUserPrestataireAdhesion({ userId: currentUser.id });
-        if (!prestataireAdhesionUnlink) throw errors.forbidden("Vous n'avez pas accès.");
+        const prestataireAdhesionUnlink = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
+        if (!prestataireAdhesionUnlink)
+          throw errors.forbidden("Vous n'avez pas accès.");
         const occ = await getOccurrenceWithDetailsById(occurrenceId);
         if (!occ) throw errors.notFound("Occurrence");
         const canAccess = await prestataireHasExecutionOnPrestation({
           prestationId: occ.clientServiceId,
           prestataireEntrepriseId: prestataireAdhesionUnlink.entrepriseId,
         });
-        if (!canAccess) throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
+        if (!canAccess)
+          throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
       } else {
         const adhesion = await getUserClientAdhesion({
           userId: currentUser.id,
@@ -1608,15 +1783,19 @@ export const getAvailableTicketsForLinkingAction = actionClient
     if (!platformRole?.role) {
       const postureGetAvail = await getActivePosture();
       if (postureGetAvail === "prestataire") {
-        const prestataireAdhesionAvail = await getUserPrestataireAdhesion({ userId: currentUser.id });
-        if (!prestataireAdhesionAvail) throw errors.forbidden("Vous n'avez pas accès.");
+        const prestataireAdhesionAvail = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
+        if (!prestataireAdhesionAvail)
+          throw errors.forbidden("Vous n'avez pas accès.");
         const occ = await getOccurrenceWithDetailsById(occurrenceId);
         if (!occ) throw errors.notFound("Occurrence");
         const canAccess = await prestataireHasExecutionOnPrestation({
           prestationId: occ.clientServiceId,
           prestataireEntrepriseId: prestataireAdhesionAvail.entrepriseId,
         });
-        if (!canAccess) throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
+        if (!canAccess)
+          throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
       } else {
         const adhesion = await getUserClientAdhesion({
           userId: currentUser.id,
@@ -1673,15 +1852,19 @@ export const getTicketsByOccurrenceAction = actionClient
     if (!platformRole?.role) {
       const postureGetTickets = await getActivePosture();
       if (postureGetTickets === "prestataire") {
-        const prestataireAdhesionTickets = await getUserPrestataireAdhesion({ userId: currentUser.id });
-        if (!prestataireAdhesionTickets) throw errors.forbidden("Vous n'avez pas accès.");
+        const prestataireAdhesionTickets = await getUserPrestataireAdhesion({
+          userId: currentUser.id,
+        });
+        if (!prestataireAdhesionTickets)
+          throw errors.forbidden("Vous n'avez pas accès.");
         const occ = await getOccurrenceWithDetailsById(occurrenceId);
         if (!occ) throw errors.notFound("Occurrence");
         const canAccess = await prestataireHasExecutionOnPrestation({
           prestationId: occ.clientServiceId,
           prestataireEntrepriseId: prestataireAdhesionTickets.entrepriseId,
         });
-        if (!canAccess) throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
+        if (!canAccess)
+          throw errors.forbidden("Vous n'avez pas accès à cette intervention.");
       } else {
         const adhesion = await getUserClientAdhesion({
           userId: currentUser.id,
@@ -1797,8 +1980,13 @@ export const insertOccurrenceOnDemandAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { prestationId, entrepriseId, dateDebutPrevue, dateFinPrevue, notes } =
-      parsedInput;
+    const {
+      prestationId,
+      entrepriseId,
+      dateDebutPrevue,
+      dateFinPrevue,
+      notes,
+    } = parsedInput;
 
     // 1. Vérifier que la prestation existe et appartient à l'entreprise
     // getPrestationWithJoinsById inclut siteNom nécessaire pour le retour OccurrenceListItem
@@ -1846,7 +2034,10 @@ export const insertOccurrenceOnDemandAction = actionClient
 
     // 5. Vérifier le quota si la prestation est en mode quota_manuel
     if (prestation.famillePlanification === "quota_manuel") {
-      const quotaInfo = await getQuotaInfoForPrestation(prestationId, dateDebut);
+      const quotaInfo = await getQuotaInfoForPrestation(
+        prestationId,
+        dateDebut,
+      );
       if (
         quotaInfo !== null &&
         quotaInfo.usedInPeriod >= quotaInfo.nbOccurrencesParPeriode
@@ -1917,8 +2108,13 @@ export const updateTacheTempsPasseAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { tacheId, occurrenceId, prestationId, entrepriseId, tempsPasseSecondes } =
-      parsedInput;
+    const {
+      tacheId,
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      tempsPasseSecondes,
+    } = parsedInput;
 
     const prestation = await getPrestationById(prestationId);
     if (!prestation || prestation.entrepriseId !== entrepriseId) {
@@ -1931,7 +2127,9 @@ export const updateTacheTempsPasseAction = actionClient
       .where(eq(clientServiceOccurrences.id, occurrenceId))
       .limit(1);
 
-    const modePilotageTps = await getExecutionContext(occurrenceCtxTps?.executionId ?? null);
+    const modePilotageTps = await getExecutionContext(
+      occurrenceCtxTps?.executionId ?? null,
+    );
     const canManageTps = await canManageOccurrence(
       currentUser.id,
       entrepriseId,
@@ -1973,7 +2171,8 @@ export const updateTacheTempsPasseAction = actionClient
       .where(eq(occurrenceTaches.id, tacheId))
       .returning();
 
-    if (!updated) throw errors.internal("Échec de la mise à jour du temps passé.");
+    if (!updated)
+      throw errors.internal("Échec de la mise à jour du temps passé.");
 
     return { tempsPasseSecondes: updated.tempsPasseSecondes };
   });
@@ -2028,7 +2227,11 @@ async function canManageDragResize(
     const adhesion = await getUserPrestataireAdhesion({ userId });
     if (adhesion?.role === "admin") return true;
   }
-  const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
+  const siteRole = await resolvePostureAwareSiteRole({
+    userId,
+    siteId,
+    entrepriseId,
+  });
   return siteRole === "responsable_site";
 }
 
@@ -2061,14 +2264,19 @@ export const dragOccurrenceAction = actionClient
 
     if (!occ) throw errors.notFound("Occurrence introuvable.");
     if (occ.statut !== "planifiee")
-      throw errors.conflict("Seules les occurrences planifiées peuvent être déplacées.");
+      throw errors.conflict(
+        "Seules les occurrences planifiées peuvent être déplacées.",
+      );
 
     const canManage = await canManageDragResize(
       session.user.id,
       parsedInput.entrepriseId,
       occ.siteId,
     );
-    if (!canManage) throw errors.forbidden("Droits insuffisants pour modifier cette occurrence.");
+    if (!canManage)
+      throw errors.forbidden(
+        "Droits insuffisants pour modifier cette occurrence.",
+      );
 
     const fuseauHoraire = "Europe/Paris";
     const newStartDate = toWallClockDate(parsedInput.newStart, fuseauHoraire);
@@ -2212,14 +2420,19 @@ export const resizeOccurrenceAction = actionClient
 
     if (!occ) throw errors.notFound("Occurrence introuvable.");
     if (occ.statut !== "planifiee")
-      throw errors.conflict("Seules les occurrences planifiées peuvent être redimensionnées.");
+      throw errors.conflict(
+        "Seules les occurrences planifiées peuvent être redimensionnées.",
+      );
 
     const canManage = await canManageDragResize(
       session.user.id,
       parsedInput.entrepriseId,
       occ.siteId,
     );
-    if (!canManage) throw errors.forbidden("Droits insuffisants pour modifier cette occurrence.");
+    if (!canManage)
+      throw errors.forbidden(
+        "Droits insuffisants pour modifier cette occurrence.",
+      );
 
     const fuseauHoraire = "Europe/Paris";
     const newEndDate = toWallClockDate(parsedInput.newEnd, fuseauHoraire);
@@ -2227,7 +2440,8 @@ export const resizeOccurrenceAction = actionClient
     const newDurationMinutes = Math.round(
       (newEndDate.getTime() - startDate.getTime()) / 60000,
     );
-    if (newDurationMinutes <= 0) throw errors.conflict("La durée doit être positive.");
+    if (newDurationMinutes <= 0)
+      throw errors.conflict("La durée doit être positive.");
 
     // ── Scope "occurrence" ──────────────────────────────────────────────────
     if (parsedInput.scope === "occurrence" || !occ.regleRecurrenceId) {

@@ -6,6 +6,7 @@ import {
   clientServiceOccurrences,
   clientServiceQuotasPlanification,
   clientServiceReglesRecurrence,
+  tacheListeItems,
   tacheListesTemplates,
 } from "@/db/schema/services";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
@@ -41,7 +42,7 @@ import {
 import {
   deleteFuturePlanifieeOccurrences,
 } from "@/server/utils/clientServiceOccurrences.utils";
-import { and, asc, eq, gte } from "drizzle-orm";
+import { and, asc, eq, gte, inArray } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 
 // ==================== HELPERS ====================
@@ -96,9 +97,16 @@ export const getReglesRecurrenceByPrestationAction = actionClient
     );
     if (!hasAccess) throw errors.forbidden("Accès refusé à cette entreprise.");
 
-    const regles = await db
-      .select()
+    const regleRows = await db
+      .select({
+        regle: clientServiceReglesRecurrence,
+        tacheListeTemplateName: tacheListesTemplates.nom,
+      })
       .from(clientServiceReglesRecurrence)
+      .leftJoin(
+        tacheListesTemplates,
+        eq(tacheListesTemplates.id, clientServiceReglesRecurrence.tacheListeTemplateId),
+      )
       .where(
         eq(
           clientServiceReglesRecurrence.clientServiceId,
@@ -110,7 +118,52 @@ export const getReglesRecurrenceByPrestationAction = actionClient
         asc(clientServiceReglesRecurrence.createdAt),
       );
 
-    return { regles: regles.map((r) => selectRegleRecurrenceSchema.parse(r)) };
+    // Fetch checklist items for all unique template IDs
+    const templateIds = [
+      ...new Set(
+        regleRows
+          .map((r) => r.regle.tacheListeTemplateId)
+          .filter((id): id is string => id !== null),
+      ),
+    ];
+    const itemsByTemplate = new Map<string, { id: string; ordre: number; titre: string; dureeEstimeeMinutes: number | null }[]>();
+    if (templateIds.length > 0) {
+      const itemRows = await db
+        .select({
+          id: tacheListeItems.id,
+          templateId: tacheListeItems.listeTemplateId,
+          ordre: tacheListeItems.ordre,
+          titre: tacheListeItems.titre,
+          dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+        })
+        .from(tacheListeItems)
+        .where(
+          templateIds.length === 1
+            ? eq(tacheListeItems.listeTemplateId, templateIds[0]!)
+            : inArray(tacheListeItems.listeTemplateId, templateIds),
+        )
+        .orderBy(asc(tacheListeItems.ordre));
+      for (const item of itemRows) {
+        const list = itemsByTemplate.get(item.templateId) ?? [];
+        list.push({
+          id: item.id,
+          ordre: item.ordre,
+          titre: item.titre,
+          dureeEstimeeMinutes: item.dureeEstimeeMinutes,
+        });
+        itemsByTemplate.set(item.templateId, list);
+      }
+    }
+
+    const regles = regleRows.map((r) => ({
+      ...selectRegleRecurrenceSchema.parse(r.regle),
+      tacheListeTemplateName: r.tacheListeTemplateName ?? null,
+      tacheListeItems: r.regle.tacheListeTemplateId
+        ? (itemsByTemplate.get(r.regle.tacheListeTemplateId) ?? [])
+        : [],
+    }));
+
+    return { regles };
   });
 
 // ==================== INSERT RÈGLE ====================

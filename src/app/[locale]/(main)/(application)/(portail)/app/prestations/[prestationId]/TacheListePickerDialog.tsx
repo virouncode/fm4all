@@ -4,12 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { updateExecutionTacheListeAction } from "@/server/actions/clientServiceExecutionsActions";
 import { getAvailableTacheListesTemplatesAction } from "@/server/actions/tacheListesTemplatesActions";
 import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
@@ -118,20 +121,20 @@ export function TacheListePickerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[80vh] max-w-2xl flex-col gap-0 p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle className="flex items-center gap-2">
-            <ClipboardList className="text-primary h-5 w-5" />
-            Choisir une checklist
-            {serviceNom && (
-              <span className="text-muted-foreground text-sm font-normal">
-                — {serviceNom}
-              </span>
-            )}
-          </DialogTitle>
-        </DialogHeader>
-
-        <Separator />
+      <DialogStyledContent className="flex max-h-[80vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardList className="text-primary h-5 w-5" />
+              Choisir une checklist
+              {serviceNom && (
+                <span className="text-muted-foreground text-sm font-normal">
+                  — {serviceNom}
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <div className="flex-1 overflow-hidden">
           {loading ? (
@@ -146,7 +149,7 @@ export function TacheListePickerDialog({
               </p>
             </div>
           ) : (
-            <ScrollArea className="h-[50vh] px-6 py-4">
+            <ScrollArea className="h-[50vh] px-5 py-4">
               <div className="space-y-2">
                 {/* Option "Aucune checklist" */}
                 <button
@@ -289,9 +292,7 @@ export function TacheListePickerDialog({
           )}
         </div>
 
-        <Separator />
-
-        <div className="flex items-center justify-end gap-2 px-6 py-4">
+        <DialogStyledFooter>
           <Button
             type="button"
             variant="outline"
@@ -308,8 +309,8 @@ export function TacheListePickerDialog({
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
             Confirmer
           </Button>
-        </div>
-      </DialogContent>
+        </DialogStyledFooter>
+      </DialogStyledContent>
     </Dialog>
   );
 }

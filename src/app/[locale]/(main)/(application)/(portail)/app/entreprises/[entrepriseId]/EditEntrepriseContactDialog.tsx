@@ -3,11 +3,15 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import {
@@ -132,49 +136,54 @@ export function EditEntrepriseContactDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="text-primary h-5 w-5" />
-            {isCreate ? "Ajouter un contact" : "Modifier le contact"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="text-primary h-5 w-5" />
+              {isCreate ? "Ajouter un contact" : "Modifier le contact"}
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         {isCreate ? (
           <Form {...insertForm}>
             <form
               onSubmit={insertForm.handleSubmit(onSubmitCreate)}
-              className="space-y-4"
             >
-              <div className="grid grid-cols-2 gap-3">
-                <RhfInput<InsertEntrepriseContactType>
-                  name="prenom"
-                  label="Prénom"
-                  requiredMark
-                />
-                <RhfInput<InsertEntrepriseContactType>
-                  name="nom"
-                  label="Nom"
-                  requiredMark
-                />
-              </div>
-              <RhfInput<InsertEntrepriseContactType>
-                name="email"
-                label="Email"
-                type="email"
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <RhfInput<InsertEntrepriseContactType>
-                  name="phone"
-                  label="Téléphone"
-                  type="tel"
-                />
-                <RhfInput<InsertEntrepriseContactType>
-                  name="fonction"
-                  label="Fonction"
-                />
-              </div>
-              <DialogFooter>
+              <DialogStyledBody>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <RhfInput<InsertEntrepriseContactType>
+                      name="prenom"
+                      label="Prénom"
+                      requiredMark
+                    />
+                    <RhfInput<InsertEntrepriseContactType>
+                      name="nom"
+                      label="Nom"
+                      requiredMark
+                    />
+                  </div>
+                  <RhfInput<InsertEntrepriseContactType>
+                    name="email"
+                    label="Email"
+                    type="email"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <RhfInput<InsertEntrepriseContactType>
+                      name="phone"
+                      label="Téléphone"
+                      type="tel"
+                    />
+                    <RhfInput<InsertEntrepriseContactType>
+                      name="fonction"
+                      label="Fonction"
+                    />
+                  </div>
+                </div>
+              </DialogStyledBody>
+              <DialogStyledFooter>
                 <Button
                   type="button"
                   variant="outline"
@@ -189,44 +198,47 @@ export function EditEntrepriseContactDialog({
                   )}
                   Créer
                 </Button>
-              </DialogFooter>
+              </DialogStyledFooter>
             </form>
           </Form>
         ) : (
           <Form {...editForm}>
             <form
               onSubmit={editForm.handleSubmit(onSubmitEdit)}
-              className="space-y-4"
             >
-              <div className="grid grid-cols-2 gap-3">
-                <RhfInput<UpdateEntrepriseContactType>
-                  name="prenom"
-                  label="Prénom"
-                  requiredMark
-                />
-                <RhfInput<UpdateEntrepriseContactType>
-                  name="nom"
-                  label="Nom"
-                  requiredMark
-                />
-              </div>
-              <RhfInput<UpdateEntrepriseContactType>
-                name="email"
-                label="Email"
-                type="email"
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <RhfInput<UpdateEntrepriseContactType>
-                  name="phone"
-                  label="Téléphone"
-                  type="tel"
-                />
-                <RhfInput<UpdateEntrepriseContactType>
-                  name="fonction"
-                  label="Fonction"
-                />
-              </div>
-              <DialogFooter>
+              <DialogStyledBody>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <RhfInput<UpdateEntrepriseContactType>
+                      name="prenom"
+                      label="Prénom"
+                      requiredMark
+                    />
+                    <RhfInput<UpdateEntrepriseContactType>
+                      name="nom"
+                      label="Nom"
+                      requiredMark
+                    />
+                  </div>
+                  <RhfInput<UpdateEntrepriseContactType>
+                    name="email"
+                    label="Email"
+                    type="email"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <RhfInput<UpdateEntrepriseContactType>
+                      name="phone"
+                      label="Téléphone"
+                      type="tel"
+                    />
+                    <RhfInput<UpdateEntrepriseContactType>
+                      name="fonction"
+                      label="Fonction"
+                    />
+                  </div>
+                </div>
+              </DialogStyledBody>
+              <DialogStyledFooter>
                 <Button
                   type="button"
                   variant="outline"
@@ -241,11 +253,11 @@ export function EditEntrepriseContactDialog({
                   )}
                   Enregistrer
                 </Button>
-              </DialogFooter>
+              </DialogStyledFooter>
             </form>
           </Form>
         )}
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

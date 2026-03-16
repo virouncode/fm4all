@@ -3,10 +3,15 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
 import { Label } from "@/components/ui/label";
 import {
   getAllServicesAction,
@@ -175,19 +180,22 @@ export function EditEntrepriseRolesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] flex flex-col gap-0 p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle className="flex items-center gap-2">
-            <Tags className="h-5 w-5 text-primary" />
-            Modifier les rôles
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="max-w-md max-h-[90vh] flex flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Tags className="h-5 w-5 text-primary" />
+              Modifier les rôles
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <form
           onSubmit={onSubmit}
           className="flex flex-col flex-1 overflow-hidden"
         >
-          <div className="flex-1 overflow-y-auto px-6 space-y-5 pb-2">
+          <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+            <div className="space-y-5">
             {/* Disclaimer */}
             <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
@@ -319,8 +327,9 @@ export function EditEntrepriseRolesDialog({
               )}
             </div>
           </div>
+          </DialogStyledBody>
 
-          <div className="flex justify-end gap-2 border-t px-6 py-4">
+          <DialogStyledFooter>
             <Button
               type="button"
               variant="outline"
@@ -334,9 +343,9 @@ export function EditEntrepriseRolesDialog({
               )}
               Enregistrer
             </Button>
-          </div>
+          </DialogStyledFooter>
         </form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

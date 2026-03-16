@@ -9,6 +9,8 @@ import {
   clientServiceReglesRecurrence,
   clientServices,
   services,
+  tacheListeItems,
+  tacheListesTemplates,
 } from "@/db/schema/services";
 import { sites } from "@/db/schema/sites";
 import { userClientAdhesions } from "@/db/schema/users";
@@ -27,6 +29,18 @@ import {
 } from "@/zod-schemas/clientServiceReglesRecurrence.schema";
 import { computeQuotaPeriode } from "@/server/utils/clientServiceOccurrences.utils";
 import { asc, desc, and, count, eq, gte, inArray, isNotNull, lte, ne } from "drizzle-orm";
+
+export type RegleRecurrenceChecklistItemType = {
+  id: string;
+  ordre: number;
+  titre: string;
+  dureeEstimeeMinutes: number | null;
+};
+
+export type RegleRecurrenceAvecTemplateType = SelectRegleRecurrenceType & {
+  tacheListeTemplateName: string | null;
+  tacheListeItems: RegleRecurrenceChecklistItemType[];
+};
 
 /**
  * Vérifie si une entreprise prestataire a au moins une exécution active sur une prestation.
@@ -447,16 +461,66 @@ export async function getQuotaInfoForPrestation(
 
 export async function getReglesRecurrenceByPrestationId(
   prestationId: string,
-): Promise<SelectRegleRecurrenceType[]> {
+): Promise<RegleRecurrenceAvecTemplateType[]> {
   const rows = await db
-    .select()
+    .select({
+      regle: clientServiceReglesRecurrence,
+      tacheListeTemplateName: tacheListesTemplates.nom,
+    })
     .from(clientServiceReglesRecurrence)
+    .leftJoin(
+      tacheListesTemplates,
+      eq(tacheListesTemplates.id, clientServiceReglesRecurrence.tacheListeTemplateId),
+    )
     .where(eq(clientServiceReglesRecurrence.clientServiceId, prestationId))
     .orderBy(
       asc(clientServiceReglesRecurrence.ordre),
       asc(clientServiceReglesRecurrence.createdAt),
     );
-  return rows.map((r) => selectRegleRecurrenceSchema.parse(r));
+
+  const templateIds = [
+    ...new Set(
+      rows
+        .map((r) => r.regle.tacheListeTemplateId)
+        .filter((id): id is string => id !== null),
+    ),
+  ];
+  const itemsByTemplate = new Map<string, RegleRecurrenceChecklistItemType[]>();
+  if (templateIds.length > 0) {
+    const itemRows = await db
+      .select({
+        id: tacheListeItems.id,
+        templateId: tacheListeItems.listeTemplateId,
+        ordre: tacheListeItems.ordre,
+        titre: tacheListeItems.titre,
+        dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+      })
+      .from(tacheListeItems)
+      .where(
+        templateIds.length === 1
+          ? eq(tacheListeItems.listeTemplateId, templateIds[0]!)
+          : inArray(tacheListeItems.listeTemplateId, templateIds),
+      )
+      .orderBy(asc(tacheListeItems.ordre));
+    for (const item of itemRows) {
+      const list = itemsByTemplate.get(item.templateId) ?? [];
+      list.push({
+        id: item.id,
+        ordre: item.ordre,
+        titre: item.titre,
+        dureeEstimeeMinutes: item.dureeEstimeeMinutes,
+      });
+      itemsByTemplate.set(item.templateId, list);
+    }
+  }
+
+  return rows.map((r) => ({
+    ...selectRegleRecurrenceSchema.parse(r.regle),
+    tacheListeTemplateName: r.tacheListeTemplateName ?? null,
+    tacheListeItems: r.regle.tacheListeTemplateId
+      ? (itemsByTemplate.get(r.regle.tacheListeTemplateId) ?? [])
+      : [],
+  }));
 }
 
 export type QuotaConfigType = {

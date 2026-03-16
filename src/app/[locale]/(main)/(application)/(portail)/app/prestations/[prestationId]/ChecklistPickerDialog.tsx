@@ -4,12 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { getAvailableTacheListesTemplatesAction } from "@/server/actions/tacheListesTemplatesActions";
 import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
 import {
@@ -90,20 +93,20 @@ export function ChecklistPickerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[80vh] max-w-2xl flex-col gap-0 p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle className="flex items-center gap-2">
-            <ClipboardList className="text-primary h-5 w-5" />
-            Choisir une checklist
-          </DialogTitle>
-          <p className="text-muted-foreground text-xs">
-            {context === "execution"
-              ? "Optionnel — aucune liste de tâches par défaut si non renseigné."
-              : "Optionnel — hérite de l\u2019exécution si non renseigné."}
-          </p>
-        </DialogHeader>
-
-        <Separator />
+      <DialogStyledContent className="flex max-h-[80vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardList className="text-primary h-5 w-5" />
+              Choisir une checklist
+            </DialogTitle>
+            <p className="text-muted-foreground text-xs">
+              {context === "execution"
+                ? "Optionnel — aucune liste de tâches par défaut si non renseigné."
+                : "Optionnel — hérite de l\u2019exécution si non renseigné."}
+            </p>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <div className="flex-1 overflow-hidden">
           {loading ? (
@@ -118,7 +121,7 @@ export function ChecklistPickerDialog({
               </p>
             </div>
           ) : (
-            <ScrollArea className="h-[50vh] px-6 py-4">
+            <ScrollArea className="h-[50vh] px-5 py-4">
               <div className="space-y-2">
                 {/* Option "Aucune (hérite de l'exécution)" */}
                 <button
@@ -254,9 +257,7 @@ export function ChecklistPickerDialog({
           )}
         </div>
 
-        <Separator />
-
-        <div className="flex items-center justify-end gap-2 px-6 py-4">
+        <DialogStyledFooter>
           <Button
             type="button"
             variant="outline"
@@ -267,8 +268,8 @@ export function ChecklistPickerDialog({
           <Button type="button" onClick={handleConfirm} disabled={!isDirty}>
             Sélectionner
           </Button>
-        </div>
-      </DialogContent>
+        </DialogStyledFooter>
+      </DialogStyledContent>
     </Dialog>
   );
 }

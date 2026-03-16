@@ -6,11 +6,15 @@ import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
@@ -119,73 +123,81 @@ export function QuotaPlanificationFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Modifier le quota" : "Configurer le quota de planification"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="sm:max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              {isEdit ? "Modifier le quota" : "Configurer le quota de planification"}
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4 py-2"
-          >
-            <RhfInput<QuotaFormValues>
-              name="nbOccurrencesParPeriode"
-              label="Nombre d'occurrences par période"
-              type="number"
-              min="1"
-              max="52"
-              requiredMark
-            />
-
-            <RhfControlledSelect<QuotaFormValues>
-              name="periodeQuota"
-              label="Période de référence"
-              selectClassName="w-full"
-              requiredMark
+        <DialogStyledBody>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col gap-4"
             >
-              <SelectItem value="trimestre">Trimestre</SelectItem>
-              <SelectItem value="semestre">Semestre</SelectItem>
-              <SelectItem value="annee">Année</SelectItem>
-            </RhfControlledSelect>
+              <RhfInput<QuotaFormValues>
+                name="nbOccurrencesParPeriode"
+                label="Nombre d'occurrences par période"
+                type="number"
+                min="1"
+                max="52"
+                requiredMark
+              />
 
-            <RhfControlledSelect<QuotaFormValues>
-              name="modeAncragePeriode"
-              label="Mode d'ancrage de la période"
-              selectClassName="w-full"
-            >
-              <SelectItem value="contrat">
-                Date de contrat (date de début de prestation)
-              </SelectItem>
-              <SelectItem value="civil">Calendrier civil</SelectItem>
-            </RhfControlledSelect>
-
-            <RhfTextArea<QuotaFormValues>
-              name="notes"
-              label="Notes (facultatif)"
-              placeholder="Instructions sur la planification…"
-              rows={3}
-            />
-
-            <DialogFooter className="pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
+              <RhfControlledSelect<QuotaFormValues>
+                name="periodeQuota"
+                label="Période de référence"
+                selectClassName="w-full"
+                requiredMark
               >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Spinner />}
-                {isEdit ? "Enregistrer" : "Configurer"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
+                <SelectItem value="trimestre">Trimestre</SelectItem>
+                <SelectItem value="semestre">Semestre</SelectItem>
+                <SelectItem value="annee">Année</SelectItem>
+              </RhfControlledSelect>
+
+              <RhfControlledSelect<QuotaFormValues>
+                name="modeAncragePeriode"
+                label="Mode d'ancrage de la période"
+                selectClassName="w-full"
+              >
+                <SelectItem value="contrat">
+                  Date de contrat (date de début de prestation)
+                </SelectItem>
+                <SelectItem value="civil">Calendrier civil</SelectItem>
+              </RhfControlledSelect>
+
+              <RhfTextArea<QuotaFormValues>
+                name="notes"
+                label="Notes (facultatif)"
+                placeholder="Instructions sur la planification…"
+                rows={3}
+              />
+            </form>
+          </Form>
+        </DialogStyledBody>
+
+        <DialogStyledFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
+            Annuler
+          </Button>
+          <Button
+            type="button"
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+          >
+            {isSubmitting && <Spinner />}
+            {isEdit ? "Enregistrer" : "Configurer"}
+          </Button>
+        </DialogStyledFooter>
+      </DialogStyledContent>
     </Dialog>
   );
 }

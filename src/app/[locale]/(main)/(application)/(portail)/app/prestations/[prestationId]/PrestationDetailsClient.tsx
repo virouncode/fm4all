@@ -1,15 +1,5 @@
 "use client";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,11 +9,24 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import {
   Select,
   SelectContent,
@@ -59,8 +62,8 @@ import {
 import type {
   QuotaConfigType,
   QuotaInfoType,
+  RegleRecurrenceAvecTemplateType,
 } from "@/server/queries/clientServices.query";
-import type { SelectRegleRecurrenceType } from "@/zod-schemas/clientServiceReglesRecurrence.schema";
 import {
   type ClientServiceStatutType,
   type PrestationListItem,
@@ -132,7 +135,7 @@ type PrestationDetailsClientProps = {
   /** Quota de la période courante — null si pas de config quota ou si mode ≠ quota_manuel */
   quotaInfo: QuotaInfoType | null;
   /** Règles de récurrence pré-chargées côté serveur (recurrence_auto uniquement) */
-  initialRegles: import("@/zod-schemas/clientServiceReglesRecurrence.schema").SelectRegleRecurrenceType[];
+  initialRegles: RegleRecurrenceAvecTemplateType[];
   /** Config quota pré-chargée côté serveur (quota_manuel uniquement) */
   initialQuotaConfig: QuotaConfigType | null;
   defaultTab?: string;
@@ -163,6 +166,8 @@ export function PrestationDetailsClient({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdatingStatut, setIsUpdatingStatut] = useState(false);
   const [confirmActivateOpen, setConfirmActivateOpen] = useState(false);
+  const [confirmPauseOpen, setConfirmPauseOpen] = useState(false);
+  const [confirmTerminerOpen, setConfirmTerminerOpen] = useState(false);
 
   const today = new Date();
   // Pour canActivate : aligné avec le check serveur (actif suffit, pas besoin de dates valides aujourd'hui)
@@ -189,6 +194,8 @@ export function PrestationDetailsClient({
     });
     setIsUpdatingStatut(false);
     setConfirmActivateOpen(false);
+    setConfirmPauseOpen(false);
+    setConfirmTerminerOpen(false);
     if (result?.serverError) {
       toast.error(result.serverError.message);
     } else if (result?.data) {
@@ -297,20 +304,16 @@ export function PrestationDetailsClient({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => doStatutTransition("en_pause")}
+                onClick={() => setConfirmPauseOpen(true)}
                 disabled={isUpdatingStatut}
               >
-                {isUpdatingStatut ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  "Mettre en pause"
-                )}
+                Mettre en pause
               </Button>
               {canAdmin && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => doStatutTransition("termine")}
+                  onClick={() => setConfirmTerminerOpen(true)}
                   disabled={isUpdatingStatut}
                 >
                   Terminer
@@ -335,7 +338,7 @@ export function PrestationDetailsClient({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => doStatutTransition("termine")}
+                  onClick={() => setConfirmTerminerOpen(true)}
                   disabled={isUpdatingStatut}
                 >
                   Terminer
@@ -461,33 +464,34 @@ export function PrestationDetailsClient({
         })()}
       </div>
 
-      {/* AlertDialog confirmation activation */}
-      <AlertDialog
-        open={confirmActivateOpen}
-        onOpenChange={setConfirmActivateOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Activer la prestation ?</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-3 text-sm">
-                {prestation.famillePlanification === "recurrence_auto" && (
-                  <p>
-                    Les interventions seront générées automatiquement selon la
-                    règle de récurrence configurée.
-                  </p>
-                )}
-                <p className="text-muted-foreground text-xs">
-                  Une prestation activée ne peut pas revenir en brouillon. Pour
-                  suspendre, utilisez &quot;Mettre en pause&quot;.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isUpdatingStatut}>
+      {/* Dialog confirmation activation */}
+      <Dialog open={confirmActivateOpen} onOpenChange={setConfirmActivateOpen}>
+        <DialogStyledContent className="max-w-md">
+          <DialogStyledHeader>
+            <DialogHeader>
+              <DialogTitle>Activer la prestation ?</DialogTitle>
+            </DialogHeader>
+          </DialogStyledHeader>
+          <DialogStyledBody className="space-y-3 text-sm">
+            {prestation.famillePlanification === "recurrence_auto" && (
+              <p>
+                Les interventions seront générées automatiquement selon la
+                règle de récurrence configurée.
+              </p>
+            )}
+            <p className="text-muted-foreground text-xs">
+              Une prestation activée ne peut pas revenir en brouillon. Pour
+              suspendre, utilisez &quot;Mettre en pause&quot;.
+            </p>
+          </DialogStyledBody>
+          <DialogStyledFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmActivateOpen(false)}
+              disabled={isUpdatingStatut}
+            >
               Annuler
-            </AlertDialogCancel>
+            </Button>
             <Button
               onClick={() => doStatutTransition("actif")}
               disabled={isUpdatingStatut}
@@ -501,9 +505,99 @@ export function PrestationDetailsClient({
                 "Activer"
               )}
             </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          </DialogStyledFooter>
+        </DialogStyledContent>
+      </Dialog>
+
+      {/* Dialog confirmation mise en pause */}
+      <Dialog open={confirmPauseOpen} onOpenChange={setConfirmPauseOpen}>
+        <DialogStyledContent className="max-w-md">
+          <DialogStyledHeader>
+            <DialogHeader>
+              <DialogTitle>Mettre la prestation en pause ?</DialogTitle>
+            </DialogHeader>
+          </DialogStyledHeader>
+          <DialogStyledBody className="space-y-2 text-sm">
+            <p>
+              Les interventions{" "}
+              <strong>à venir non encore démarrées</strong> seront{" "}
+              <strong>supprimées définitivement</strong> — pas annulées,
+              vraiment effacées.
+            </p>
+            <p className="text-muted-foreground text-xs">
+              À la reprise, de nouvelles interventions seront régénérées.
+              L&apos;historique passé est conservé.
+            </p>
+          </DialogStyledBody>
+          <DialogStyledFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmPauseOpen(false)}
+              disabled={isUpdatingStatut}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={() => doStatutTransition("en_pause")}
+              disabled={isUpdatingStatut}
+            >
+              {isUpdatingStatut ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Mise en pause...
+                </>
+              ) : (
+                "Mettre en pause"
+              )}
+            </Button>
+          </DialogStyledFooter>
+        </DialogStyledContent>
+      </Dialog>
+
+      {/* Dialog confirmation terminer */}
+      <Dialog open={confirmTerminerOpen} onOpenChange={setConfirmTerminerOpen}>
+        <DialogStyledContent className="max-w-md">
+          <DialogStyledHeader>
+            <DialogHeader>
+              <DialogTitle>Terminer la prestation ?</DialogTitle>
+            </DialogHeader>
+          </DialogStyledHeader>
+          <DialogStyledBody className="space-y-2 text-sm">
+            <p>
+              Les interventions{" "}
+              <strong>à venir non encore démarrées</strong> passeront en{" "}
+              <strong>annulée</strong> — elles resteront visibles dans
+              l&apos;historique.
+            </p>
+            <p className="text-muted-foreground text-xs">
+              Cette action est irréversible. Tout le passé est conservé
+              intégralement.
+            </p>
+          </DialogStyledBody>
+          <DialogStyledFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmTerminerOpen(false)}
+              disabled={isUpdatingStatut}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={() => doStatutTransition("termine")}
+              disabled={isUpdatingStatut}
+            >
+              {isUpdatingStatut ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Clôture en cours...
+                </>
+              ) : (
+                "Terminer la prestation"
+              )}
+            </Button>
+          </DialogStyledFooter>
+        </DialogStyledContent>
+      </Dialog>
 
       {/* ==================== TABS ==================== */}
       <Tabs
@@ -813,26 +907,28 @@ export function PrestationDetailsClient({
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la prestation ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              La prestation <strong>{prestation.serviceNom}</strong> —{" "}
-              {prestation.siteNom} sera définitivement supprimée. Cette action
-              est irréversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting} variant="outline">
+        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Supprimer la prestation ?</AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="px-5 py-4 text-sm">
+            La prestation <strong>{prestation.serviceNom}</strong> —{" "}
+            {prestation.siteNom} sera définitivement supprimée. Cette action
+            est irréversible.
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting}>
               Annuler
-            </AlertDialogCancel>
-            <AlertDialogAction
+            </Button>
+            <Button
+              variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={isDeleting}
-              variant="destructive"
             >
               {isDeleting ? "Suppression..." : "Supprimer"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -873,17 +969,17 @@ function PlanificationTab({
 }: {
   prestation: PrestationListItem;
   canManage: boolean;
-  initialRegles: SelectRegleRecurrenceType[];
+  initialRegles: RegleRecurrenceAvecTemplateType[];
   initialQuotaConfig: QuotaConfigType | null;
   onReglesChanged?: (hasActive: boolean) => void;
 }) {
   const famille = prestation.famillePlanification;
 
   const [regles, setRegles] =
-    useState<SelectRegleRecurrenceType[]>(initialRegles);
+    useState<RegleRecurrenceAvecTemplateType[]>(initialRegles);
 
   const updateRegles = useCallback(
-    (newRegles: SelectRegleRecurrenceType[]) => {
+    (newRegles: RegleRecurrenceAvecTemplateType[]) => {
       setRegles(newRegles);
       onReglesChanged?.(newRegles.some((r) => r.actif));
     },
@@ -896,10 +992,10 @@ function PlanificationTab({
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingRegle, setEditingRegle] =
-    useState<SelectRegleRecurrenceType | null>(null);
+    useState<RegleRecurrenceAvecTemplateType | null>(null);
   const [checklistRegleOpen, setChecklistRegleOpen] = useState(false);
   const [checklistRegle, setChecklistRegle] =
-    useState<SelectRegleRecurrenceType | null>(null);
+    useState<RegleRecurrenceAvecTemplateType | null>(null);
   const [quotaDialogOpen, setQuotaDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -1144,7 +1240,12 @@ function PlanificationTab({
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
         prestation={prestation}
-        onSuccess={(newRegle) => updateRegles([...regles, newRegle])}
+        onSuccess={(newRegle) =>
+          updateRegles([
+            ...regles,
+            { ...newRegle, tacheListeTemplateName: null, tacheListeItems: [] },
+          ])
+        }
       />
       <RegleRecurrenceFormDialog
         open={editDialogOpen}
@@ -1155,7 +1256,17 @@ function PlanificationTab({
         prestation={prestation}
         regle={editingRegle ?? undefined}
         onSuccess={(updated) =>
-          updateRegles(regles.map((r) => (r.id === updated.id ? updated : r)))
+          updateRegles(
+            regles.map((r) =>
+              r.id === updated.id
+                ? {
+                    ...updated,
+                    tacheListeTemplateName: r.tacheListeTemplateName,
+                    tacheListeItems: r.tacheListeItems,
+                  }
+                : r,
+            ),
+          )
         }
       />
       {checklistRegle && (
@@ -1175,7 +1286,17 @@ function PlanificationTab({
             updateRegles(
               regles.map((r) =>
                 r.id === checklistRegle.id
-                  ? { ...r, tacheListeTemplateId: pack?.id ?? null }
+                  ? {
+                      ...r,
+                      tacheListeTemplateId: pack?.id ?? null,
+                      tacheListeTemplateName: pack?.nom ?? null,
+                      tacheListeItems: pack?.items.map((i) => ({
+                        id: i.id,
+                        ordre: i.ordre,
+                        titre: i.titre,
+                        dureeEstimeeMinutes: i.dureeEstimeeMinutes,
+                      })) ?? [],
+                    }
                   : r,
               ),
             );
@@ -1194,13 +1315,15 @@ function RegleCard({
   onDelete,
   onChecklist,
 }: {
-  regle: SelectRegleRecurrenceType;
+  regle: RegleRecurrenceAvecTemplateType;
   canManage: boolean;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onChecklist: () => void;
 }) {
+  const [checklistExpanded, setChecklistExpanded] = useState(false);
+
   const rule = regle.regleRrule;
   const parts = Object.fromEntries(
     rule.split(";").map((p) => {
@@ -1241,7 +1364,7 @@ function RegleCard({
   return (
     <Card className={!regle.actif ? "opacity-60" : undefined}>
       <CardContent className="flex items-start justify-between gap-4 pt-4 pb-4">
-        <div className="space-y-1 text-sm">
+        <div className="min-w-0 flex-1 space-y-2 text-sm">
           {regle.libelle && <p className="font-medium">{regle.libelle}</p>}
           <p className="text-muted-foreground">
             {freq}
@@ -1256,11 +1379,72 @@ function RegleCard({
               {regle.dureePrevueMinutes} min
             </p>
           )}
+          {/* Checklist accordion */}
           {regle.tacheListeTemplateId && (
-            <p className="text-muted-foreground text-xs">
-              <ClipboardList className="mr-1 inline h-3 w-3" />
-              Checklist spécifique
-            </p>
+            <div className="pt-1">
+              <p className="text-muted-foreground mb-1.5 flex items-center gap-1.5 text-xs font-medium">
+                <ListChecks className="text-primary h-3.5 w-3.5 flex-shrink-0" />
+                Checklist
+              </p>
+              {regle.tacheListeTemplateName ? (
+                <div className="overflow-hidden rounded-lg border">
+                  <div className="flex items-center gap-2 p-2.5">
+                    {regle.tacheListeItems.length > 0 ? (
+                      <button
+                        type="button"
+                        className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                        onClick={() => setChecklistExpanded((v) => !v)}
+                        aria-label={checklistExpanded ? "Réduire" : "Développer"}
+                      >
+                        {checklistExpanded ? (
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        ) : (
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    ) : (
+                      <span className="h-3.5 w-3.5 flex-shrink-0" />
+                    )}
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                      <span className="truncate text-xs font-medium">
+                        {regle.tacheListeTemplateName}
+                      </span>
+                      <Badge variant="outline" className="flex-shrink-0 text-xs">
+                        {regle.tacheListeItems.length} tâche
+                        {regle.tacheListeItems.length !== 1 ? "s" : ""}
+                      </Badge>
+                    </div>
+                  </div>
+                  {checklistExpanded && regle.tacheListeItems.length > 0 && (
+                    <div className="bg-muted/30 divide-y border-t">
+                      {regle.tacheListeItems.map((item, idx) => (
+                        <div
+                          key={item.id}
+                          className="flex items-start gap-2 px-2.5 py-1.5 text-xs"
+                        >
+                          <span className="text-muted-foreground w-4 flex-shrink-0 text-center">
+                            {idx + 1}.
+                          </span>
+                          <span className="min-w-0 flex-1 font-medium">
+                            {item.titre}
+                          </span>
+                          {item.dureeEstimeeMinutes && (
+                            <span className="text-muted-foreground flex flex-shrink-0 items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {item.dureeEstimeeMinutes}min
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <span className="text-muted-foreground text-xs italic">
+                  Checklist spécifique
+                </span>
+              )}
+            </div>
           )}
           {!regle.actif && (
             <span className="text-muted-foreground text-xs italic">
@@ -1891,36 +2075,36 @@ function ExecutionCard({
       )}
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cette exécution ?</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-2 text-sm">
-                <p>
-                  L&apos;exécution{" "}
-                  <strong>{execution.prestataireNom ?? "inconnu"}</strong>, ses
-                  tarifs et{" "}
-                  <strong>toutes les données financières clôturées</strong>{" "}
-                  associées seront supprimés définitivement.
-                </p>
-                <p>
-                  Les interventions existantes perdront leur référence
-                  prestataire. Cette action est <strong>irréversible</strong> —
-                  à n&apos;utiliser que si aucune intervention réalisée
-                  n&apos;est associée à cette exécution.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
-            <AlertDialogAction
+        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Supprimer cette exécution ?</AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="px-5 py-4 space-y-2 text-sm">
+            <p>
+              L&apos;exécution{" "}
+              <strong>{execution.prestataireNom ?? "inconnu"}</strong>, ses
+              tarifs et{" "}
+              <strong>toutes les données financières clôturées</strong>{" "}
+              associées seront supprimés définitivement.
+            </p>
+            <p>
+              Les interventions existantes perdront leur référence
+              prestataire. Cette action est <strong>irréversible</strong> —
+              à n&apos;utiliser que si aucune intervention réalisée
+              n&apos;est associée à cette exécution.
+            </p>
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={isDeleting}>Annuler</Button>
+            <Button
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? "Suppression..." : "Retirer"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -3,12 +3,15 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
 import { Spinner } from "@/components/ui/spinner";
 import {
   getSireneDataAction,
@@ -107,82 +110,84 @@ export function EditEntrepriseInfosDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Building2 className="text-primary h-5 w-5" />
-            Mettre à jour depuis l&apos;API SIRENE
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="text-primary h-5 w-5" />
+              Mettre à jour depuis l&apos;API SIRENE
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-        <Separator />
-
-        <div className="space-y-4 py-2">
-          {/* SIRET affiché + bouton Rechercher */}
-          <div className="space-y-1.5">
-            <p className="text-muted-foreground text-sm font-medium">SIRET</p>
-            <div className="flex items-center gap-2">
-              <p className="bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm">
-                {currentSiret}
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="shrink-0"
-                disabled={
-                  searchState.status === "searching" ||
-                  searchState.status === "found"
-                }
-                onClick={handleSearch}
-              >
-                {searchState.status === "searching" ? (
-                  <Spinner />
-                ) : (
-                  <Search className="h-4 w-4" />
-                )}
-                Rechercher
-              </Button>
+        <DialogStyledBody>
+          <div className="space-y-4 py-2">
+            {/* SIRET affiché + bouton Rechercher */}
+            <div className="space-y-1.5">
+              <p className="text-muted-foreground text-sm font-medium">SIRET</p>
+              <div className="flex items-center gap-2">
+                <p className="bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm">
+                  {currentSiret}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  disabled={
+                    searchState.status === "searching" ||
+                    searchState.status === "found"
+                  }
+                  onClick={handleSearch}
+                >
+                  {searchState.status === "searching" ? (
+                    <Spinner />
+                  ) : (
+                    <Search className="h-4 w-4" />
+                  )}
+                  Rechercher
+                </Button>
+              </div>
+              {searchState.status === "error" && (
+                <p className="text-destructive text-xs">{searchState.message}</p>
+              )}
+              {searchState.status === "found" && (
+                <p className="text-muted-foreground text-xs">
+                  Données récupérées — vérifiez avant d&apos;enregistrer.
+                </p>
+              )}
             </div>
-            {searchState.status === "error" && (
-              <p className="text-destructive text-xs">{searchState.message}</p>
-            )}
+
+            {/* Données SIRENE */}
             {searchState.status === "found" && (
-              <p className="text-muted-foreground text-xs">
-                Données récupérées — vérifiez avant d&apos;enregistrer.
-              </p>
+              <>
+                <ReadOnlyField label="Nom" value={searchState.data.nom} />
+                <ReadOnlyField
+                  label="Forme juridique"
+                  value={searchState.data.formeJuridique}
+                />
+                <ReadOnlyField
+                  label="Adresse"
+                  value={[
+                    searchState.data.adresseLigne1,
+                    searchState.data.adresseLigne2,
+                    searchState.data.codePostal && searchState.data.ville
+                      ? `${searchState.data.codePostal} ${searchState.data.ville}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
+                />
+                <ReadOnlyField
+                  label="N° TVA"
+                  value={searchState.data.numeroTva}
+                />
+              </>
             )}
           </div>
+        </DialogStyledBody>
 
-          {/* Données SIRENE */}
-          {searchState.status === "found" && (
-            <>
-              <ReadOnlyField label="Nom" value={searchState.data.nom} />
-              <ReadOnlyField
-                label="Forme juridique"
-                value={searchState.data.formeJuridique}
-              />
-              <ReadOnlyField
-                label="Adresse"
-                value={[
-                  searchState.data.adresseLigne1,
-                  searchState.data.adresseLigne2,
-                  searchState.data.codePostal && searchState.data.ville
-                    ? `${searchState.data.codePostal} ${searchState.data.ville}`
-                    : null,
-                ]
-                  .filter(Boolean)
-                  .join(", ")}
-              />
-              <ReadOnlyField
-                label="N° TVA"
-                value={searchState.data.numeroTva}
-              />
-            </>
-          )}
-        </div>
-
-        <DialogFooter>
+        <DialogStyledFooter>
           <Button
             type="button"
             variant="outline"
@@ -199,8 +204,8 @@ export function EditEntrepriseInfosDialog({
             {isSaving && <Spinner />}
             Enregistrer
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </DialogStyledFooter>
+      </DialogStyledContent>
     </Dialog>
   );
 }

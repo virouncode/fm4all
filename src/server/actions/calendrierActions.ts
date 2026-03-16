@@ -26,6 +26,7 @@ import {
   getUserPrestataireAdhesion,
   hasAccessToEntreprise,
 } from "@/server/queries/userAdhesions.query";
+import { getEffectiveSitesForService } from "@/server/utils/clientServiceOccurrences.utils";
 import { getActivePosture } from "@/server/utils/permissions.utils";
 import { and, asc, eq, gte, inArray, isNotNull, lte } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
@@ -45,9 +46,13 @@ export type CalendarEventItemType = {
     occurrenceId?: string;
     statut?: string;
     regleId?: string;
+    tacheListeTemplateId?: string;
     prestationId: string;
+    clientEntrepriseId: string;
     serviceNom: string;
     siteNom?: string;
+    siteAdresse?: string;
+    prestataireNom?: string;
     famillePlanification: string;
     dateDebutOriginale?: string;
   };
@@ -76,7 +81,7 @@ export type CalendarFilterOptionsType = {
 // ==================== CONSTANTS ====================
 
 const OCCURRENCE_STATUT_COLORS: Record<string, string> = {
-  planifiee: "#94a3b8",
+  planifiee: "#3b82f6",
   en_cours: "#3b82f6",
   terminee: "#22c55e",
   non_honoree: "#ef4444",
@@ -84,7 +89,7 @@ const OCCURRENCE_STATUT_COLORS: Record<string, string> = {
   non_applicable: "#d1d5db",
 };
 
-const VIRTUAL_COLOR = "#6366f1";
+// Les occurrences virtuelles sont considérées comme "planifiée"
 
 // ==================== HELPERS ====================
 
@@ -297,12 +302,25 @@ export const getCalendarFilterOptionsAction = actionClient
     }
 
     // ── Prestataires (client/plateforme uniquement) ────────────────────────
-    // Utilise getClientPrestataires qui retourne les prestataires avec exécutions actives
+    // Client    : prestataires ayant des exécutions actives sur ses prestations
+    // Plateforme: tous les prestataires actifs du système (vue cross-clients)
+    // Prestataire: [] (inutile, il se voit lui-même)
 
-    const prestatairesRows: { id: string; nom: string }[] =
-      posture !== "prestataire"
-        ? await getClientPrestataires(parsedInput.entrepriseId)
-        : [];
+    let prestatairesRows: { id: string; nom: string }[] = [];
+    if (posture === "client") {
+      prestatairesRows = await getClientPrestataires(parsedInput.entrepriseId);
+    } else if (posture === "plateforme") {
+      prestatairesRows = await db
+        .selectDistinct({ id: entreprises.id, nom: entreprises.nom })
+        .from(clientServiceExecutions)
+        .innerJoin(
+          serviceEntreprises,
+          eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+        )
+        .innerJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
+        .where(eq(clientServiceExecutions.actif, true))
+        .orderBy(asc(entreprises.nom));
+    }
 
     // ── Clients (prestataire + plateforme) ────────────────────────────────
     // Prestataire → ses clients (via exécutions/relations)
@@ -479,7 +497,12 @@ export const getCalendarEventsAction = actionClient
       entrepriseId: string;
       famillePlanification: string;
       serviceNom: string;
+      siteId: string;
       siteNom: string;
+      siteAdresseLigne1: string;
+      siteAdresseLigne2: string | null;
+      siteCodePostal: string;
+      siteVille: string;
     };
 
     const prestationColumns = {
@@ -487,7 +510,12 @@ export const getCalendarEventsAction = actionClient
       entrepriseId: clientServices.entrepriseId,
       famillePlanification: clientServices.famillePlanification,
       serviceNom: services.nom,
+      siteId: clientServices.siteId,
       siteNom: sites.nom,
+      siteAdresseLigne1: sites.adresseLigne1,
+      siteAdresseLigne2: sites.adresseLigne2,
+      siteCodePostal: sites.codePostal,
+      siteVille: sites.ville,
     };
 
     let prestations: PrestationRowType[];
@@ -546,7 +574,11 @@ export const getCalendarEventsAction = actionClient
         )
         .where(
           and(
-            eq(clientServices.entrepriseId, parsedInput.entrepriseId),
+            // Plateforme : clientIds contient le/les clients sélectionnés
+            // Client : pas de clientIds → entrepriseId = son propre ID
+            hasClientFilter
+              ? inArray(clientServices.entrepriseId, parsedInput.clientIds!)
+              : eq(clientServices.entrepriseId, parsedInput.entrepriseId),
             eq(clientServices.statut, "actif"),
             hasServiceFilter
               ? inArray(clientServices.serviceId, parsedInput.serviceIds!)
@@ -573,7 +605,11 @@ export const getCalendarEventsAction = actionClient
         )
         .where(
           and(
-            eq(clientServices.entrepriseId, parsedInput.entrepriseId),
+            // Plateforme : clientIds contient le/les clients sélectionnés
+            // Client : pas de clientIds → entrepriseId = son propre ID
+            hasClientFilter
+              ? inArray(clientServices.entrepriseId, parsedInput.clientIds!)
+              : eq(clientServices.entrepriseId, parsedInput.entrepriseId),
             eq(clientServices.statut, "actif"),
             hasServiceFilter
               ? inArray(clientServices.serviceId, parsedInput.serviceIds!)
@@ -588,6 +624,42 @@ export const getCalendarEventsAction = actionClient
     const prestationMap = new Map(prestations.map((p) => [p.id, p]));
     const events: CalendarEventItemType[] = [];
 
+    // ── Batch lookup prestataireNom par prestation ──────────────────────────
+    const executionRows = await db
+      .selectDistinct({
+        clientServiceId: clientServiceExecutions.clientServiceId,
+        prestataireNom: entreprises.nom,
+      })
+      .from(clientServiceExecutions)
+      .innerJoin(
+        serviceEntreprises,
+        eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+      )
+      .innerJoin(
+        entreprises,
+        eq(entreprises.id, serviceEntreprises.entrepriseId),
+      )
+      .where(
+        and(
+          inArray(clientServiceExecutions.clientServiceId, prestationIds),
+          eq(clientServiceExecutions.actif, true),
+        ),
+      );
+    const prestataireMap = new Map(
+      executionRows.map((e) => [e.clientServiceId, e.prestataireNom]),
+    );
+
+    // ── Helper adresse ──────────────────────────────────────────────────────
+    function formatSiteAdresse(p: PrestationRowType): string {
+      return [
+        p.siteAdresseLigne1,
+        p.siteAdresseLigne2,
+        `${p.siteCodePostal} ${p.siteVille}`,
+      ]
+        .filter(Boolean)
+        .join(", ");
+    }
+
     // ── 2. Occurrences matérialisées dans la fenêtre ────────────────────────
 
     const materializedRows = await db
@@ -599,6 +671,7 @@ export const getCalendarEventsAction = actionClient
         dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
         dateFinPrevue: clientServiceOccurrences.dateFinPrevue,
         statut: clientServiceOccurrences.statut,
+        siteId: clientServiceOccurrences.siteId,
         siteNom: sites.nom,
       })
       .from(clientServiceOccurrences)
@@ -614,12 +687,14 @@ export const getCalendarEventsAction = actionClient
         ),
       );
 
-    // Clé de déduplication : regleRecurrenceId|dateDebutOriginale ISO
-    const materializedByRegleDate = new Set(
+    // Clé de déduplication : regleRecurrenceId|siteId|dateDebutOriginale ISO
+    // Granularité par site : une occurrence matérialisée sur site A ne supprime
+    // pas l'event virtuel sur site B pour la même règle/date.
+    const materializedByRegleSiteDate = new Set(
       materializedRows
         .filter((o) => o.regleRecurrenceId && o.dateDebutOriginale)
         .map(
-          (o) => `${o.regleRecurrenceId}|${o.dateDebutOriginale!.toISOString()}`,
+          (o) => `${o.regleRecurrenceId}|${o.siteId}|${o.dateDebutOriginale!.toISOString()}`,
         ),
     );
 
@@ -641,8 +716,11 @@ export const getCalendarEventsAction = actionClient
           statut: occ.statut,
           regleId: occ.regleRecurrenceId ?? undefined,
           prestationId: occ.clientServiceId,
+          clientEntrepriseId: prestation.entrepriseId,
           serviceNom: prestation.serviceNom,
           siteNom: occ.siteNom,
+          siteAdresse: formatSiteAdresse(prestation),
+          prestataireNom: prestataireMap.get(occ.clientServiceId),
           famillePlanification: prestation.famillePlanification,
           dateDebutOriginale: occ.dateDebutOriginale?.toISOString(),
         },
@@ -650,9 +728,9 @@ export const getCalendarEventsAction = actionClient
     }
 
     // ── 3. Événements virtuels depuis les RRULE ─────────────────────────────
-    // Masqués si un filtre siteIds est actif (les règles n'ont pas de site spécifique)
+    // Si un filtre siteIds est actif, on filtre par prestation.siteId dans la boucle.
 
-    if (!hasSiteFilter) {
+    {
       const recurrenceAutoIds = prestations
         .filter((p) => p.famillePlanification === "recurrence_auto")
         .map((p) => p.id);
@@ -700,9 +778,53 @@ export const getCalendarEventsAction = actionClient
             ),
         );
 
+        // Résoudre les sites feuilles effectifs pour chaque prestation récurrente
+        const effectiveSitesByPrestation = new Map<string, string[]>();
+        for (const regle of regles) {
+          if (effectiveSitesByPrestation.has(regle.clientServiceId)) continue;
+          const prestation = prestationMap.get(regle.clientServiceId);
+          if (!prestation) continue;
+          const leafSiteIds = await getEffectiveSitesForService({
+            clientServiceId: regle.clientServiceId,
+            entrepriseId: prestation.entrepriseId,
+            rootSiteId: prestation.siteId,
+          });
+          effectiveSitesByPrestation.set(
+            regle.clientServiceId,
+            leafSiteIds.length > 0 ? leafSiteIds : [prestation.siteId],
+          );
+        }
+
+        // Batch fetch nom+adresse de tous les sites feuilles
+        const allLeafSiteIds = [
+          ...new Set([...effectiveSitesByPrestation.values()].flat()),
+        ];
+        const leafSiteRows =
+          allLeafSiteIds.length > 0
+            ? await db
+                .select({
+                  id: sites.id,
+                  nom: sites.nom,
+                  adresseLigne1: sites.adresseLigne1,
+                  adresseLigne2: sites.adresseLigne2,
+                  codePostal: sites.codePostal,
+                  ville: sites.ville,
+                })
+                .from(sites)
+                .where(inArray(sites.id, allLeafSiteIds))
+            : [];
+        const leafSiteMap = new Map(leafSiteRows.map((s) => [s.id, s]));
+
         for (const regle of regles) {
           const prestation = prestationMap.get(regle.clientServiceId);
           if (!prestation) continue;
+
+          const allEffectiveSiteIds =
+            effectiveSitesByPrestation.get(regle.clientServiceId) ?? [prestation.siteId];
+          const filteredSiteIds = hasSiteFilter
+            ? allEffectiveSiteIds.filter((id) => parsedInput.siteIds!.includes(id))
+            : allEffectiveSiteIds;
+          if (filteredSiteIds.length === 0) continue;
 
           let rrule: ReturnType<typeof rrulestr>;
           try {
@@ -716,29 +838,45 @@ export const getCalendarEventsAction = actionClient
 
           for (const date of dates) {
             const dateIso = date.toISOString();
-
             if (suppressedKeys.has(`${regle.id}|${dateIso}`)) continue;
-            if (materializedByRegleDate.has(`${regle.id}|${dateIso}`)) continue;
 
             const dateFinPrevue =
               regle.dureePrevueMinutes != null
                 ? new Date(date.getTime() + regle.dureePrevueMinutes * 60 * 1000)
                 : null;
 
-            events.push({
-              id: `virtual-${regle.id}-${date.getTime()}`,
-              title: regle.libelle ?? prestation.serviceNom,
-              start: dateIso,
-              end: dateFinPrevue?.toISOString(),
-              color: VIRTUAL_COLOR,
-              extendedProps: {
-                type: "virtual",
-                regleId: regle.id,
-                prestationId: regle.clientServiceId,
-                serviceNom: prestation.serviceNom,
-                famillePlanification: prestation.famillePlanification,
-              },
-            });
+            for (const siteId of filteredSiteIds) {
+              if (materializedByRegleSiteDate.has(`${regle.id}|${siteId}|${dateIso}`)) continue;
+
+              const siteInfo = leafSiteMap.get(siteId);
+              const siteNom = siteInfo?.nom ?? prestation.siteNom;
+              const siteAdresse = siteInfo
+                ? [siteInfo.adresseLigne1, siteInfo.adresseLigne2, `${siteInfo.codePostal} ${siteInfo.ville}`]
+                    .filter(Boolean)
+                    .join(", ")
+                : formatSiteAdresse(prestation);
+
+              events.push({
+                id: `virtual-${regle.id}-${siteId}-${date.getTime()}`,
+                title: regle.libelle ?? prestation.serviceNom,
+                start: dateIso,
+                end: dateFinPrevue?.toISOString(),
+                color: OCCURRENCE_STATUT_COLORS.planifiee,
+                extendedProps: {
+                  type: "virtual",
+                  statut: "planifiee",
+                  regleId: regle.id,
+                  tacheListeTemplateId: regle.tacheListeTemplateId ?? undefined,
+                  prestationId: regle.clientServiceId,
+                  clientEntrepriseId: prestation.entrepriseId,
+                  serviceNom: prestation.serviceNom,
+                  siteNom,
+                  siteAdresse,
+                  prestataireNom: prestataireMap.get(regle.clientServiceId),
+                  famillePlanification: prestation.famillePlanification,
+                },
+              });
+            }
           }
         }
       }

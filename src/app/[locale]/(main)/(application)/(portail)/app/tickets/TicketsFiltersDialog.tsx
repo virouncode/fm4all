@@ -5,10 +5,14 @@ import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -277,17 +281,20 @@ export function TicketsFiltersDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!w-2/3 !max-w-none">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <Filter className="text-primary size-6" />
-              Filtrer les tickets
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="!w-2/3 !max-w-none">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Filter className="text-primary size-6" />
+                Filtrer les tickets
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-        <div className="space-y-6">
+        <DialogStyledBody>
+          <div className="space-y-6">
           <Form {...form}>
             <form className="flex flex-col gap-4">
               {/* Ligne 1 */}
@@ -432,7 +439,8 @@ export function TicketsFiltersDialog({
             </Button>
           </div>
         </div>
-      </DialogContent>
+        </DialogStyledBody>
+      </DialogStyledContent>
     </Dialog>
   );
 }

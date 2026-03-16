@@ -5,15 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { roleEntrepriseCodes } from "@/constants/codeTables";
 import { isValidSIRET } from "@/lib/utils/isValidSIRET";
@@ -328,30 +331,30 @@ export function EntrepriseFormDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 p-0">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle>
-              <div className="flex items-center gap-2">
-                <Building2 className="text-primary size-5" />
-                Nouvelle entreprise
-              </div>
-            </DialogTitle>
-            <p className="text-muted-foreground text-sm">
-              Étape {step} sur 2 —{" "}
-              {step === 1
-                ? "Identification de l'entreprise"
-                : "Rôles et services"}
-            </p>
-          </DialogHeader>
-
-          <Separator />
+        <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+          <DialogStyledHeader>
+            <DialogHeader>
+              <DialogTitle>
+                <div className="flex items-center gap-2">
+                  <Building2 className="text-primary size-5" />
+                  Nouvelle entreprise
+                </div>
+              </DialogTitle>
+              <p className="text-muted-foreground text-sm">
+                Étape {step} sur 2 —{" "}
+                {step === 1
+                  ? "Identification de l'entreprise"
+                  : "Rôles et services"}
+              </p>
+            </DialogHeader>
+          </DialogStyledHeader>
 
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex min-h-0 flex-1 flex-col"
             >
-              <div className="flex-1 overflow-y-auto px-6 py-4">
+              <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
                 {step === 1 ? (
                   <div className="space-y-4">
                     {/* Prospect picker */}
@@ -612,11 +615,9 @@ export function EntrepriseFormDialog({
                     )}
                   </div>
                 )}
-              </div>
+              </DialogStyledBody>
 
-              <Separator />
-
-              <DialogFooter className="bg-background px-6 py-4">
+              <DialogStyledFooter>
                 {step === 1 ? (
                   <>
                     <Button
@@ -660,10 +661,10 @@ export function EntrepriseFormDialog({
                     </Button>
                   </>
                 )}
-              </DialogFooter>
+              </DialogStyledFooter>
             </form>
           </Form>
-        </DialogContent>
+        </DialogStyledContent>
       </Dialog>
 
       <ProspectPickerDialog

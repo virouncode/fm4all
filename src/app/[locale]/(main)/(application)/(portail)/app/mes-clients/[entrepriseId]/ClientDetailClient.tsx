@@ -13,10 +13,7 @@ import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions
 import type { RelationContactWithDetails } from "@/server/queries/entreprises.query";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -425,20 +422,22 @@ export function ClientDetailClient({
           if (!v) setConfirmRemoveContact(null);
         }}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Retirer ce contact ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Voulez-vous vraiment retirer{" "}
-              <strong>
-                {confirmRemoveContact?.prenom} {confirmRemoveContact?.nom}
-              </strong>{" "}
-              de vos contacts pour ce client ?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
+        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Retirer ce contact ?</AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="px-5 py-4 text-sm">
+            Voulez-vous vraiment retirer{" "}
+            <strong>
+              {confirmRemoveContact?.prenom} {confirmRemoveContact?.nom}
+            </strong>{" "}
+            de vos contacts pour ce client ?
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button variant="outline" onClick={() => setConfirmRemoveContact(null)}>Annuler</Button>
+            <Button
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() =>
                 confirmRemoveContact &&
@@ -446,7 +445,7 @@ export function ClientDetailClient({
               }
             >
               Retirer
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

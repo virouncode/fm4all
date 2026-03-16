@@ -5,10 +5,14 @@ import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -85,56 +89,60 @@ export function EntreprisesFiltersDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <Filter className="text-primary size-6" />
-              Filtrer les entreprises
-            </div>
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          <Form {...form}>
-            <form className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <RhfInput
-                  label="Recherche"
-                  name="search"
-                  placeholder="Nom, SIRET, email..."
-                  className="col-span-1"
-                  withError={false}
-                />
-
-                <RhfControlledSelect
-                  label="Rôle"
-                  name="role"
-                  className="col-span-1"
-                  selectClassName="w-full"
-                  withError={false}
-                >
-                  <SelectItem value="all">Tous les rôles</SelectItem>
-                  <SelectItem value="client">Client</SelectItem>
-                  <SelectItem value="prestataire">Prestataire</SelectItem>
-                  <SelectItem value="plateforme">Plateforme</SelectItem>
-                </RhfControlledSelect>
+      <DialogStyledContent className="sm:max-w-xl">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Filter className="text-primary size-6" />
+                Filtrer les entreprises
               </div>
-            </form>
-          </Form>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-          <div className="flex items-center justify-end">
-            <Button
-              type="button"
-              onClick={handleReset}
-              disabled={activeFiltersCount === 0}
-            >
-              <RotateCcw />
-              Réinitialiser ({activeFiltersCount})
-            </Button>
+        <DialogStyledBody>
+          <div className="space-y-6">
+            <Form {...form}>
+              <form className="flex flex-col gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <RhfInput
+                    label="Recherche"
+                    name="search"
+                    placeholder="Nom, SIRET, email..."
+                    className="col-span-1"
+                    withError={false}
+                  />
+
+                  <RhfControlledSelect
+                    label="Rôle"
+                    name="role"
+                    className="col-span-1"
+                    selectClassName="w-full"
+                    withError={false}
+                  >
+                    <SelectItem value="all">Tous les rôles</SelectItem>
+                    <SelectItem value="client">Client</SelectItem>
+                    <SelectItem value="prestataire">Prestataire</SelectItem>
+                    <SelectItem value="plateforme">Plateforme</SelectItem>
+                  </RhfControlledSelect>
+                </div>
+              </form>
+            </Form>
+
+            <div className="flex items-center justify-end">
+              <Button
+                type="button"
+                onClick={handleReset}
+                disabled={activeFiltersCount === 0}
+              >
+                <RotateCcw />
+                Réinitialiser ({activeFiltersCount})
+              </Button>
+            </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogStyledBody>
+      </DialogStyledContent>
     </Dialog>
   );
 }

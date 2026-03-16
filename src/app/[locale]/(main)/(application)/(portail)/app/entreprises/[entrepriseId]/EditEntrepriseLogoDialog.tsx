@@ -3,10 +3,15 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { RhfFileInput, type AttachmentFormType } from "@/components/rhf/RhfFileInput";
 import { updateEntrepriseLogoAction } from "@/server/actions/entreprisesActions";
@@ -85,28 +90,32 @@ export function EditEntrepriseLogoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <ImageIcon className="h-5 w-5 text-primary" />
-            Modifier le logo
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ImageIcon className="h-5 w-5 text-primary" />
+              Modifier le logo
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <RhfFileInput<UpdateEntrepriseLogoType>
-              name="logo"
-              label="Logo de l'entreprise"
-              proprietaireEntrepriseId={entrepriseId}
-              categorie="logo"
-              accept="image/jpeg,image/png,image/webp"
-              maxSizeBytes={2 * 1024 * 1024}
-              description="JPG, PNG ou WebP · max 2 Mo"
-              deleteOnClear={false}
-            />
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogStyledBody>
+              <RhfFileInput<UpdateEntrepriseLogoType>
+                name="logo"
+                label="Logo de l'entreprise"
+                proprietaireEntrepriseId={entrepriseId}
+                categorie="logo"
+                accept="image/jpeg,image/png,image/webp"
+                maxSizeBytes={2 * 1024 * 1024}
+                description="JPG, PNG ou WebP · max 2 Mo"
+                deleteOnClear={false}
+              />
+            </DialogStyledBody>
 
-            <div className="flex justify-end gap-2 pt-2">
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -120,10 +129,10 @@ export function EditEntrepriseLogoDialog({
                 )}
                 Enregistrer
               </Button>
-            </div>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

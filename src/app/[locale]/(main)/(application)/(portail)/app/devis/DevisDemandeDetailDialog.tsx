@@ -2,22 +2,24 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
+import { Badge } from "@/components/ui/badge";
 import {
   deleteDevisDemandeAction,
   deleteDevisDemandeAttachmentAction,
@@ -192,17 +194,20 @@ export function DevisDemandeDetailDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
-          <DialogHeader className="px-6 pt-6 pb-4">
-            <DialogTitle>
-              <div className="flex items-center gap-2">
-                <FileText className="text-primary" />
-                Demande de devis
-              </div>
-            </DialogTitle>
-          </DialogHeader>
+        <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+          <DialogStyledHeader>
+            <DialogHeader>
+              <DialogTitle>
+                <div className="flex items-center gap-2">
+                  <FileText className="text-primary" />
+                  Demande de devis
+                </div>
+              </DialogTitle>
+            </DialogHeader>
+          </DialogStyledHeader>
 
-          <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-5">
+          <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+            <div className="space-y-5">
             {/* Statut + infos principales */}
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
@@ -329,10 +334,11 @@ export function DevisDemandeDetailDialog({
               </div>
             )}
           </div>
+          </DialogStyledBody>
 
           {/* Footer actions */}
           {(permissions.canEdit || permissions.canDelete) && (
-            <div className="bg-background sticky bottom-0 flex shrink-0 justify-end gap-2 border-t px-6 pt-4 pb-6">
+            <DialogStyledFooter>
               {permissions.canDelete && (
                 <Button
                   variant="ghost"
@@ -357,30 +363,32 @@ export function DevisDemandeDetailDialog({
                   Modifier
                 </Button>
               )}
-            </div>
+            </DialogStyledFooter>
           )}
-        </DialogContent>
+        </DialogStyledContent>
       </Dialog>
 
       {/* Confirmation suppression */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la demande ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. La demande &quot;{demande.titre}&quot; sera
-              définitivement supprimée.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
+        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Supprimer la demande ?</AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="px-5 py-4 text-sm">
+            Cette action est irréversible. La demande &quot;{demande.titre}&quot; sera
+            définitivement supprimée.
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Annuler</Button>
+            <Button
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? "Suppression..." : "Supprimer"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -7,10 +7,15 @@ import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
@@ -215,22 +220,25 @@ export function SiteFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <MapPin className="text-primary size-6" />
-              {mode === "create" ? "Créer un site" : "Modifier le site"}
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] flex-col sm:max-w-[600px]">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <MapPin className="text-primary size-6" />
+                {mode === "create" ? "Créer un site" : "Modifier le site"}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            <div className="flex-1 space-y-6 overflow-y-auto px-1">
+            <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+              <div className="space-y-6">
               {/* Nom */}
               <RhfInput<InsertSiteFormType | UpdateSiteFormType>
                 name="nom"
@@ -344,9 +352,9 @@ export function SiteFormDialog({
                 textareaClassName="h-40"
               />
             </div>
+            </DialogStyledBody>
 
-            {/* Actions - Fixed Footer */}
-            <div className="bg-background flex shrink-0 justify-end gap-4 border-t pt-4">
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -360,10 +368,10 @@ export function SiteFormDialog({
 
                 {mode === "create" ? "Créer" : "Enregistrer"}
               </Button>
-            </div>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

@@ -5,10 +5,14 @@ import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -235,20 +239,23 @@ export function DevisFiltersDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!w-2/3 !max-w-none">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <Filter className="text-primary size-6" />
-              Filtrer les devis
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="!w-2/3 !max-w-none">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Filter className="text-primary size-6" />
+                Filtrer les devis
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-        <div className="space-y-6">
-          <Form {...form}>
-            <form className="flex flex-col gap-4">
-              <div className="grid grid-cols-3 gap-4">
+        <DialogStyledBody>
+          <div className="space-y-6">
+            <Form {...form}>
+              <form className="flex flex-col gap-4">
+                <div className="grid grid-cols-3 gap-4">
                 <RhfInput
                   label="Recherche"
                   name="search"
@@ -344,22 +351,23 @@ export function DevisFiltersDialog({
                     </SelectItem>
                   ))}
                 </RhfControlledSelect>
-              </div>
-            </form>
-          </Form>
+                </div>
+              </form>
+            </Form>
 
-          <div className="flex items-center justify-end">
-            <Button
-              type="button"
-              onClick={handleReset}
-              disabled={activeFiltersCount === 0}
-            >
-              <RotateCcw />
-              Réinitialiser ({activeFiltersCount})
-            </Button>
+            <div className="flex items-center justify-end">
+              <Button
+                type="button"
+                onClick={handleReset}
+                disabled={activeFiltersCount === 0}
+              >
+                <RotateCcw />
+                Réinitialiser ({activeFiltersCount})
+              </Button>
+            </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogStyledBody>
+      </DialogStyledContent>
     </Dialog>
   );
 }

@@ -1,27 +1,27 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -379,20 +379,20 @@ export function TacheListeManagerDialog({
 }: TacheListeManagerDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col gap-0 p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle className="flex items-center gap-2">
-            <ClipboardList className="text-primary h-5 w-5" />
-            Gérer mes checklists
-            {serviceNom && (
-              <span className="text-muted-foreground text-sm font-normal">
-                — {serviceNom}
-              </span>
-            )}
-          </DialogTitle>
-        </DialogHeader>
-
-        <Separator />
+      <DialogStyledContent className="flex max-h-[85vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardList className="text-primary h-5 w-5" />
+              Gérer mes checklists
+              {serviceNom && (
+                <span className="text-muted-foreground text-sm font-normal">
+                  — {serviceNom}
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <ScrollArea className="h-[60vh]">
           {open && (
@@ -404,14 +404,12 @@ export function TacheListeManagerDialog({
               prestataireEntrepriseId={prestataireEntrepriseId}
               prestataireEntrepriseNom={prestataireEntrepriseNom}
               canManage={canManage}
-              className="px-6 py-4"
+              className="px-5 py-4"
             />
           )}
         </ScrollArea>
 
-        <Separator />
-
-        <div className="flex justify-end px-6 py-4">
+        <DialogStyledFooter>
           <Button
             type="button"
             variant="outline"
@@ -419,8 +417,8 @@ export function TacheListeManagerDialog({
           >
             Fermer
           </Button>
-        </div>
-      </DialogContent>
+        </DialogStyledFooter>
+      </DialogStyledContent>
     </Dialog>
   );
 }
@@ -682,23 +680,25 @@ function PackEditor({
       </div>
 
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la checklist ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              La checklist <strong>{pack.nom}</strong> et toutes ses tâches
-              seront définitivement supprimées. Cette action est irréversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
-            <AlertDialogAction
+        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Supprimer la checklist ?</AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="px-5 py-4 text-sm">
+            La checklist <strong>{pack.nom}</strong> et toutes ses tâches
+            seront définitivement supprimées. Cette action est irréversible.
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)} disabled={isDeleting}>Annuler</Button>
+            <Button
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? "Suppression..." : "Supprimer"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

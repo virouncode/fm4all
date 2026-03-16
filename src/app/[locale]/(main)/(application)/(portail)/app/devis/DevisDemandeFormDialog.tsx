@@ -7,11 +7,15 @@ import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+  DialogStyledFooter,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
@@ -221,24 +225,27 @@ export function DevisDemandeFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <FileText className="text-primary" />
-              {mode === "create"
-                ? "Nouvelle demande de devis"
-                : "Modifier la demande"}
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <FileText className="text-primary" />
+                {mode === "create"
+                  ? "Nouvelle demande de devis"
+                  : "Modifier la demande"}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            <div className="flex-1 space-y-4 overflow-y-auto p-6">
+            <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+              <div className="space-y-4">
               {/* Site — désactivé en mode edit */}
               <RhfControlledSelect<
                 InsertDevisDemandeFormType | UpdateDevisDemandeFormType
@@ -338,9 +345,10 @@ export function DevisDemandeFormDialog({
                   </div>
                 )}
               </div>
-            </div>
+              </div>
+            </DialogStyledBody>
 
-            <DialogFooter className="bg-background sticky bottom-0 flex shrink-0 justify-end gap-2 border-t px-6 pt-4 pb-6">
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -360,10 +368,10 @@ export function DevisDemandeFormDialog({
                     ? "Créer la demande"
                     : "Enregistrer"}
               </Button>
-            </DialogFooter>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

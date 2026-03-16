@@ -6,11 +6,15 @@ import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import {
@@ -175,38 +179,42 @@ function CreateOrLinkUserForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <UserPlus className="text-primary" />
-              {title}
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <UserPlus className="text-primary" />
+                {title}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-        {/* Toggle mode */}
-        <ToggleGroup
-          type="single"
-          variant="outline"
-          size="sm"
-          value={mode}
-          onValueChange={(v) => v && setMode(v as "nouveau" | "existant")}
-          className="self-start"
-        >
-          <ToggleGroupItem
-            value="nouveau"
-            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3 text-xs"
+        <DialogStyledBody className="px-5 py-4">
+          {/* Toggle mode */}
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            size="sm"
+            value={mode}
+            onValueChange={(v) => v && setMode(v as "nouveau" | "existant")}
+            className="self-start"
           >
-            Nouvel utilisateur
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="existant"
-            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3 text-xs"
-          >
-            Rattacher existant
-          </ToggleGroupItem>
-        </ToggleGroup>
+            <ToggleGroupItem
+              value="nouveau"
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3 text-xs"
+            >
+              Nouvel utilisateur
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="existant"
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3 text-xs"
+            >
+              Rattacher existant
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </DialogStyledBody>
 
         {mode === "existant" ? (
           <LinkExistingUserForm
@@ -231,7 +239,7 @@ function CreateOrLinkUserForm({
             onOpenChange={onOpenChange}
           />
         )}
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }
@@ -341,57 +349,59 @@ function LinkExistingUserForm({
         <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
           {emptyMessage}
         </div>
-        <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+        <DialogStyledFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Fermer
           </Button>
-        </DialogFooter>
+        </DialogStyledFooter>
       </>
     );
   }
 
   return (
     <>
-      <div className="flex-1 space-y-4 overflow-y-auto px-1">
-        <div className="space-y-2">
-          <Label>
-            Utilisateur à rattacher <span aria-hidden="true">*</span>
-          </Label>
-          <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Sélectionnez un utilisateur" />
-            </SelectTrigger>
-            <SelectContent>
-              {eligibleUsers.map((u) => (
-                <SelectItem key={u.id} value={u.id}>
-                  {u.prenom} {u.nom}{" "}
-                  <span className="text-muted-foreground">({u.email})</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>
+              Utilisateur à rattacher <span aria-hidden="true">*</span>
+            </Label>
+            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sélectionnez un utilisateur" />
+              </SelectTrigger>
+              <SelectContent>
+                {eligibleUsers.map((u) => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.prenom} {u.nom}{" "}
+                    <span className="text-muted-foreground">({u.email})</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="space-y-2">
-          <Label>
-            Rôle <span aria-hidden="true">*</span>
-          </Label>
-          <Select value={selectedRole} onValueChange={setSelectedRole}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Sélectionnez un rôle" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableRoles.map((r) => (
-                <SelectItem key={r.code} value={r.code}>
-                  {r.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <Label>
+              Rôle <span aria-hidden="true">*</span>
+            </Label>
+            <Select value={selectedRole} onValueChange={setSelectedRole}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sélectionnez un rôle" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableRoles.map((r) => (
+                  <SelectItem key={r.code} value={r.code}>
+                    {r.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
+      </DialogStyledBody>
 
-      <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+      <DialogStyledFooter>
         <Button variant="outline" onClick={() => onOpenChange(false)}>
           Annuler
         </Button>
@@ -402,7 +412,7 @@ function LinkExistingUserForm({
           {submitting && <Spinner />}
           Rattacher
         </Button>
-      </DialogFooter>
+      </DialogStyledFooter>
     </>
   );
 }
@@ -508,49 +518,51 @@ function CreateUserFormInner({
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-1 flex-col overflow-hidden"
       >
-        <div className="flex-1 space-y-4 overflow-y-auto px-1">
-          <div className="grid grid-cols-2 gap-4">
+        <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <RhfInput<InsertUserFormType>
+                label="Prénom"
+                name="prenom"
+                requiredMark
+              />
+              <RhfInput<InsertUserFormType> label="Nom" name="nom" requiredMark />
+            </div>
+
             <RhfInput<InsertUserFormType>
-              label="Prénom"
-              name="prenom"
+              label="Email"
+              name="email"
+              type="email"
               requiredMark
             />
-            <RhfInput<InsertUserFormType> label="Nom" name="nom" requiredMark />
+            <RhfInput<InsertUserFormType> label="N° de téléphone" name="phone" />
+            <RhfControlledSelect<InsertUserFormType>
+              label="Rôle"
+              name="roleAdhesion"
+              requiredMark
+              className="w-full"
+              selectClassName="w-full"
+            >
+              {availableRoles.map((r) => (
+                <SelectItem key={r.code} value={r.code}>
+                  {r.name}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
+
+            <RhfFileInput<InsertUserFormType>
+              label="Avatar (format carré, max 2MB)"
+              name="avatar"
+              proprietaireEntrepriseId={entrepriseId}
+              categorie="avatar"
+              accept="image/*"
+              squareMandatory
+              maxSizeBytes={2 * 1024 * 1024}
+            />
           </div>
+        </DialogStyledBody>
 
-          <RhfInput<InsertUserFormType>
-            label="Email"
-            name="email"
-            type="email"
-            requiredMark
-          />
-          <RhfInput<InsertUserFormType> label="N° de téléphone" name="phone" />
-          <RhfControlledSelect<InsertUserFormType>
-            label="Rôle"
-            name="roleAdhesion"
-            requiredMark
-            className="w-full"
-            selectClassName="w-full"
-          >
-            {availableRoles.map((r) => (
-              <SelectItem key={r.code} value={r.code}>
-                {r.name}
-              </SelectItem>
-            ))}
-          </RhfControlledSelect>
-
-          <RhfFileInput<InsertUserFormType>
-            label="Avatar (format carré, max 2MB)"
-            name="avatar"
-            proprietaireEntrepriseId={entrepriseId}
-            categorie="avatar"
-            accept="image/*"
-            squareMandatory
-            maxSizeBytes={2 * 1024 * 1024}
-          />
-        </div>
-
-        <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+        <DialogStyledFooter>
           <Button
             type="button"
             variant="outline"
@@ -561,7 +573,7 @@ function CreateUserFormInner({
           <Button type="submit" disabled={isSubmitting || !isDirty}>
             {isSubmitting && <Spinner />}Créer
           </Button>
-        </DialogFooter>
+        </DialogStyledFooter>
       </form>
     </Form>
   );
@@ -622,56 +634,58 @@ function CreatePlateformeUserFormInner({
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-1 flex-col overflow-hidden"
       >
-        <div className="flex-1 space-y-4 overflow-y-auto px-1">
-          <div className="grid grid-cols-2 gap-4">
+        <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <RhfInput<InsertPlateformeUserFormType>
+                label="Prénom"
+                name="prenom"
+                requiredMark
+              />
+              <RhfInput<InsertPlateformeUserFormType>
+                label="Nom"
+                name="nom"
+                requiredMark
+              />
+            </div>
+
             <RhfInput<InsertPlateformeUserFormType>
-              label="Prénom"
-              name="prenom"
+              label="Email"
+              name="email"
+              type="email"
               requiredMark
             />
             <RhfInput<InsertPlateformeUserFormType>
-              label="Nom"
-              name="nom"
+              label="N° de téléphone"
+              name="phone"
+            />
+            <RhfControlledSelect<InsertPlateformeUserFormType>
+              label="Rôle plateforme"
+              name="rolePlateformeAdhesion"
               requiredMark
+              className="w-full"
+              selectClassName="w-full"
+            >
+              {rolePlateformeAdhesionCT.map((r) => (
+                <SelectItem key={r.code} value={r.code}>
+                  {r.name}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
+
+            <RhfFileInput<InsertPlateformeUserFormType>
+              label="Avatar (format carré, max 2MB)"
+              name="avatar"
+              proprietaireEntrepriseId={entrepriseId}
+              categorie="avatar"
+              accept="image/*"
+              squareMandatory
+              maxSizeBytes={2 * 1024 * 1024}
             />
           </div>
+        </DialogStyledBody>
 
-          <RhfInput<InsertPlateformeUserFormType>
-            label="Email"
-            name="email"
-            type="email"
-            requiredMark
-          />
-          <RhfInput<InsertPlateformeUserFormType>
-            label="N° de téléphone"
-            name="phone"
-          />
-          <RhfControlledSelect<InsertPlateformeUserFormType>
-            label="Rôle plateforme"
-            name="rolePlateformeAdhesion"
-            requiredMark
-            className="w-full"
-            selectClassName="w-full"
-          >
-            {rolePlateformeAdhesionCT.map((r) => (
-              <SelectItem key={r.code} value={r.code}>
-                {r.name}
-              </SelectItem>
-            ))}
-          </RhfControlledSelect>
-
-          <RhfFileInput<InsertPlateformeUserFormType>
-            label="Avatar (format carré, max 2MB)"
-            name="avatar"
-            proprietaireEntrepriseId={entrepriseId}
-            categorie="avatar"
-            accept="image/*"
-            squareMandatory
-            maxSizeBytes={2 * 1024 * 1024}
-          />
-        </div>
-
-        <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+        <DialogStyledFooter>
           <Button
             type="button"
             variant="outline"
@@ -682,7 +696,7 @@ function CreatePlateformeUserFormInner({
           <Button type="submit" disabled={isSubmitting || !isDirty}>
             {isSubmitting && <Spinner />}Créer
           </Button>
-        </DialogFooter>
+        </DialogStyledFooter>
       </form>
     </Form>
   );
@@ -850,15 +864,17 @@ function EditUserForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <User className="text-primary" />
-              Modifier un utilisateur
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <User className="text-primary" />
+                Modifier un utilisateur
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
           <form
@@ -869,74 +885,76 @@ function EditUserForm({
             })}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            <div className="flex-1 space-y-4 overflow-y-auto px-1">
-              <div className="grid grid-cols-2 gap-4">
+            <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <RhfInput<UpdateUserFormType>
+                    label="Prénom"
+                    name="prenom"
+                    requiredMark
+                  />
+                  <RhfInput<UpdateUserFormType>
+                    label="Nom"
+                    name="nom"
+                    requiredMark
+                  />
+                </div>
+
                 <RhfInput<UpdateUserFormType>
-                  label="Prénom"
-                  name="prenom"
+                  label="Email"
+                  name="email"
+                  type="email"
                   requiredMark
                 />
                 <RhfInput<UpdateUserFormType>
-                  label="Nom"
-                  name="nom"
-                  requiredMark
+                  label="N° de téléphone"
+                  name="phone"
+                />
+
+                {canEditRole && (
+                  <RhfControlledSelect<UpdateUserFormType>
+                    label="Rôle"
+                    name="roleAdhesion"
+                    className="w-full"
+                    selectClassName="w-full"
+                  >
+                    {availableRoles.map((r) => (
+                      <SelectItem key={r.code} value={r.code}>
+                        {r.name}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                )}
+
+                {canEditStatut && (
+                  <RhfControlledSelect<UpdateUserFormType>
+                    label="Statut"
+                    name="statut"
+                    className="w-full"
+                    selectClassName="w-full"
+                  >
+                    {adhesionStatutCT.map((s) => (
+                      <SelectItem key={s.code} value={s.code}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                )}
+
+                <RhfFileInput<UpdateUserFormType>
+                  label="Avatar (format carré, max 2MB)"
+                  name="avatar"
+                  proprietaireEntrepriseId={entrepriseId}
+                  categorie="avatar"
+                  accept="image/*"
+                  squareMandatory
+                  maxSizeBytes={2 * 1024 * 1024}
+                  previewHeight={200}
                 />
               </div>
+            </DialogStyledBody>
 
-              <RhfInput<UpdateUserFormType>
-                label="Email"
-                name="email"
-                type="email"
-                requiredMark
-              />
-              <RhfInput<UpdateUserFormType>
-                label="N° de téléphone"
-                name="phone"
-              />
-
-              {canEditRole && (
-                <RhfControlledSelect<UpdateUserFormType>
-                  label="Rôle"
-                  name="roleAdhesion"
-                  className="w-full"
-                  selectClassName="w-full"
-                >
-                  {availableRoles.map((r) => (
-                    <SelectItem key={r.code} value={r.code}>
-                      {r.name}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-              )}
-
-              {canEditStatut && (
-                <RhfControlledSelect<UpdateUserFormType>
-                  label="Statut"
-                  name="statut"
-                  className="w-full"
-                  selectClassName="w-full"
-                >
-                  {adhesionStatutCT.map((s) => (
-                    <SelectItem key={s.code} value={s.code}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-              )}
-
-              <RhfFileInput<UpdateUserFormType>
-                label="Avatar (format carré, max 2MB)"
-                name="avatar"
-                proprietaireEntrepriseId={entrepriseId}
-                categorie="avatar"
-                accept="image/*"
-                squareMandatory
-                maxSizeBytes={2 * 1024 * 1024}
-                previewHeight={200}
-              />
-            </div>
-
-            <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -947,10 +965,10 @@ function EditUserForm({
               <Button type="submit" disabled={isSubmitting || !isDirty}>
                 {isSubmitting && <Spinner />}Enregistrer
               </Button>
-            </DialogFooter>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

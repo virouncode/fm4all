@@ -7,11 +7,14 @@ import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { SelectItem } from "@/components/ui/select";
@@ -452,19 +455,21 @@ export function RegleRecurrenceFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-lg flex-col gap-0 p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle>
-            {isEdit ? "Modifier la règle" : "Ajouter une règle de récurrence"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] max-w-lg flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              {isEdit ? "Modifier la règle" : "Ajouter une règle de récurrence"}
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            <div className="flex-1 space-y-4 overflow-y-auto px-6 pb-2">
+            <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4 pb-2">
 
               {/* Libellé */}
               <RhfInput<RegleFormValues>
@@ -819,7 +824,7 @@ export function RegleRecurrenceFormDialog({
               proprietaireEntrepriseId={prestation.entrepriseId}
             />
 
-            <DialogFooter className="sticky bottom-0 border-t bg-background px-6 py-4">
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -832,10 +837,10 @@ export function RegleRecurrenceFormDialog({
                 {isSubmitting && <Spinner />}
                 {isEdit ? "Enregistrer" : "Ajouter la règle"}
               </Button>
-            </DialogFooter>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

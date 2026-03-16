@@ -6,11 +6,15 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { Spinner } from "@/components/ui/spinner";
 import { insertOccurrenceOnDemandAction } from "@/server/actions/clientServiceOccurrencesActions";
@@ -91,66 +95,74 @@ export function OccurrenceOnDemandDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Ajouter une intervention</DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="sm:max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>Ajouter une intervention</DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4 py-2"
+        <DialogStyledBody>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col gap-4"
+            >
+              {isRecurrenceAuto && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-amber-800">
+                    Intervention ponctuelle
+                  </AlertTitle>
+                  <AlertDescription className="text-amber-700">
+                    Cette prestation a un planning automatique. Cette intervention
+                    s&apos;ajoutera ponctuellement, hors planning habituel.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <RhfInput<InsertOccurrenceOnDemandFormType>
+                name="dateDebutPrevue"
+                label="Date et heure de début"
+                type="datetime-local"
+                requiredMark
+              />
+
+              <RhfInput<InsertOccurrenceOnDemandFormType>
+                name="dateFinPrevue"
+                label="Date et heure de fin (facultatif)"
+                type="datetime-local"
+              />
+
+              <RhfTextArea<InsertOccurrenceOnDemandFormType>
+                name="notes"
+                label="Notes / instructions (facultatif)"
+                placeholder="Précisions sur l'intervention…"
+                rows={3}
+              />
+            </form>
+          </Form>
+        </DialogStyledBody>
+
+        <DialogStyledFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
           >
-            {isRecurrenceAuto && (
-              <Alert className="border-amber-200 bg-amber-50">
-                <AlertTriangle className="h-4 w-4 text-amber-600" />
-                <AlertTitle className="text-amber-800">
-                  Intervention ponctuelle
-                </AlertTitle>
-                <AlertDescription className="text-amber-700">
-                  Cette prestation a un planning automatique. Cette intervention
-                  s&apos;ajoutera ponctuellement, hors planning habituel.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <RhfInput<InsertOccurrenceOnDemandFormType>
-              name="dateDebutPrevue"
-              label="Date et heure de début"
-              type="datetime-local"
-              requiredMark
-            />
-
-            <RhfInput<InsertOccurrenceOnDemandFormType>
-              name="dateFinPrevue"
-              label="Date et heure de fin (facultatif)"
-              type="datetime-local"
-            />
-
-            <RhfTextArea<InsertOccurrenceOnDemandFormType>
-              name="notes"
-              label="Notes / instructions (facultatif)"
-              placeholder="Précisions sur l'intervention…"
-              rows={3}
-            />
-
-            <DialogFooter className="pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Spinner />}
-                Créer le passage
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
+            Annuler
+          </Button>
+          <Button
+            type="button"
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+          >
+            {isSubmitting && <Spinner />}
+            Créer le passage
+          </Button>
+        </DialogStyledFooter>
+      </DialogStyledContent>
     </Dialog>
   );
 }

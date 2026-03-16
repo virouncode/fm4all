@@ -1,15 +1,12 @@
 "use client";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCallback, useRef, useState } from "react";
 import { ConfirmContext, type ConfirmOptions } from "./ConfirmContext";
@@ -36,23 +33,26 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
     <ConfirmContext.Provider value={confirm}>
       {children}
       <AlertDialog open={open} onOpenChange={(o) => !o && handleClose(false)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{opts.title ?? "Are you sure?"}</AlertDialogTitle>
-            {opts.description ? (
-              <AlertDialogDescription>
-                {opts.description}
-              </AlertDialogDescription>
-            ) : null}
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
+        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
+          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogHeader>
+              <AlertDialogTitle>{opts.title ?? "Are you sure?"}</AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          {opts.description ? (
+            <div className="px-5 py-4 text-sm">
+              {opts.description}
+            </div>
+          ) : null}
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button
+              variant="outline"
               onClick={() => handleClose(false)}
               className="min-w-24"
             >
               {opts.cancelText ?? "Cancel"}
-            </AlertDialogCancel>
-            <AlertDialogAction
+            </Button>
+            <Button
               className={cn(
                 buttonVariants({
                   variant: opts.danger ? "destructive" : "default",
@@ -62,7 +62,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
               onClick={() => handleClose(true)}
             >
               {opts.confirmText ?? "Delete"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

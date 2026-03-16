@@ -4,11 +4,15 @@ import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import {
@@ -155,45 +159,49 @@ export function UserSiteAttributionEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {attribution.isInherited
-              ? "Créer un override"
-              : "Modifier l'attribution"}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="mb-4">
-          <p className="text-sm font-medium">Site : {attribution.site.nom}</p>
-        </div>
+      <DialogStyledContent className="max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              {attribution.isInherited
+                ? "Créer un override"
+                : "Modifier l'attribution"}
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <RhfControlledSelect
-              name="role"
-              label="Rôle"
-              requiredMark
-              selectClassName="w-full"
-            >
-              {roleOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </RhfControlledSelect>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
+            <DialogStyledBody>
+              <div className="space-y-4">
+                <p className="text-sm font-medium">Site : {attribution.site.nom}</p>
 
-            <RhfControlledSelect
-              name="scope"
-              label="Périmètre"
-              requiredMark
-              selectClassName="w-full"
-            >
-              <SelectItem value="self">{scopeLabels.self}</SelectItem>
-              <SelectItem value="subtree">{scopeLabels.subtree}</SelectItem>
-            </RhfControlledSelect>
+                <RhfControlledSelect
+                  name="role"
+                  label="Rôle"
+                  requiredMark
+                  selectClassName="w-full"
+                >
+                  {roleOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
 
-            <DialogFooter>
+                <RhfControlledSelect
+                  name="scope"
+                  label="Périmètre"
+                  requiredMark
+                  selectClassName="w-full"
+                >
+                  <SelectItem value="self">{scopeLabels.self}</SelectItem>
+                  <SelectItem value="subtree">{scopeLabels.subtree}</SelectItem>
+                </RhfControlledSelect>
+              </div>
+            </DialogStyledBody>
+
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -204,10 +212,10 @@ export function UserSiteAttributionEditDialog({
               <Button type="submit" disabled={isSubmitting || !isDirty}>
                 {isSubmitting ? "Enregistrement..." : "Enregistrer"}
               </Button>
-            </DialogFooter>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

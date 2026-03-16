@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import {
   Form,
   FormControl,
@@ -345,23 +348,25 @@ export function ExecutionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
-          <DialogTitle>Ajouter une exécution</DialogTitle>
-          {postureActive === "prestataire" && (
-            <p className="text-muted-foreground text-sm">
-              {clientNom} — {serviceNom}
-            </p>
-          )}
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>Ajouter une exécution</DialogTitle>
+            {postureActive === "prestataire" && (
+              <p className="text-muted-foreground text-sm">
+                {clientNom} — {serviceNom}
+              </p>
+            )}
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex min-h-0 flex-1 flex-col"
           >
-            <div className="min-h-0 flex-1 overflow-y-auto px-6">
-              <div className="space-y-5 py-2 pb-4">
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              <div className="space-y-5 pb-4">
                 {/* ── SECTION PRESTATAIRE ── */}
                 {postureActive !== "prestataire" && (
                   <div className="space-y-3">
@@ -878,7 +883,7 @@ export function ExecutionFormDialog({
               }
             />
 
-            <DialogFooter className="bg-background flex-shrink-0 border-t px-6 pt-4 pb-6">
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -891,10 +896,10 @@ export function ExecutionFormDialog({
                 {isSubmitting && <Spinner />}
                 Ajouter une exécution
               </Button>
-            </DialogFooter>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

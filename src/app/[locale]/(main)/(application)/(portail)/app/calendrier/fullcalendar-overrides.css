@@ -199,10 +199,46 @@
   color: var(--muted-foreground);
 }
 
-/* ── Lien "X autres" ─────────────────────────────────────────── */
+/* ── Lien "+N more" (vue month) ──────────────────────────────── */
 .fc .fc-daygrid-more-link {
   font-size: 0.7rem;
   color: var(--muted-foreground);
+  padding: 0 2px;
+}
+.fc .fc-daygrid-more-link:hover {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+/* Popover "+N more" */
+.fc .fc-popover {
+  background: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 50;
+}
+.fc .fc-popover-header {
+  background: var(--muted);
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.fc .fc-popover-body {
+  padding: 4px;
+}
+
+/* ── iCal-style event content ────────────────────────────────── */
+/* Supprime le padding FC par défaut — notre eventContent gère son propre layout */
+.fc .fc-event-main {
+  padding: 0;
+  color: var(--foreground);
+}
+/* En vue timeGrid, l'event-main doit occuper toute la hauteur du bloc */
+.fc .fc-timegrid-event .fc-event-main {
+  height: 100%;
 }
 
 /* ── Masquer le bandeau de licence ───────────────────────────── */

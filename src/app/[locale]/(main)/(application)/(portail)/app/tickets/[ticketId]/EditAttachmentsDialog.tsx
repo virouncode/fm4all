@@ -4,12 +4,16 @@ import { RhfFileInput } from "@/components/rhf/RhfFileInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { getPresignedReadUrlAction } from "@/server/actions/s3Actions";
 import { updateTicketAttachmentsAction } from "@/server/actions/ticketsActions";
@@ -157,15 +161,17 @@ export function EditAttachmentsDialog({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <Paperclip className="text-primary h-4 w-4" />
-              Modifier les pièces jointes
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Paperclip className="text-primary h-4 w-4" />
+                Modifier les pièces jointes
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         <Form {...form}>
           <form
@@ -173,7 +179,8 @@ export function EditAttachmentsDialog({
             className="flex flex-1 flex-col overflow-hidden"
           >
             {/* Contenu scrollable */}
-            <div className="flex-1 space-y-4 overflow-y-auto p-6">
+            <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
+              <div className="space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium">
@@ -215,9 +222,9 @@ export function EditAttachmentsDialog({
                 )}
               </div>
             </div>
+            </DialogStyledBody>
 
-            {/* Footer sticky */}
-            <DialogFooter className="bg-background sticky bottom-0 flex shrink-0 justify-end gap-2 border-t px-6 pt-4 pb-6">
+            <DialogStyledFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -231,10 +238,10 @@ export function EditAttachmentsDialog({
               >
                 {isSubmitting ? "Enregistrement..." : "Enregistrer"}
               </Button>
-            </DialogFooter>
+            </DialogStyledFooter>
           </form>
         </Form>
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }

@@ -3,10 +3,14 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import {
   Select,
   SelectContent,
@@ -63,17 +67,20 @@ export function TicketsSortDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <ArrowDownUp className="text-primary size-6" />
-              Trier les tickets
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="sm:max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <ArrowDownUp className="text-primary size-6" />
+                Trier les tickets
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
-        <div className="space-y-6 py-4">
+        <DialogStyledBody>
+        <div className="space-y-6">
           {/* Trier par */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Trier par</label>
@@ -116,7 +123,8 @@ export function TicketsSortDialog({
             </div>
           </div>
         </div>
-      </DialogContent>
+        </DialogStyledBody>
+      </DialogStyledContent>
     </Dialog>
   );
 }
