@@ -1,7 +1,6 @@
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import {
-  countNonAssignedOccurrencesByPrestationId,
   countOccurrencesByPrestationId,
   getDistinctSitesForPrestation,
   getExecutionsWithPrixByPrestationId,
@@ -181,7 +180,6 @@ export default async function PrestationDetailPage({
   const [
     occurrences,
     totalOccurrences,
-    totalNonAssigned,
     availableSites,
     clientHasActiveAdmin,
     quotaInfo,
@@ -190,7 +188,6 @@ export default async function PrestationDetailPage({
   ] = await Promise.all([
     getOccurrencesByPrestationId(prestationId, { limit: 50, sortDir: "asc" }),
     countOccurrencesByPrestationId(prestationId),
-    countNonAssignedOccurrencesByPrestationId(prestationId),
     getDistinctSitesForPrestation(prestationId),
     hasClientActiveAdmin(prestation.entrepriseId),
     prestation.famillePlanification === "quota_manuel"
@@ -209,14 +206,12 @@ export default async function PrestationDetailPage({
       prestation={prestation}
       canManage={canManage}
       canAdmin={canAdmin}
-      canSeeFinancials={canSeeFinancials}
       isPlateforme={isPlateforme}
       canChangeModePilotage={canChangeModePilotage}
       clientHasActiveAdmin={clientHasActiveAdmin}
       executions={executions}
       occurrences={occurrences}
       totalOccurrences={totalOccurrences}
-      totalNonAssigned={totalNonAssigned}
       availableSites={availableSites}
       quotaInfo={quotaInfo}
       initialRegles={initialRegles}

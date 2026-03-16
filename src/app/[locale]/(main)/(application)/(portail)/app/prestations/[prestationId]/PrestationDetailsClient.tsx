@@ -32,10 +32,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { modeAncragePeriodeCT } from "@/constants/codeTables";
 import useIntersection from "@/hooks/use-intersection";
 import { Link, useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import {
   deleteExecutionAction,
   toggleExecutionActifAction,
@@ -59,8 +60,6 @@ import type {
   QuotaConfigType,
   QuotaInfoType,
 } from "@/server/queries/clientServices.query";
-import { modeAncragePeriodeCT } from "@/constants/codeTables";
-import { cn } from "@/lib/utils";
 import type { SelectRegleRecurrenceType } from "@/zod-schemas/clientServiceReglesRecurrence.schema";
 import {
   type ClientServiceStatutType,
@@ -123,15 +122,12 @@ type PrestationDetailsClientProps = {
   canManage: boolean;
   /** Opérations fortes : supprimer + terminer — admin uniquement (client/prestataire) + plateforme */
   canAdmin: boolean;
-  /** Données financières : onglet Exécution & Tarifs */
-  canSeeFinancials: boolean;
   isPlateforme: boolean;
   canChangeModePilotage: boolean;
   clientHasActiveAdmin: boolean;
   executions: ExecutionWithPrix[];
   occurrences: OccurrenceListItem[];
   totalOccurrences: number;
-  totalNonAssigned: number;
   availableSites: Array<{ id: string; nom: string }>;
   /** Quota de la période courante — null si pas de config quota ou si mode ≠ quota_manuel */
   quotaInfo: QuotaInfoType | null;
@@ -146,14 +142,12 @@ export function PrestationDetailsClient({
   prestation,
   canManage,
   canAdmin,
-  canSeeFinancials,
   isPlateforme,
   canChangeModePilotage,
   clientHasActiveAdmin,
   executions: initialExecutions,
   occurrences,
   totalOccurrences,
-  totalNonAssigned,
   availableSites,
   quotaInfo,
   initialRegles,
@@ -164,8 +158,6 @@ export function PrestationDetailsClient({
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [executions, setExecutions] =
     useState<ExecutionWithPrix[]>(initialExecutions);
-  const [interventionsCount, setInterventionsCount] =
-    useState(totalOccurrences);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -363,7 +355,10 @@ export function PrestationDetailsClient({
                 : true;
           const step4Done = prestation.statut !== "brouillon";
           const step4Enabled =
-            canManage && prestation.statut === "brouillon" && canActivate && !isUpdatingStatut;
+            canManage &&
+            prestation.statut === "brouillon" &&
+            canActivate &&
+            !isUpdatingStatut;
           const step5Enabled = prestation.statut === "actif";
 
           const steps = [
@@ -398,7 +393,7 @@ export function PrestationDetailsClient({
             {
               n: 5,
               label: "Gérer les interventions",
-              done: false,
+              done: step5Enabled,
               enabled: step5Enabled,
               onClick: () => setActiveTab("interventions"),
             },
@@ -416,7 +411,7 @@ export function PrestationDetailsClient({
 
           return (
             <div className="mt-3 space-y-2">
-              <div className="flex flex-wrap items-center gap-x-1 gap-y-1.5 rounded-md border bg-muted/30 px-3 py-2">
+              <div className="bg-muted/30 flex flex-wrap items-center justify-center gap-x-1 gap-y-1.5 rounded-md border px-3 py-2">
                 {steps.map((step, i) => (
                   <span key={step.n} className="flex items-center gap-x-1">
                     {i > 0 && (
@@ -425,25 +420,30 @@ export function PrestationDetailsClient({
                     {step.enabled && !step.done ? (
                       <button
                         onClick={step.onClick}
-                        className="rounded px-1.5 py-0.5 text-sm transition-colors hover:bg-muted hover:text-foreground text-muted-foreground"
+                        className="hover:bg-muted hover:text-foreground text-muted-foreground rounded px-1.5 py-0.5 text-sm transition-colors"
                       >
-                        <span className="mr-0.5 text-xs opacity-60">{step.n}.</span>
+                        <span className="mr-0.5 text-xs opacity-60">
+                          {step.n}.
+                        </span>
                         {step.label}
                       </button>
                     ) : step.done ? (
                       <button
                         onClick={step.enabled ? step.onClick : undefined}
                         className={cn(
-                          "rounded px-1.5 py-0.5 text-sm font-semibold text-foreground",
-                          step.enabled && "transition-colors hover:bg-muted cursor-pointer",
+                          "text-foreground rounded px-1.5 py-0.5 text-sm font-semibold",
+                          step.enabled &&
+                            "hover:bg-muted cursor-pointer transition-colors",
                           !step.enabled && "cursor-default",
                         )}
                       >
-                        <span className="mr-0.5 text-xs font-normal opacity-60">{step.n}.</span>
+                        <span className="mr-0.5 text-xs font-normal opacity-60">
+                          {step.n}.
+                        </span>
                         {step.label}
                       </button>
                     ) : (
-                      <span className="px-1.5 py-0.5 text-sm text-muted-foreground/40">
+                      <span className="text-muted-foreground/40 px-1.5 py-0.5 text-sm">
                         <span className="mr-0.5 text-xs">{step.n}.</span>
                         {step.label}
                       </span>
@@ -452,7 +452,7 @@ export function PrestationDetailsClient({
                 ))}
               </div>
               {activationBlockReason && (
-                <p className="px-1 text-xs text-muted-foreground/70">
+                <p className="text-muted-foreground/70 px-1 text-xs">
                   {activationBlockReason}
                 </p>
               )}
@@ -477,33 +477,6 @@ export function PrestationDetailsClient({
                     règle de récurrence configurée.
                   </p>
                 )}
-                {prestation.famillePlanification === "recurrence_auto" &&
-                  !hasActiveExecution && (
-                    <div className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2">
-                      <p className="font-medium text-orange-800">
-                        Pas encore de prestataire actif
-                      </p>
-                      <p className="mt-0.5 text-orange-700">
-                        Les interventions seront créées en statut{" "}
-                        <strong>À attribuer</strong>.{" "}
-                        {canSeeFinancials
-                          ? "Vous pourrez assigner un prestataire dans l'onglet « Exécution & Tarifs » après l'activation."
-                          : "Contactez un administrateur pour assigner un prestataire."}
-                      </p>
-                    </div>
-                  )}
-                {prestation.famillePlanification === "recurrence_auto" &&
-                  hasActiveExecution && (
-                    <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2">
-                      <p className="font-medium text-green-800">
-                        Prestataire actif — prêt
-                      </p>
-                      <p className="mt-0.5 text-green-700">
-                        Les interventions seront assignées automatiquement au
-                        prestataire configuré.
-                      </p>
-                    </div>
-                  )}
                 <p className="text-muted-foreground text-xs">
                   Une prestation activée ne peut pas revenir en brouillon. Pour
                   suspendre, utilisez &quot;Mettre en pause&quot;.
@@ -576,16 +549,6 @@ export function PrestationDetailsClient({
           >
             <CalendarCheck className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Interventions</span>
-            {interventionsCount > 0 && (
-              <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
-                {interventionsCount}
-              </span>
-            )}
-            {totalNonAssigned > 0 && (
-              <span className="rounded-full bg-orange-100 px-1.5 text-xs text-orange-700">
-                {totalNonAssigned}
-              </span>
-            )}
           </TabsTrigger>
         </TabsList>
 
@@ -833,7 +796,6 @@ export function PrestationDetailsClient({
             initialOccurrences={occurrences}
             totalOccurrences={totalOccurrences}
             prestation={prestation}
-            onCountChange={setInterventionsCount}
             availableSites={availableSites}
             canManage={canManage}
             quotaInfo={quotaInfo}
@@ -917,7 +879,8 @@ function PlanificationTab({
 }) {
   const famille = prestation.famillePlanification;
 
-  const [regles, setRegles] = useState<SelectRegleRecurrenceType[]>(initialRegles);
+  const [regles, setRegles] =
+    useState<SelectRegleRecurrenceType[]>(initialRegles);
 
   const updateRegles = useCallback(
     (newRegles: SelectRegleRecurrenceType[]) => {
@@ -926,7 +889,9 @@ function PlanificationTab({
     },
     [onReglesChanged],
   );
-  const [quota, setQuota] = useState<QuotaConfigType | null>(initialQuotaConfig);
+  const [quota, setQuota] = useState<QuotaConfigType | null>(
+    initialQuotaConfig,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -982,7 +947,6 @@ function PlanificationTab({
     annee: "an",
   };
 
-
   if (isLoading) {
     return (
       <div className="flex h-32 items-center justify-center">
@@ -1027,11 +991,11 @@ function PlanificationTab({
                 <p>
                   Un nombre fixe d&apos;interventions est alloué par période (ex
                   : 4 par an, 2 par trimestre). Il n&apos;y a{" "}
-                  <strong>pas de génération automatique</strong> : vous planifiez
-                  chaque intervention manuellement depuis l&apos;onglet{" "}
-                  <strong>Interventions</strong>, dans la limite du quota défini.
-                  Configurez le quota dans cet onglet, puis créez les
-                  interventions une par une selon vos besoins.
+                  <strong>pas de génération automatique</strong> : vous
+                  planifiez chaque intervention manuellement depuis
+                  l&apos;onglet <strong>Interventions</strong>, dans la limite
+                  du quota défini. Configurez le quota dans cet onglet, puis
+                  créez les interventions une par une selon vos besoins.
                 </p>
               </div>
 
@@ -1055,11 +1019,7 @@ function PlanificationTab({
 
   // ===== PONCTUEL =====
   if (famille === "ponctuel") {
-    return (
-      <div className="space-y-4">
-        {planificationInfoBlock}
-      </div>
-    );
+    return <div className="space-y-4">{planificationInfoBlock}</div>;
   }
 
   // ===== QUOTA MANUEL =====
@@ -1099,8 +1059,9 @@ function PlanificationTab({
                 icon={CalendarCheck}
                 label="Mode d'ancrage"
                 value={
-                  modeAncragePeriodeCT.find((m) => m.code === quota.modeAncragePeriode)?.name ??
-                  quota.modeAncragePeriode
+                  modeAncragePeriodeCT.find(
+                    (m) => m.code === quota.modeAncragePeriode,
+                  )?.name ?? quota.modeAncragePeriode
                 }
               />
               {quota.notes && (
@@ -1221,7 +1182,6 @@ function PlanificationTab({
           }}
         />
       )}
-
     </div>
   );
 }
@@ -1991,13 +1951,11 @@ type OccurrenceStatutFilterType =
 
 type OccurrenceFiltersStateType = {
   statut: OccurrenceStatutFilterType;
-  nonAssignedOnly: boolean;
   siteId: string;
 };
 
 const DEFAULT_FILTERS: OccurrenceFiltersStateType = {
   statut: "",
-  nonAssignedOnly: false,
   siteId: "",
 };
 
@@ -2007,7 +1965,6 @@ function InterventionsTab({
   initialOccurrences,
   totalOccurrences,
   prestation,
-  onCountChange,
   availableSites,
   canManage,
   quotaInfo,
@@ -2016,7 +1973,6 @@ function InterventionsTab({
   initialOccurrences: OccurrenceListItem[];
   totalOccurrences: number;
   prestation: PrestationListItem;
-  onCountChange: (count: number) => void;
   availableSites: Array<{ id: string; nom: string }>;
   canManage: boolean;
   quotaInfo: QuotaInfoType | null;
@@ -2046,7 +2002,6 @@ function InterventionsTab({
 
   const activeFiltersCount = [
     filters.statut !== "",
-    filters.nonAssignedOnly,
     filters.siteId !== "",
   ].filter(Boolean).length;
 
@@ -2058,7 +2013,6 @@ function InterventionsTab({
       offset: occurrences.length,
       limit: PAGE_SIZE,
       statut: filters.statut || undefined,
-      nonAssignedOnly: filters.nonAssignedOnly || undefined,
       siteId: filters.siteId || undefined,
       sortDir,
     });
@@ -2073,7 +2027,6 @@ function InterventionsTab({
     prestation.entrepriseId,
     occurrences.length,
     filters.statut,
-    filters.nonAssignedOnly,
     filters.siteId,
     sortDir,
   ]);
@@ -2101,7 +2054,6 @@ function InterventionsTab({
       offset: 0,
       limit: PAGE_SIZE,
       statut: newFilters.statut || undefined,
-      nonAssignedOnly: newFilters.nonAssignedOnly || undefined,
       siteId: newFilters.siteId || undefined,
       sortDir: newSortDir,
     });
@@ -2110,7 +2062,6 @@ function InterventionsTab({
       setHasMore(result.data.occurrences.length === PAGE_SIZE);
       if (result.data.filteredTotal !== undefined) {
         setDisplayedTotal(result.data.filteredTotal);
-        onCountChange(result.data.filteredTotal);
       }
     }
     setIsFiltering(false);
@@ -2142,26 +2093,6 @@ function InterventionsTab({
             <div className="space-y-3">
               <div className="space-y-1">
                 <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
-                  Workflow
-                </p>
-                <p>
-                  Pour qu&apos;une prestation génère des interventions, il faut
-                  suivre cet ordre :{" "}
-                  <strong>1. Créer la prestation</strong> →{" "}
-                  <strong>2. Créer une exécution</strong> (assigner un
-                  prestataire avec ses tarifs) →{" "}
-                  <strong>3. Configurer la planification</strong> (onglet
-                  « Planification ») →{" "}
-                  <strong>4. Activer la prestation</strong> →{" "}
-                  <strong>5. Les interventions apparaissent ici</strong>{" "}
-                  (automatiquement pour la récurrence auto, manuellement pour
-                  le quota et le ponctuel). Les interventions ne peuvent être
-                  créées que sur une prestation <strong>active</strong>.
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
                   Qu&apos;est-ce qu&apos;une intervention ?
                 </p>
                 <p>
@@ -2179,11 +2110,11 @@ function InterventionsTab({
                 </p>
                 <p>
                   <strong>Planifiée</strong> → <strong>En cours</strong>{" "}
-                  (démarrée par l&apos;intervenant) →{" "}
-                  <strong>Terminée</strong> (tâches complétées) ou{" "}
-                  <strong>Non honorée</strong> (intervention non réalisée) ou{" "}
-                  <strong>Annulée</strong>. Les interventions terminées
-                  alimentent l&apos;historique et les analytics.
+                  (démarrée par l&apos;intervenant) → <strong>Terminée</strong>{" "}
+                  (tâches complétées) ou <strong>Non honorée</strong>{" "}
+                  (intervention non réalisée) ou <strong>Annulée</strong>. Les
+                  interventions terminées alimentent l&apos;historique et les
+                  analytics.
                 </p>
               </div>
             </div>
@@ -2196,6 +2127,17 @@ function InterventionsTab({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       {interventionsInfoBlock}
+
+      {/* Disclaimer récurrence auto */}
+      {!isQuotaMode && prestation.statut === "actif" && (
+        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <p>
+            Seules les prochaines interventions déjà générées sont affichées.{" "}
+            <strong>D&apos;autres apparaîtront automatiquement</strong> au fil du temps.
+          </p>
+        </div>
+      )}
 
       {/* Bandeau quota (quota_manuel actif uniquement) */}
       {isQuotaMode && prestation.statut === "actif" && (
@@ -2214,11 +2156,16 @@ function InterventionsTab({
           <p>
             {!hasActiveExecution &&
               "Aucune exécution valide — les interventions ne peuvent pas être créées. Ajoutez un prestataire dans l'onglet « Exécution »."}
-            {hasActiveExecution && !quotaInfo &&
+            {hasActiveExecution &&
+              !quotaInfo &&
               "Quota non configuré — configurez-le dans l'onglet « Planification » pour suivre et limiter vos interventions."}
-            {hasActiveExecution && quotaInfo && isQuotaFull &&
+            {hasActiveExecution &&
+              quotaInfo &&
+              isQuotaFull &&
               `Toutes les interventions sont planifiées pour la période en cours (${quotaUsed}/${quotaInfo.nbOccurrencesParPeriode}).`}
-            {hasActiveExecution && quotaInfo && !isQuotaFull &&
+            {hasActiveExecution &&
+              quotaInfo &&
+              !isQuotaFull &&
               `${quotaUsed}/${quotaInfo.nbOccurrencesParPeriode} intervention${quotaInfo.nbOccurrencesParPeriode > 1 ? "s" : ""} planifiée${quotaInfo.nbOccurrencesParPeriode > 1 ? "s" : ""} sur la période en cours — il en reste ${quotaInfo.nbOccurrencesParPeriode - quotaUsed} à planifier.`}
           </p>
         </div>
@@ -2341,7 +2288,6 @@ function InterventionsTab({
           setOccurrences((prev) => [newOccurrence, ...prev]);
           setDisplayedTotal((prev) => prev + 1);
           if (isQuotaMode) setQuotaUsed((prev) => prev + 1);
-          onCountChange(displayedTotal + 1);
         }}
       />
     </div>
@@ -2416,7 +2362,6 @@ function OccurrencesFiltersDialog({
 }) {
   const activeFiltersCount = [
     currentFilters.statut !== "",
-    currentFilters.nonAssignedOnly,
     currentFilters.siteId !== "",
   ].filter(Boolean).length;
 
@@ -2486,23 +2431,6 @@ function OccurrencesFiltersDialog({
               </Select>
             </div>
           )}
-
-          {/* À attribuer */}
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="nonAssignedSwitch"
-              className="cursor-pointer text-sm font-medium"
-            >
-              À attribuer uniquement
-            </label>
-            <Switch
-              id="nonAssignedSwitch"
-              checked={currentFilters.nonAssignedOnly}
-              onCheckedChange={(checked) =>
-                handleChange({ nonAssignedOnly: checked })
-              }
-            />
-          </div>
 
           {/* Réinitialiser */}
           <div className="flex justify-end border-t pt-3">
