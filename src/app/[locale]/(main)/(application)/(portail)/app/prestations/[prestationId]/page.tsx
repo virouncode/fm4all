@@ -9,6 +9,9 @@ import {
 } from "@/server/queries/clientServiceExecutions.query";
 import {
   getPrestationWithJoinsById,
+  getQuotaConfigByPrestationId,
+  getQuotaInfoForPrestation,
+  getReglesRecurrenceByPrestationId,
   hasClientActiveAdmin,
   prestataireHasExecutionOnPrestation,
 } from "@/server/queries/clientServices.query";
@@ -174,19 +177,31 @@ export default async function PrestationDetailPage({
     ? rawExecutions
     : rawExecutions.map((e) => ({ ...e, prix: [] }));
 
-  // 7. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin
+  // 7. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin + quota
   const [
     occurrences,
     totalOccurrences,
     totalNonAssigned,
     availableSites,
     clientHasActiveAdmin,
+    quotaInfo,
+    initialRegles,
+    initialQuotaConfig,
   ] = await Promise.all([
     getOccurrencesByPrestationId(prestationId, { limit: 50, sortDir: "asc" }),
     countOccurrencesByPrestationId(prestationId),
     countNonAssignedOccurrencesByPrestationId(prestationId),
     getDistinctSitesForPrestation(prestationId),
     hasClientActiveAdmin(prestation.entrepriseId),
+    prestation.famillePlanification === "quota_manuel"
+      ? getQuotaInfoForPrestation(prestationId)
+      : Promise.resolve(null),
+    prestation.famillePlanification === "recurrence_auto"
+      ? getReglesRecurrenceByPrestationId(prestationId)
+      : Promise.resolve([]),
+    prestation.famillePlanification === "quota_manuel"
+      ? getQuotaConfigByPrestationId(prestationId)
+      : Promise.resolve(null),
   ]);
 
   return (
@@ -203,6 +218,9 @@ export default async function PrestationDetailPage({
       totalOccurrences={totalOccurrences}
       totalNonAssigned={totalNonAssigned}
       availableSites={availableSites}
+      quotaInfo={quotaInfo}
+      initialRegles={initialRegles}
+      initialQuotaConfig={initialQuotaConfig}
       defaultTab={defaultTab}
     />
   );

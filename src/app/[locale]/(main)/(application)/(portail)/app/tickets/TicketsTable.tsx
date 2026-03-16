@@ -110,8 +110,8 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   const router = useRouter();
 
   // View state from UI store (persisted in localStorage)
-  const ticketView = useUiStore((state) => state.ticketView);
-  const setTicketView = useUiStore((state) => state.setTicketView);
+  const TicketViewType = useUiStore((state) => state.TicketViewType);
+  const setTicketViewType = useUiStore((state) => state.setTicketViewType);
 
   // Data state
   const [tickets, setTickets] = useState<SelectTicketType[]>([]);
@@ -436,24 +436,28 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
       {/* Header Actions */}
       <div className="flex flex-shrink-0 items-center justify-between gap-2">
         {/* View Toggle */}
-        <div role="group" aria-label="Mode d'affichage" className="flex items-center">
+        <div
+          role="group"
+          aria-label="Mode d'affichage"
+          className="flex items-center"
+        >
           <Button
-            variant={ticketView === "list" ? "default" : "outline"}
+            variant={TicketViewType === "list" ? "default" : "outline"}
             size="sm"
-            onClick={() => setTicketView("list")}
+            onClick={() => setTicketViewType("list")}
             className="rounded-r-none border-r-0"
             aria-label="Vue liste"
-            aria-pressed={ticketView === "list"}
+            aria-pressed={TicketViewType === "list"}
           >
             <List aria-hidden="true" />
           </Button>
           <Button
-            variant={ticketView === "grid" ? "default" : "outline"}
+            variant={TicketViewType === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => setTicketView("grid")}
+            onClick={() => setTicketViewType("grid")}
             className="rounded-l-none"
             aria-label="Vue grille"
-            aria-pressed={ticketView === "grid"}
+            aria-pressed={TicketViewType === "grid"}
           >
             <Grid3x3 aria-hidden="true" />
           </Button>
@@ -491,7 +495,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
 
       {/* View: Table ou Grid */}
       <div className="flex-1 overflow-hidden">
-        {ticketView === "list" ? (
+        {TicketViewType === "list" ? (
           <InfiniteDataTable<SelectTicketType>
             columns={columns}
             items={tickets}

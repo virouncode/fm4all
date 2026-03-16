@@ -155,6 +155,15 @@ export const clientServiceReglesRecurrence = pgTable(
     // RRULE pure sans DTSTART — ex: "FREQ=WEEKLY;BYDAY=MO,WE,FR"
     regleRrule: text("regle_rrule").notNull(),
     dureePrevueMinutes: smallint("duree_prevue_minutes"),
+    /**
+     * Checklist spécifique à cette règle (override sur la checklist de l'exécution).
+     * Priorité : regle.tacheListeTemplateId > execution.tacheListeTemplateId
+     * Cas d'usage : nettoyage lundi (vitres + sol) vs vendredi (sol seulement)
+     */
+    tacheListeTemplateId: uuid("tache_liste_template_id").references(
+      () => tacheListesTemplates.id,
+      { onDelete: "set null" },
+    ),
     actif: boolean("actif").notNull().default(true),
     ordre: smallint("ordre").notNull().default(0),
     createdById: createdById(() => user),

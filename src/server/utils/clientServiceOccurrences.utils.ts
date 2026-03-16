@@ -12,6 +12,10 @@ import {
   tacheListeItems,
 } from "@/db/schema/services";
 import { sitesArborescence } from "@/db/schema/sites";
+import type {
+  ModeAncragePeriodeType,
+  PeriodeQuotaType,
+} from "@/zod-schemas/clientServiceReglesRecurrence.schema";
 import {
   and,
   asc,
@@ -30,6 +34,115 @@ import "server-only";
 type DbOrTransactionType =
   | typeof db
   | Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+// ---------------------------------------------------------------------------
+// 0. QUOTA — CALCUL DE LA PÉRIODE COURANTE
+// ---------------------------------------------------------------------------
+
+/**
+ * Avance une date d'une période (sans muter l'original).
+ */
+function addPeriod(date: Date, periode: PeriodeQuotaType): Date {
+  const d = new Date(date);
+  switch (periode) {
+    case "semaine":
+      d.setDate(d.getDate() + 7);
+      break;
+    case "mois":
+      d.setMonth(d.getMonth() + 1);
+      break;
+    case "trimestre":
+      d.setMonth(d.getMonth() + 3);
+      break;
+    case "semestre":
+      d.setMonth(d.getMonth() + 6);
+      break;
+    case "annee":
+      d.setFullYear(d.getFullYear() + 1);
+      break;
+  }
+  return d;
+}
+
+/**
+ * Calcule les bornes [debut, fin[ de la période quota courante.
+ *
+ * Mode "contrat" : périodes démarrant depuis dateAncragePeriode, de durée periodeQuota.
+ * Mode "civil"   : périodes calées sur le calendrier civil (semaine ISO, mois, trimestre…).
+ *
+ * @param dateAncragePeriode  Date au format "YYYY-MM-DD"
+ * @param periodeQuota        Durée d'une période
+ * @param modeAncragePeriode  Ancrage contrat ou civil
+ * @param today               Date de référence (défaut : maintenant)
+ * @returns { debut, fin } — fin est le dernier milliseconde inclus dans la période
+ */
+export function computeQuotaPeriode(
+  dateAncragePeriode: string,
+  periodeQuota: PeriodeQuotaType,
+  modeAncragePeriode: ModeAncragePeriodeType,
+  today: Date = new Date(),
+): { debut: Date; fin: Date } {
+  if (modeAncragePeriode === "civil") {
+    const year = today.getFullYear();
+    const month = today.getMonth(); // 0-indexed
+
+    switch (periodeQuota) {
+      case "semaine": {
+        // Semaine ISO : lundi → dimanche
+        const day = today.getDay();
+        const mondayOffset = day === 0 ? -6 : 1 - day;
+        const debut = new Date(today);
+        debut.setDate(today.getDate() + mondayOffset);
+        debut.setHours(0, 0, 0, 0);
+        const fin = new Date(debut);
+        fin.setDate(debut.getDate() + 6);
+        fin.setHours(23, 59, 59, 999);
+        return { debut, fin };
+      }
+      case "mois": {
+        const debut = new Date(year, month, 1, 0, 0, 0, 0);
+        const fin = new Date(year, month + 1, 0, 23, 59, 59, 999);
+        return { debut, fin };
+      }
+      case "trimestre": {
+        const quarterStart = Math.floor(month / 3) * 3;
+        const debut = new Date(year, quarterStart, 1, 0, 0, 0, 0);
+        const fin = new Date(year, quarterStart + 3, 0, 23, 59, 59, 999);
+        return { debut, fin };
+      }
+      case "semestre": {
+        const semStart = month < 6 ? 0 : 6;
+        const debut = new Date(year, semStart, 1, 0, 0, 0, 0);
+        const fin = new Date(year, semStart + 6, 0, 23, 59, 59, 999);
+        return { debut, fin };
+      }
+      case "annee": {
+        const debut = new Date(year, 0, 1, 0, 0, 0, 0);
+        const fin = new Date(year, 11, 31, 23, 59, 59, 999);
+        return { debut, fin };
+      }
+    }
+  }
+
+  // Mode "contrat" : itération depuis l'ancrage
+  const anchor = new Date(dateAncragePeriode + "T00:00:00");
+
+  // Si today est avant l'ancrage, la première période n'a pas encore commencé
+  if (today < anchor) {
+    const fin = new Date(addPeriod(anchor, periodeQuota).getTime() - 1);
+    return { debut: anchor, fin };
+  }
+
+  let periodStart = new Date(anchor);
+  let periodEnd = addPeriod(periodStart, periodeQuota);
+
+  while (periodEnd <= today) {
+    periodStart = periodEnd;
+    periodEnd = addPeriod(periodStart, periodeQuota);
+  }
+
+  return { debut: periodStart, fin: new Date(periodEnd.getTime() - 1) };
+}
 
 // ---------------------------------------------------------------------------
 // 1. RÉSOLUTION DU PÉRIMÈTRE
@@ -385,7 +498,7 @@ export async function snapshotOccurrenceTaches({
 export async function ensureOccurrencesWindow({
   clientServiceId,
   now,
-  daysAhead = 90,
+  daysAhead = 7,
   tx,
 }: {
   clientServiceId: string;
@@ -409,8 +522,18 @@ export async function ensureOccurrencesWindow({
     return { created: 0, skipped: 0 };
   }
 
-  const windowEnd = new Date(now);
-  windowEnd.setDate(windowEnd.getDate() + daysAhead);
+  // Borne basse : max(now, prestation.dateDebut) — ne génère pas avant le début contractuel
+  const windowStart =
+    cs.dateDebut && cs.dateDebut > now ? cs.dateDebut : new Date(now);
+
+  // Borne haute : min(now+daysAhead, prestation.dateFin) — ne génère pas après la fin contractuelle
+  const rawWindowEnd = new Date(now);
+  rawWindowEnd.setDate(rawWindowEnd.getDate() + daysAhead);
+  const windowEnd =
+    cs.dateFin && cs.dateFin < rawWindowEnd ? cs.dateFin : rawWindowEnd;
+
+  // Fenêtre vide → rien à générer
+  if (windowStart >= windowEnd) return { created: 0, skipped: 0 };
 
   // Résolution du périmètre
   const effectiveSiteIds = await getEffectiveSitesForService({
@@ -422,10 +545,10 @@ export async function ensureOccurrencesWindow({
 
   if (effectiveSiteIds.length === 0) return { created: 0, skipped: 0 };
 
-  // Génération des dates depuis les règles RRULE
+  // Génération des dates depuis les règles RRULE (fenêtre bornée par dateDebut/dateFin)
   const generated = await generateDatesFromRrules(
     clientServiceId,
-    now,
+    windowStart,
     windowEnd,
     tx,
   );
@@ -445,7 +568,7 @@ export async function ensureOccurrencesWindow({
         eq(clientServiceOccurrences.clientServiceId, clientServiceId),
         eq(clientServiceOccurrences.typeSource, "regle_recurrence"),
         inArray(clientServiceOccurrences.siteId, effectiveSiteIds),
-        gte(clientServiceOccurrences.dateDebutOriginale, now),
+        gte(clientServiceOccurrences.dateDebutOriginale, windowStart),
         lte(clientServiceOccurrences.dateDebutOriginale, windowEnd),
       ),
     );
@@ -464,7 +587,6 @@ export async function ensureOccurrencesWindow({
   let skipped = 0;
 
   const toInsert: (typeof clientServiceOccurrences.$inferInsert)[] = [];
-  const toInsertExecutionIds: (string | null)[] = [];
 
   for (const siteId of effectiveSiteIds) {
     for (const gen of generated) {
@@ -475,7 +597,7 @@ export async function ensureOccurrencesWindow({
         continue;
       }
 
-      // Exécution gagnante figée au moment de la génération
+      // Exécution gagnante résolue à la génération (optimiste — gel définitif au passage → en_cours)
       const executionId = await pickExecutionForOccurrence({
         clientServiceId,
         entrepriseId: cs.entrepriseId,
@@ -498,55 +620,15 @@ export async function ensureOccurrencesWindow({
         executionId,
         statut: "planifiee",
       });
-      toInsertExecutionIds.push(executionId);
 
       existingKeys.add(key);
       created++;
     }
   }
 
+  // Tâches NON snapshotées ici — snapshot réservé au cron J-1 ou au passage → en_cours
   if (toInsert.length > 0) {
-    // Pré-charger le tacheListeTemplateId des exécutions concernées
-    const uniqueExecIds = [
-      ...new Set(
-        toInsertExecutionIds.filter((id): id is string => id !== null),
-      ),
-    ];
-    const executionPackMap = new Map<string, string | null>();
-    if (uniqueExecIds.length > 0) {
-      const execRows = await dbClient
-        .select({
-          id: clientServiceExecutions.id,
-          tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
-        })
-        .from(clientServiceExecutions)
-        .where(inArray(clientServiceExecutions.id, uniqueExecIds));
-      for (const row of execRows) {
-        executionPackMap.set(row.id, row.tacheListeTemplateId ?? null);
-      }
-    }
-
-    // Insérer les occurrences et récupérer leurs IDs
-    const inserted = await dbClient
-      .insert(clientServiceOccurrences)
-      .values(toInsert)
-      .returning({ id: clientServiceOccurrences.id });
-
-    // Snapshot des tâches pour chaque occurrence
-    for (let i = 0; i < inserted.length; i++) {
-      const execId = toInsertExecutionIds[i];
-      const resolvedPackId = execId
-        ? (executionPackMap.get(execId) ?? null)
-        : null;
-
-      if (resolvedPackId) {
-        await snapshotOccurrenceTaches({
-          occurrenceId: inserted[i].id,
-          tacheListeTemplateId: resolvedPackId,
-          tx,
-        });
-      }
-    }
+    await dbClient.insert(clientServiceOccurrences).values(toInsert);
   }
 
   return { created, skipped };
@@ -568,7 +650,7 @@ export async function ensureOccurrencesWindow({
 export async function onClientServiceChanged({
   clientServiceId,
   now,
-  daysAhead = 90,
+  daysAhead = 7,
 }: {
   clientServiceId: string;
   now: Date;

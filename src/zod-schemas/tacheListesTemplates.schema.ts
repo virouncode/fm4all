@@ -7,6 +7,8 @@ export const getAvailableTacheListesTemplatesSchema = z.object({
   serviceId: z.uuid("ID de service invalide"),
   entrepriseId: z.uuid("ID d'entreprise invalide"),
   executionId: z.uuid().optional(),
+  /** Fourni directement quand pas d'executionId (ex: création d'exécution) */
+  prestataireEntrepriseId: z.uuid().optional(),
 });
 export type GetAvailableTacheListesTemplatesType = z.infer<
   typeof getAvailableTacheListesTemplatesSchema

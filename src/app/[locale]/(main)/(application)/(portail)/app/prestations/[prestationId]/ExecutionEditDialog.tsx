@@ -28,11 +28,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { modePilotageCT } from "@/constants/codeTables";
 import { updateExecutionAction } from "@/server/actions/clientServiceExecutionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import type {
+  ExecutionChecklistItem,
   ExecutionPrixItem,
   ExecutionWithPrix,
 } from "@/server/queries/clientServiceExecutions.query";
@@ -43,10 +46,20 @@ import {
 import type { ModeCommercialType } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { Plus, Trash2 } from "lucide-react";
-import { useEffect } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  ListChecks,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
+import { TacheListeManagerDialog } from "./TacheListeManagerDialog";
+import { TacheListePickerDialog } from "./TacheListePickerDialog";
 
 type ExecutionEditDialogProps = {
   open: boolean;
@@ -54,12 +67,17 @@ type ExecutionEditDialogProps = {
   execution: ExecutionWithPrix;
   prestationId: string;
   entrepriseId: string;
+  serviceId: string;
   modeCommercial: ModeCommercialType;
   isPlateforme: boolean;
   canChangeModePilotage: boolean;
   clientHasActiveAdmin: boolean;
   clientNom: string;
   serviceNom: string;
+  /** Borne min du calendrier — date de début de la prestation (ISO YYYY-MM-DD) */
+  prestationDateDebut?: string | null;
+  /** Borne max du calendrier — date de fin de la prestation (ISO YYYY-MM-DD) */
+  prestationDateFin?: string | null;
   onSuccess: (executions: ExecutionWithPrix[]) => void;
 };
 
@@ -151,15 +169,29 @@ export function ExecutionEditDialog({
   execution,
   prestationId,
   entrepriseId,
+  serviceId,
   modeCommercial,
   isPlateforme,
   canChangeModePilotage,
   clientHasActiveAdmin,
   clientNom,
   serviceNom,
+  prestationDateDebut,
+  prestationDateFin,
   onSuccess,
 }: ExecutionEditDialogProps) {
   const postureActive = useAppStore((state) => state.postureActive);
+
+  // Checklist state (managed outside RHF — saved via separate action)
+  const [checklistPickerOpen, setChecklistPickerOpen] = useState(false);
+  const [checklistManagerOpen, setChecklistManagerOpen] = useState(false);
+  const [checklistExpanded, setChecklistExpanded] = useState(false);
+  const [localChecklistName, setLocalChecklistName] = useState<string | null>(
+    execution.tacheListeTemplateName,
+  );
+  const [localChecklistItems, setLocalChecklistItems] = useState<
+    ExecutionChecklistItem[]
+  >(execution.tacheListeItems);
   const showIntermediaire =
     isPlateforme && modeCommercial === "intermediaire_fm4all";
 
@@ -205,6 +237,9 @@ export function ExecutionEditDialog({
 
   useEffect(() => {
     if (!open) return;
+    setLocalChecklistName(execution.tacheListeTemplateName);
+    setLocalChecklistItems(execution.tacheListeItems);
+    setChecklistExpanded(false);
     const activePrixForReset = execution.prix.filter((p) => p.actif);
     form.reset({
       executionId: execution.id,
@@ -301,11 +336,15 @@ export function ExecutionEditDialog({
                     label="Date de début"
                     requiredMark
                     buttonClassName="w-full"
+                    min={prestationDateDebut ?? undefined}
+                    max={prestationDateFin ?? undefined}
                   />
                   <RhfDatePicker<UpdateExecutionFormType>
                     name="dateFinValidite"
                     label="Date de fin (optionnelle)"
                     buttonClassName="w-full"
+                    min={prestationDateDebut ?? undefined}
+                    max={prestationDateFin ?? undefined}
                   />
                 </div>
 
@@ -619,8 +658,133 @@ export function ExecutionEditDialog({
                     </p>
                   )}
                 </div>
+
+                <Separator />
+
+                {/* Section Checklist */}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <span className="flex items-center gap-1.5 text-sm font-medium">
+                      <ListChecks className="text-primary h-4 w-4 shrink-0" />
+                      Checklist par défaut
+                    </span>
+                    <p className="text-muted-foreground text-xs">
+                      Utilisée pour toutes les interventions de cette exécution (sauf override par règle).
+                    </p>
+                    {localChecklistName ? (
+                      <div className="mt-1 overflow-hidden rounded-lg border">
+                        <div className="flex items-center gap-2 p-3">
+                          {localChecklistItems.length > 0 ? (
+                            <button
+                              type="button"
+                              className="text-muted-foreground hover:text-foreground shrink-0"
+                              onClick={() => setChecklistExpanded((v) => !v)}
+                              aria-label={checklistExpanded ? "Réduire" : "Développer"}
+                            >
+                              {checklistExpanded ? (
+                                <ChevronDown className="h-4 w-4" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4" />
+                              )}
+                            </button>
+                          ) : (
+                            <span className="h-4 w-4 shrink-0" />
+                          )}
+                          <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                            {localChecklistName}
+                          </span>
+                          <Badge variant="outline" className="shrink-0 text-xs">
+                            {localChecklistItems.length} tâche
+                            {localChecklistItems.length !== 1 ? "s" : ""}
+                          </Badge>
+                        </div>
+                        {checklistExpanded && localChecklistItems.length > 0 && (
+                          <div className="bg-muted/30 divide-y border-t">
+                            {localChecklistItems.map((item, idx) => (
+                              <div
+                                key={item.id}
+                                className="flex items-start gap-2 px-3 py-2 text-xs"
+                              >
+                                <span className="text-muted-foreground w-5 shrink-0 text-center">
+                                  {idx + 1}.
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <span className="font-medium">{item.titre}</span>
+                                </div>
+                                {item.dureeEstimeeMinutes && (
+                                  <span className="text-muted-foreground flex shrink-0 items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    {item.dureeEstimeeMinutes}min
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground mt-1 text-xs italic">
+                        Aucune checklist assignée.
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex shrink-0 flex-col gap-1.5 pt-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setChecklistPickerOpen(true)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                      Modifier
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setChecklistManagerOpen(true)}
+                    >
+                      Gérer les checklists
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <TacheListePickerDialog
+              open={checklistPickerOpen}
+              onOpenChange={setChecklistPickerOpen}
+              executionId={execution.id}
+              prestationId={prestationId}
+              serviceId={serviceId}
+              serviceNom={serviceNom}
+              entrepriseId={entrepriseId}
+              currentPackId={execution.tacheListeTemplateId}
+              onSuccess={(pack) => {
+                setLocalChecklistName(pack?.nom ?? null);
+                setLocalChecklistItems(pack?.items ?? []);
+                setChecklistPickerOpen(false);
+              }}
+            />
+            <TacheListeManagerDialog
+              open={checklistManagerOpen}
+              onOpenChange={setChecklistManagerOpen}
+              serviceId={serviceId}
+              serviceNom={serviceNom}
+              proprietaireEntrepriseId={
+                postureActive === "plateforme" ? null : entrepriseId
+              }
+              clientEntrepriseId={
+                postureActive === "plateforme" ? entrepriseId : undefined
+              }
+              clientEntrepriseNom={
+                postureActive === "plateforme" ? clientNom : undefined
+              }
+              prestataireEntrepriseId={execution.prestataireEntrepriseId ?? undefined}
+              prestataireEntrepriseNom={execution.prestataireNom ?? undefined}
+            />
 
             <DialogFooter className="bg-background flex-shrink-0 border-t px-6 pt-4 pb-6">
               <Button

@@ -2640,7 +2640,45 @@ Une attribution peut être sur un site parent avec `scope = "subtree"`. Toujours
 
 ---
 
-**Dernière mise à jour**: 2026-03-10
+**Dernière mise à jour**: 2026-03-16
+
+---
+
+## Changelog (2026-03-16)
+
+**Audit module Prestations — 6 bugs corrigés** :
+
+- 🔴 **`insertRegleRecurrenceAction` ne généraient pas les occurrences immédiatement** : `onClientServiceChanged()` n'était pas appelée après l'INSERT d'une règle de récurrence (contrairement à l'UPDATE). Les occurrences attendaient jusqu'au cron suivant (minuit UTC). Ajout de l'appel après l'insert.
+- 🔴 **`hasActiveRegle` initialisé à `false` en dur** (`PrestationDetailsClient.tsx`) : Le breadcrumb étape 4 (Planification) était toujours grisé au premier rendu même si une règle active existait déjà. Corrigé : `useState(initialRegles.some((r) => r.actif))`.
+- 🟠 **Sémantique `hasActiveExecution` duale** : `hasActiveExecution` avait deux usages incompatibles — pour `canActivate` (= seul `e.actif` comme côté serveur) et pour le bandeau Interventions (= actif + dans les bornes de date). Scindé en `hasAnyActiveExecution` (simple `e.actif`) et `hasActiveExecution` (avec `dateDebutValidite`/`dateFinValidite`).
+- 🟠 **`hasActiveExecution` non destructuré dans `InterventionsTab`** : Prop déclarée dans le type mais absente du destructuring → valeur toujours `undefined`. Ajouté au destructuring.
+- 🟠 **`RhfDateTimePicker` sans contraintes de date dans `RegleRecurrenceFormDialog`** : La "Première occurrence" acceptait n'importe quelle date. Ajout de `min`/`max` calés sur `prestation.dateDebut`/`dateFin`.
+- 🟠 **JSX unclosed div dans le breadcrumb** : `<div className="mt-3 space-y-2">` ouverte mais jamais fermée → ~100 erreurs TS en cascade. Corrigé + ajout du message `activationBlockReason` (explique pourquoi l'étape Activation est grisée).
+- ✅ **Message d'info ajouté dans `RegleRecurrenceFormDialog`** : Explique le comportement de skip silencieux si aucune exécution ne couvre la date de la première occurrence.
+
+**Pièges à retenir — module Prestations** :
+
+```typescript
+// 1. TOUJOURS appeler onClientServiceChanged après INSERT d'une règle (pas seulement UPDATE)
+await onClientServiceChanged({ clientServiceId, now: new Date() });
+
+// 2. Initialiser hasActiveRegle depuis les données, jamais false en dur
+const [hasActiveRegle, setHasActiveRegle] = useState(
+  initialRegles.some((r) => r.actif)
+);
+
+// 3. Deux variables pour hasActiveExecution selon l'usage
+const hasAnyActiveExecution = executions.some((e) => e.actif); // canActivate
+const hasActiveExecution = executions.some(                     // bandeau UI
+  (e) => e.actif && e.dateDebutValidite <= today &&
+    (e.dateFinValidite === null || e.dateFinValidite >= today)
+);
+```
+
+**Fichiers modifiés** :
+- `src/app/[locale]/.../prestations/[prestationId]/PrestationDetailsClient.tsx`
+- `src/app/[locale]/.../prestations/[prestationId]/RegleRecurrenceFormDialog.tsx`
+- `src/server/actions/clientServiceReglesRecurrenceActions.ts`
 
 ---
 

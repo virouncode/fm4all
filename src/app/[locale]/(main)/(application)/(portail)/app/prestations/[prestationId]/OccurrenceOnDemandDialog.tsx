@@ -105,11 +105,11 @@ export function OccurrenceOnDemandDialog({
               <Alert className="border-amber-200 bg-amber-50">
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
                 <AlertTitle className="text-amber-800">
-                  Passage exceptionnel
+                  Intervention ponctuelle
                 </AlertTitle>
                 <AlertDescription className="text-amber-700">
-                  Cette prestation utilise un planning automatique. Ce passage
-                  s&apos;ajoutera en dehors du planning habituel.
+                  Cette prestation a un planning automatique. Cette intervention
+                  s&apos;ajoutera ponctuellement, hors planning habituel.
                 </AlertDescription>
               </Alert>
             )}

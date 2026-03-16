@@ -13,9 +13,13 @@ import { ChevronDown } from "lucide-react";
 
 type OptionType = { id: string; label: string };
 
+type FilterGroupType = { groupLabel: string; options: OptionType[] };
+
 type FilterMultiSelectProps = {
   label: string;
-  options: OptionType[];
+  options?: OptionType[];
+  /** Affiche les options groupées avec un séparateur par groupe (ex: par client) */
+  groupedOptions?: FilterGroupType[];
   selectedIds: string[];
   onChange: (ids: string[]) => void;
 };
@@ -24,11 +28,17 @@ type FilterMultiSelectProps = {
 
 export function FilterMultiSelect({
   label,
-  options,
+  options = [],
+  groupedOptions,
   selectedIds,
   onChange,
 }: FilterMultiSelectProps) {
   const count = selectedIds.length;
+  const hasGroups = groupedOptions && groupedOptions.length > 0;
+  const allOptions = hasGroups
+    ? groupedOptions.flatMap((g) => g.options)
+    : options;
+  const isEmpty = allOptions.length === 0;
 
   const toggle = (id: string) => {
     if (selectedIds.includes(id)) {
@@ -56,11 +66,34 @@ export function FilterMultiSelect({
           <ChevronDown className="h-3.5 w-3.5 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-56 p-2" align="start">
-        {options.length === 0 ? (
+      <PopoverContent className="w-64 p-2" align="start">
+        {isEmpty ? (
           <p className="px-2 py-1.5 text-xs text-muted-foreground">
             Aucune option
           </p>
+        ) : hasGroups ? (
+          <div className="flex max-h-72 flex-col overflow-y-auto">
+            {groupedOptions.map((group, gi) => (
+              <div key={group.groupLabel}>
+                {gi > 0 && <div className="bg-border my-1 h-px" />}
+                <div className="bg-popover sticky top-0 px-2 py-1 text-xs font-semibold text-muted-foreground">
+                  {group.groupLabel}
+                </div>
+                {group.options.map((opt) => (
+                  <label
+                    key={opt.id}
+                    className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent"
+                  >
+                    <Checkbox
+                      checked={selectedIds.includes(opt.id)}
+                      onCheckedChange={() => toggle(opt.id)}
+                    />
+                    <span className="truncate">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="flex max-h-60 flex-col gap-1 overflow-y-auto">
             {options.map((opt) => (

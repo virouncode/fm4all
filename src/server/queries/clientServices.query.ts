@@ -2,7 +2,14 @@ import "server-only";
 
 import { db } from "@/db";
 import { entreprises, serviceEntreprises } from "@/db/schema/entreprises";
-import { clientServiceExecutions, clientServices, services } from "@/db/schema/services";
+import {
+  clientServiceExecutions,
+  clientServiceOccurrences,
+  clientServiceQuotasPlanification,
+  clientServiceReglesRecurrence,
+  clientServices,
+  services,
+} from "@/db/schema/services";
 import { sites } from "@/db/schema/sites";
 import { userClientAdhesions } from "@/db/schema/users";
 import {
@@ -14,7 +21,12 @@ import {
   type SelectClientServiceType,
   selectClientServiceSchema,
 } from "@/zod-schemas/clientServices.schema";
-import { asc, desc, and, eq, inArray, isNotNull } from "drizzle-orm";
+import {
+  selectRegleRecurrenceSchema,
+  type SelectRegleRecurrenceType,
+} from "@/zod-schemas/clientServiceReglesRecurrence.schema";
+import { computeQuotaPeriode } from "@/server/utils/clientServiceOccurrences.utils";
+import { asc, desc, and, count, eq, gte, inArray, isNotNull, lte, ne } from "drizzle-orm";
 
 /**
  * Vérifie si une entreprise prestataire a au moins une exécution active sur une prestation.
@@ -371,4 +383,104 @@ export async function prestationBelongsToEntreprise({
     .limit(1);
 
   return !!row;
+}
+
+// ---------------------------------------------------------------------------
+// QUOTA INFO (pour l'affichage et l'enforcement)
+// ---------------------------------------------------------------------------
+
+export type QuotaInfoType = {
+  nbOccurrencesParPeriode: number;
+  periodDebut: Date;
+  periodFin: Date;
+  usedInPeriod: number;
+};
+
+/**
+ * Retourne les infos de quota pour une prestation en mode quota_manuel.
+ * Calcule la période courante et le nombre d'occurrences non-annulées dans cette période.
+ *
+ * @returns null si aucune config quota n'est définie pour cette prestation.
+ */
+export async function getQuotaInfoForPrestation(
+  prestationId: string,
+  today: Date = new Date(),
+): Promise<QuotaInfoType | null> {
+  const [quota] = await db
+    .select()
+    .from(clientServiceQuotasPlanification)
+    .where(eq(clientServiceQuotasPlanification.clientServiceId, prestationId))
+    .limit(1);
+
+  if (!quota) return null;
+
+  const { debut, fin } = computeQuotaPeriode(
+    quota.dateAncragePeriode,
+    quota.periodeQuota,
+    quota.modeAncragePeriode,
+    today,
+  );
+
+  const [usageRow] = await db
+    .select({ total: count() })
+    .from(clientServiceOccurrences)
+    .where(
+      and(
+        eq(clientServiceOccurrences.clientServiceId, prestationId),
+        ne(clientServiceOccurrences.statut, "annulee"),
+        gte(clientServiceOccurrences.dateDebutPrevue, debut),
+        lte(clientServiceOccurrences.dateDebutPrevue, fin),
+      ),
+    );
+
+  return {
+    nbOccurrencesParPeriode: quota.nbOccurrencesParPeriode,
+    periodDebut: debut,
+    periodFin: fin,
+    usedInPeriod: usageRow?.total ?? 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// PLANIFICATION — données initiales (évite le fetch client-side au montage)
+// ---------------------------------------------------------------------------
+
+export async function getReglesRecurrenceByPrestationId(
+  prestationId: string,
+): Promise<SelectRegleRecurrenceType[]> {
+  const rows = await db
+    .select()
+    .from(clientServiceReglesRecurrence)
+    .where(eq(clientServiceReglesRecurrence.clientServiceId, prestationId))
+    .orderBy(
+      asc(clientServiceReglesRecurrence.ordre),
+      asc(clientServiceReglesRecurrence.createdAt),
+    );
+  return rows.map((r) => selectRegleRecurrenceSchema.parse(r));
+}
+
+export type QuotaConfigType = {
+  nbOccurrencesParPeriode: number;
+  periodeQuota: "trimestre" | "semestre" | "annee";
+  modeAncragePeriode: "contrat" | "civil";
+  notes: string | null;
+};
+
+export async function getQuotaConfigByPrestationId(
+  prestationId: string,
+): Promise<QuotaConfigType | null> {
+  const [row] = await db
+    .select({
+      nbOccurrencesParPeriode:
+        clientServiceQuotasPlanification.nbOccurrencesParPeriode,
+      periodeQuota: clientServiceQuotasPlanification.periodeQuota,
+      modeAncragePeriode: clientServiceQuotasPlanification.modeAncragePeriode,
+      notes: clientServiceQuotasPlanification.notes,
+    })
+    .from(clientServiceQuotasPlanification)
+    .where(
+      eq(clientServiceQuotasPlanification.clientServiceId, prestationId),
+    )
+    .limit(1);
+  return row ?? null;
 }

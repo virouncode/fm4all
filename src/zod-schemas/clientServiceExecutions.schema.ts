@@ -126,6 +126,8 @@ export const insertExecutionFormSchema = z
     prix: z
       .array(insertExecutionPrixFormSchema)
       .min(1, "Au moins une ligne de tarif est requise"),
+    /** Checklist par défaut pour toutes les interventions de cette exécution */
+    tacheListeTemplateId: z.uuid().nullable().optional(),
   })
   .superRefine((data, ctx) => {
     // Règle : max 1 abonnement par exécution (sinon les périodes se chevauchent)

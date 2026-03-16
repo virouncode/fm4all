@@ -665,13 +665,13 @@ export function OccurrenceDetailClient({
               <>
                 <span className="font-semibold">Suivi prestataire</span>
                 {" — "}
-                Le prestataire dispose d&apos;agents connectés sur la plateforme. Ils gèrent la progression de cette intervention de leur côté.
+                Des agents du prestataire suivent cette intervention depuis la plateforme.
               </>
             ) : (
               <>
                 <span className="font-semibold">Suivi interne</span>
                 {" — "}
-                Le prestataire n&apos;a pas d&apos;agents attribués à ce site sur la plateforme. La progression est suivie en interne.
+                Le prestataire n&apos;est pas sur la plateforme pour ce site. L&apos;avancement est géré en interne.
               </>
             )}
           </div>

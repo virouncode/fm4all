@@ -205,3 +205,27 @@ export const insertOccurrenceOnDemandFormSchema = z.object({
 export type InsertOccurrenceOnDemandFormType = z.infer<
   typeof insertOccurrenceOnDemandFormSchema
 >;
+
+// ==================== DRAG OCCURRENCE (FC) ====================
+
+export const dragOccurrenceSchema = z.object({
+  occurrenceId: z.uuid("ID de l'occurrence invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  /** ISO string from FullCalendar (with timezone offset) */
+  newStart: z.string().min(1, "Nouvelle heure de début requise"),
+  /** ISO string from FullCalendar — optional if no end time */
+  newEnd: z.string().optional(),
+  scope: z.enum(["occurrence", "suivantes"]),
+});
+export type DragOccurrenceType = z.infer<typeof dragOccurrenceSchema>;
+
+// ==================== RESIZE OCCURRENCE (FC) ====================
+
+export const resizeOccurrenceSchema = z.object({
+  occurrenceId: z.uuid("ID de l'occurrence invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  /** ISO string from FullCalendar (with timezone offset) */
+  newEnd: z.string().min(1, "Nouvelle heure de fin requise"),
+  scope: z.enum(["occurrence", "suivantes"]),
+});
+export type ResizeOccurrenceType = z.infer<typeof resizeOccurrenceSchema>;

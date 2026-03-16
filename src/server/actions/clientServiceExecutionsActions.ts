@@ -563,6 +563,18 @@ export const insertExecutionWithPrixAction = actionClient
       throw errors.notFound("Prestation");
     }
 
+    // Règle métier : l'exécution doit être contenue dans l'enveloppe contractuelle de la prestation
+    if (prestation.dateDebut && normalized.dateDebutValidite < prestation.dateDebut) {
+      throw errors.conflict(
+        `La date de début de l'exécution ne peut pas être antérieure au début de la prestation (${prestation.dateDebut.toLocaleDateString("fr-FR")}).`,
+      );
+    }
+    if (prestation.dateFin && normalized.dateFinValidite && normalized.dateFinValidite > prestation.dateFin) {
+      throw errors.conflict(
+        `La date de fin de l'exécution ne peut pas dépasser la fin de la prestation (${prestation.dateFin.toLocaleDateString("fr-FR")}).`,
+      );
+    }
+
     // Prestataire : vérifier que serviceEntrepriseId appartient à leur entreprise
     if (!isPlateforme) {
       const activePosture = await getActivePosture();
@@ -614,6 +626,7 @@ export const insertExecutionWithPrixAction = actionClient
           dateFinValidite: normalized.dateFinValidite,
           priorite: normalized.priorite,
           modePilotage: parsedInput.modePilotage,
+          tacheListeTemplateId: parsedInput.tacheListeTemplateId ?? null,
           actif: true,
           createdById: currentUser.id,
           updatedById: currentUser.id,
@@ -1139,8 +1152,21 @@ export const updateExecutionAction = actionClient
       existingExecution.serviceEntrepriseId,
     );
 
-    // Guard dateDebutValidite : vérifier qu'aucune occurrence non-annulée n'existe avant la nouvelle date
+    // Règle métier : l'exécution doit être contenue dans l'enveloppe contractuelle de la prestation
     const newDateDebut = new Date(parsedInput.dateDebutValidite);
+    const newDateFin = parsedInput.dateFinValidite ? new Date(parsedInput.dateFinValidite) : null;
+    if (prestation.dateDebut && newDateDebut < prestation.dateDebut) {
+      throw errors.conflict(
+        `La date de début de l'exécution ne peut pas être antérieure au début de la prestation (${prestation.dateDebut.toLocaleDateString("fr-FR")}).`,
+      );
+    }
+    if (prestation.dateFin && newDateFin && newDateFin > prestation.dateFin) {
+      throw errors.conflict(
+        `La date de fin de l'exécution ne peut pas dépasser la fin de la prestation (${prestation.dateFin.toLocaleDateString("fr-FR")}).`,
+      );
+    }
+
+    // Guard dateDebutValidite : vérifier qu'aucune occurrence non-annulée n'existe avant la nouvelle date
     const [conflict] = await db
       .select({ count: count() })
       .from(clientServiceOccurrences)

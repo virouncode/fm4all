@@ -10,8 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "@/i18n/navigation";
-import { getPrestationsAction } from "@/server/actions/clientServicesActions";
 import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
+import { getPrestationsAction } from "@/server/actions/clientServicesActions";
 import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
@@ -56,7 +56,7 @@ type FiltersType = {
 
 type PrestationsClientProps = {
   searchParams: SearchParamsType;
-}
+};
 
 export default function PrestationsClient({
   searchParams,
@@ -66,8 +66,10 @@ export default function PrestationsClient({
   const router = useRouter();
 
   // Vue persistée dans localStorage
-  const prestationView = useUiStore((state) => state.prestationView);
-  const setPrestationView = useUiStore((state) => state.setPrestationView);
+  const PrestationViewType = useUiStore((state) => state.PrestationViewType);
+  const setPrestationViewType = useUiStore(
+    (state) => state.setPrestationViewType,
+  );
 
   // Données
   const [prestations, setPrestations] = useState<PrestationListItem[]>([]);
@@ -113,7 +115,9 @@ export default function PrestationsClient({
     } else if (posture === "prestataire" && entreprise?.id) {
       getMesClientsAction({ entrepriseId: entreprise.id }).then((result) => {
         if (result?.data?.clients) {
-          setClients(result.data.clients.map((c) => ({ id: c.id, nom: c.nom })));
+          setClients(
+            result.data.clients.map((c) => ({ id: c.id, nom: c.nom })),
+          );
         }
       });
     }
@@ -121,19 +125,33 @@ export default function PrestationsClient({
 
   // Chargement des prestations
   const loadPrestations = useCallback(async () => {
-    const validOrderByValues = ["createdAt", "updatedAt", "serviceNom", "siteNom", "statut", "famillePlanification", "dateDebut"];
-    const orderByParam = (searchParams.orderBy && validOrderByValues.includes(searchParams.orderBy)
-      ? searchParams.orderBy
-      : undefined) as PrestationsOrderByType | undefined;
-    const orderDirParam = (searchParams.orderDir === "asc" || searchParams.orderDir === "desc"
-      ? searchParams.orderDir as "asc" | "desc"
-      : undefined);
+    const validOrderByValues = [
+      "createdAt",
+      "updatedAt",
+      "serviceNom",
+      "siteNom",
+      "statut",
+      "famillePlanification",
+      "dateDebut",
+    ];
+    const orderByParam = (
+      searchParams.orderBy && validOrderByValues.includes(searchParams.orderBy)
+        ? searchParams.orderBy
+        : undefined
+    ) as PrestationsOrderByType | undefined;
+    const orderDirParam =
+      searchParams.orderDir === "asc" || searchParams.orderDir === "desc"
+        ? (searchParams.orderDir as "asc" | "desc")
+        : undefined;
     const commonFilters = {
       statut: (searchParams.statut as ClientServiceStatutType) || undefined,
       serviceId: searchParams.serviceId || undefined,
       siteId: searchParams.siteId || undefined,
-      modeCommercial: (searchParams.modeCommercial as ModeCommercialType) || undefined,
-      famillePlanification: (searchParams.famillePlanification as FamillePlanificationType) || undefined,
+      modeCommercial:
+        (searchParams.modeCommercial as ModeCommercialType) || undefined,
+      famillePlanification:
+        (searchParams.famillePlanification as FamillePlanificationType) ||
+        undefined,
       orderBy: orderByParam,
       orderDir: orderDirParam,
     };
@@ -182,9 +200,10 @@ export default function PrestationsClient({
       const result = await getPrestationsAction({
         // plateforme : clientEntrepriseId ou undefined (cross-clients)
         // client : son propre entreprise
-        entrepriseId: posture === "plateforme"
-          ? (searchParams.clientEntrepriseId || undefined)
-          : (entreprise?.id || undefined),
+        entrepriseId:
+          posture === "plateforme"
+            ? searchParams.clientEntrepriseId || undefined
+            : entreprise?.id || undefined,
         ...commonFilters,
       });
 
@@ -217,7 +236,13 @@ export default function PrestationsClient({
       modeCommercial: searchParams.modeCommercial,
       famillePlanification: searchParams.famillePlanification,
     });
-  }, [searchParams.statut, searchParams.serviceId, searchParams.siteId, searchParams.modeCommercial, searchParams.famillePlanification]);
+  }, [
+    searchParams.statut,
+    searchParams.serviceId,
+    searchParams.siteId,
+    searchParams.modeCommercial,
+    searchParams.famillePlanification,
+  ]);
 
   const handlePrestationClick = (p: PrestationListItem) => {
     router.push({
@@ -240,8 +265,10 @@ export default function PrestationsClient({
     if (searchParams.orderDir) params.orderDir = searchParams.orderDir;
     if (searchParams.statut) params.statut = searchParams.statut;
     if (searchParams.serviceId) params.serviceId = searchParams.serviceId;
-    if (searchParams.modeCommercial) params.modeCommercial = searchParams.modeCommercial;
-    if (searchParams.famillePlanification) params.famillePlanification = searchParams.famillePlanification;
+    if (searchParams.modeCommercial)
+      params.modeCommercial = searchParams.modeCommercial;
+    if (searchParams.famillePlanification)
+      params.famillePlanification = searchParams.famillePlanification;
     // Pas de siteId : reset au changement de client (les sites sont propres à chaque client)
     if (clientId !== "all") params.clientEntrepriseId = clientId;
     replaceWithParams(params);
@@ -256,8 +283,10 @@ export default function PrestationsClient({
     if (newFilters.statut) params.statut = newFilters.statut;
     if (newFilters.serviceId) params.serviceId = newFilters.serviceId;
     if (newFilters.siteId) params.siteId = newFilters.siteId;
-    if (newFilters.modeCommercial) params.modeCommercial = newFilters.modeCommercial;
-    if (newFilters.famillePlanification) params.famillePlanification = newFilters.famillePlanification;
+    if (newFilters.modeCommercial)
+      params.modeCommercial = newFilters.modeCommercial;
+    if (newFilters.famillePlanification)
+      params.famillePlanification = newFilters.famillePlanification;
     // Préserver le filtre client (géré par le sélecteur dédié, pas le dialog)
     if (searchParams.clientEntrepriseId)
       params.clientEntrepriseId = searchParams.clientEntrepriseId;
@@ -275,7 +304,7 @@ export default function PrestationsClient({
       {/* ==================== SÉLECTEUR CLIENT (plateforme et prestataire) ==================== */}
       {(posture === "plateforme" || posture === "prestataire") && (
         <div className="flex flex-shrink-0 items-center gap-2">
-          <span className="text-muted-foreground whitespace-nowrap text-sm">
+          <span className="text-muted-foreground text-sm whitespace-nowrap">
             Client :
           </span>
           <Select
@@ -306,22 +335,22 @@ export default function PrestationsClient({
           className="flex items-center"
         >
           <Button
-            variant={prestationView === "list" ? "default" : "outline"}
+            variant={PrestationViewType === "list" ? "default" : "outline"}
             size="sm"
-            onClick={() => setPrestationView("list")}
+            onClick={() => setPrestationViewType("list")}
             className="rounded-r-none border-r-0"
             aria-label="Vue liste"
-            aria-pressed={prestationView === "list"}
+            aria-pressed={PrestationViewType === "list"}
           >
             <List aria-hidden="true" />
           </Button>
           <Button
-            variant={prestationView === "grid" ? "default" : "outline"}
+            variant={PrestationViewType === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => setPrestationView("grid")}
+            onClick={() => setPrestationViewType("grid")}
             className="rounded-l-none"
             aria-label="Vue grille"
-            aria-pressed={prestationView === "grid"}
+            aria-pressed={PrestationViewType === "grid"}
           >
             <Grid3x3 aria-hidden="true" />
           </Button>
@@ -359,7 +388,7 @@ export default function PrestationsClient({
 
       {/* ==================== CONTENU ==================== */}
       <div className="flex-1 overflow-hidden">
-        {prestationView === "list" ? (
+        {PrestationViewType === "list" ? (
           <InfiniteDataTable<PrestationListItem>
             columns={columns}
             items={prestations}
@@ -403,7 +432,9 @@ export default function PrestationsClient({
         currentFilters={filters}
         onApply={handleFiltersApply}
         clientEntrepriseId={searchParams.clientEntrepriseId}
-        prestataireEntrepriseId={posture === "prestataire" ? entreprise?.id : undefined}
+        prestataireEntrepriseId={
+          posture === "prestataire" ? entreprise?.id : undefined
+        }
       />
 
       {/* Tri */}
@@ -423,7 +454,7 @@ type PrestationsGridProps = {
   isError: boolean;
   showEntreprise: boolean;
   onPrestationClick: (p: PrestationListItem) => void;
-}
+};
 
 function PrestationsGrid({
   prestations,
@@ -436,7 +467,7 @@ function PrestationsGrid({
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-52 animate-pulse rounded-lg bg-muted" />
+          <div key={i} className="bg-muted h-52 animate-pulse rounded-lg" />
         ))}
       </div>
     );
@@ -444,7 +475,7 @@ function PrestationsGrid({
 
   if (isError) {
     return (
-      <div className="flex items-center justify-center py-16 text-muted-foreground">
+      <div className="text-muted-foreground flex items-center justify-center py-16">
         Une erreur est survenue lors du chargement des prestations.
       </div>
     );
@@ -452,7 +483,7 @@ function PrestationsGrid({
 
   if (prestations.length === 0) {
     return (
-      <div className="flex items-center justify-center py-16 text-muted-foreground">
+      <div className="text-muted-foreground flex items-center justify-center py-16">
         Aucune prestation trouvée.
       </div>
     );

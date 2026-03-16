@@ -346,6 +346,11 @@ export function PrestationFormDialog({
     control: form.control,
   });
 
+  const watchedFamille = useWatch({
+    control: form.control,
+    name: "famillePlanification",
+  });
+
   // ── Form step 2 (uniquement posture prestataire) ──
   const execForm = useForm<ExecutionStep2ValuesType>({
     resolver: zodResolver(executionStep2Schema),
@@ -1231,12 +1236,26 @@ export function PrestationFormDialog({
                     label="Mode de planification"
                     requiredMark
                     selectClassName="w-full"
-                    description="Déterminée automatiquement selon la fréquence. La configuration détaillée (RRULE / quota) se fait ensuite."
                   >
-                    <SelectItem value="recurrence_auto">Récurrence automatique (quotidien, hebdo, mensuel)</SelectItem>
-                    <SelectItem value="quota_manuel">Quota à planifier (trimestriel, semestriel, annuel)</SelectItem>
-                    <SelectItem value="ponctuel">Ponctuel (one-shot)</SelectItem>
+                    <SelectItem value="recurrence_auto">Récurrence automatique (quotidien, hebdo, mensuel…)</SelectItem>
+                    <SelectItem value="quota_manuel">Quota (trimestriel, semestriel, annuel…)</SelectItem>
+                    <SelectItem value="ponctuel">Ponctuel (intervention unique)</SelectItem>
                   </RhfControlledSelect>
+                  {watchedFamille === "recurrence_auto" && (
+                    <p className="text-muted-foreground text-xs">
+                      Les interventions se répètent automatiquement selon un planning que vous définirez dans la fiche prestation (ex : chaque lundi, le 1er du mois…).
+                    </p>
+                  )}
+                  {watchedFamille === "quota_manuel" && (
+                    <p className="text-muted-foreground text-xs">
+                      Un nombre d&apos;interventions fixe est alloué sur une période (ex : 4 fois par an). Vous les planifiez manuellement dans l&apos;enveloppe disponible.
+                    </p>
+                  )}
+                  {watchedFamille === "ponctuel" && (
+                    <p className="text-muted-foreground text-xs">
+                      Aucune planification automatique. Chaque intervention est créée manuellement, à la demande.
+                    </p>
+                  )}
                 </div>
 
                 <Separator />

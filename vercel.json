@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/crons/materialize-occurrences",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/crons/snapshot-taches",
+      "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/crons/reconcile",
+      "schedule": "30 3 * * *"
+    }
+  ]
+}

@@ -201,7 +201,9 @@ export function DevisDetailClient({
   const [devis, setDevis] = useState(initialDevis);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
-  const [pdfStorageKey, setPdfStorageKey] = useState<string | null>(initialPdfStorageKey ?? null);
+  const [pdfStorageKey, setPdfStorageKey] = useState<string | null>(
+    initialPdfStorageKey ?? null,
+  );
   const [emetteurLogoUrl, setEmetteurLogoUrl] = useState<string | null>(null);
   const [openLines, setOpenLines] = useState<Set<number>>(new Set());
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -334,7 +336,9 @@ export function DevisDetailClient({
 
       // Convertir le logo en data URL pour éviter les problèmes CORS avec html2canvas
       if (emetteurLogoUrl) {
-        const imgEl = pdfRef.current.querySelector("img") as HTMLImageElement | null;
+        const imgEl = pdfRef.current.querySelector(
+          "img",
+        ) as HTMLImageElement | null;
         if (imgEl) {
           try {
             const resp = await fetch(emetteurLogoUrl);
@@ -370,7 +374,9 @@ export function DevisDetailClient({
       const page = pdfDoc.addPage([pageWidth, pageHeight]);
       const pngImage = await pdfDoc.embedPng(imgData);
       // Hauteur du contenu en pt (proportionnelle à la largeur A4)
-      const contentHeightPt = Math.round((canvas.height / canvas.width) * pageWidth);
+      const contentHeightPt = Math.round(
+        (canvas.height / canvas.width) * pageWidth,
+      );
       // pdf-lib : origine en bas à gauche → dessiner depuis le haut de la page
       const drawY = pageHeight - Math.min(contentHeightPt, pageHeight);
       page.drawImage(pngImage, {
@@ -382,7 +388,9 @@ export function DevisDetailClient({
 
       const pdfBytes = await pdfDoc.save();
       const filename = `devis-${devisNumero}.pdf`;
-      const file = new File([pdfBytes.buffer as ArrayBuffer], filename, { type: "application/pdf" });
+      const file = new File([pdfBytes.buffer as ArrayBuffer], filename, {
+        type: "application/pdf",
+      });
 
       const { key: tempKey } = await uploadFileToS3({
         file,
@@ -549,7 +557,11 @@ export function DevisDetailClient({
           </div>
           <div className="flex items-center gap-2">
             {effectivePermissions.canEmettre && (
-              <Button size="sm" disabled={disabled || isPdfGenerating} onClick={handleEmettre}>
+              <Button
+                size="sm"
+                disabled={disabled || isPdfGenerating}
+                onClick={handleEmettre}
+              >
                 {isPdfGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -726,7 +738,7 @@ export function DevisDetailClient({
             </Form>
           ) : (
             // ===== MODE LECTURE SEULE =====
-            <ReadOnlyDevisView
+            <ReadOnlyDevisViewType
               devis={devis}
               permissions={effectivePermissions}
             />
@@ -743,51 +755,60 @@ export function DevisDetailClient({
               Ce devis est expiré et ne peut plus être signé.
             </p>
           </div>
-        ) : (effectivePermissions.canSigner || effectivePermissions.canRefuser) && (
-          <div className="flex shrink-0 justify-center gap-3 px-8 pt-4 pb-2">
-            {effectivePermissions.canSigner && (
-              <Button disabled={disabled} onClick={handleSigner}>
-                <CheckCircle className="h-4 w-4" />
-                Signer le devis
-              </Button>
-            )}
-            {effectivePermissions.canRefuser && (
-              <Button variant="destructive" disabled={disabled} onClick={handleRefuser}>
-                <XCircle className="h-4 w-4" />
-                Refuser le devis
-              </Button>
-            )}
-          </div>
+        ) : (
+          (effectivePermissions.canSigner ||
+            effectivePermissions.canRefuser) && (
+            <div className="flex shrink-0 justify-center gap-3 px-8 pt-4 pb-2">
+              {effectivePermissions.canSigner && (
+                <Button disabled={disabled} onClick={handleSigner}>
+                  <CheckCircle className="h-4 w-4" />
+                  Signer le devis
+                </Button>
+              )}
+              {effectivePermissions.canRefuser && (
+                <Button
+                  variant="destructive"
+                  disabled={disabled}
+                  onClick={handleRefuser}
+                >
+                  <XCircle className="h-4 w-4" />
+                  Refuser le devis
+                </Button>
+              )}
+            </div>
+          )
         )}
-        <div className={`flex flex-1 items-start justify-center ${effectivePermissions.canSigner || effectivePermissions.canRefuser ? "pt-3 pb-8 px-8" : "p-8"}`}>
-        {/* Wrapper aux dimensions scalées — évite que transform réserve l'espace A4 complet */}
         <div
-          className="shrink-0 rounded shadow-md ring-1 ring-gray-200 dark:ring-gray-700"
-          style={{
-            width: "calc(210mm * 0.75)",
-            height: "calc(297mm * 0.75)",
-            overflow: "hidden",
-          }}
+          className={`flex flex-1 items-start justify-center ${effectivePermissions.canSigner || effectivePermissions.canRefuser ? "px-8 pt-3 pb-8" : "p-8"}`}
         >
+          {/* Wrapper aux dimensions scalées — évite que transform réserve l'espace A4 complet */}
           <div
-            style={{ transform: "scale(0.75)", transformOrigin: "top left" }}
+            className="shrink-0 rounded shadow-md ring-1 ring-gray-200 dark:ring-gray-700"
+            style={{
+              width: "calc(210mm * 0.75)",
+              height: "calc(297mm * 0.75)",
+              overflow: "hidden",
+            }}
           >
-            <DevisPreviewCard devis={preview} />
+            <div
+              style={{ transform: "scale(0.75)", transformOrigin: "top left" }}
+            >
+              <DevisPreviewCard devis={preview} />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ── Preview pleine taille hors-écran pour génération PDF ── */}
-      <div
-        aria-hidden="true"
-        style={{ position: "absolute", left: "-9999px", top: 0, zIndex: -1 }}
-      >
-        <div ref={pdfRef}>
-          <DevisPreviewCard devis={preview} pdfMode />
+        {/* ── Preview pleine taille hors-écran pour génération PDF ── */}
+        <div
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px", top: 0, zIndex: -1 }}
+        >
+          <div ref={pdfRef}>
+            <DevisPreviewCard devis={preview} pdfMode />
+          </div>
         </div>
       </div>
     </div>
-  </div>
   );
 }
 
@@ -1103,15 +1124,15 @@ function LigneAccordion({
 
 // ============================= READ ONLY VIEW ==============================//
 
-type ReadOnlyDevisViewProps = {
+type ReadOnlyDevisViewTypeProps = {
   devis: DevisAvecLignes;
   permissions: PermissionsType;
 };
 
-function ReadOnlyDevisView({
+function ReadOnlyDevisViewType({
   devis,
   permissions,
-}: ReadOnlyDevisViewProps) {
+}: ReadOnlyDevisViewTypeProps) {
   const fmt = (c: number) =>
     (c / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 
@@ -1127,14 +1148,18 @@ function ReadOnlyDevisView({
   const remiseGlobale = devis.remiseGlobaleHt ?? 0;
   const totalHtNet = totalHtBrut - totalRemiseLignes - remiseGlobale;
   const totalTva = devis.lignes.reduce((sum, l) => {
-    const htNet = l.prixUnitaireHt * Number(l.quantite) - (l.remiseHtMontant ?? 0);
+    const htNet =
+      l.prixUnitaireHt * Number(l.quantite) - (l.remiseHtMontant ?? 0);
     return sum + Math.round((htNet * l.tauxTva) / 10000);
   }, 0);
   const totalTtc = totalHtNet + totalTva;
 
   const periodeLabel = (l: DevisAvecLignes["lignes"][number]) => {
     if (l.typePrix !== "abonnement" || !l.periodeFacturation) return "";
-    return { semaine: "/sem.", mois: "/mois", annee: "/an" }[l.periodeFacturation] ?? "";
+    return (
+      { semaine: "/sem.", mois: "/mois", annee: "/an" }[l.periodeFacturation] ??
+      ""
+    );
   };
 
   return (
@@ -1147,7 +1172,7 @@ function ReadOnlyDevisView({
         <div className="grid grid-cols-2 gap-3">
           {/* Émetteur */}
           <div className="rounded-lg border p-3 text-sm">
-            <p className="text-muted-foreground mb-1 text-xs font-medium uppercase tracking-wide">
+            <p className="text-muted-foreground mb-1 text-xs font-medium tracking-wide uppercase">
               Émetteur
             </p>
             <p className="font-semibold">{devis.emetteurEntrepriseNom}</p>
@@ -1157,10 +1182,14 @@ function ReadOnlyDevisView({
               </p>
             )}
             {devis.emetteurEmailContact && (
-              <p className="text-muted-foreground text-xs">{devis.emetteurEmailContact}</p>
+              <p className="text-muted-foreground text-xs">
+                {devis.emetteurEmailContact}
+              </p>
             )}
             {devis.emetteurPhoneContact && (
-              <p className="text-muted-foreground text-xs">{devis.emetteurPhoneContact}</p>
+              <p className="text-muted-foreground text-xs">
+                {devis.emetteurPhoneContact}
+              </p>
             )}
             <p className="text-muted-foreground mt-1 text-xs">
               SIRET&nbsp;: {devis.emetteurEntrepriseSiret}
@@ -1173,7 +1202,7 @@ function ReadOnlyDevisView({
           </div>
           {/* Client */}
           <div className="rounded-lg border p-3 text-sm">
-            <p className="text-muted-foreground mb-1 text-xs font-medium uppercase tracking-wide">
+            <p className="text-muted-foreground mb-1 text-xs font-medium tracking-wide uppercase">
               Client
             </p>
             <p className="font-semibold">{devis.proprietaireEntrepriseNom}</p>
@@ -1185,7 +1214,7 @@ function ReadOnlyDevisView({
                 TVA&nbsp;: {devis.proprietaireEntrepriseNumeroTva}
               </p>
             )}
-            <p className="text-muted-foreground mt-2 text-xs font-medium uppercase tracking-wide">
+            <p className="text-muted-foreground mt-2 text-xs font-medium tracking-wide uppercase">
               Site
             </p>
             <p className="text-xs">{devis.siteNom}</p>
@@ -1205,7 +1234,9 @@ function ReadOnlyDevisView({
           {devis.dateEmission && (
             <>
               <span className="text-muted-foreground">Émission</span>
-              <span>{new Date(devis.dateEmission).toLocaleDateString("fr-FR")}</span>
+              <span>
+                {new Date(devis.dateEmission).toLocaleDateString("fr-FR")}
+              </span>
             </>
           )}
           {devis.validTo && (
@@ -1224,11 +1255,15 @@ function ReadOnlyDevisView({
         </h2>
         <div className="rounded-lg border">
           {devis.lignes.length === 0 ? (
-            <p className="text-muted-foreground p-3 text-sm italic">Aucune ligne</p>
+            <p className="text-muted-foreground p-3 text-sm italic">
+              Aucune ligne
+            </p>
           ) : (
             <div className="divide-y">
               {devis.lignes.map((l) => {
-                const ligneHt = l.prixUnitaireHt * Number(l.quantite) - (l.remiseHtMontant ?? 0);
+                const ligneHt =
+                  l.prixUnitaireHt * Number(l.quantite) -
+                  (l.remiseHtMontant ?? 0);
                 return (
                   <div key={l.id} className="px-3 py-2.5 text-sm">
                     <div className="flex items-start justify-between gap-2">
@@ -1238,14 +1273,19 @@ function ReadOnlyDevisView({
                       </span>
                     </div>
                     {l.description && (
-                      <p className="text-muted-foreground mt-0.5 text-xs">{l.description}</p>
+                      <p className="text-muted-foreground mt-0.5 text-xs">
+                        {l.description}
+                      </p>
                     )}
                     <p className="text-muted-foreground mt-0.5 text-xs">
                       {Number(l.quantite)} {l.unite} × {fmt(l.prixUnitaireHt)}
                       {periodeLabel(l) && <span> {periodeLabel(l)}</span>}
                       {" — "}TVA {l.tauxTva / 100}&nbsp;%
                       {l.remiseHtMontant ? (
-                        <span className="text-orange-500"> — remise {fmt(l.remiseHtMontant)}</span>
+                        <span className="text-orange-500">
+                          {" "}
+                          — remise {fmt(l.remiseHtMontant)}
+                        </span>
                       ) : null}
                     </p>
                   </div>
@@ -1267,13 +1307,17 @@ function ReadOnlyDevisView({
             {totalRemiseLignes > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Remises lignes</span>
-                <span className="font-mono text-orange-500">− {fmt(totalRemiseLignes)}</span>
+                <span className="font-mono text-orange-500">
+                  − {fmt(totalRemiseLignes)}
+                </span>
               </div>
             )}
             {remiseGlobale > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Remise globale</span>
-                <span className="font-mono text-orange-500">− {fmt(remiseGlobale)}</span>
+                <span className="font-mono text-orange-500">
+                  − {fmt(remiseGlobale)}
+                </span>
               </div>
             )}
             <div className="flex justify-between border-t pt-1">
@@ -1298,7 +1342,9 @@ function ReadOnlyDevisView({
           <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
             Description
           </h2>
-          <p className="rounded-lg border p-3 text-sm whitespace-pre-wrap">{devis.description}</p>
+          <p className="rounded-lg border p-3 text-sm whitespace-pre-wrap">
+            {devis.description}
+          </p>
         </section>
       )}
 
@@ -1308,12 +1354,11 @@ function ReadOnlyDevisView({
           <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
             Note interne
           </h2>
-          <p className="rounded-lg border border-dashed p-3 text-sm italic whitespace-pre-wrap">
+          <p className="rounded-lg border border-dashed p-3 text-sm whitespace-pre-wrap italic">
             {devis.noteInterne}
           </p>
         </section>
       )}
-
     </div>
   );
 }

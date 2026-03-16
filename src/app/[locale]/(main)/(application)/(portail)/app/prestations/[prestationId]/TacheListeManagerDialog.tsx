@@ -61,6 +61,9 @@ export type TacheListeManagerContentProps = {
   /** Fourni en posture plateforme : permet de choisir entre système et client */
   clientEntrepriseId?: string;
   clientEntrepriseNom?: string;
+  /** Fourni en posture plateforme quand un prestataire est sélectionné */
+  prestataireEntrepriseId?: string;
+  prestataireEntrepriseNom?: string;
   /** Rôle des packs non-système dans ce contexte */
   nonSystemBadgeRole?: "client" | "prestataire";
   /** Masque le bouton "Nouvelle checklist" (ex: ChecklistsClient gère la création globalement) */
@@ -78,6 +81,8 @@ export function TacheListeManagerContent({
   proprietaireEntrepriseId,
   clientEntrepriseId,
   clientEntrepriseNom,
+  prestataireEntrepriseId,
+  prestataireEntrepriseNom,
   nonSystemBadgeRole,
   hideCreateButton = false,
   canManage = true,
@@ -93,14 +98,14 @@ export function TacheListeManagerContent({
 
   const isPlatformMode =
     proprietaireEntrepriseId === null && !!clientEntrepriseId;
-  const [newPackOwner, setNewPackOwner] = useState<"system" | "client">(
-    "system",
-  );
+  const [newPackOwner, setNewPackOwner] = useState<
+    "system" | "client" | "prestataire"
+  >("system");
 
   const loadPacks = useCallback(async () => {
     if (proprietaireEntrepriseId === null && clientEntrepriseId) {
-      // Mode plateforme : charger les packs système ET ceux du client
-      const [systemResult, clientResult] = await Promise.all([
+      // Mode plateforme : charger les packs système + client (+ prestataire si fourni)
+      const requests = [
         getTacheListesTemplatesAction({
           proprietaireEntrepriseId: null,
           serviceId,
@@ -109,14 +114,20 @@ export function TacheListeManagerContent({
           proprietaireEntrepriseId: clientEntrepriseId,
           serviceId,
         }),
-      ]);
-      if (systemResult?.serverError) {
+        ...(prestataireEntrepriseId
+          ? [
+              getTacheListesTemplatesAction({
+                proprietaireEntrepriseId: prestataireEntrepriseId,
+                serviceId,
+              }),
+            ]
+          : []),
+      ];
+      const results = await Promise.all(requests);
+      if (results[0]?.serverError) {
         toast.error("Impossible de charger les checklists.");
       } else {
-        setPacks([
-          ...(systemResult?.data?.packs ?? []),
-          ...(clientResult?.data?.packs ?? []),
-        ]);
+        setPacks(results.flatMap((r) => r?.data?.packs ?? []));
       }
     } else {
       const result = await getTacheListesTemplatesAction({
@@ -130,7 +141,12 @@ export function TacheListeManagerContent({
       }
     }
     setLoading(false);
-  }, [proprietaireEntrepriseId, serviceId, clientEntrepriseId]);
+  }, [
+    proprietaireEntrepriseId,
+    serviceId,
+    clientEntrepriseId,
+    prestataireEntrepriseId,
+  ]);
 
   useEffect(() => {
     // Spinner uniquement au changement de contexte (service/propriétaire)
@@ -149,7 +165,9 @@ export function TacheListeManagerContent({
     const resolvedProprietaireId: string | null = isPlatformMode
       ? newPackOwner === "system"
         ? null
-        : (clientEntrepriseId ?? null)
+        : newPackOwner === "prestataire"
+          ? (prestataireEntrepriseId ?? null)
+          : (clientEntrepriseId ?? null)
       : proprietaireEntrepriseId;
 
     setCreatingPack(true);
@@ -198,7 +216,7 @@ export function TacheListeManagerContent({
                   <RadioGroup
                     value={newPackOwner}
                     onValueChange={(v) =>
-                      setNewPackOwner(v as "system" | "client")
+                      setNewPackOwner(v as "system" | "client" | "prestataire")
                     }
                     className="space-y-1"
                   >
@@ -210,7 +228,7 @@ export function TacheListeManagerContent({
                       >
                         Système{" "}
                         <span className="text-muted-foreground text-xs">
-                          (disponible pour tous les clients)
+                          (disponible pour tous)
                         </span>
                       </Label>
                     </div>
@@ -228,6 +246,25 @@ export function TacheListeManagerContent({
                         )}
                       </Label>
                     </div>
+                    {prestataireEntrepriseId && (
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem
+                          value="prestataire"
+                          id="owner-prestataire"
+                        />
+                        <Label
+                          htmlFor="owner-prestataire"
+                          className="cursor-pointer text-sm font-normal"
+                        >
+                          Pour ce prestataire{" "}
+                          {prestataireEntrepriseNom && (
+                            <span className="text-muted-foreground text-xs">
+                              : {prestataireEntrepriseNom}
+                            </span>
+                          )}
+                        </Label>
+                      </div>
+                    )}
                   </RadioGroup>
                 </div>
               )}
@@ -293,9 +330,7 @@ export function TacheListeManagerContent({
               pack={pack}
               expanded={expandedPackId === pack.id}
               onToggleExpand={() =>
-                setExpandedPackId(
-                  expandedPackId === pack.id ? null : pack.id,
-                )
+                setExpandedPackId(expandedPackId === pack.id ? null : pack.id)
               }
               entrepriseId={pack.proprietaireEntrepriseId}
               clientEntrepriseId={clientEntrepriseId}
@@ -323,6 +358,9 @@ type TacheListeManagerDialogProps = {
   /** Fourni en posture plateforme : permet de choisir entre système et client */
   clientEntrepriseId?: string;
   clientEntrepriseNom?: string;
+  /** Fourni en posture plateforme quand un prestataire est sélectionné */
+  prestataireEntrepriseId?: string;
+  prestataireEntrepriseNom?: string;
   /** Si false, masque tous les boutons CRUD — défaut true */
   canManage?: boolean;
 };
@@ -335,6 +373,8 @@ export function TacheListeManagerDialog({
   proprietaireEntrepriseId,
   clientEntrepriseId,
   clientEntrepriseNom,
+  prestataireEntrepriseId,
+  prestataireEntrepriseNom,
   canManage = true,
 }: TacheListeManagerDialogProps) {
   return (
@@ -361,6 +401,8 @@ export function TacheListeManagerDialog({
               proprietaireEntrepriseId={proprietaireEntrepriseId}
               clientEntrepriseId={clientEntrepriseId}
               clientEntrepriseNom={clientEntrepriseNom}
+              prestataireEntrepriseId={prestataireEntrepriseId}
+              prestataireEntrepriseNom={prestataireEntrepriseNom}
               canManage={canManage}
               className="px-6 py-4"
             />
@@ -817,9 +859,7 @@ function DraggableItemRow({
                 onClick={handleSave}
                 disabled={isSaving || !editTitre.trim()}
               >
-                {isSaving ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : null}
+                {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
                 Enregistrer
               </Button>
               <Button

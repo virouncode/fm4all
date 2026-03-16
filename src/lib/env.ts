@@ -37,6 +37,7 @@ export const env = {
 
   // Optionnels serveur
   MAILGUN_BCC_EMAIL: optional("MAILGUN_BCC_EMAIL"),
+  CRON_SECRET: optional("CRON_SECRET"),
   S3_PRESIGN_READ_EXPIRES_SECONDS: Number(
     optionalWithDefault("S3_PRESIGN_READ_EXPIRES_SECONDS", "60"),
   ),

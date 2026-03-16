@@ -3,15 +3,21 @@
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import type { FactureAvecDetails } from "@/server/queries/factures.query";
 import { getFacturesAction } from "@/server/actions/facturesActions";
+import type { FactureAvecDetails } from "@/server/queries/factures.query";
 import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
-import type { FactureModeCommercialSnapshotType, FactureStatutType } from "@/zod-schemas/enums";
+import type {
+  FactureModeCommercialSnapshotType,
+  FactureStatutType,
+} from "@/zod-schemas/enums";
 import { ArrowDownUp, Filter, Grid3x3, List, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { createFacturesColumns, facturesIdLabelMap } from "./createFacturesColumns";
+import {
+  createFacturesColumns,
+  facturesIdLabelMap,
+} from "./createFacturesColumns";
 import { FacturesFiltersDialog } from "./FacturesFiltersDialog";
 import { FacturesGrid } from "./FacturesGrid";
 import { FacturesSortDialog } from "./FacturesSortDialog";
@@ -81,7 +87,12 @@ function toOrderDir(value: string | undefined): "asc" | "desc" {
 }
 
 function toStatut(value: string | undefined): FactureStatutType | undefined {
-  const valid: FactureStatutType[] = ["brouillon", "emise", "litige", "annulee"];
+  const valid: FactureStatutType[] = [
+    "brouillon",
+    "emise",
+    "litige",
+    "annulee",
+  ];
   return value && valid.includes(value as FactureStatutType)
     ? (value as FactureStatutType)
     : undefined;
@@ -90,7 +101,10 @@ function toStatut(value: string | undefined): FactureStatutType | undefined {
 function toModeCommercial(
   value: string | undefined,
 ): FactureModeCommercialSnapshotType | undefined {
-  const valid: FactureModeCommercialSnapshotType[] = ["direct", "intermediaire"];
+  const valid: FactureModeCommercialSnapshotType[] = [
+    "direct",
+    "intermediaire",
+  ];
   return value && valid.includes(value as FactureModeCommercialSnapshotType)
     ? (value as FactureModeCommercialSnapshotType)
     : undefined;
@@ -118,8 +132,8 @@ export function FacturesTable({
   const entreprise = useAppStore((state) => state.entreprise);
   const router = useRouter();
 
-  const factureView = useUiStore((state) => state.factureView);
-  const setFactureView = useUiStore((state) => state.setFactureView);
+  const FactureViewType = useUiStore((state) => state.FactureViewType);
+  const setFactureViewType = useUiStore((state) => state.setFactureViewType);
 
   const [items, setItems] = useState<FactureAvecDetails[]>([]);
   const [total, setTotal] = useState(0);
@@ -145,7 +159,9 @@ export function FacturesTable({
         entrepriseId: entreprise.id,
         tabType,
         statut: toStatut(searchParams.statut),
-        modeCommercialSnapshot: toModeCommercial(searchParams.modeCommercialSnapshot),
+        modeCommercialSnapshot: toModeCommercial(
+          searchParams.modeCommercialSnapshot,
+        ),
         siteId: searchParams.siteId || undefined,
         clientId: searchParams.clientId || undefined,
         emetteurId: searchParams.emetteurId || undefined,
@@ -193,7 +209,9 @@ export function FacturesTable({
         entrepriseId: entreprise.id,
         tabType,
         statut: toStatut(searchParams.statut),
-        modeCommercialSnapshot: toModeCommercial(searchParams.modeCommercialSnapshot),
+        modeCommercialSnapshot: toModeCommercial(
+          searchParams.modeCommercialSnapshot,
+        ),
         siteId: searchParams.siteId || undefined,
         clientId: searchParams.clientId || undefined,
         emetteurId: searchParams.emetteurId || undefined,
@@ -232,7 +250,8 @@ export function FacturesTable({
       const query: Record<string, string> = { tab: tabType };
       if (filters.search) query.search = filters.search;
       if (filters.statut) query.statut = filters.statut;
-      if (filters.modeCommercialSnapshot) query.modeCommercialSnapshot = filters.modeCommercialSnapshot;
+      if (filters.modeCommercialSnapshot)
+        query.modeCommercialSnapshot = filters.modeCommercialSnapshot;
       if (filters.siteId) query.siteId = filters.siteId;
       if (filters.clientId) query.clientId = filters.clientId;
       if (filters.emetteurId) query.emetteurId = filters.emetteurId;
@@ -276,17 +295,17 @@ export function FacturesTable({
         <div className="flex items-center rounded-md border">
           <Button
             size="sm"
-            variant={factureView === "list" ? "default" : "ghost"}
+            variant={FactureViewType === "list" ? "default" : "ghost"}
             className="rounded-r-none border-r"
-            onClick={() => setFactureView("list")}
+            onClick={() => setFactureViewType("list")}
           >
             <List className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            variant={factureView === "grid" ? "default" : "ghost"}
+            variant={FactureViewType === "grid" ? "default" : "ghost"}
             className="rounded-l-none"
-            onClick={() => setFactureView("grid")}
+            onClick={() => setFactureViewType("grid")}
           >
             <Grid3x3 className="h-4 w-4" />
           </Button>
@@ -331,7 +350,7 @@ export function FacturesTable({
 
       {/* Contenu */}
       <div className="flex-1 overflow-hidden">
-        {factureView === "grid" ? (
+        {FactureViewType === "grid" ? (
           <FacturesGrid
             items={items}
             isLoading={loading}

@@ -128,9 +128,10 @@ export const getAvailableTacheListesTemplatesAction = actionClient
     const { serviceId, entrepriseId, executionId } = parsedInput;
 
     // Résolution préalable du prestataireEntrepriseId (réutilisé pour le check d'accès ET pour les packs)
-    const prestataireEntrepriseId = executionId
-      ? await getExecutionPrestataireEntrepriseId(executionId)
-      : null;
+    // Priorité : parsedInput.prestataireEntrepriseId > résolu depuis executionId
+    const prestataireEntrepriseId =
+      parsedInput.prestataireEntrepriseId ??
+      (executionId ? await getExecutionPrestataireEntrepriseId(executionId) : null);
 
     // En posture prestataire, l'entrepriseId passé est celui du CLIENT — le prestataire
     // n'a pas d'adhésion client, donc on vérifie l'accès contre son propre entrepriseId

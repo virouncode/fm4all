@@ -6,6 +6,7 @@ import {
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServicePerimetre,
+  clientServiceReglesRecurrence,
   clientServices,
 } from "@/db/schema/services";
 import { userPrestataireAdhesions } from "@/db/schema/users";
@@ -635,6 +636,25 @@ export const updatePrestationStatutAction = actionClient
           "Impossible d'activer une prestation sans exécution active. " +
             "Ajoutez au moins une exécution (prestataire + tarifs) dans l'onglet Exécution & Tarifs.",
         );
+      }
+
+      // Guard : activation en récurrence auto sans règle active interdite
+      if (current.famillePlanification === "recurrence_auto") {
+        const [regleRow] = await db
+          .select({ total: count() })
+          .from(clientServiceReglesRecurrence)
+          .where(
+            and(
+              eq(clientServiceReglesRecurrence.clientServiceId, prestationId),
+              eq(clientServiceReglesRecurrence.actif, true),
+            ),
+          );
+        if (!regleRow || regleRow.total === 0) {
+          throw errors.conflict(
+            "Impossible d'activer une prestation en récurrence automatique sans règle de planification. " +
+              "Ajoutez au moins une règle dans l'onglet Planning.",
+          );
+        }
       }
     }
 

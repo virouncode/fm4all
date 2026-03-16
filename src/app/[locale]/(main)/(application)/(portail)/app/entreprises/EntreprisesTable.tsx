@@ -63,8 +63,10 @@ export function EntreprisesTable({ searchParams }: EntreprisesTableProps) {
   const router = useRouter();
 
   // View state persisted in localStorage
-  const entrepriseView = useUiStore((state) => state.entrepriseView);
-  const setEntrepriseView = useUiStore((state) => state.setEntrepriseView);
+  const EntrepriseViewType = useUiStore((state) => state.EntrepriseViewType);
+  const setEntrepriseViewType = useUiStore(
+    (state) => state.setEntrepriseViewType,
+  );
 
   // Data state
   const [entreprises, setEntreprises] = useState<EntrepriseWithDetails[]>([]);
@@ -271,22 +273,22 @@ export function EntreprisesTable({ searchParams }: EntreprisesTableProps) {
           className="flex items-center"
         >
           <Button
-            variant={entrepriseView === "list" ? "default" : "outline"}
+            variant={EntrepriseViewType === "list" ? "default" : "outline"}
             size="sm"
-            onClick={() => setEntrepriseView("list")}
+            onClick={() => setEntrepriseViewType("list")}
             className="rounded-r-none border-r-0"
             aria-label="Vue liste"
-            aria-pressed={entrepriseView === "list"}
+            aria-pressed={EntrepriseViewType === "list"}
           >
             <List aria-hidden="true" />
           </Button>
           <Button
-            variant={entrepriseView === "grid" ? "default" : "outline"}
+            variant={EntrepriseViewType === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => setEntrepriseView("grid")}
+            onClick={() => setEntrepriseViewType("grid")}
             className="rounded-l-none"
             aria-label="Vue grille"
-            aria-pressed={entrepriseView === "grid"}
+            aria-pressed={EntrepriseViewType === "grid"}
           >
             <Grid3x3 aria-hidden="true" />
           </Button>
@@ -326,7 +328,7 @@ export function EntreprisesTable({ searchParams }: EntreprisesTableProps) {
 
       {/* View: Table ou Grid */}
       <div className="flex-1 overflow-hidden">
-        {entrepriseView === "list" ? (
+        {EntrepriseViewType === "list" ? (
           <InfiniteDataTable<EntrepriseWithDetails>
             columns={columns}
             items={entreprises}
@@ -371,7 +373,6 @@ export function EntreprisesTable({ searchParams }: EntreprisesTableProps) {
         onOpenChange={setSortDialogOpen}
         searchParams={searchParams}
       />
-
     </div>
   );
 }

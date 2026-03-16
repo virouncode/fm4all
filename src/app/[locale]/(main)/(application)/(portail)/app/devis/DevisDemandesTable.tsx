@@ -106,8 +106,12 @@ export function DevisDemandesTable({
   const entreprise = useAppStore((state) => state.entreprise);
   const router = useRouter();
 
-  const devisDemandeView = useUiStore((state) => state.devisDemandeView);
-  const setDevisDemandeView = useUiStore((state) => state.setDevisDemandeView);
+  const DevisDemandeViewType = useUiStore(
+    (state) => state.DevisDemandeViewType,
+  );
+  const setDevisDemandeViewType = useUiStore(
+    (state) => state.setDevisDemandeViewType,
+  );
 
   const [items, setItems] = useState<DevisDemandeAvecDetails[]>([]);
   const [total, setTotal] = useState(0);
@@ -253,7 +257,10 @@ export function DevisDemandesTable({
     setTotal((prev) => prev + 1);
   };
 
-  const columns = createDevisDemandesColumns({ showClient: showClientColumn, showDevisCount });
+  const columns = createDevisDemandesColumns({
+    showClient: showClientColumn,
+    showDevisCount,
+  });
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -263,17 +270,17 @@ export function DevisDemandesTable({
         <div className="flex items-center rounded-md border">
           <Button
             size="sm"
-            variant={devisDemandeView === "list" ? "default" : "ghost"}
+            variant={DevisDemandeViewType === "list" ? "default" : "ghost"}
             className="rounded-r-none border-r"
-            onClick={() => setDevisDemandeView("list")}
+            onClick={() => setDevisDemandeViewType("list")}
           >
             <List className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            variant={devisDemandeView === "grid" ? "default" : "ghost"}
+            variant={DevisDemandeViewType === "grid" ? "default" : "ghost"}
             className="rounded-l-none"
-            onClick={() => setDevisDemandeView("grid")}
+            onClick={() => setDevisDemandeViewType("grid")}
           >
             <Grid3x3 className="h-4 w-4" />
           </Button>
@@ -305,10 +312,7 @@ export function DevisDemandesTable({
           </Button>
 
           {showNewButton && (
-            <Button
-              size="sm"
-              onClick={() => setFormDialogOpen(true)}
-            >
+            <Button size="sm" onClick={() => setFormDialogOpen(true)}>
               <Plus className="h-4 w-4" />
               Nouvelle demande
             </Button>
@@ -318,7 +322,7 @@ export function DevisDemandesTable({
 
       {/* Contenu */}
       <div className="flex-1 overflow-hidden">
-        {devisDemandeView === "grid" ? (
+        {DevisDemandeViewType === "grid" ? (
           <DevisDemandeGrid
             items={items}
             isLoading={loading}

@@ -26,6 +26,8 @@ export const insertRegleRecurrenceFormSchema = z.object({
   dureePrevueMinutes: z.string().optional(), // string dans le form, converti en number côté action
   actif: z.boolean().default(true),
   ordre: z.string().optional(), // string dans le form, converti en number côté action
+  /** Checklist optionnelle — null = hérite de l'exécution */
+  tacheListeTemplateId: z.uuid().nullable().optional(),
 });
 export type InsertRegleRecurrenceFormType = z.infer<
   typeof insertRegleRecurrenceFormSchema
@@ -130,4 +132,14 @@ export const getQuotaPlanificationActionSchema = z.object({
 });
 export type GetQuotaPlanificationActionType = z.infer<
   typeof getQuotaPlanificationActionSchema
+>;
+
+export const updateRegleTacheListeSchema = z.object({
+  regleId: z.uuid("ID de la règle invalide"),
+  prestationId: z.uuid("ID de la prestation invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  tacheListeTemplateId: z.uuid().nullable(),
+});
+export type UpdateRegleTacheListeType = z.infer<
+  typeof updateRegleTacheListeSchema
 >;

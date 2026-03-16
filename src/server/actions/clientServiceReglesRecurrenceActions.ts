@@ -2,9 +2,13 @@
 
 import { db } from "@/db";
 import {
+  clientServiceExceptionsRecurrence,
+  clientServiceOccurrences,
   clientServiceQuotasPlanification,
   clientServiceReglesRecurrence,
+  tacheListesTemplates,
 } from "@/db/schema/services";
+import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -27,9 +31,17 @@ import {
   reorderReglesRecurrenceActionSchema,
   selectRegleRecurrenceSchema,
   updateRegleRecurrenceActionSchema,
+  updateRegleTacheListeSchema,
   upsertQuotaPlanificationActionSchema,
 } from "@/zod-schemas/clientServiceReglesRecurrence.schema";
-import { and, asc, eq } from "drizzle-orm";
+import {
+  createExceptionDeplaceeSchema,
+  createExceptionSupprimeeSchema,
+} from "@/zod-schemas/clientServiceExceptions.schema";
+import {
+  deleteFuturePlanifieeOccurrences,
+} from "@/server/utils/clientServiceOccurrences.utils";
+import { and, asc, eq, gte } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 
 // ==================== HELPERS ====================
@@ -139,6 +151,16 @@ export const insertRegleRecurrenceAction = actionClient
       );
     }
 
+    // Valider que dtstartLocal >= prestation.dateDebut
+    if (prestation.dateDebut) {
+      const dtstartDate = new Date(parsedInput.dtstartLocal);
+      if (dtstartDate < prestation.dateDebut) {
+        throw errors.conflict(
+          `La date de début de la règle (${dtstartDate.toLocaleDateString("fr-FR")}) ne peut pas être antérieure à la date de début de la prestation (${prestation.dateDebut.toLocaleDateString("fr-FR")}).`,
+        );
+      }
+    }
+
     // Calculer le prochain ordre
     const [lastRegle] = await db
       .select({ ordre: clientServiceReglesRecurrence.ordre })
@@ -174,10 +196,16 @@ export const insertRegleRecurrenceAction = actionClient
             : null,
         actif: parsedInput.actif ?? true,
         ordre: nextOrdre,
+        tacheListeTemplateId: parsedInput.tacheListeTemplateId ?? null,
         createdById: session.user.id,
         updatedById: session.user.id,
       })
       .returning();
+
+    await onClientServiceChanged({
+      clientServiceId: parsedInput.clientServiceId,
+      now: new Date(),
+    });
 
     return { regle: selectRegleRecurrenceSchema.parse(inserted) };
   });
@@ -223,6 +251,16 @@ export const updateRegleRecurrenceAction = actionClient
       );
     }
 
+    // Valider que dtstartLocal >= prestation.dateDebut (si modifié)
+    if (parsedInput.dtstartLocal !== undefined && prestation.dateDebut) {
+      const dtstartDate = new Date(parsedInput.dtstartLocal);
+      if (dtstartDate < prestation.dateDebut) {
+        throw errors.conflict(
+          `La date de début de la règle (${dtstartDate.toLocaleDateString("fr-FR")}) ne peut pas être antérieure à la date de début de la prestation (${prestation.dateDebut.toLocaleDateString("fr-FR")}).`,
+        );
+      }
+    }
+
     const updateFields: Partial<typeof clientServiceReglesRecurrence.$inferInsert> =
       {
         updatedById: session.user.id,
@@ -244,6 +282,9 @@ export const updateRegleRecurrenceAction = actionClient
     if (parsedInput.actif !== undefined) updateFields.actif = parsedInput.actif;
     if (parsedInput.ordre !== undefined)
       updateFields.ordre = Number(parsedInput.ordre);
+    if (parsedInput.tacheListeTemplateId !== undefined)
+      updateFields.tacheListeTemplateId =
+        parsedInput.tacheListeTemplateId ?? null;
 
     const [updated] = await db
       .update(clientServiceReglesRecurrence)
@@ -481,4 +522,370 @@ export const upsertQuotaPlanificationAction = actionClient
       .returning();
 
     return { quota: upserted };
+  });
+
+// ==================== EXCEPTIONS RÉCURRENCE ====================
+
+/**
+ * Ajoute UNTIL=<dateOriginale-1s> à une chaîne RRULE (sans DTSTART).
+ * Retire tout UNTIL ou COUNT existant pour éviter les conflits.
+ */
+function addUntilToRrule(rruleStr: string, exclusiveDate: Date): string {
+  const until = new Date(exclusiveDate.getTime() - 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const untilStr =
+    `${until.getUTCFullYear()}${pad(until.getUTCMonth() + 1)}${pad(until.getUTCDate())}` +
+    `T${pad(until.getUTCHours())}${pad(until.getUTCMinutes())}${pad(until.getUTCSeconds())}Z`;
+  return rruleStr
+    .replace(/;?UNTIL=[^;]+/i, "")
+    .replace(/;?COUNT=\d+/i, "")
+    .trimEnd()
+    .replace(/;$/, "") + `;UNTIL=${untilStr}`;
+}
+
+/**
+ * Crée une exception "supprimée" sur une règle de récurrence.
+ *
+ * Scopes :
+ *   "occurrence" — supprime cette occurrence seulement (exception en DB + suppression de
+ *                  l'occurrence matérialisée planifiée si elle existe)
+ *   "suivantes"  — supprime cette occurrence et toutes les suivantes (tronque la RRULE avec
+ *                  UNTIL + supprime les occurrences planifiées futures)
+ *   "serie"      — désactive la règle entière (actif = false) + supprime les futures planifiées
+ */
+export const createExceptionSupprimeeAction = actionClient
+  .metadata({ actionName: "createExceptionSupprimeeAction" })
+  .inputSchema(createExceptionSupprimeeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized();
+
+    const {
+      entrepriseId,
+      clientServiceId,
+      regleRecurrenceId,
+      dateOriginale,
+      scope,
+      motif,
+    } = parsedInput;
+
+    const prestation = await getPrestationById(clientServiceId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation introuvable.");
+    }
+
+    const canManage = await canManageRegles(
+      session.user.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canManage) {
+      throw errors.forbidden("Vous n'avez pas les droits pour modifier cette prestation.");
+    }
+
+    // Vérifier que la règle appartient bien à cette prestation
+    const [regle] = await db
+      .select()
+      .from(clientServiceReglesRecurrence)
+      .where(
+        and(
+          eq(clientServiceReglesRecurrence.id, regleRecurrenceId),
+          eq(clientServiceReglesRecurrence.clientServiceId, clientServiceId),
+        ),
+      )
+      .limit(1);
+    if (!regle) throw errors.notFound("Règle de récurrence introuvable.");
+
+    const dateOriginaleDate = new Date(dateOriginale);
+    const now = new Date();
+
+    await db.transaction(async (tx) => {
+      // 1. Insérer l'exception "supprimee" (idempotent — si elle existe déjà, pas d'erreur critique)
+      await tx
+        .insert(clientServiceExceptionsRecurrence)
+        .values({
+          clientServiceId,
+          regleRecurrenceId,
+          siteId: null,
+          dateOriginale: dateOriginaleDate,
+          typeException: "supprimee",
+          motif: motif ?? null,
+          createdById: session.user.id,
+          updatedById: session.user.id,
+        })
+        .onConflictDoNothing();
+
+      if (scope === "occurrence") {
+        // Supprimer l'occurrence matérialisée planifiée pour cette date, si elle existe
+        await tx.delete(clientServiceOccurrences).where(
+          and(
+            eq(clientServiceOccurrences.clientServiceId, clientServiceId),
+            eq(clientServiceOccurrences.regleRecurrenceId, regleRecurrenceId),
+            eq(clientServiceOccurrences.statut, "planifiee"),
+            eq(clientServiceOccurrences.dateDebutOriginale, dateOriginaleDate),
+          ),
+        );
+      } else if (scope === "suivantes") {
+        // Tronquer la RRULE avec UNTIL juste avant dateOriginale
+        const newRrule = addUntilToRrule(regle.regleRrule, dateOriginaleDate);
+        await tx
+          .update(clientServiceReglesRecurrence)
+          .set({
+            regleRrule: newRrule,
+            updatedById: session.user.id,
+            updatedAt: now,
+          })
+          .where(eq(clientServiceReglesRecurrence.id, regleRecurrenceId));
+
+        // Supprimer toutes les occurrences planifiées à partir de dateOriginale
+        await deleteFuturePlanifieeOccurrences({
+          clientServiceId,
+          now: dateOriginaleDate,
+          tx,
+        });
+      } else {
+        // scope === "serie" : désactiver la règle entière
+        await tx
+          .update(clientServiceReglesRecurrence)
+          .set({
+            actif: false,
+            updatedById: session.user.id,
+            updatedAt: now,
+          })
+          .where(eq(clientServiceReglesRecurrence.id, regleRecurrenceId));
+
+        // Supprimer toutes les futures occurrences planifiées (à partir de maintenant)
+        await deleteFuturePlanifieeOccurrences({
+          clientServiceId,
+          now,
+          tx,
+        });
+      }
+    });
+
+    return { success: true, scope };
+  });
+
+/**
+ * Crée une exception "déplacée" sur une règle de récurrence.
+ *
+ * Scopes :
+ *   "occurrence" — déplace cette occurrence seulement : insère l'exception + met à jour
+ *                  la date de l'occurrence matérialisée planifiée si elle existe
+ *   "suivantes"  — tronque la RRULE avec UNTIL + insère l'exception pour cette occurrence
+ *                  + supprime les futures planifiées (l'utilisateur crée ensuite une nouvelle règle)
+ */
+export const createExceptionDeplaceeAction = actionClient
+  .metadata({ actionName: "createExceptionDeplaceeAction" })
+  .inputSchema(createExceptionDeplaceeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized();
+
+    const {
+      entrepriseId,
+      clientServiceId,
+      regleRecurrenceId,
+      dateOriginale,
+      nouvelleDateDebut,
+      nouvelleHeureFin,
+      scope,
+      motif,
+    } = parsedInput;
+
+    const prestation = await getPrestationById(clientServiceId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation introuvable.");
+    }
+
+    const canManage = await canManageRegles(
+      session.user.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canManage) {
+      throw errors.forbidden("Vous n'avez pas les droits pour modifier cette prestation.");
+    }
+
+    const [regle] = await db
+      .select()
+      .from(clientServiceReglesRecurrence)
+      .where(
+        and(
+          eq(clientServiceReglesRecurrence.id, regleRecurrenceId),
+          eq(clientServiceReglesRecurrence.clientServiceId, clientServiceId),
+        ),
+      )
+      .limit(1);
+    if (!regle) throw errors.notFound("Règle de récurrence introuvable.");
+
+    const dateOriginaleDate = new Date(dateOriginale);
+    const nouvelleDateDebutDate = new Date(nouvelleDateDebut);
+    const nouvelleHeureFinDate = nouvelleHeureFin ? new Date(nouvelleHeureFin) : null;
+    const now = new Date();
+
+    await db.transaction(async (tx) => {
+      // 1. Insérer l'exception "deplacee"
+      await tx
+        .insert(clientServiceExceptionsRecurrence)
+        .values({
+          clientServiceId,
+          regleRecurrenceId,
+          siteId: null,
+          dateOriginale: dateOriginaleDate,
+          typeException: "deplacee",
+          nouvelleDateDebut: nouvelleDateDebutDate,
+          nouvelleHeureFin: nouvelleHeureFinDate,
+          motif: motif ?? null,
+          createdById: session.user.id,
+          updatedById: session.user.id,
+        })
+        .onConflictDoNothing();
+
+      if (scope === "occurrence") {
+        // Mettre à jour la date de l'occurrence matérialisée planifiée si elle existe
+        await tx
+          .update(clientServiceOccurrences)
+          .set({
+            dateDebutPrevue: nouvelleDateDebutDate,
+            dateFinPrevue: nouvelleHeureFinDate,
+            updatedById: session.user.id,
+            updatedAt: now,
+          })
+          .where(
+            and(
+              eq(clientServiceOccurrences.clientServiceId, clientServiceId),
+              eq(clientServiceOccurrences.regleRecurrenceId, regleRecurrenceId),
+              eq(clientServiceOccurrences.statut, "planifiee"),
+              eq(clientServiceOccurrences.dateDebutOriginale, dateOriginaleDate),
+            ),
+          );
+      } else {
+        // scope === "suivantes" : tronquer la RRULE + supprimer futures planifiées
+        const newRrule = addUntilToRrule(regle.regleRrule, dateOriginaleDate);
+        await tx
+          .update(clientServiceReglesRecurrence)
+          .set({
+            regleRrule: newRrule,
+            updatedById: session.user.id,
+            updatedAt: now,
+          })
+          .where(eq(clientServiceReglesRecurrence.id, regleRecurrenceId));
+
+        // Supprimer toutes les occurrences planifiées à partir de dateOriginale
+        // (sauf celle qu'on vient de déplacer — elle sera mise à jour via l'exception)
+        await tx.delete(clientServiceOccurrences).where(
+          and(
+            eq(clientServiceOccurrences.clientServiceId, clientServiceId),
+            eq(clientServiceOccurrences.regleRecurrenceId, regleRecurrenceId),
+            eq(clientServiceOccurrences.statut, "planifiee"),
+            gte(clientServiceOccurrences.dateDebutOriginale, dateOriginaleDate),
+          ),
+        );
+
+        // Re-créer l'occurrence déplacée avec la nouvelle date
+        await tx
+          .insert(clientServiceOccurrences)
+          .values({
+            clientServiceId,
+            siteId: prestation.siteId,
+            typeSource: "regle_recurrence",
+            regleRecurrenceId,
+            dateDebutOriginale: dateOriginaleDate,
+            dateDebutPrevue: nouvelleDateDebutDate,
+            dateFinPrevue: nouvelleHeureFinDate,
+            statut: "planifiee",
+            createdById: session.user.id,
+            updatedById: session.user.id,
+          })
+          .onConflictDoNothing();
+      }
+    });
+
+    return { success: true, scope };
+  });
+
+// ==================== UPDATE REGLE TACHE LISTE ====================
+
+export const updateRegleTacheListeAction = actionClient
+  .metadata({ actionName: "updateRegleTacheListeAction" })
+  .inputSchema(updateRegleTacheListeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { regleId, prestationId, entrepriseId, tacheListeTemplateId } =
+      parsedInput;
+
+    const prestation = await getPrestationById(prestationId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation");
+    }
+
+    const canManage = await canManageRegles(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canManage) {
+      throw errors.forbidden(
+        "Vous devez être responsable de ce site pour modifier la checklist.",
+      );
+    }
+
+    // Vérifier que la règle appartient à la prestation
+    const [regle] = await db
+      .select({ id: clientServiceReglesRecurrence.id })
+      .from(clientServiceReglesRecurrence)
+      .where(
+        and(
+          eq(clientServiceReglesRecurrence.id, regleId),
+          eq(clientServiceReglesRecurrence.clientServiceId, prestationId),
+        ),
+      )
+      .limit(1);
+
+    if (!regle) throw errors.notFound("Règle de récurrence");
+
+    // Si un pack est fourni, vérifier compatibilité avec le service
+    if (tacheListeTemplateId) {
+      const [pack] = await db
+        .select({ serviceId: tacheListesTemplates.serviceId })
+        .from(tacheListesTemplates)
+        .where(eq(tacheListesTemplates.id, tacheListeTemplateId))
+        .limit(1);
+
+      if (!pack) throw errors.notFound("Pack de tâches");
+      if (pack.serviceId !== prestation.serviceId) {
+        throw errors.conflict(
+          "Ce pack de tâches n'est pas compatible avec le service de cette prestation.",
+        );
+      }
+    }
+
+    const [updated] = await db
+      .update(clientServiceReglesRecurrence)
+      .set({
+        tacheListeTemplateId,
+        updatedById: currentUser.id,
+        updatedAt: new Date(),
+      })
+      .where(eq(clientServiceReglesRecurrence.id, regleId))
+      .returning();
+
+    if (!updated) throw errors.internal("Échec de la mise à jour.");
+
+    await onClientServiceChanged({ clientServiceId: prestationId, now: new Date() });
+
+    return { regle: selectRegleRecurrenceSchema.parse(updated) };
   });

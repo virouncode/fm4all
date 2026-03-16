@@ -20,6 +20,11 @@ import {
   getCalendarFilterOptionsAction,
   getCalendarSitesForFilterAction,
 } from "@/server/actions/calendrierActions";
+import {
+  dragOccurrenceAction,
+  resizeOccurrenceAction,
+} from "@/server/actions/clientServiceOccurrencesActions";
+import { toast } from "sonner";
 import { useAppStore } from "@/stores/application/appStore";
 import type {
   CalendarSlotDurationType,
@@ -37,11 +42,24 @@ import { fr } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FilterMultiSelect } from "./FilterMultiSelect";
+import { OccurrenceEditScopeDialog } from "./OccurrenceEditScopeDialog";
 import "./fullcalendar-overrides.css";
 
 // ==================== TYPES ====================
 
 type OptionType = { id: string; nom: string };
+
+/** Groupe de sites par client, pour l'affichage groupé dans FilterMultiSelect */
+type SiteGroupType = { groupLabel: string; options: { id: string; label: string }[] };
+
+type PendingEditType = {
+  type: "drag" | "resize";
+  occurrenceId: string;
+  hasRule: boolean;
+  newStart: string;
+  newEnd?: string;
+  revert: () => void;
+};
 
 // ==================== OPTIONS TEMPS ====================
 
@@ -90,47 +108,147 @@ export function CalendrierClient() {
   const [prestataires, setPrestataires] = useState<OptionType[]>([]);
   const [clients, setClients] = useState<OptionType[]>([]);
 
+  /** Sites groupés par client — actif en posture prestataire/plateforme */
+  const [siteGroups, setSiteGroups] = useState<SiteGroupType[]>([]);
+
   // true si l'utilisateur est admin dans son entreprise pour la posture active
   const [isAdmin, setIsAdmin] = useState(false);
+  const [pendingEdit, setPendingEdit] = useState<PendingEditType | null>(null);
   // Référence aux sites initiaux (tous) pour restaurer après reset du filtre clients
   const allSitesRef = useRef<OptionType[]>([]);
+  const initialSiteGroupsRef = useRef<SiteGroupType[]>([]);
 
-  // Charge les options + pré-sélectionne les sites attribués
+  // Charge les options + restaure les sélections persistées
   useEffect(() => {
     if (!entreprise?.id) return;
 
-    // Reset des sélections précédentes lors d'un changement de posture/entreprise
+    // Reset immédiat pour éviter l'affichage de données périmées
     setSelectedSiteIds([]);
     setSelectedServiceIds([]);
     setSelectedPrestataireIds([]);
     setSelectedClientIds([]);
     setSites([]);
+    setSiteGroups([]);
     setServices([]);
     setPrestataires([]);
     setClients([]);
 
-    getCalendarFilterOptionsAction({ entrepriseId: entreprise.id }).then(
-      (result) => {
-        if (result?.data) {
-          const {
-            sites: s,
-            services: svc,
-            prestataires: p,
-            clients: c,
-            defaultSiteIds,
-            isAdmin: admin,
-          } = result.data;
-          setSites(s);
-          allSitesRef.current = s;
-          setServices(svc);
-          setPrestataires(p);
-          setClients(c);
-          setSelectedSiteIds(defaultSiteIds);
-          setIsAdmin(admin);
+    const entrepriseId = entreprise.id;
+    let cancelled = false;
+
+    async function init() {
+      const result = await getCalendarFilterOptionsAction({ entrepriseId });
+      if (cancelled || !result?.data) return;
+
+      const {
+        sites: s,
+        sitesParClient,
+        services: svc,
+        prestataires: p,
+        clients: c,
+        defaultSiteIds,
+        isAdmin: admin,
+      } = result.data;
+
+      setServices(svc);
+      setPrestataires(p);
+      setClients(c);
+      setIsAdmin(admin);
+
+      // ── Sélection clients ───────────────────────────────────────────────
+      // Posture client : on force l'id de l'entreprise (pas de filtre client dans l'UI)
+      // Posture prestataire / plateforme : restaurer depuis le store (intersecté avec les disponibles)
+      let clientIds: string[];
+      if (posture === "client") {
+        clientIds = [entrepriseId];
+      } else {
+        const persisted = useUiStore.getState().CalendarSelectedClientIds;
+        clientIds = persisted.filter((id) => c.some((cl) => cl.id === id));
+      }
+      setSelectedClientIds(clientIds);
+
+      // ── Sites ───────────────────────────────────────────────────────────
+      // Pour prestataire/plateforme, les sites dépendent des clients sélectionnés
+      const toGroups = (list: typeof sitesParClient) =>
+        list.map((g) => ({
+          groupLabel: g.clientNom,
+          options: g.sites.map((sv) => ({ id: sv.id, label: sv.nom })),
+        }));
+
+      let resolvedSites: OptionType[] = s;
+      let resolvedGroups: SiteGroupType[] = toGroups(sitesParClient);
+
+      if (posture !== "client" && clientIds.length > 0) {
+        if (posture === "prestataire") {
+          // Filtrer les groupes initiaux aux clients sélectionnés (pas d'appel serveur)
+          resolvedGroups = toGroups(
+            sitesParClient.filter((g) => clientIds.includes(g.clientId)),
+          );
+          resolvedSites = resolvedGroups.flatMap((g) =>
+            g.options.map((o) => ({ id: o.id, nom: o.label })),
+          );
+        } else {
+          // Plateforme : charger les sites des clients sélectionnés
+          const sitesResult = await getCalendarSitesForFilterAction({
+            clientEntrepriseIds: clientIds,
+          });
+          if (!cancelled && sitesResult?.data?.sitesParClient) {
+            resolvedGroups = toGroups(sitesResult.data.sitesParClient);
+            resolvedSites = resolvedGroups.flatMap((g) =>
+              g.options.map((o) => ({ id: o.id, nom: o.label })),
+            );
+          }
         }
-      },
-    );
+      }
+
+      allSitesRef.current = s;
+      initialSiteGroupsRef.current = resolvedGroups;
+      setSites(resolvedSites);
+      setSiteGroups(resolvedGroups);
+
+      // ── Sélection sites ─────────────────────────────────────────────────
+      const availableSiteIds = resolvedSites.map((sv) => sv.id);
+      const persistedSiteIds = useUiStore.getState().CalendarSelectedSiteIds;
+      const validSiteIds = persistedSiteIds.filter((id) =>
+        availableSiteIds.includes(id),
+      );
+      // Posture client sans sélection persistée → pré-sélectionner tout (defaultSiteIds)
+      setSelectedSiteIds(
+        validSiteIds.length > 0
+          ? validSiteIds
+          : posture === "client"
+            ? defaultSiteIds
+            : [],
+      );
+
+      // ── Sélection services ──────────────────────────────────────────────
+      const persistedServiceIds =
+        useUiStore.getState().CalendarSelectedServiceIds;
+      setSelectedServiceIds(
+        persistedServiceIds.filter((id) => svc.some((sv) => sv.id === id)),
+      );
+    }
+
+    init();
+    return () => {
+      cancelled = true;
+    };
   }, [entreprise?.id, posture]);
+
+  // Sync des sélections vers le store persisté (hors posture client pour les clients)
+  useEffect(() => {
+    if (posture !== "client") {
+      useUiStore.getState().setCalendarSelectedClientIds(selectedClientIds);
+    }
+  }, [selectedClientIds, posture]);
+
+  useEffect(() => {
+    useUiStore.getState().setCalendarSelectedSiteIds(selectedSiteIds);
+  }, [selectedSiteIds]);
+
+  useEffect(() => {
+    useUiStore.getState().setCalendarSelectedServiceIds(selectedServiceIds);
+  }, [selectedServiceIds]);
 
   // Ref toujours à jour — lu dans fetchEvents pour éviter les closures périmées
   const filtersRef = useRef({
@@ -188,27 +306,35 @@ export function CalendrierClient() {
     [],
   );
 
-  // Changement de client (admin prestataire) : recharge dynamiquement les sites disponibles
+  // Changement de client : recharge les sites groupés par client
   const handleClientChange = useCallback(
     async (ids: string[]) => {
       setSelectedClientIds(ids);
       setSelectedSiteIds([]);
 
-      if (isAdmin && posture === "prestataire") {
-        if (ids.length === 0) {
-          // Aucun client sélectionné → restaurer tous les sites d'exécution
-          setSites(allSitesRef.current);
-        } else {
-          const result = await getCalendarSitesForFilterAction({
-            clientEntrepriseIds: ids,
-          });
-          if (result?.data) {
-            setSites(result.data.sites);
-          }
+      if (ids.length === 0) {
+        // Aucun client sélectionné → restaurer les sites initiaux
+        setSiteGroups(initialSiteGroupsRef.current);
+        setSites(allSitesRef.current);
+      } else {
+        const result = await getCalendarSitesForFilterAction({
+          clientEntrepriseIds: ids,
+        });
+        if (result?.data?.sitesParClient) {
+          const groups = result.data.sitesParClient.map((g) => ({
+            groupLabel: g.clientNom,
+            options: g.sites.map((s) => ({ id: s.id, label: s.nom })),
+          }));
+          setSiteGroups(groups);
+          setSites(
+            groups.flatMap((g) =>
+              g.options.map((o) => ({ id: o.id, nom: o.label })),
+            ),
+          );
         }
       }
     },
-    [isAdmin, posture],
+    [],
   );
 
   const calendarView = useUiStore((s) => s.CalendarViewType);
@@ -255,6 +381,53 @@ export function CalendrierClient() {
     setDatePickerOpen(false);
   };
 
+  const handleConfirmScope = async (scope: "occurrence" | "suivantes") => {
+    if (!pendingEdit || !entreprise?.id) return;
+    try {
+      if (pendingEdit.type === "drag") {
+        const result = await dragOccurrenceAction({
+          occurrenceId: pendingEdit.occurrenceId,
+          entrepriseId: entreprise.id,
+          newStart: pendingEdit.newStart,
+          newEnd: pendingEdit.newEnd,
+          scope,
+        });
+        if (result?.serverError) {
+          toast.error(result.serverError.message);
+          pendingEdit.revert();
+        } else {
+          if (result?.data?.warningNoExecution) {
+            toast.warning("Aucune occurrence générée — aucun prestataire actif sur cette période.");
+          }
+          calendarRef.current?.getApi().refetchEvents();
+        }
+      } else {
+        const result = await resizeOccurrenceAction({
+          occurrenceId: pendingEdit.occurrenceId,
+          entrepriseId: entreprise.id,
+          newEnd: pendingEdit.newEnd!,
+          scope,
+        });
+        if (result?.serverError) {
+          toast.error(result.serverError.message);
+          pendingEdit.revert();
+        } else {
+          if (result?.data?.warningNoExecution) {
+            toast.warning("Aucune occurrence générée — aucun prestataire actif sur cette période.");
+          }
+          calendarRef.current?.getApi().refetchEvents();
+        }
+      }
+    } finally {
+      setPendingEdit(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    pendingEdit?.revert();
+    setPendingEdit(null);
+  };
+
   const isClient = posture === "client";
   const isPlateforme = posture === "plateforme";
   const isPrestataire = posture === "prestataire";
@@ -265,9 +438,18 @@ export function CalendrierClient() {
       <div className="flex flex-shrink-0 items-center gap-3 rounded-lg border px-3 py-2">
         {/* Filtres multi-select */}
         <div className="flex flex-1 flex-wrap items-center gap-2">
+          {(isPrestataire || isPlateforme) && clients.length > 0 && (
+            <FilterMultiSelect
+              label="Clients"
+              options={clients.map((c) => ({ id: c.id, label: c.nom }))}
+              selectedIds={selectedClientIds}
+              onChange={handleClientChange}
+            />
+          )}
           <FilterMultiSelect
             label="Sites"
-            options={sites.map((s) => ({ id: s.id, label: s.nom }))}
+            options={siteGroups.length === 0 ? sites.map((s) => ({ id: s.id, label: s.nom })) : undefined}
+            groupedOptions={siteGroups.length > 0 ? siteGroups : undefined}
             selectedIds={selectedSiteIds}
             onChange={setSelectedSiteIds}
           />
@@ -283,14 +465,6 @@ export function CalendrierClient() {
               options={prestataires.map((p) => ({ id: p.id, label: p.nom }))}
               selectedIds={selectedPrestataireIds}
               onChange={setSelectedPrestataireIds}
-            />
-          )}
-          {isPrestataire && clients.length > 0 && (
-            <FilterMultiSelect
-              label="Clients"
-              options={clients.map((c) => ({ id: c.id, label: c.nom }))}
-              selectedIds={selectedClientIds}
-              onChange={handleClientChange}
             />
           )}
         </div>
@@ -389,7 +563,16 @@ export function CalendrierClient() {
         </Popover>
       </div>
 
-      {/* Calendrier */}
+      {/* Message si aucun client sélectionné (prestataire / plateforme) */}
+      {(isPrestataire || isPlateforme) && selectedClientIds.length === 0 ? (
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 rounded-lg border bg-muted/30">
+          <CalendarIcon className="text-muted-foreground/40 h-12 w-12" />
+          <p className="text-muted-foreground text-sm">
+            Sélectionnez un ou plusieurs clients pour afficher le calendrier.
+          </p>
+        </div>
+      ) : (
+      /* Calendrier */
       <div className="min-h-0 flex-1 overflow-hidden rounded-lg border">
         <FullCalendar
           ref={calendarRef}
@@ -438,6 +621,99 @@ export function CalendrierClient() {
           }}
           height="100%"
           stickyHeaderDates
+          timeZone="Europe/Paris"
+          editable={isAdmin}
+          eventAllow={(_, draggedEvent) => {
+            if (!draggedEvent) return false;
+            const { type, statut } = draggedEvent.extendedProps as {
+              type?: string;
+              statut?: string;
+            };
+            return type === "materialized" && statut === "planifiee";
+          }}
+          eventDrop={(info) => {
+            const { type, statut, occurrenceId, regleId } =
+              info.event.extendedProps as {
+                type?: string;
+                statut?: string;
+                occurrenceId?: string;
+                regleId?: string;
+              };
+            if (
+              type !== "materialized" ||
+              statut !== "planifiee" ||
+              !occurrenceId
+            ) {
+              info.revert();
+              return;
+            }
+            if (!regleId) {
+              dragOccurrenceAction({
+                occurrenceId,
+                entrepriseId: entreprise!.id,
+                newStart: info.event.startStr,
+                newEnd: info.event.endStr || undefined,
+                scope: "occurrence",
+              }).then((result) => {
+                if (result?.serverError) {
+                  toast.error(result.serverError.message);
+                  info.revert();
+                } else {
+                  calendarRef.current?.getApi().refetchEvents();
+                }
+              });
+              return;
+            }
+            setPendingEdit({
+              type: "drag",
+              occurrenceId,
+              hasRule: true,
+              newStart: info.event.startStr,
+              newEnd: info.event.endStr || undefined,
+              revert: info.revert,
+            });
+          }}
+          eventResize={(info) => {
+            const { type, statut, occurrenceId, regleId } =
+              info.event.extendedProps as {
+                type?: string;
+                statut?: string;
+                occurrenceId?: string;
+                regleId?: string;
+              };
+            if (
+              type !== "materialized" ||
+              statut !== "planifiee" ||
+              !occurrenceId
+            ) {
+              info.revert();
+              return;
+            }
+            if (!regleId) {
+              resizeOccurrenceAction({
+                occurrenceId,
+                entrepriseId: entreprise!.id,
+                newEnd: info.event.endStr,
+                scope: "occurrence",
+              }).then((result) => {
+                if (result?.serverError) {
+                  toast.error(result.serverError.message);
+                  info.revert();
+                } else {
+                  calendarRef.current?.getApi().refetchEvents();
+                }
+              });
+              return;
+            }
+            setPendingEdit({
+              type: "resize",
+              occurrenceId,
+              hasRule: true,
+              newStart: info.event.startStr,
+              newEnd: info.event.endStr || undefined,
+              revert: info.revert,
+            });
+          }}
           eventClick={(info) => {
             const { type, occurrenceId, prestationId } = info.event
               .extendedProps as {
@@ -476,6 +752,16 @@ export function CalendrierClient() {
           noEventsContent="Aucune intervention sur cette période"
         />
       </div>
+      )}
+
+      <OccurrenceEditScopeDialog
+        open={pendingEdit !== null}
+        onOpenChange={(open) => {
+          if (!open) handleCancelEdit();
+        }}
+        type={pendingEdit?.type ?? "drag"}
+        onConfirm={handleConfirmScope}
+      />
     </div>
   );
 }

@@ -28,6 +28,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { modePilotageCT } from "@/constants/codeTables";
 import {
@@ -35,6 +37,7 @@ import {
   insertExecutionWithPrixAction,
 } from "@/server/actions/clientServiceExecutionsActions";
 import type { ExecutionWithPrix } from "@/server/queries/clientServiceExecutions.query";
+import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
 import { useAppStore } from "@/stores/application/appStore";
 import {
   type InsertExecutionFormType,
@@ -42,10 +45,20 @@ import {
 } from "@/zod-schemas/clientServiceExecutions.schema";
 import type { ModeCommercialType } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  ListChecks,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
+import { ChecklistPickerDialog } from "./ChecklistPickerDialog";
+import { TacheListeManagerDialog } from "./TacheListeManagerDialog";
 
 type ExecutionFormDialogProps = {
   open: boolean;
@@ -60,6 +73,10 @@ type ExecutionFormDialogProps = {
   clientHasActiveAdmin: boolean;
   clientNom: string;
   serviceNom: string;
+  /** Borne min du calendrier — date de début de la prestation (ISO YYYY-MM-DD) */
+  prestationDateDebut?: string | null;
+  /** Borne max du calendrier — date de fin de la prestation (ISO YYYY-MM-DD) */
+  prestationDateFin?: string | null;
   onSuccess: (executions: ExecutionWithPrix[]) => void;
 };
 
@@ -147,11 +164,19 @@ export function ExecutionFormDialog({
   clientHasActiveAdmin,
   clientNom,
   serviceNom,
+  prestationDateDebut,
+  prestationDateFin,
   onSuccess,
 }: ExecutionFormDialogProps) {
   const [prestataires, setPrestataires] = useState<PrestatairItemType[]>([]);
   const [loadingPrestataires, setLoadingPrestataires] = useState(false);
   const [prestataireHasActiveAdmin, setPrestataireHasActiveAdmin] = useState(true);
+
+  // Checklist state (outside RHF — picker only, value passed in onSubmit)
+  const [selectedChecklist, setSelectedChecklist] = useState<TacheListeTemplateWithItems | null>(null);
+  const [checklistPickerOpen, setChecklistPickerOpen] = useState(false);
+  const [checklistManagerOpen, setChecklistManagerOpen] = useState(false);
+  const [checklistExpanded, setChecklistExpanded] = useState(false);
 
   // Mode intermédiaire : uniquement plateforme + modeCommercial=intermediaire_fm4all
   const showIntermediaire =
@@ -174,7 +199,7 @@ export function ExecutionFormDialog({
       entrepriseId,
       siteId,
       serviceEntrepriseId: "",
-      dateDebutValidite: "",
+      dateDebutValidite: prestationDateDebut ?? "",
       dateFinValidite: "",
       priorite: "0",
       modePilotage: defaultModePilotage,
@@ -192,12 +217,14 @@ export function ExecutionFormDialog({
   useEffect(() => {
     if (!open) return;
 
+    setSelectedChecklist(null);
+    setChecklistExpanded(false);
     form.reset({
       prestationId,
       entrepriseId,
       siteId,
       serviceEntrepriseId: "",
-      dateDebutValidite: "",
+      dateDebutValidite: prestationDateDebut ?? "",
       dateFinValidite: "",
       priorite: "0",
       modePilotage: defaultModePilotage,
@@ -237,8 +264,16 @@ export function ExecutionFormDialog({
     form,
   ]);
 
+  const watchedServiceEntrepriseId = useWatch({ control: form.control, name: "serviceEntrepriseId" });
+  const selectedPrestataireEntrepriseId = prestataires.find(
+    (p) => p.serviceEntrepriseId === watchedServiceEntrepriseId,
+  )?.entrepriseId ?? null;
+
   const onSubmit = async (data: InsertExecutionFormType) => {
-    const result = await insertExecutionWithPrixAction(data);
+    const result = await insertExecutionWithPrixAction({
+      ...data,
+      tacheListeTemplateId: selectedChecklist?.id ?? null,
+    });
 
     if (result?.serverError) {
       toast.error(result.serverError.message);
@@ -380,11 +415,15 @@ export function ExecutionFormDialog({
                     label="Date de début"
                     requiredMark
                     buttonClassName="w-full"
+                    min={prestationDateDebut ?? undefined}
+                    max={prestationDateFin ?? undefined}
                   />
                   <RhfDatePicker<InsertExecutionFormType>
                     name="dateFinValidite"
                     label="Date de fin (optionnelle)"
                     buttonClassName="w-full"
+                    min={prestationDateDebut ?? undefined}
+                    max={prestationDateFin ?? undefined}
                   />
                 </div>
 
@@ -698,8 +737,146 @@ export function ExecutionFormDialog({
                     </p>
                   )}
                 </div>
+
+                <Separator />
+
+                {/* Section Checklist */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="flex items-center gap-1.5 text-sm font-medium">
+                        <ListChecks className="text-primary h-4 w-4 shrink-0" />
+                        Checklist par défaut (facultatif)
+                      </span>
+                      <p className="text-muted-foreground text-xs">
+                        Utilisée pour toutes les interventions de cette exécution (sauf override par règle de récurrence).
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-col gap-1.5">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setChecklistPickerOpen(true)}
+                      >
+                        <Pencil className="h-3 w-3" />
+                        Modifier
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setChecklistManagerOpen(true)}
+                      >
+                        Gérer les checklists
+                      </Button>
+                    </div>
+                  </div>
+                  <div>
+                    {selectedChecklist ? (
+                      <div className="mt-1 overflow-hidden rounded-lg border">
+                        <div className="flex items-center gap-2 p-3">
+                          {selectedChecklist.items.length > 0 ? (
+                            <button
+                              type="button"
+                              className="text-muted-foreground hover:text-foreground shrink-0"
+                              onClick={() => setChecklistExpanded((v) => !v)}
+                              aria-label={checklistExpanded ? "Réduire" : "Développer"}
+                            >
+                              {checklistExpanded ? (
+                                <ChevronDown className="h-4 w-4" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4" />
+                              )}
+                            </button>
+                          ) : (
+                            <span className="h-4 w-4 shrink-0" />
+                          )}
+                          <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                            {selectedChecklist.nom}
+                          </span>
+                          <Badge variant="outline" className="shrink-0 text-xs">
+                            {selectedChecklist.items.length} tâche
+                            {selectedChecklist.items.length !== 1 ? "s" : ""}
+                          </Badge>
+                        </div>
+                        {checklistExpanded && selectedChecklist.items.length > 0 && (
+                          <div className="bg-muted/30 divide-y border-t">
+                            {selectedChecklist.items.map((item, idx) => (
+                              <div
+                                key={item.id}
+                                className="flex items-start gap-2 px-3 py-2 text-xs"
+                              >
+                                <span className="text-muted-foreground w-5 shrink-0 text-center">
+                                  {idx + 1}.
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <span className="font-medium">{item.titre}</span>
+                                  {item.description && (
+                                    <p className="text-muted-foreground mt-0.5 truncate">
+                                      {item.description}
+                                    </p>
+                                  )}
+                                </div>
+                                {item.dureeEstimeeMinutes && (
+                                  <span className="text-muted-foreground flex shrink-0 items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    {item.dureeEstimeeMinutes}min
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-xs italic">
+                        Aucune checklist assignée.
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
+
+            <ChecklistPickerDialog
+              open={checklistPickerOpen}
+              onOpenChange={setChecklistPickerOpen}
+              serviceId={serviceId}
+              entrepriseId={entrepriseId}
+              prestataireEntrepriseId={selectedPrestataireEntrepriseId}
+              currentPackId={selectedChecklist?.id ?? null}
+              context="execution"
+              onSelect={(pack) => {
+                setSelectedChecklist(pack);
+                setChecklistExpanded(false);
+              }}
+            />
+            <TacheListeManagerDialog
+              open={checklistManagerOpen}
+              onOpenChange={setChecklistManagerOpen}
+              serviceId={serviceId}
+              serviceNom={serviceNom}
+              proprietaireEntrepriseId={
+                postureActive === "plateforme" ? null : entrepriseId
+              }
+              clientEntrepriseId={
+                postureActive === "plateforme" ? entrepriseId : undefined
+              }
+              clientEntrepriseNom={
+                postureActive === "plateforme" ? clientNom : undefined
+              }
+              prestataireEntrepriseId={selectedPrestataireEntrepriseId ?? undefined}
+              prestataireEntrepriseNom={
+                selectedPrestataireEntrepriseId
+                  ? (prestataires.find(
+                      (p) => p.entrepriseId === selectedPrestataireEntrepriseId,
+                    )?.nom ?? undefined)
+                  : undefined
+              }
+            />
 
             <DialogFooter className="bg-background flex-shrink-0 border-t px-6 pt-4 pb-6">
               <Button

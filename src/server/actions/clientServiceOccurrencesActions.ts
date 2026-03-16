@@ -5,6 +5,7 @@ import { documents, documentsLinks } from "@/db/schema/documents";
 import {
   clientServiceExecutions,
   clientServiceOccurrences,
+  clientServiceReglesRecurrence,
   occurrenceTaches,
 } from "@/db/schema/services";
 import { tickets } from "@/db/schema/tickets";
@@ -19,6 +20,7 @@ import {
 import {
   getPrestationById,
   getPrestationWithJoinsById,
+  getQuotaInfoForPrestation,
   prestataireHasExecutionOnPrestation,
 } from "@/server/queries/clientServices.query";
 import {
@@ -34,6 +36,8 @@ import type { ModePilotageType } from "@/zod-schemas/clientServiceExecutions.sch
 import { getUsersByEntrepriseId, getUsersByPrestataireEntrepriseId } from "@/server/queries/users.query";
 import { promoteS3Key, s3, S3_BUCKET } from "@/server/s3/s3";
 import {
+  deleteFuturePlanifieeOccurrences,
+  ensureOccurrencesWindow,
   insertPrixAppliquesForOccurrence,
   pickExecutionForOccurrence,
   snapshotOccurrenceTaches,
@@ -42,12 +46,14 @@ import {
   addTachePieceJointeSchema,
   deleteAdHocTacheSchema,
   deleteTachePieceJointeSchema,
+  dragOccurrenceSchema,
   getAssignableUsersForOccurrenceSchema,
   getOccurrencesPageSchema,
   getOccurrenceTachesSchema,
   insertAdHocTacheSchema,
   insertOccurrenceOnDemandFormSchema,
   occurrenceTicketsSchema,
+  resizeOccurrenceSchema,
   ticketOccurrenceLinkSchema,
   updateAdHocTacheSchema,
   updateOccurrenceAssigneeSchema,
@@ -68,6 +74,7 @@ import {
   max,
   or,
 } from "drizzle-orm";
+import { DateTime } from "luxon";
 import { flattenValidationErrors } from "next-safe-action";
 
 // ==================== HELPERS ====================
@@ -303,9 +310,22 @@ export const updateOccurrenceStatutAction = actionClient
     // 7. RÈGLE CLÔTURE : la terminaison est autorisée même si des tâches sont encore ouvertes
     // (regles_metier.md §6 — "la réalité terrain le justifie")
 
-    // 8. Mise à jour statut + auto-assignation au démarrage + snapshot facturation
+    // 8. Mise à jour statut + gel executionId au démarrage + snapshot tâches + facturation
     const now = new Date();
     const updated = await db.transaction(async (tx) => {
+      // Gel définitif de l'executionId au passage → en_cours
+      // On re-résout pour couvrir le cas où la planification a changé depuis la génération
+      let resolvedExecutionId = occurrence.executionId;
+      if (newStatut === "en_cours") {
+        resolvedExecutionId = await pickExecutionForOccurrence({
+          clientServiceId: occurrence.clientServiceId,
+          entrepriseId,
+          siteId: occurrence.siteId,
+          targetDate: now,
+          tx,
+        });
+      }
+
       const [row] = await tx
         .update(clientServiceOccurrences)
         .set({
@@ -315,6 +335,8 @@ export const updateOccurrenceStatutAction = actionClient
                 dateDebutReelle: now,
                 // BUG-3 fix: L'exécutant réel est toujours l'utilisateur courant, pas l'assigné précédent.
                 assigneeUserId: currentUser.id,
+                // Gel définitif de l'exécution gagnante
+                executionId: resolvedExecutionId,
               }
             : {}),
           ...(newStatut === "terminee" || newStatut === "non_honoree"
@@ -327,6 +349,46 @@ export const updateOccurrenceStatutAction = actionClient
         .returning();
 
       if (!row) throw errors.internal("Échec de la mise à jour du statut.");
+
+      // Snapshot des tâches au démarrage si pas encore fait (idempotent)
+      // Priorité checklist : règle de récurrence > exécution
+      if (newStatut === "en_cours" && resolvedExecutionId) {
+        const [existing] = await tx
+          .select({ nb: count() })
+          .from(occurrenceTaches)
+          .where(eq(occurrenceTaches.occurrenceId, occurrenceId));
+        if ((existing?.nb ?? 0) === 0) {
+          // 1. Chercher la checklist sur la règle de récurrence (override)
+          let resolvedTacheListeTemplateId: string | null = null;
+
+          if (occurrence.regleRecurrenceId) {
+            const [regle] = await tx
+              .select({ tacheListeTemplateId: clientServiceReglesRecurrence.tacheListeTemplateId })
+              .from(clientServiceReglesRecurrence)
+              .where(eq(clientServiceReglesRecurrence.id, occurrence.regleRecurrenceId))
+              .limit(1);
+            resolvedTacheListeTemplateId = regle?.tacheListeTemplateId ?? null;
+          }
+
+          // 2. Fallback sur la checklist de l'exécution
+          if (!resolvedTacheListeTemplateId) {
+            const [exec] = await tx
+              .select({ tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId })
+              .from(clientServiceExecutions)
+              .where(eq(clientServiceExecutions.id, resolvedExecutionId))
+              .limit(1);
+            resolvedTacheListeTemplateId = exec?.tacheListeTemplateId ?? null;
+          }
+
+          if (resolvedTacheListeTemplateId) {
+            await snapshotOccurrenceTaches({
+              occurrenceId,
+              tacheListeTemplateId: resolvedTacheListeTemplateId,
+              tx,
+            });
+          }
+        }
+      }
 
       if (newStatut === "terminee") {
         await insertPrixAppliquesForOccurrence({ occurrenceId, tx });
@@ -1782,7 +1844,20 @@ export const insertOccurrenceOnDemandAction = actionClient
       );
     }
 
-    // 5. Insérer l'occurrence (+ snapshot tâches depuis la checklist) dans une transaction
+    // 5. Vérifier le quota si la prestation est en mode quota_manuel
+    if (prestation.famillePlanification === "quota_manuel") {
+      const quotaInfo = await getQuotaInfoForPrestation(prestationId, dateDebut);
+      if (
+        quotaInfo !== null &&
+        quotaInfo.usedInPeriod >= quotaInfo.nbOccurrencesParPeriode
+      ) {
+        throw errors.conflict(
+          `Le quota d'interventions est atteint pour la période en cours (${quotaInfo.nbOccurrencesParPeriode} sur ${quotaInfo.nbOccurrencesParPeriode}). Aucune nouvelle intervention ne peut être ajoutée avant la prochaine période.`,
+        );
+      }
+    }
+
+    // 6. Insérer l'occurrence (+ snapshot tâches depuis la checklist) dans une transaction
     const occurrence = await db.transaction(async (tx) => {
       const [inserted] = await tx
         .insert(clientServiceOccurrences)
@@ -1801,21 +1876,7 @@ export const insertOccurrenceOnDemandAction = actionClient
 
       if (!inserted) throw errors.internal("Échec de la création du passage.");
 
-      // Snapshot des tâches depuis la checklist de l'exécution (si définie)
-      if (executionId) {
-        const [exec] = await tx
-          .select({ tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId })
-          .from(clientServiceExecutions)
-          .where(eq(clientServiceExecutions.id, executionId))
-          .limit(1);
-        if (exec?.tacheListeTemplateId) {
-          await snapshotOccurrenceTaches({
-            occurrenceId: inserted.id,
-            tacheListeTemplateId: exec.tacheListeTemplateId,
-            tx,
-          });
-        }
-      }
+      // Tâches NON snapshotées ici — snapshot réservé au cron J-1 ou au passage → en_cours
 
       return inserted;
     });
@@ -1915,4 +1976,357 @@ export const updateTacheTempsPasseAction = actionClient
     if (!updated) throw errors.internal("Échec de la mise à jour du temps passé.");
 
     return { tempsPasseSecondes: updated.tempsPasseSecondes };
+  });
+
+// ==================== HELPERS (drag/resize) ====================
+
+const UTC_DAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
+
+function toWallClockDate(isoStr: string, zone: string): Date {
+  const wallClock = DateTime.fromISO(isoStr)
+    .setZone(zone)
+    .toFormat("yyyy-MM-dd'T'HH:mm:ss");
+  return new Date(wallClock);
+}
+
+function parseRruleParts(rruleStr: string): Record<string, string> {
+  return Object.fromEntries(
+    rruleStr.split(";").map((p) => {
+      const [k, v] = p.split("=");
+      return [k!, v ?? ""];
+    }),
+  );
+}
+
+function stripUntilCount(rruleStr: string): string {
+  return rruleStr
+    .replace(/;?UNTIL=[^;]+/gi, "")
+    .replace(/;?COUNT=\d+/gi, "")
+    .trimEnd()
+    .replace(/;$/, "");
+}
+
+function addUntilLocal(rruleStr: string, exclusiveDate: Date): string {
+  const until = new Date(exclusiveDate.getTime() - 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const untilStr = `${until.getUTCFullYear()}${pad(until.getUTCMonth() + 1)}${pad(until.getUTCDate())}T${pad(until.getUTCHours())}${pad(until.getUTCMinutes())}${pad(until.getUTCSeconds())}Z`;
+  return stripUntilCount(rruleStr) + `;UNTIL=${untilStr}`;
+}
+
+async function canManageDragResize(
+  userId: string,
+  entrepriseId: string,
+  siteId: string,
+): Promise<boolean> {
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) return true;
+  const posture = await getActivePosture();
+  if (posture === "client") {
+    const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
+    if (adhesion?.role === "admin") return true;
+  } else if (posture === "prestataire") {
+    const adhesion = await getUserPrestataireAdhesion({ userId });
+    if (adhesion?.role === "admin") return true;
+  }
+  const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
+  return siteRole === "responsable_site";
+}
+
+// ==================== DRAG OCCURRENCE ====================
+
+export const dragOccurrenceAction = actionClient
+  .metadata({ actionName: "dragOccurrenceAction" })
+  .inputSchema(dragOccurrenceSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized();
+
+    const [occ] = await db
+      .select({
+        id: clientServiceOccurrences.id,
+        clientServiceId: clientServiceOccurrences.clientServiceId,
+        siteId: clientServiceOccurrences.siteId,
+        statut: clientServiceOccurrences.statut,
+        regleRecurrenceId: clientServiceOccurrences.regleRecurrenceId,
+        dateDebutOriginale: clientServiceOccurrences.dateDebutOriginale,
+        dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
+        dateFinPrevue: clientServiceOccurrences.dateFinPrevue,
+      })
+      .from(clientServiceOccurrences)
+      .where(eq(clientServiceOccurrences.id, parsedInput.occurrenceId))
+      .limit(1);
+
+    if (!occ) throw errors.notFound("Occurrence introuvable.");
+    if (occ.statut !== "planifiee")
+      throw errors.conflict("Seules les occurrences planifiées peuvent être déplacées.");
+
+    const canManage = await canManageDragResize(
+      session.user.id,
+      parsedInput.entrepriseId,
+      occ.siteId,
+    );
+    if (!canManage) throw errors.forbidden("Droits insuffisants pour modifier cette occurrence.");
+
+    const fuseauHoraire = "Europe/Paris";
+    const newStartDate = toWallClockDate(parsedInput.newStart, fuseauHoraire);
+    const newEndDate = parsedInput.newEnd
+      ? toWallClockDate(parsedInput.newEnd, fuseauHoraire)
+      : null;
+
+    // ── Scope "occurrence" ──────────────────────────────────────────────────
+    if (parsedInput.scope === "occurrence" || !occ.regleRecurrenceId) {
+      await db
+        .update(clientServiceOccurrences)
+        .set({
+          dateDebutPrevue: newStartDate,
+          ...(newEndDate ? { dateFinPrevue: newEndDate } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(clientServiceOccurrences.id, occ.id));
+
+      return { success: true };
+    }
+
+    // ── Scope "suivantes" ───────────────────────────────────────────────────
+    const [rule] = await db
+      .select()
+      .from(clientServiceReglesRecurrence)
+      .where(eq(clientServiceReglesRecurrence.id, occ.regleRecurrenceId!))
+      .limit(1);
+
+    if (!rule) throw errors.notFound("Règle de récurrence introuvable.");
+
+    const dateOrigUTC = occ.dateDebutOriginale ?? occ.dateDebutPrevue;
+    if (!dateOrigUTC) throw errors.internal("Date d'origine manquante.");
+
+    const parts = parseRruleParts(rule.regleRrule);
+    const freq = parts["FREQ"] ?? "WEEKLY";
+    const intervalN = parseInt(parts["INTERVAL"] ?? "1", 10);
+    const intervalPart = intervalN > 1 ? `;INTERVAL=${intervalN}` : "";
+    const bydayList = (parts["BYDAY"] ?? "").split(",").filter(Boolean);
+    const draggedDay = UTC_DAY_CODES[dateOrigUTC.getUTCDay()] ?? "MO";
+
+    await db.transaction(async (tx) => {
+      // 1. Tronquer la règle originale
+      await tx
+        .update(clientServiceReglesRecurrence)
+        .set({ regleRrule: addUntilLocal(rule.regleRrule, dateOrigUTC) })
+        .where(eq(clientServiceReglesRecurrence.id, rule.id));
+
+      // 2. Supprimer les occurrences futures planifiées depuis cette date
+      await deleteFuturePlanifieeOccurrences({
+        clientServiceId: occ.clientServiceId,
+        now: dateOrigUTC,
+        tx,
+      });
+
+      // 3. Créer Règle B : jour déplacé, nouvelle heure
+      const ruleBRrule =
+        freq === "WEEKLY" && bydayList.length > 0
+          ? `FREQ=WEEKLY${intervalPart};BYDAY=${draggedDay}`
+          : stripUntilCount(rule.regleRrule);
+
+      await tx.insert(clientServiceReglesRecurrence).values({
+        clientServiceId: rule.clientServiceId,
+        libelle: rule.libelle,
+        dtstartLocal: newStartDate,
+        fuseauHoraire: rule.fuseauHoraire,
+        regleRrule: ruleBRrule,
+        dureePrevueMinutes: newEndDate
+          ? Math.round((newEndDate.getTime() - newStartDate.getTime()) / 60000)
+          : rule.dureePrevueMinutes,
+        actif: true,
+        ordre: rule.ordre,
+        createdById: session.user.id,
+        updatedById: session.user.id,
+      });
+
+      // 4. Créer Règle A : autres jours, heure originale (si WEEKLY multi-jours)
+      const otherDays = bydayList.filter((d) => d !== draggedDay);
+      if (freq === "WEEKLY" && otherDays.length > 0) {
+        const ruleADtstart = new Date(
+          Date.UTC(
+            dateOrigUTC.getUTCFullYear(),
+            dateOrigUTC.getUTCMonth(),
+            dateOrigUTC.getUTCDate(),
+            rule.dtstartLocal.getUTCHours(),
+            rule.dtstartLocal.getUTCMinutes(),
+            0,
+            0,
+          ),
+        );
+
+        await tx.insert(clientServiceReglesRecurrence).values({
+          clientServiceId: rule.clientServiceId,
+          libelle: rule.libelle,
+          dtstartLocal: ruleADtstart,
+          fuseauHoraire: rule.fuseauHoraire,
+          regleRrule: `FREQ=WEEKLY${intervalPart};BYDAY=${otherDays.join(",")}`,
+          dureePrevueMinutes: rule.dureePrevueMinutes,
+          actif: true,
+          ordre: rule.ordre,
+          createdById: session.user.id,
+          updatedById: session.user.id,
+        });
+      }
+    });
+
+    // 5. Régénérer les occurrences
+    const { created } = await ensureOccurrencesWindow({
+      clientServiceId: occ.clientServiceId,
+      now: dateOrigUTC,
+      daysAhead: 90,
+    });
+
+    return { success: true, warningNoExecution: created === 0 };
+  });
+
+// ==================== RESIZE OCCURRENCE ====================
+
+export const resizeOccurrenceAction = actionClient
+  .metadata({ actionName: "resizeOccurrenceAction" })
+  .inputSchema(resizeOccurrenceSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized();
+
+    const [occ] = await db
+      .select({
+        id: clientServiceOccurrences.id,
+        clientServiceId: clientServiceOccurrences.clientServiceId,
+        siteId: clientServiceOccurrences.siteId,
+        statut: clientServiceOccurrences.statut,
+        regleRecurrenceId: clientServiceOccurrences.regleRecurrenceId,
+        dateDebutOriginale: clientServiceOccurrences.dateDebutOriginale,
+        dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
+      })
+      .from(clientServiceOccurrences)
+      .where(eq(clientServiceOccurrences.id, parsedInput.occurrenceId))
+      .limit(1);
+
+    if (!occ) throw errors.notFound("Occurrence introuvable.");
+    if (occ.statut !== "planifiee")
+      throw errors.conflict("Seules les occurrences planifiées peuvent être redimensionnées.");
+
+    const canManage = await canManageDragResize(
+      session.user.id,
+      parsedInput.entrepriseId,
+      occ.siteId,
+    );
+    if (!canManage) throw errors.forbidden("Droits insuffisants pour modifier cette occurrence.");
+
+    const fuseauHoraire = "Europe/Paris";
+    const newEndDate = toWallClockDate(parsedInput.newEnd, fuseauHoraire);
+    const startDate = occ.dateDebutPrevue!;
+    const newDurationMinutes = Math.round(
+      (newEndDate.getTime() - startDate.getTime()) / 60000,
+    );
+    if (newDurationMinutes <= 0) throw errors.conflict("La durée doit être positive.");
+
+    // ── Scope "occurrence" ──────────────────────────────────────────────────
+    if (parsedInput.scope === "occurrence" || !occ.regleRecurrenceId) {
+      await db
+        .update(clientServiceOccurrences)
+        .set({ dateFinPrevue: newEndDate, updatedAt: new Date() })
+        .where(eq(clientServiceOccurrences.id, occ.id));
+
+      return { success: true };
+    }
+
+    // ── Scope "suivantes" ───────────────────────────────────────────────────
+    const [rule] = await db
+      .select()
+      .from(clientServiceReglesRecurrence)
+      .where(eq(clientServiceReglesRecurrence.id, occ.regleRecurrenceId!))
+      .limit(1);
+
+    if (!rule) throw errors.notFound("Règle de récurrence introuvable.");
+
+    const dateOrigUTC = occ.dateDebutOriginale ?? occ.dateDebutPrevue;
+    if (!dateOrigUTC) throw errors.internal("Date d'origine manquante.");
+
+    const parts = parseRruleParts(rule.regleRrule);
+    const freq = parts["FREQ"] ?? "WEEKLY";
+    const intervalN = parseInt(parts["INTERVAL"] ?? "1", 10);
+    const intervalPart = intervalN > 1 ? `;INTERVAL=${intervalN}` : "";
+    const bydayList = (parts["BYDAY"] ?? "").split(",").filter(Boolean);
+    const resizedDay = UTC_DAY_CODES[dateOrigUTC.getUTCDay()] ?? "MO";
+
+    await db.transaction(async (tx) => {
+      // 1. Tronquer la règle originale
+      await tx
+        .update(clientServiceReglesRecurrence)
+        .set({ regleRrule: addUntilLocal(rule.regleRrule, dateOrigUTC) })
+        .where(eq(clientServiceReglesRecurrence.id, rule.id));
+
+      // 2. Supprimer les occurrences futures planifiées
+      await deleteFuturePlanifieeOccurrences({
+        clientServiceId: occ.clientServiceId,
+        now: dateOrigUTC,
+        tx,
+      });
+
+      // 3. Créer Règle B : jour redimensionné, nouvelle durée, même heure
+      const ruleBRrule =
+        freq === "WEEKLY" && bydayList.length > 0
+          ? `FREQ=WEEKLY${intervalPart};BYDAY=${resizedDay}`
+          : stripUntilCount(rule.regleRrule);
+
+      await tx.insert(clientServiceReglesRecurrence).values({
+        clientServiceId: rule.clientServiceId,
+        libelle: rule.libelle,
+        dtstartLocal: dateOrigUTC,
+        fuseauHoraire: rule.fuseauHoraire,
+        regleRrule: ruleBRrule,
+        dureePrevueMinutes: newDurationMinutes,
+        actif: true,
+        ordre: rule.ordre,
+        createdById: session.user.id,
+        updatedById: session.user.id,
+      });
+
+      // 4. Créer Règle A : autres jours, durée originale (si WEEKLY multi-jours)
+      const otherDays = bydayList.filter((d) => d !== resizedDay);
+      if (freq === "WEEKLY" && otherDays.length > 0) {
+        const ruleADtstart = new Date(
+          Date.UTC(
+            dateOrigUTC.getUTCFullYear(),
+            dateOrigUTC.getUTCMonth(),
+            dateOrigUTC.getUTCDate(),
+            rule.dtstartLocal.getUTCHours(),
+            rule.dtstartLocal.getUTCMinutes(),
+            0,
+            0,
+          ),
+        );
+
+        await tx.insert(clientServiceReglesRecurrence).values({
+          clientServiceId: rule.clientServiceId,
+          libelle: rule.libelle,
+          dtstartLocal: ruleADtstart,
+          fuseauHoraire: rule.fuseauHoraire,
+          regleRrule: `FREQ=WEEKLY${intervalPart};BYDAY=${otherDays.join(",")}`,
+          dureePrevueMinutes: rule.dureePrevueMinutes,
+          actif: true,
+          ordre: rule.ordre,
+          createdById: session.user.id,
+          updatedById: session.user.id,
+        });
+      }
+    });
+
+    // 5. Régénérer
+    const { created: createdResize } = await ensureOccurrencesWindow({
+      clientServiceId: occ.clientServiceId,
+      now: dateOrigUTC,
+      daysAhead: 90,
+    });
+
+    return { success: true, warningNoExecution: createdResize === 0 };
   });

@@ -3,8 +3,8 @@
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import type { DevisAvecDetails } from "@/server/queries/devis.query";
 import { getDevisAction } from "@/server/actions/devisActions";
+import type { DevisAvecDetails } from "@/server/queries/devis.query";
 import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
 import type { DevisStatutType } from "@/zod-schemas/enums";
@@ -104,8 +104,8 @@ export function DevisTable({
   const entreprise = useAppStore((state) => state.entreprise);
   const router = useRouter();
 
-  const devisView = useUiStore((state) => state.devisView);
-  const setDevisView = useUiStore((state) => state.setDevisView);
+  const DevisViewType = useUiStore((state) => state.DevisViewType);
+  const setDevisViewType = useUiStore((state) => state.setDevisViewType);
 
   const [items, setItems] = useState<DevisAvecDetails[]>([]);
   const [total, setTotal] = useState(0);
@@ -244,7 +244,11 @@ export function DevisTable({
     serviceId: searchParams.serviceId,
   };
 
-  const columns = createDevisColumns({ hideProprietaire, hideEmetteur, hideService });
+  const columns = createDevisColumns({
+    hideProprietaire,
+    hideEmetteur,
+    hideService,
+  });
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -254,17 +258,17 @@ export function DevisTable({
         <div className="flex items-center rounded-md border">
           <Button
             size="sm"
-            variant={devisView === "list" ? "default" : "ghost"}
+            variant={DevisViewType === "list" ? "default" : "ghost"}
             className="rounded-r-none border-r"
-            onClick={() => setDevisView("list")}
+            onClick={() => setDevisViewType("list")}
           >
             <List className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            variant={devisView === "grid" ? "default" : "ghost"}
+            variant={DevisViewType === "grid" ? "default" : "ghost"}
             className="rounded-l-none"
-            onClick={() => setDevisView("grid")}
+            onClick={() => setDevisViewType("grid")}
           >
             <Grid3x3 className="h-4 w-4" />
           </Button>
@@ -296,10 +300,7 @@ export function DevisTable({
           </Button>
 
           {canCreate && (
-            <Button
-              size="sm"
-              onClick={() => router.push("/app/devis/nouveau")}
-            >
+            <Button size="sm" onClick={() => router.push("/app/devis/nouveau")}>
               <Plus className="h-4 w-4" />
               Nouveau devis
             </Button>
@@ -309,7 +310,7 @@ export function DevisTable({
 
       {/* Contenu */}
       <div className="flex-1 overflow-hidden">
-        {devisView === "grid" ? (
+        {DevisViewType === "grid" ? (
           <DevisGrid
             items={items}
             isLoading={loading}

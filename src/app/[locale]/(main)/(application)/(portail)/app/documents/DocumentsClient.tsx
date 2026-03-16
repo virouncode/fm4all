@@ -95,8 +95,8 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
   );
   const router = useRouter();
 
-  const documentView = useUiStore((state) => state.documentView);
-  const setDocumentView = useUiStore((state) => state.setDocumentView);
+  const DocumentViewType = useUiStore((state) => state.DocumentViewType);
+  const setDocumentViewType = useUiStore((state) => state.setDocumentViewType);
 
   // Permission: can the current user create/edit/delete documents?
   const canWrite =
@@ -228,7 +228,15 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
     loadDocuments();
     loadTags();
     if (isPartagesTab) loadPartners();
-  }, [entreprise?.id, posture, searchParams, isPartagesTab, loadDocuments, loadTags, loadPartners]);
+  }, [
+    entreprise?.id,
+    posture,
+    searchParams,
+    isPartagesTab,
+    loadDocuments,
+    loadTags,
+    loadPartners,
+  ]);
 
   // Load more (infinite scroll)
   const loadMore = useCallback(async () => {
@@ -395,22 +403,22 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
           className="flex items-center"
         >
           <Button
-            variant={documentView === "list" ? "default" : "outline"}
+            variant={DocumentViewType === "list" ? "default" : "outline"}
             size="sm"
-            onClick={() => setDocumentView("list")}
+            onClick={() => setDocumentViewType("list")}
             className="rounded-r-none border-r-0"
             aria-label="Vue liste"
-            aria-pressed={documentView === "list"}
+            aria-pressed={DocumentViewType === "list"}
           >
             <List aria-hidden="true" />
           </Button>
           <Button
-            variant={documentView === "grid" ? "default" : "outline"}
+            variant={DocumentViewType === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => setDocumentView("grid")}
+            onClick={() => setDocumentViewType("grid")}
             className="rounded-l-none"
             aria-label="Vue grille"
-            aria-pressed={documentView === "grid"}
+            aria-pressed={DocumentViewType === "grid"}
           >
             <Grid3x3 aria-hidden="true" />
           </Button>
@@ -487,7 +495,7 @@ export function DocumentsClient({ searchParams }: DocumentsClientProps) {
 
       {/* View */}
       <div className="flex-1 overflow-hidden">
-        {documentView === "list" ? (
+        {DocumentViewType === "list" ? (
           <InfiniteDataTable<SelectDocumentWithTagsType>
             columns={columns}
             items={documents}

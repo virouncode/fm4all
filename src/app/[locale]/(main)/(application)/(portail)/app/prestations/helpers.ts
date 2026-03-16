@@ -84,7 +84,7 @@ export function getFamillePlanificationBadge(famille: FamillePlanificationType):
       return {
         label: "Ponctuel",
         className:
-          "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+          "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
       };
     default:
       return {

@@ -84,6 +84,8 @@ type RhfDateTimePickerProps<S extends FieldValues> = {
   dateDisabled?: boolean;
   timeDisabled?: boolean;
   withError?: boolean;
+  /** Heure affichée (et appliquée) quand le champ est encore vide */
+  defaultTime?: { hour: number; minute: number };
 } & Omit<BaseButtonProps, "onBlur" | "disabled">;
 
 const roundTo5 = (m: number) => Math.round(m / 5) * 5;
@@ -105,6 +107,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
   dateDisabled,
   timeDisabled,
   withError = true,
+  defaultTime,
   ...buttonProps
 }: RhfDateTimePickerProps<S>) {
   const { control } = useFormContext<S>();
@@ -153,7 +156,13 @@ export function RhfDateTimePicker<S extends FieldValues>({
           ? DateTime.fromISO(rawValue as string, { zone })
           : null;
 
-        const base = (dt ?? DateTime.now().setZone(zone)).setZone(zone);
+        const base = isEmpty
+          ? defaultTime
+            ? DateTime.now()
+                .setZone(zone)
+                .set({ hour: defaultTime.hour, minute: defaultTime.minute, second: 0, millisecond: 0 })
+            : DateTime.now().setZone(zone)
+          : dt!.setZone(zone);
 
         const dateStart = base.startOf("day");
         const curH24 = base.hour;

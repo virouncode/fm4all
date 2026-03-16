@@ -32,6 +32,10 @@ type UiStoreType = {
   CalendarSlotMinTime: string;
   CalendarSlotMaxTime: string;
   CalendarSlotDuration: CalendarSlotDurationType;
+  /** Sélection persistée des filtres calendrier */
+  CalendarSelectedClientIds: string[];
+  CalendarSelectedSiteIds: string[];
+  CalendarSelectedServiceIds: string[];
 
   // actions
   setTicketViewType: (view: TicketViewType) => void;
@@ -45,6 +49,9 @@ type UiStoreType = {
   setCalendarSlotMinTime: (time: string) => void;
   setCalendarSlotMaxTime: (time: string) => void;
   setCalendarSlotDuration: (duration: CalendarSlotDurationType) => void;
+  setCalendarSelectedClientIds: (ids: string[]) => void;
+  setCalendarSelectedSiteIds: (ids: string[]) => void;
+  setCalendarSelectedServiceIds: (ids: string[]) => void;
 };
 
 export const useUiStore = create<UiStoreType>()(
@@ -62,6 +69,9 @@ export const useUiStore = create<UiStoreType>()(
       CalendarSlotMinTime: "06:00:00",
       CalendarSlotMaxTime: "20:00:00",
       CalendarSlotDuration: "00:15:00",
+      CalendarSelectedClientIds: [],
+      CalendarSelectedSiteIds: [],
+      CalendarSelectedServiceIds: [],
 
       // actions
       setTicketViewType: (view) => set({ TicketViewType: view }),
@@ -76,6 +86,12 @@ export const useUiStore = create<UiStoreType>()(
       setCalendarSlotMaxTime: (time) => set({ CalendarSlotMaxTime: time }),
       setCalendarSlotDuration: (duration) =>
         set({ CalendarSlotDuration: duration }),
+      setCalendarSelectedClientIds: (ids) =>
+        set({ CalendarSelectedClientIds: ids }),
+      setCalendarSelectedSiteIds: (ids) =>
+        set({ CalendarSelectedSiteIds: ids }),
+      setCalendarSelectedServiceIds: (ids) =>
+        set({ CalendarSelectedServiceIds: ids }),
     }),
     {
       name: UI_STORE_KEY,
@@ -91,6 +107,9 @@ export const useUiStore = create<UiStoreType>()(
         CalendarSlotMinTime: state.CalendarSlotMinTime,
         CalendarSlotMaxTime: state.CalendarSlotMaxTime,
         CalendarSlotDuration: state.CalendarSlotDuration,
+        CalendarSelectedClientIds: state.CalendarSelectedClientIds,
+        CalendarSelectedSiteIds: state.CalendarSelectedSiteIds,
+        CalendarSelectedServiceIds: state.CalendarSelectedServiceIds,
       }),
     },
   ),

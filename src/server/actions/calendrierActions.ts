@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { serviceEntreprises } from "@/db/schema/entreprises";
+import { entreprises, serviceEntreprises } from "@/db/schema/entreprises";
 import {
   clientServiceExceptionsRecurrence,
   clientServiceExecutions,
@@ -16,6 +16,7 @@ import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import { getClientPrestataires, getMesClients } from "@/server/queries/clientServiceExecutions.query";
+import { getEntreprisesClientes } from "@/server/queries/entreprises.query";
 import {
   getAccessibleSitesByUser,
   getSitesByEntrepriseId,
@@ -48,15 +49,23 @@ export type CalendarEventItemType = {
     serviceNom: string;
     siteNom?: string;
     famillePlanification: string;
+    dateDebutOriginale?: string;
   };
+};
+
+export type SiteParClientType = {
+  clientId: string;
+  clientNom: string;
+  sites: { id: string; nom: string }[];
 };
 
 export type CalendarFilterOptionsType = {
   sites: { id: string; nom: string }[];
+  /** Sites groupés par client — peuplé pour posture prestataire/plateforme */
+  sitesParClient: SiteParClientType[];
   services: { id: string; nom: string }[];
   /** Vide pour posture prestataire */
   prestataires: { id: string; nom: string }[];
-  /** Vide pour posture client et plateforme (pour l'instant) */
   clients: { id: string; nom: string }[];
   /** IDs des sites pré-sélectionnés au chargement */
   defaultSiteIds: string[];
@@ -154,11 +163,12 @@ export const getCalendarFilterOptionsAction = actionClient
 
     // ── Sites ──────────────────────────────────────────────────────────────
     // Client      : getAccessibleSitesByUser (admin → tous, non-admin → attribués + sous-sites)
-    // Plateforme  : getSitesByEntrepriseId (tous les sites de l'entreprise)
-    // Prestataire admin    : tous les sites où il a des exécutions actives
-    // Prestataire non-admin : ses sites attribués uniquement
+    // Plateforme  : vide initialement — chargé dynamiquement à la sélection de clients
+    // Prestataire admin    : tous les sites client où il a des exécutions actives, groupés par client
+    // Prestataire non-admin : ses sites attribués uniquement, groupés par client
 
     let sitesRows: { id: string; nom: string }[];
+    let sitesParClient: SiteParClientType[] = [];
 
     if (posture === "client") {
       const siteList = await getAccessibleSitesByUser({
@@ -167,14 +177,20 @@ export const getCalendarFilterOptionsAction = actionClient
       });
       sitesRows = siteList.map((s) => ({ id: s.id, nom: s.nom }));
     } else if (posture === "plateforme") {
-      const siteList = await getSitesByEntrepriseId(parsedInput.entrepriseId);
-      sitesRows = siteList.map((s) => ({ id: s.id, nom: s.nom }));
+      // Pas de sites initiaux — chargés dynamiquement quand des clients sont sélectionnés
+      sitesRows = [];
     } else if (isAdmin) {
       // Prestataire admin : tous les sites client où il a des exécutions actives
-      sitesRows = await db
-        .selectDistinct({ id: sites.id, nom: sites.nom })
+      const rows = await db
+        .selectDistinct({
+          id: sites.id,
+          nom: sites.nom,
+          clientEntrepriseId: clientServices.entrepriseId,
+          clientNom: entreprises.nom,
+        })
         .from(clientServices)
         .innerJoin(sites, eq(sites.id, clientServices.siteId))
+        .innerJoin(entreprises, eq(entreprises.id, clientServices.entrepriseId))
         .innerJoin(
           clientServiceExecutions,
           and(
@@ -195,18 +211,49 @@ export const getCalendarFilterOptionsAction = actionClient
             eq(clientServices.statut, "actif"),
           ),
         )
-        .orderBy(asc(sites.nom));
+        .orderBy(asc(entreprises.nom), asc(sites.nom));
+      sitesRows = rows.map((r) => ({ id: r.id, nom: r.nom }));
+      // Grouper par client
+      const grouped = new Map<string, SiteParClientType>();
+      for (const row of rows) {
+        if (!grouped.has(row.clientEntrepriseId)) {
+          grouped.set(row.clientEntrepriseId, {
+            clientId: row.clientEntrepriseId,
+            clientNom: row.clientNom,
+            sites: [],
+          });
+        }
+        grouped.get(row.clientEntrepriseId)!.sites.push({ id: row.id, nom: row.nom });
+      }
+      sitesParClient = Array.from(grouped.values());
     } else {
       // Prestataire non-admin : sites attribués uniquement (toutes entreprises clientes)
-      sitesRows = await db
-        .selectDistinct({ id: sites.id, nom: sites.nom })
+      const rows = await db
+        .selectDistinct({
+          id: sites.id,
+          nom: sites.nom,
+          clientEntrepriseId: sites.entrepriseId,
+          clientNom: entreprises.nom,
+        })
         .from(userPrestataireSiteAttributions)
-        .innerJoin(
-          sites,
-          eq(sites.id, userPrestataireSiteAttributions.siteId),
-        )
+        .innerJoin(sites, eq(sites.id, userPrestataireSiteAttributions.siteId))
+        .innerJoin(entreprises, eq(entreprises.id, sites.entrepriseId))
         .where(eq(userPrestataireSiteAttributions.userId, userId))
-        .orderBy(asc(sites.nom));
+        .orderBy(asc(entreprises.nom), asc(sites.nom));
+      sitesRows = rows.map((r) => ({ id: r.id, nom: r.nom }));
+      // Grouper par client
+      const grouped = new Map<string, SiteParClientType>();
+      for (const row of rows) {
+        if (!grouped.has(row.clientEntrepriseId)) {
+          grouped.set(row.clientEntrepriseId, {
+            clientId: row.clientEntrepriseId,
+            clientNom: row.clientNom,
+            sites: [],
+          });
+        }
+        grouped.get(row.clientEntrepriseId)!.sites.push({ id: row.id, nom: row.nom });
+      }
+      sitesParClient = Array.from(grouped.values());
     }
 
     // ── Services ───────────────────────────────────────────────────────────
@@ -229,28 +276,15 @@ export const getCalendarFilterOptionsAction = actionClient
         )
         .orderBy(asc(services.nom));
     } else if (posture === "prestataire") {
+      // Services proposés par le prestataire (catalogue direct via serviceEntreprises)
       servicesRows = await db
         .selectDistinct({ id: services.id, nom: services.nom })
-        .from(clientServices)
-        .innerJoin(services, eq(services.id, clientServices.serviceId))
-        .innerJoin(
-          clientServiceExecutions,
-          and(
-            eq(clientServiceExecutions.clientServiceId, clientServices.id),
-            eq(clientServiceExecutions.actif, true),
-          ),
-        )
-        .innerJoin(
-          serviceEntreprises,
-          eq(
-            serviceEntreprises.id,
-            clientServiceExecutions.serviceEntrepriseId,
-          ),
-        )
+        .from(serviceEntreprises)
+        .innerJoin(services, eq(services.id, serviceEntreprises.serviceId))
         .where(
           and(
             eq(serviceEntreprises.entrepriseId, parsedInput.entrepriseId),
-            eq(clientServices.statut, "actif"),
+            eq(serviceEntreprises.actif, true),
           ),
         )
         .orderBy(asc(services.nom));
@@ -270,13 +304,16 @@ export const getCalendarFilterOptionsAction = actionClient
         ? await getClientPrestataires(parsedInput.entrepriseId)
         : [];
 
-    // ── Clients (prestataire uniquement) ──────────────────────────────────
-    // Utilise getMesClients qui retourne les clients via relations ET exécutions
+    // ── Clients (prestataire + plateforme) ────────────────────────────────
+    // Prestataire → ses clients (via exécutions/relations)
+    // Plateforme  → toutes les entreprises clientes
 
     let clientsRows: { id: string; nom: string }[] = [];
     if (posture === "prestataire") {
       const mesClients = await getMesClients(parsedInput.entrepriseId);
       clientsRows = mesClients.map((c) => ({ id: c.id, nom: c.nom }));
+    } else if (posture === "plateforme") {
+      clientsRows = await getEntreprisesClientes();
     }
 
     // ── DefaultSiteIds ────────────────────────────────────────────────────
@@ -288,6 +325,7 @@ export const getCalendarFilterOptionsAction = actionClient
 
     return {
       sites: sitesRows,
+      sitesParClient,
       services: servicesRows,
       prestataires: prestatairesRows,
       clients: clientsRows,
@@ -299,9 +337,10 @@ export const getCalendarFilterOptionsAction = actionClient
 // ==================== ACTION: SITES FOR FILTER (DYNAMIC) ====================
 
 /**
- * Retourne les sites d'une ou plusieurs entreprises clientes.
- * Utilisé pour le rechargement dynamique des sites quand la sélection de clients change
- * (admin prestataire / plateforme).
+ * Retourne les sites d'une ou plusieurs entreprises clientes, groupés par client.
+ * Utilisé pour le rechargement dynamique des sites quand la sélection de clients change.
+ * - Prestataire non-admin : uniquement ses sites attribués parmi les sites des clients
+ * - Prestataire admin / Plateforme : tous les sites des clients sélectionnés
  */
 export const getCalendarSitesForFilterAction = actionClient
   .metadata({ actionName: "getCalendarSitesForFilterAction" })
@@ -313,16 +352,81 @@ export const getCalendarSitesForFilterAction = actionClient
     const session = await getSession();
     if (!session?.user) throw errors.unauthorized();
 
-    const results = await Promise.all(
-      parsedInput.clientEntrepriseIds.map((id) => getSitesByEntrepriseId(id)),
-    );
+    const posture = await getActivePosture();
+    const userId = session.user.id;
 
-    const allSites = results.flat();
-    const uniqueSites = Array.from(new Map(allSites.map((s) => [s.id, s])).values())
-      .map((s) => ({ id: s.id, nom: s.nom }))
-      .sort((a, b) => a.nom.localeCompare(b.nom));
+    // Noms des entreprises clientes
+    const clientEntreprises = await db
+      .select({ id: entreprises.id, nom: entreprises.nom })
+      .from(entreprises)
+      .where(inArray(entreprises.id, parsedInput.clientEntrepriseIds));
 
-    return { sites: uniqueSites };
+    let sitesParClient: SiteParClientType[];
+
+    if (posture === "prestataire") {
+      const adhesion = await getUserPrestataireAdhesion({ userId });
+      const isAdmin = adhesion?.role === "admin";
+
+      if (!isAdmin) {
+        // Non-admin : uniquement les sites attribués parmi ceux des clients sélectionnés
+        const rows = await db
+          .selectDistinct({
+            id: sites.id,
+            nom: sites.nom,
+            clientEntrepriseId: sites.entrepriseId,
+          })
+          .from(userPrestataireSiteAttributions)
+          .innerJoin(sites, eq(sites.id, userPrestataireSiteAttributions.siteId))
+          .where(
+            and(
+              eq(userPrestataireSiteAttributions.userId, userId),
+              inArray(sites.entrepriseId, parsedInput.clientEntrepriseIds),
+            ),
+          )
+          .orderBy(asc(sites.nom));
+
+        sitesParClient = parsedInput.clientEntrepriseIds
+          .map((clientId) => ({
+            clientId,
+            clientNom:
+              clientEntreprises.find((c) => c.id === clientId)?.nom ?? clientId,
+            sites: rows
+              .filter((r) => r.clientEntrepriseId === clientId)
+              .map((r) => ({ id: r.id, nom: r.nom })),
+          }))
+          .filter((g) => g.sites.length > 0);
+      } else {
+        // Admin : tous les sites des clients sélectionnés
+        const results = await Promise.all(
+          parsedInput.clientEntrepriseIds.map(async (clientId) => ({
+            clientId,
+            clientNom:
+              clientEntreprises.find((c) => c.id === clientId)?.nom ?? clientId,
+            sites: (await getSitesByEntrepriseId(clientId)).map((s) => ({
+              id: s.id,
+              nom: s.nom,
+            })),
+          })),
+        );
+        sitesParClient = results.filter((g) => g.sites.length > 0);
+      }
+    } else {
+      // Plateforme : tous les sites des clients sélectionnés
+      const results = await Promise.all(
+        parsedInput.clientEntrepriseIds.map(async (clientId) => ({
+          clientId,
+          clientNom:
+            clientEntreprises.find((c) => c.id === clientId)?.nom ?? clientId,
+          sites: (await getSitesByEntrepriseId(clientId)).map((s) => ({
+            id: s.id,
+            nom: s.nom,
+          })),
+        })),
+      );
+      sitesParClient = results.filter((g) => g.sites.length > 0);
+    }
+
+    return { sitesParClient };
   });
 
 // ==================== ACTION: CALENDAR EVENTS ====================
@@ -454,12 +558,19 @@ export const getCalendarEventsAction = actionClient
           ),
         );
     } else {
-      // Client/plateforme sans filtre prestataire — requête simple
+      // Client/plateforme sans filtre prestataire — exige au moins une exécution active
       prestations = await db
-        .select(prestationColumns)
+        .selectDistinct(prestationColumns)
         .from(clientServices)
         .innerJoin(services, eq(services.id, clientServices.serviceId))
         .innerJoin(sites, eq(sites.id, clientServices.siteId))
+        .innerJoin(
+          clientServiceExecutions,
+          and(
+            eq(clientServiceExecutions.clientServiceId, clientServices.id),
+            eq(clientServiceExecutions.actif, true),
+          ),
+        )
         .where(
           and(
             eq(clientServices.entrepriseId, parsedInput.entrepriseId),
@@ -533,6 +644,7 @@ export const getCalendarEventsAction = actionClient
           serviceNom: prestation.serviceNom,
           siteNom: occ.siteNom,
           famillePlanification: prestation.famillePlanification,
+          dateDebutOriginale: occ.dateDebutOriginale?.toISOString(),
         },
       });
     }
