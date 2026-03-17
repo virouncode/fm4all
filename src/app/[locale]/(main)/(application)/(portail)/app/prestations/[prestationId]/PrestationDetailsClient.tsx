@@ -2349,9 +2349,9 @@ function InterventionsTab({
         <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
           <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <p>
-            Seules les prochaines interventions déjà générées sont affichées.{" "}
-            <strong>D&apos;autres apparaîtront automatiquement</strong> au fil
-            du temps.
+            Cette liste affiche uniquement les interventions réellement créées.
+            Le calendrier peut afficher aussi des occurrences prévisionnelles
+            issues de la planification.
           </p>
         </div>
       )}

@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Move, Timer } from "lucide-react";
+import { CalendarCheck, Move, Timer } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -34,8 +34,10 @@ export function OccurrenceEditScopeDialog({
         <div className="bg-primary/8 border-b px-5 pt-5 pb-4">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base leading-snug">
-              <Icon className="text-primary h-4 w-4 shrink-0" />
-              {type === "drag" ? "Déplacer l'intervention" : "Modifier la durée"}
+              <CalendarCheck className="text-primary h-4 w-4 shrink-0" />
+              {type === "drag"
+                ? "Déplacer l'intervention"
+                : "Modifier la durée"}
             </DialogTitle>
           </DialogHeader>
         </div>
@@ -50,13 +52,17 @@ export function OccurrenceEditScopeDialog({
 
         {/* Footer — colonne */}
         <div className="bg-muted/30 flex flex-col gap-2 border-t px-5 py-3">
-          <Button variant="outline" size="sm" onClick={() => onConfirm("occurrence")}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onConfirm("occurrence")}
+          >
             Cette intervention seulement
           </Button>
           <Button size="sm" onClick={() => onConfirm("suivantes")}>
             Cette intervention et toutes les suivantes
           </Button>
-          <Button variant="ghost" size="sm" onClick={onCancel}>
+          <Button variant="outline" size="sm" onClick={onCancel}>
             Annuler
           </Button>
         </div>
