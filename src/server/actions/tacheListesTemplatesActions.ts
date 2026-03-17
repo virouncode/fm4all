@@ -397,7 +397,7 @@ export const insertTacheListeItemAction = actionClient
       optionalStrings: ["description"] as const,
     });
 
-    const { listeTemplateId, entrepriseId, titre, dureeEstimeeMinutes } =
+    const { listeTemplateId, entrepriseId, titre, dureeEstimeeMinutes, emoji } =
       normalized;
 
     // Vérifier que le pack appartient à cette entreprise
@@ -449,6 +449,7 @@ export const insertTacheListeItemAction = actionClient
         description: normalized.description ?? null,
         actif: true,
         dureeEstimeeMinutes: dureeEstimeeMinutes ?? null,
+        emoji: emoji ?? null,
         createdById: currentUser.id,
         updatedById: currentUser.id,
       })
@@ -474,7 +475,7 @@ export const updateTacheListeItemAction = actionClient
       optionalStrings: ["description"] as const,
     });
 
-    const { id, entrepriseId, titre, ordre, actif, dureeEstimeeMinutes } =
+    const { id, entrepriseId, titre, ordre, actif, dureeEstimeeMinutes, emoji } =
       normalized;
 
     // Vérifier propriété via le pack
@@ -523,6 +524,7 @@ export const updateTacheListeItemAction = actionClient
     if (actif !== undefined) updateData.actif = actif;
     if (dureeEstimeeMinutes !== undefined)
       updateData.dureeEstimeeMinutes = dureeEstimeeMinutes;
+    if (emoji !== undefined) updateData.emoji = emoji;
 
     const [item] = await db
       .update(tacheListeItems)

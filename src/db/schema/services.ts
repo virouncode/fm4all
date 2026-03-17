@@ -519,6 +519,7 @@ export const tacheListeItems = pgTable(
     description: text("description"),
     actif: boolean("actif").notNull().default(true),
     dureeEstimeeMinutes: smallint("duree_estimee_minutes"),
+    emoji: varchar("emoji", { length: 10 }),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),
@@ -557,6 +558,7 @@ export const occurrenceTaches = pgTable(
     ordre: smallint("ordre").notNull(),
     titre: varchar("titre", { length: 255 }).notNull(),
     description: text("description"),
+    emoji: varchar("emoji", { length: 10 }),
     statut: occurrenceTacheStatutEnum("statut").notNull().default("a_faire"),
     assigneeUserId: uuid("assignee_user_id").references(() => user.id, {
       onDelete: "set null",

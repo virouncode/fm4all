@@ -233,7 +233,10 @@ export function ChecklistPickerDialog({
                               {idx + 1}.
                             </span>
                             <div className="min-w-0 flex-1">
-                              <span className="font-medium">{item.titre}</span>
+                              <span className="font-medium">
+                                {item.emoji && <span className="mr-1.5">{item.emoji}</span>}
+                                {item.titre}
+                              </span>
                               {item.description && (
                                 <p className="text-muted-foreground mt-0.5 truncate">
                                   {item.description}

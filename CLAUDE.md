@@ -2716,6 +2716,40 @@ const hasActiveExecution = executions.some(                     // bandeau UI
 - Pusher client : `await import("@/lib/pusher")` dynamique (evite SSR issues)
 - Migrations : **toujours** `pnpm db:generate` → jamais écrire le SQL manuellement
 
+## Changelog (2026-03-17 — session 2)
+
+**Feature Emoji sur les tâches de checklist** :
+
+- ✅ **`tacheListeItems.emoji`** : colonne déjà existante (`varchar(10)`)
+- ✅ **`occurrenceTaches.emoji`** : colonne ajoutée (migration `0052_curious_lord_tyger.sql`) + copiée dans `snapshotOccurrenceTaches()`
+- ✅ **`src/lib/fm-emojis.ts`** : liste curatée de ~200 emojis FM en 14 catégories (Nettoyage, Maintenance, Sécurité incendie, Café & Boissons, Fontaines & Eau, Travaux & Rénovation, Espaces verts, Office Management, Accueil & Réception, Sécurité & Accès, Énergie & Environnement, Logistique, Hygiène & Santé, Général)
+- ✅ **`TacheListeManagerDialog.tsx`** : picker emoji inline (Popover + ScrollArea, catégories, "Supprimer l'emoji") dans `DraggableItemRow` + `AddItemForm`
+- ✅ **Affichage emoji partout** : `{item.emoji && <span className="mr-1.5">{item.emoji}</span>}` ajouté dans tous les composants qui affichent des tâches
+
+**Fichiers d'affichage mis à jour** :
+- `PrestationDetailsClient.tsx` — onglets Planification (règles) et Exécution (checklist)
+- `OccurrenceDetailClient.tsx` — liste tâches + détail tâche courante
+- `OccurrenceDetailDialog.tsx` (calendrier) — popup interventions
+- `ChecklistsClient.tsx` — page Checklists
+- `ExecutionEditDialog.tsx` + `ExecutionFormDialog.tsx` — aperçu checklist
+- `OccurrenceOnDemandDialog.tsx` — aperçu checklist
+- `OccurrenceTerrain.tsx` — 3 emplacements (récap, liste statuts, détail tâche)
+- 4 picker dialogs (TacheListePicker, RegleTacheListePicker, OccurrenceTacheListePicker, ChecklistPicker)
+
+**Queries/types corrigés pour propager emoji** :
+- `ExecutionChecklistItem` (type) + query dans `clientServiceExecutions.query.ts` — `emoji` ajouté au SELECT et au push
+- `getOccurrenceTachesAction` — fallback template : `emoji` ajouté au SELECT + map
+- `getTacheItemsByTemplateAction` — `emoji` ajouté au SELECT + map
+- `OccurrenceDetailDialog.tsx` — type local `TacheItemType` + `mapTaches()` mis à jour
+
+**Pièges emoji à retenir** :
+
+- Il n'existe pas d'emoji aspirateur dans Unicode — utiliser 🧹 par convention
+- `fm-emojis.ts` est la liste curatée FM (pas de dépendance externe) — enrichir ici si besoin
+- Quand on ajoute un nouveau composant affichant des tâches : toujours vérifier que le type source inclut `emoji: string | null` ET que la query/action le sélectionne
+- Pattern d'affichage standard : `{item.emoji && <span className="mr-1.5">{item.emoji}</span>}` AVANT `{item.titre}`
+- Les tâches créées avant la feature ont `emoji = null` → rien n'est affiché (comportement attendu)
+
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 
 - `/app/sites` - Gestion hiérarchique avec closure table

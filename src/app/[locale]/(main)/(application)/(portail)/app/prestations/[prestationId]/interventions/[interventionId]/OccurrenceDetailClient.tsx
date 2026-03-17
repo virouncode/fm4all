@@ -99,6 +99,7 @@ type VirtualTacheItem = {
   id: string;
   titre: string;
   description: string | null;
+  emoji: string | null;
   ordre: number;
   dureeEstimeeMinutes: number | null;
 };
@@ -1080,6 +1081,7 @@ export function OccurrenceDetailClient({
                       </span>
                       <div className="min-w-0 flex-1">
                         <span className="text-muted-foreground text-sm font-medium">
+                          {item.emoji && <span className="mr-1.5">{item.emoji}</span>}
                           {item.titre}
                         </span>
                         {item.description && (
@@ -1535,6 +1537,7 @@ function TacheRow({
                 <span
                   className={`font-medium ${tache.statut === "terminee" ? "line-through opacity-60" : ""}`}
                 >
+                  {tache.emoji && <span className="mr-1.5">{tache.emoji}</span>}
                   {tache.titre}
                 </span>
                 {isAdHoc &&

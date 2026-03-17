@@ -1,0 +1,1 @@
+ALTER TABLE "occurrence_taches" ADD COLUMN "emoji" varchar(10);

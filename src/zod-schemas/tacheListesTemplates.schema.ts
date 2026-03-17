@@ -88,6 +88,7 @@ export const insertTacheListeItemSchema = z.object({
     .transform(capitalizeFirstWord),
   description: z.string().optional(),
   dureeEstimeeMinutes: z.number().int().positive().optional(),
+  emoji: z.string().max(10).optional(),
 });
 export type InsertTacheListeItemType = z.infer<
   typeof insertTacheListeItemSchema
@@ -106,6 +107,7 @@ export const updateTacheListeItemSchema = z.object({
   ordre: z.number().int().positive().optional(),
   actif: z.boolean().optional(),
   dureeEstimeeMinutes: z.number().int().positive().nullable().optional(),
+  emoji: z.string().max(10).nullable().optional(),
 });
 export type UpdateTacheListeItemType = z.infer<
   typeof updateTacheListeItemSchema

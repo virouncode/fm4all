@@ -53,6 +53,7 @@ export type TerrainTacheType = {
   ordre: number;
   titre: string;
   description: string | null;
+  emoji: string | null;
   statut: OccurrenceTacheStatutType;
   assigneeNom: string | null;
   completeeParNom: string | null;
@@ -154,6 +155,7 @@ export async function getTerrainDataByToken(
       ordre: occurrenceTaches.ordre,
       titre: occurrenceTaches.titre,
       description: occurrenceTaches.description,
+      emoji: occurrenceTaches.emoji,
       statut: occurrenceTaches.statut,
       assigneeNom: occurrenceTaches.assigneeNom,
       completeeParNom: occurrenceTaches.completeeParNom,
@@ -198,6 +200,7 @@ export async function getTerrainDataByToken(
     ordre: t.ordre,
     titre: t.titre,
     description: t.description,
+    emoji: t.emoji,
     statut: t.statut,
     assigneeNom: t.assigneeNom,
     completeeParNom: t.completeeParNom,

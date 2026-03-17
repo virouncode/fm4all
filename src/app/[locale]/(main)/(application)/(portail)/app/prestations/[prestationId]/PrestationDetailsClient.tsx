@@ -1261,6 +1261,7 @@ function PlanificationTab({
                           id: i.id,
                           ordre: i.ordre,
                           titre: i.titre,
+                          emoji: i.emoji,
                           dureeEstimeeMinutes: i.dureeEstimeeMinutes,
                         })) ?? [],
                     }
@@ -1398,6 +1399,7 @@ function RegleCard({
                             {idx + 1}.
                           </span>
                           <span className="min-w-0 flex-1 font-medium">
+                            {item.emoji && <span className="mr-1.5">{item.emoji}</span>}
                             {item.titre}
                           </span>
                           {item.dureeEstimeeMinutes && (
@@ -1939,6 +1941,7 @@ function ExecutionCard({
                             {idx + 1}.
                           </span>
                           <span className="min-w-0 flex-1 font-medium">
+                            {item.emoji && <span className="mr-1.5">{item.emoji}</span>}
                             {item.titre}
                           </span>
                           {item.dureeEstimeeMinutes && (

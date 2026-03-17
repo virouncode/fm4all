@@ -12,6 +12,7 @@ export type TacheListeItemRow = {
   description: string | null;
   actif: boolean;
   dureeEstimeeMinutes: number | null;
+  emoji: string | null;
 };
 
 export type TacheListeTemplateRow = {
@@ -93,6 +94,7 @@ export async function getAvailableTacheListesTemplates({
       description: tacheListeItems.description,
       actif: tacheListeItems.actif,
       dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+      emoji: tacheListeItems.emoji,
     })
     .from(tacheListeItems)
     .where(
@@ -114,6 +116,7 @@ export async function getAvailableTacheListesTemplates({
       description: item.description,
       actif: item.actif,
       dureeEstimeeMinutes: item.dureeEstimeeMinutes,
+      emoji: item.emoji ?? null,
     });
     itemsByPack.set(item.listeTemplateId, existing);
   }
@@ -194,6 +197,7 @@ export async function getTacheListesWithServiceNames({
       description: tacheListeItems.description,
       actif: tacheListeItems.actif,
       dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+      emoji: tacheListeItems.emoji,
     })
     .from(tacheListeItems)
     .where(inArray(tacheListeItems.listeTemplateId, packIds))
@@ -209,6 +213,7 @@ export async function getTacheListesWithServiceNames({
       description: item.description,
       actif: item.actif,
       dureeEstimeeMinutes: item.dureeEstimeeMinutes,
+      emoji: item.emoji ?? null,
     });
     itemsByPack.set(item.listeTemplateId, existing);
   }
@@ -254,6 +259,7 @@ export async function getTacheListeTemplateWithItems(
       description: tacheListeItems.description,
       actif: tacheListeItems.actif,
       dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+      emoji: tacheListeItems.emoji,
     })
     .from(tacheListeItems)
     .where(eq(tacheListeItems.listeTemplateId, id))
@@ -268,6 +274,7 @@ export async function getTacheListeTemplateWithItems(
       description: item.description,
       actif: item.actif,
       dureeEstimeeMinutes: item.dureeEstimeeMinutes,
+      emoji: item.emoji ?? null,
     })),
   };
 }
@@ -323,6 +330,7 @@ export async function getTacheListesTemplatesByProprietaire({
       description: tacheListeItems.description,
       actif: tacheListeItems.actif,
       dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+      emoji: tacheListeItems.emoji,
     })
     .from(tacheListeItems)
     .where(inArray(tacheListeItems.listeTemplateId, packIds))
@@ -338,6 +346,7 @@ export async function getTacheListesTemplatesByProprietaire({
       description: item.description,
       actif: item.actif,
       dureeEstimeeMinutes: item.dureeEstimeeMinutes,
+      emoji: item.emoji ?? null,
     });
     itemsByPack.set(item.listeTemplateId, existing);
   }

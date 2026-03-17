@@ -636,6 +636,7 @@ export const getOccurrenceTachesAction = actionClient
       .select({
         id: tacheListeItems.id,
         titre: tacheListeItems.titre,
+        emoji: tacheListeItems.emoji,
         ordre: tacheListeItems.ordre,
       })
       .from(tacheListeItems)
@@ -651,6 +652,7 @@ export const getOccurrenceTachesAction = actionClient
     const previewTaches = items.map((item) => ({
       id: item.id,
       titre: item.titre,
+      emoji: item.emoji,
       ordre: item.ordre,
       statut: "a_faire" as const,
     }));
@@ -675,6 +677,7 @@ export const getTacheItemsByTemplateAction = actionClient
       .select({
         id: tacheListeItems.id,
         titre: tacheListeItems.titre,
+        emoji: tacheListeItems.emoji,
         ordre: tacheListeItems.ordre,
       })
       .from(tacheListeItems)
@@ -690,6 +693,7 @@ export const getTacheItemsByTemplateAction = actionClient
       taches: items.map((item) => ({
         id: item.id,
         titre: item.titre,
+        emoji: item.emoji,
         ordre: item.ordre,
         statut: "a_faire" as const,
       })),

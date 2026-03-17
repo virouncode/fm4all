@@ -476,7 +476,10 @@ export function OccurrenceTerrain({
                     <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500">
                       {tache.ordre}
                     </span>
-                    <span className="text-sm text-gray-700">{tache.titre}</span>
+                    <span className="text-sm text-gray-700">
+                      {tache.emoji && <span className="mr-1.5">{tache.emoji}</span>}
+                      {tache.titre}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -625,6 +628,7 @@ export function OccurrenceTerrain({
                       className="flex items-center justify-between gap-3 px-4 py-3"
                     >
                       <span className="text-sm text-gray-700">
+                        {tache.emoji && <span className="mr-1.5">{tache.emoji}</span>}
                         {tache.titre}
                       </span>
                       <span
@@ -864,6 +868,7 @@ function TacheCard({
           <p
             className={`text-base leading-snug font-semibold ${tache.statut === "terminee" ? "text-gray-400 line-through" : "text-gray-900"}`}
           >
+            {tache.emoji && <span className="mr-1.5">{tache.emoji}</span>}
             {tache.titre}
           </p>
           {tache.description && tache.statut !== "terminee" && (

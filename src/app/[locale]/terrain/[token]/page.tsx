@@ -9,7 +9,7 @@ export default async function TerrainPage({
 }) {
   const { token } = await params;
 
-  const data = await getTerrainDataByToken(token);
+  const data = await getTerrainDataByToken(token).catch(() => null);
   if (!data) notFound();
 
   return (

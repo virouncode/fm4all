@@ -20,10 +20,12 @@ import {
 } from "@/components/ui/dialog-styled";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { FM_EMOJI_CATEGORIES } from "@/lib/fm-emojis";
 import {
   deleteTacheListeItemAction,
   deleteTacheListeTemplateAction,
@@ -51,6 +53,76 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
+// ==================== FM EMOJI PICKER ====================
+
+function FmEmojiPicker({
+  value,
+  onChange,
+}: {
+  value: string | null;
+  onChange: (emoji: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-8 w-8 p-0 text-base"
+          aria-label="Choisir un emoji"
+        >
+          {value ?? "😀"}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-2" align="start">
+        <ScrollArea className="h-64">
+          <div className="space-y-2 pr-2">
+            {FM_EMOJI_CATEGORIES.map((cat) => (
+              <div key={cat.label}>
+                <p className="text-muted-foreground mb-1 text-xs font-medium">
+                  {cat.label}
+                </p>
+                <div className="flex flex-wrap gap-0.5">
+                  {cat.emojis.map((emoji, emojiIdx) => (
+                    <button
+                      key={`${cat.label}-${emojiIdx}`}
+                      type="button"
+                      onClick={() => {
+                        onChange(value === emoji ? null : emoji);
+                        setOpen(false);
+                      }}
+                      className={`rounded p-1 text-base leading-none hover:bg-muted ${value === emoji ? "bg-muted ring-1 ring-primary" : ""}`}
+                      aria-label={emoji}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+        {value && (
+          <div className="border-t pt-2 mt-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-full text-xs"
+              onClick={() => { onChange(null); setOpen(false); }}
+            >
+              Supprimer l&apos;emoji
+            </Button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 // ==================== CONTENT (réutilisable inline ou dans un dialog) ====================
 
@@ -782,6 +854,7 @@ function DraggableItemRow({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitre, setEditTitre] = useState(item.titre);
   const [editDesc, setEditDesc] = useState(item.description ?? "");
+  const [editEmoji, setEditEmoji] = useState<string | null>(item.emoji);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -793,6 +866,7 @@ function DraggableItemRow({
       entrepriseId,
       titre: editTitre.trim(),
       description: editDesc.trim() || undefined,
+      emoji: editEmoji ?? undefined,
     });
     setIsSaving(false);
     if (result?.serverError) {
@@ -805,6 +879,7 @@ function DraggableItemRow({
         description: result.data.item.description ?? null,
         actif: result.data.item.actif,
         dureeEstimeeMinutes: result.data.item.dureeEstimeeMinutes ?? null,
+        emoji: result.data.item.emoji ?? null,
       });
       setIsEditing(false);
     }
@@ -838,13 +913,16 @@ function DraggableItemRow({
       <div className="border-t first:border-t-0">
         {isEditing ? (
           <div className="space-y-2 px-4 py-3">
-            <Input
-              value={editTitre}
-              onChange={(e) => setEditTitre(e.target.value)}
-              placeholder="Titre de la tâche"
-              className="text-sm"
-              autoFocus
-            />
+            <div className="flex items-center gap-2">
+              <FmEmojiPicker value={editEmoji} onChange={setEditEmoji} />
+              <Input
+                value={editTitre}
+                onChange={(e) => setEditTitre(e.target.value)}
+                placeholder="Titre de la tâche"
+                className="flex-1 text-sm"
+                autoFocus
+              />
+            </div>
             <Textarea
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
@@ -870,6 +948,7 @@ function DraggableItemRow({
                   setIsEditing(false);
                   setEditTitre(item.titre);
                   setEditDesc(item.description ?? "");
+                  setEditEmoji(item.emoji);
                 }}
               >
                 Annuler
@@ -890,7 +969,12 @@ function DraggableItemRow({
             )}
 
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">{item.titre}</p>
+              <p className="text-sm font-medium">
+                {item.emoji && (
+                  <span className="mr-1.5">{item.emoji}</span>
+                )}
+                {item.titre}
+              </p>
               {item.description && (
                 <p className="text-muted-foreground mt-0.5 text-xs">
                   {item.description}
@@ -949,6 +1033,7 @@ function AddItemForm({
 }) {
   const [titre, setTitre] = useState("");
   const [description, setDescription] = useState("");
+  const [emoji, setEmoji] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async () => {
@@ -959,6 +1044,7 @@ function AddItemForm({
       entrepriseId,
       titre: titre.trim(),
       description: description.trim() || undefined,
+      emoji: emoji ?? undefined,
     });
     setSaving(false);
     if (result?.serverError) {
@@ -971,23 +1057,27 @@ function AddItemForm({
         description: result.data.item.description ?? null,
         actif: result.data.item.actif,
         dureeEstimeeMinutes: result.data.item.dureeEstimeeMinutes ?? null,
+        emoji: result.data.item.emoji ?? null,
       });
     }
   };
 
   return (
     <div className="space-y-2 border-t px-4 py-3">
-      <Input
-        value={titre}
-        onChange={(e) => setTitre(e.target.value)}
-        placeholder="Titre de la tâche *"
-        className="text-sm"
-        autoFocus
-        onKeyDown={(e) => {
-          if (e.key === "Enter") void handleSubmit();
-          if (e.key === "Escape") onCancel();
-        }}
-      />
+      <div className="flex items-center gap-2">
+        <FmEmojiPicker value={emoji} onChange={setEmoji} />
+        <Input
+          value={titre}
+          onChange={(e) => setTitre(e.target.value)}
+          placeholder="Titre de la tâche *"
+          className="flex-1 text-sm"
+          autoFocus
+          onKeyDown={(e) => {
+            if (e.key === "Enter") void handleSubmit();
+            if (e.key === "Escape") onCancel();
+          }}
+        />
+      </div>
       <Textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}

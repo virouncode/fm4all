@@ -166,7 +166,7 @@ export default async function OccurrenceDetailPage({
   const taches = await getOccurrenceTaches(occurrenceId);
 
   // 9. Si aucune tâche réelle, résoudre le template pour afficher les tâches virtuelles
-  let virtualTacheItems: { id: string; titre: string; description: string | null; ordre: number; dureeEstimeeMinutes: number | null }[] = [];
+  let virtualTacheItems: { id: string; titre: string; description: string | null; emoji: string | null; ordre: number; dureeEstimeeMinutes: number | null }[] = [];
   if (taches.length === 0) {
     // Résolution prioritaire : occurrence override → règle → exécution
     let resolvedTemplateId: string | null = occurrence.tacheListeTemplateId ?? null;
@@ -195,6 +195,7 @@ export default async function OccurrenceDetailPage({
           id: tacheListeItems.id,
           titre: tacheListeItems.titre,
           description: tacheListeItems.description,
+          emoji: tacheListeItems.emoji,
           ordre: tacheListeItems.ordre,
           dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
         })

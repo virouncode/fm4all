@@ -368,6 +368,7 @@ export type ExecutionChecklistItem = {
   id: string;
   ordre: number;
   titre: string;
+  emoji: string | null;
   dureeEstimeeMinutes: number | null;
 };
 
@@ -491,6 +492,7 @@ export async function getExecutionsWithPrixByPrestationId(
         templateId: tacheListeItems.listeTemplateId,
         ordre: tacheListeItems.ordre,
         titre: tacheListeItems.titre,
+        emoji: tacheListeItems.emoji,
         dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
       })
       .from(tacheListeItems)
@@ -506,6 +508,7 @@ export async function getExecutionsWithPrixByPrestationId(
         id: item.id,
         ordre: item.ordre,
         titre: item.titre,
+        emoji: item.emoji,
         dureeEstimeeMinutes: item.dureeEstimeeMinutes,
       });
       itemsByTemplate.set(item.templateId, list);
@@ -756,6 +759,7 @@ export type OccurrenceTacheDetail = {
   ordre: number;
   titre: string;
   description: string | null;
+  emoji: string | null;
   statut: OccurrenceTacheStatutType;
   notes: string | null;
   startedAt: Date | null;
@@ -836,6 +840,7 @@ export async function getOccurrenceTaches(
       ordre: occurrenceTaches.ordre,
       titre: occurrenceTaches.titre,
       description: occurrenceTaches.description,
+      emoji: occurrenceTaches.emoji,
       statut: occurrenceTaches.statut,
       notes: occurrenceTaches.notes,
       startedAt: occurrenceTaches.startedAt,

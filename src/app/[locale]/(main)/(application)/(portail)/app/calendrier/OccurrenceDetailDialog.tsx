@@ -46,6 +46,7 @@ type Props = {
 type TacheItemType = {
   id: string;
   titre: string;
+  emoji: string | null;
   statut: string;
   ordre: number;
 };
@@ -146,11 +147,12 @@ export function OccurrenceDetailDialog({
     } = eventProps;
 
     const mapTaches = (
-      items: { id: string; titre: string; statut: string; ordre: number }[],
+      items: { id: string; titre: string; emoji?: string | null; statut: string; ordre: number }[],
     ) =>
       items.map((t) => ({
         id: t.id,
         titre: t.titre,
+        emoji: t.emoji ?? null,
         statut: t.statut,
         ordre: t.ordre,
       }));
@@ -356,7 +358,10 @@ export function OccurrenceDetailDialog({
                         <span
                           className={`h-2 w-2 shrink-0 rounded-full ${tConfig?.dotClass ?? "bg-slate-400"}`}
                         />
-                        <span className="truncate text-sm">{t.titre}</span>
+                        <span className="truncate text-sm">
+                          {t.emoji && <span className="mr-1.5">{t.emoji}</span>}
+                          {t.titre}
+                        </span>
                       </div>
                     );
                   })

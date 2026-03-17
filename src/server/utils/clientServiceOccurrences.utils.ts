@@ -476,6 +476,7 @@ export async function snapshotOccurrenceTaches({
       ordre: item.ordre,
       titre: item.titre,
       description: item.description,
+      emoji: item.emoji,
       statut: "a_faire" as const,
     })),
   );
