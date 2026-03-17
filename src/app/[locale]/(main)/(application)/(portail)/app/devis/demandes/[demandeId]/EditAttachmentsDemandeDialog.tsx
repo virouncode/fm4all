@@ -22,6 +22,7 @@ import {
 import { getPresignedReadUrlAction } from "@/server/actions/s3Actions";
 import type { DevisDemandeAttachmentItemType } from "@/server/queries/devisDemandes.query";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Spinner } from "@/components/ui/spinner";
 import { Paperclip, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState } from "react-hook-form";
@@ -289,7 +290,7 @@ export function EditAttachmentsDemandeDialog({
                 type="submit"
                 disabled={isSubmitting || !isDirty || loadingUrls}
               >
-                {isSubmitting ? "Enregistrement..." : "Enregistrer"}
+                {isSubmitting ? <Spinner className="size-3" /> : <Paperclip className="size-3" />}Enregistrer
               </Button>
             </DialogStyledFooter>
           </form>

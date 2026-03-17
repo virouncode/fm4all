@@ -3,17 +3,17 @@
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
-import { getFactureEmetteursAction } from "@/server/actions/facturesActions";
 import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
+import { getFactureEmetteursAction } from "@/server/actions/facturesActions";
 import { getServicesAction } from "@/server/actions/servicesActions";
 import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import { useAppStore } from "@/stores/application/appStore";
@@ -60,7 +60,8 @@ export function FacturesFiltersDialog({
   // Posture prestataire recues : emetteur filtrable, client masqué
   // Posture plateforme : tout filtrable
   const showClientFilter =
-    (posture === "prestataire" && tabType === "emises") || posture === "plateforme";
+    (posture === "prestataire" && tabType === "emises") ||
+    posture === "plateforme";
   const showEmetteurFilter =
     (posture === "prestataire" && tabType === "recues") ||
     posture === "client" ||
@@ -69,11 +70,17 @@ export function FacturesFiltersDialog({
 
   const [sites, setSites] = useState<Array<{ id: string; nom: string }>>([]);
   const [loadingSites, setLoadingSites] = useState(false);
-  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>([]);
+  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
   const [loadingClients, setLoadingClients] = useState(false);
-  const [emetteurs, setEmetteurs] = useState<Array<{ id: string; nom: string }>>([]);
+  const [emetteurs, setEmetteurs] = useState<
+    Array<{ id: string; nom: string }>
+  >([]);
   const [loadingEmetteurs, setLoadingEmetteurs] = useState(false);
-  const [services, setServices] = useState<Array<{ id: string; nom: string }>>([]);
+  const [services, setServices] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
   const [loadingServices, setLoadingServices] = useState(false);
 
   const form = useForm<FiltersType>({
@@ -101,7 +108,9 @@ export function FacturesFiltersDialog({
       try {
         const result = await getEntreprisesClientesAction();
         if (result?.data?.clients) {
-          setClients(result.data.clients.map((c) => ({ id: c.id, nom: c.nom })));
+          setClients(
+            result.data.clients.map((c) => ({ id: c.id, nom: c.nom })),
+          );
         }
       } catch {
         toast.error("Erreur lors du chargement des clients");
@@ -120,9 +129,13 @@ export function FacturesFiltersDialog({
     async function loadEmetteurs() {
       setLoadingEmetteurs(true);
       try {
-        const result = await getFactureEmetteursAction({ entrepriseId: entreprise!.id });
+        const result = await getFactureEmetteursAction({
+          entrepriseId: entreprise!.id,
+        });
         if (result?.data?.emetteurs) {
-          setEmetteurs(result.data.emetteurs.map((e) => ({ id: e.id, nom: e.nom })));
+          setEmetteurs(
+            result.data.emetteurs.map((e) => ({ id: e.id, nom: e.nom })),
+          );
         }
       } catch {
         toast.error("Erreur lors du chargement des émetteurs");
@@ -143,7 +156,9 @@ export function FacturesFiltersDialog({
       try {
         const result = await getServicesAction();
         if (result?.data?.services) {
-          setServices(result.data.services.map((s) => ({ id: s.id, nom: s.nom })));
+          setServices(
+            result.data.services.map((s) => ({ id: s.id, nom: s.nom })),
+          );
         }
       } catch {
         toast.error("Erreur lors du chargement des services");
@@ -166,7 +181,9 @@ export function FacturesFiltersDialog({
     async function loadSites() {
       setLoadingSites(true);
       try {
-        const result = await getAccessibleSitesAction({ entrepriseId: clientId! });
+        const result = await getAccessibleSitesAction({
+          entrepriseId: clientId!,
+        });
         if (result?.data) {
           setSites(result.data.map((s) => ({ id: s.id, nom: s.nom })));
         }
@@ -210,7 +227,10 @@ export function FacturesFiltersDialog({
     const cleaned: FiltersType = {
       search: debouncedSearch || undefined,
       statut: filters.statut === "all" ? undefined : filters.statut,
-      modeCommercialSnapshot: filters.modeCommercialSnapshot === "all" ? undefined : filters.modeCommercialSnapshot,
+      modeCommercialSnapshot:
+        filters.modeCommercialSnapshot === "all"
+          ? undefined
+          : filters.modeCommercialSnapshot,
       siteId: filters.siteId === "all" ? undefined : filters.siteId,
       clientId: filters.clientId === "all" ? undefined : filters.clientId,
       emetteurId: filters.emetteurId === "all" ? undefined : filters.emetteurId,
@@ -232,7 +252,11 @@ export function FacturesFiltersDialog({
     let count = 0;
     if (filters.search) count++;
     if (filters.statut && filters.statut !== "all") count++;
-    if (filters.modeCommercialSnapshot && filters.modeCommercialSnapshot !== "all") count++;
+    if (
+      filters.modeCommercialSnapshot &&
+      filters.modeCommercialSnapshot !== "all"
+    )
+      count++;
     if (filters.siteId && filters.siteId !== "all") count++;
     if (filters.clientId && filters.clientId !== "all") count++;
     if (filters.emetteurId && filters.emetteurId !== "all") count++;
@@ -258,145 +282,152 @@ export function FacturesFiltersDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!w-2/3 !max-w-none">
-        <DialogHeader>
-          <DialogTitle>
-            <div className="flex items-center gap-2">
-              <Filter className="text-primary size-6" />
-              Filtrer les factures
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="!w-2/3 !max-w-none">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Filter className="text-primary size-5" />
+                Filtrer les factures
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
+        <DialogStyledBody>
+          <div className="space-y-6">
+            <Form {...form}>
+              <form className="flex flex-col gap-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <RhfInput
+                    label="Recherche"
+                    name="search"
+                    placeholder="Numéro, titre, description…"
+                    withError={false}
+                  />
 
-        <div className="space-y-6">
-          <Form {...form}>
-            <form className="flex flex-col gap-4">
-              <div className="grid grid-cols-3 gap-4">
-                <RhfInput
-                  label="Recherche"
-                  name="search"
-                  placeholder="Numéro, titre, description…"
-                  withError={false}
-                />
-
-                <RhfControlledSelect
-                  label="Statut"
-                  name="statut"
-                  selectClassName="w-full"
-                  withError={false}
-                >
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="brouillon">Brouillon</SelectItem>
-                  <SelectItem value="emise">Émise</SelectItem>
-                  <SelectItem value="litige">En litige</SelectItem>
-                  <SelectItem value="annulee">Annulée</SelectItem>
-                </RhfControlledSelect>
-
-                {showModeFilter && (
                   <RhfControlledSelect
-                    label="Mode commercial"
-                    name="modeCommercialSnapshot"
+                    label="Statut"
+                    name="statut"
                     selectClassName="w-full"
                     withError={false}
                   >
                     <SelectItem value="all">Tous</SelectItem>
-                    <SelectItem value="direct">Prestation directe</SelectItem>
-                    <SelectItem value="intermediaire">Intermédiation</SelectItem>
+                    <SelectItem value="brouillon">Brouillon</SelectItem>
+                    <SelectItem value="emise">Émise</SelectItem>
+                    <SelectItem value="litige">En litige</SelectItem>
+                    <SelectItem value="annulee">Annulée</SelectItem>
                   </RhfControlledSelect>
-                )}
 
-                {showEmetteurFilter && (
+                  {showModeFilter && (
+                    <RhfControlledSelect
+                      label="Mode commercial"
+                      name="modeCommercialSnapshot"
+                      selectClassName="w-full"
+                      withError={false}
+                    >
+                      <SelectItem value="all">Tous</SelectItem>
+                      <SelectItem value="direct">Prestation directe</SelectItem>
+                      <SelectItem value="intermediaire">
+                        Intermédiation
+                      </SelectItem>
+                    </RhfControlledSelect>
+                  )}
+
+                  {showEmetteurFilter && (
+                    <RhfControlledSelect
+                      label="Émetteur"
+                      name="emetteurId"
+                      selectClassName="w-full"
+                      withError={false}
+                      disabled={loadingEmetteurs}
+                    >
+                      <SelectItem value="all">
+                        {loadingEmetteurs
+                          ? "Chargement…"
+                          : "Tous les émetteurs"}
+                      </SelectItem>
+                      {emetteurs.map((e) => (
+                        <SelectItem key={e.id} value={e.id}>
+                          {e.nom}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+                  )}
+
+                  {showClientFilter && (
+                    <RhfControlledSelect
+                      label="Client"
+                      name="clientId"
+                      selectClassName="w-full"
+                      withError={false}
+                      disabled={loadingClients}
+                    >
+                      <SelectItem value="all">
+                        {loadingClients ? "Chargement…" : "Tous les clients"}
+                      </SelectItem>
+                      {clients.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.nom}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+                  )}
+
                   <RhfControlledSelect
-                    label="Émetteur"
-                    name="emetteurId"
+                    label="Site"
+                    name="siteId"
                     selectClassName="w-full"
                     withError={false}
-                    disabled={loadingEmetteurs}
+                    disabled={siteSelectDisabled}
                   >
                     <SelectItem value="all">
-                      {loadingEmetteurs ? "Chargement…" : "Tous les émetteurs"}
+                      {loadingSites
+                        ? "Chargement…"
+                        : showClientFilter &&
+                            (!filters.clientId || filters.clientId === "all")
+                          ? "Sélectionnez un client"
+                          : "Tous les sites"}
                     </SelectItem>
-                    {emetteurs.map((e) => (
-                      <SelectItem key={e.id} value={e.id}>
-                        {e.nom}
+                    {sites.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.nom}
                       </SelectItem>
                     ))}
                   </RhfControlledSelect>
-                )}
 
-                {showClientFilter && (
                   <RhfControlledSelect
-                    label="Client"
-                    name="clientId"
+                    label="Service"
+                    name="serviceId"
                     selectClassName="w-full"
                     withError={false}
-                    disabled={loadingClients}
+                    disabled={loadingServices}
                   >
                     <SelectItem value="all">
-                      {loadingClients ? "Chargement…" : "Tous les clients"}
+                      {loadingServices ? "Chargement…" : "Tous les services"}
                     </SelectItem>
-                    {clients.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.nom}
+                    {services.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.nom}
                       </SelectItem>
                     ))}
                   </RhfControlledSelect>
-                )}
+                </div>
+              </form>
+            </Form>
 
-                <RhfControlledSelect
-                  label="Site"
-                  name="siteId"
-                  selectClassName="w-full"
-                  withError={false}
-                  disabled={siteSelectDisabled}
-                >
-                  <SelectItem value="all">
-                    {loadingSites
-                      ? "Chargement…"
-                      : showClientFilter &&
-                        (!filters.clientId || filters.clientId === "all")
-                      ? "Sélectionnez un client"
-                      : "Tous les sites"}
-                  </SelectItem>
-                  {sites.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.nom}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-
-                <RhfControlledSelect
-                  label="Service"
-                  name="serviceId"
-                  selectClassName="w-full"
-                  withError={false}
-                  disabled={loadingServices}
-                >
-                  <SelectItem value="all">
-                    {loadingServices ? "Chargement…" : "Tous les services"}
-                  </SelectItem>
-                  {services.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.nom}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-              </div>
-            </form>
-          </Form>
-
-          <div className="flex items-center justify-end">
-            <Button
-              type="button"
-              onClick={handleReset}
-              disabled={activeFiltersCount === 0}
-            >
-              <RotateCcw />
-              Réinitialiser ({activeFiltersCount})
-            </Button>
+            <div className="flex items-center justify-end">
+              <Button
+                type="button"
+                onClick={handleReset}
+                disabled={activeFiltersCount === 0}
+              >
+                <RotateCcw />
+                Réinitialiser ({activeFiltersCount})
+              </Button>
+            </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogStyledBody>
+      </DialogStyledContent>
     </Dialog>
   );
 }

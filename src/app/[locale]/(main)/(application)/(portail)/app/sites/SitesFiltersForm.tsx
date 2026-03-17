@@ -3,6 +3,7 @@
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
+import { DialogStyledBody } from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
@@ -14,8 +15,8 @@ import {
 } from "@/zod-schemas/sites.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RotateCcw } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
@@ -65,7 +66,10 @@ export function SitesFiltersForm() {
     if (debouncedEffectifMin) query.effectifMin = debouncedEffectifMin;
     if (debouncedEffectifMax) query.effectifMax = debouncedEffectifMax;
 
-    router.replace({ pathname: pathname as "/app/sites", query }, { scroll: false });
+    router.replace(
+      { pathname: pathname as "/app/sites", query },
+      { scroll: false },
+    );
   }, [
     debouncedNom,
     debouncedVille,
@@ -107,99 +111,101 @@ export function SitesFiltersForm() {
   }, [filters]);
 
   return (
-    <div className="space-y-6">
-      <Form {...form}>
-        <form className="grid grid-cols-3 gap-4">
-          <RhfInput
-            label="Nom"
-            name="nom"
-            placeholder="Nom du site..."
-            className="col-span-1"
-            withError={false}
-          />
+    <DialogStyledBody>
+      <div className="space-y-6">
+        <Form {...form}>
+          <form className="grid grid-cols-3 gap-4">
+            <RhfInput
+              label="Nom"
+              name="nom"
+              placeholder="Nom du site..."
+              className="col-span-1"
+              withError={false}
+            />
 
-          <RhfInput
-            label="Ville"
-            name="ville"
-            placeholder="Ville..."
-            className="col-span-1"
-            withError={false}
-          />
+            <RhfInput
+              label="Ville"
+              name="ville"
+              placeholder="Ville..."
+              className="col-span-1"
+              withError={false}
+            />
 
-          <RhfControlledSelect
-            label="Type de bâtiment"
-            name="typeBatiment"
-            className="col-span-1"
-            selectClassName="w-full"
-            withError={false}
+            <RhfControlledSelect
+              label="Type de bâtiment"
+              name="typeBatiment"
+              className="col-span-1"
+              selectClassName="w-full"
+              withError={false}
+            >
+              <SelectItem value="all">Tous</SelectItem>
+              {typeBatimentCT.map((type) => (
+                <SelectItem key={type.code} value={type.code}>
+                  {t(type.name)}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
+
+            <RhfControlledSelect
+              label="Type d'occupation"
+              name="typeOccupation"
+              className="col-span-1"
+              selectClassName="w-full"
+              withError={false}
+            >
+              <SelectItem value="all">Tous</SelectItem>
+              {typeOccupationCT.map((type) => (
+                <SelectItem key={type.code} value={type.code}>
+                  {t(type.name)}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
+
+            <RhfInput
+              label="Surface min (m²)"
+              name="surfaceMin"
+              placeholder="1"
+              className="col-span-1"
+              withError={false}
+            />
+
+            <RhfInput
+              label="Surface max (m²)"
+              name="surfaceMax"
+              placeholder="3000"
+              className="col-span-1"
+              withError={false}
+            />
+
+            <RhfInput
+              label="Effectif min"
+              name="effectifMin"
+              placeholder="1"
+              className="col-span-1"
+              withError={false}
+            />
+
+            <RhfInput
+              label="Effectif max"
+              name="effectifMax"
+              placeholder="300"
+              className="col-span-1"
+              withError={false}
+            />
+          </form>
+        </Form>
+
+        <div className="flex items-center justify-end">
+          <Button
+            type="button"
+            onClick={handleReset}
+            disabled={activeFiltersCount === 0}
           >
-            <SelectItem value="all">Tous</SelectItem>
-            {typeBatimentCT.map((type) => (
-              <SelectItem key={type.code} value={type.code}>
-                {t(type.name)}
-              </SelectItem>
-            ))}
-          </RhfControlledSelect>
-
-          <RhfControlledSelect
-            label="Type d'occupation"
-            name="typeOccupation"
-            className="col-span-1"
-            selectClassName="w-full"
-            withError={false}
-          >
-            <SelectItem value="all">Tous</SelectItem>
-            {typeOccupationCT.map((type) => (
-              <SelectItem key={type.code} value={type.code}>
-                {t(type.name)}
-              </SelectItem>
-            ))}
-          </RhfControlledSelect>
-
-          <RhfInput
-            label="Surface min (m²)"
-            name="surfaceMin"
-            placeholder="1"
-            className="col-span-1"
-            withError={false}
-          />
-
-          <RhfInput
-            label="Surface max (m²)"
-            name="surfaceMax"
-            placeholder="3000"
-            className="col-span-1"
-            withError={false}
-          />
-
-          <RhfInput
-            label="Effectif min"
-            name="effectifMin"
-            placeholder="1"
-            className="col-span-1"
-            withError={false}
-          />
-
-          <RhfInput
-            label="Effectif max"
-            name="effectifMax"
-            placeholder="300"
-            className="col-span-1"
-            withError={false}
-          />
-        </form>
-      </Form>
-
-      <div className="flex items-center justify-end">
-        <Button
-          type="button"
-          onClick={handleReset}
-          disabled={activeFiltersCount === 0}
-        >
-          <RotateCcw />
-          Réinitialiser ({activeFiltersCount})
-        </Button>
+            <RotateCcw />
+            Réinitialiser ({activeFiltersCount})
+          </Button>
+        </div>
       </div>
-    </div>
+    </DialogStyledBody>
   );
 }

@@ -295,7 +295,7 @@ export function ExecutionEditDialog({
       <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
         <DialogStyledHeader>
           <DialogHeader>
-            <DialogTitle>Modifier l&apos;exécution</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Pencil className="text-primary h-4 w-4" />Modifier l&apos;exécution</DialogTitle>
             {postureActive === "prestataire" && (
               <p className="text-muted-foreground text-sm">
                 {clientNom} — {serviceNom}
@@ -801,7 +801,7 @@ export function ExecutionEditDialog({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && <Spinner />}
+                {isSubmitting ? <Spinner className="size-3" /> : <Pencil className="size-3" />}
                 Enregistrer les modifications
               </Button>
             </DialogStyledFooter>

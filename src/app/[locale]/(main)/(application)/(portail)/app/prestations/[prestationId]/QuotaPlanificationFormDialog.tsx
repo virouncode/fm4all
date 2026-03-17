@@ -26,6 +26,7 @@ import {
 import { z } from "zod";
 import type { PrestationListItem } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarRange } from "lucide-react";
 
 // Local form schema without .default() (per CLAUDE.md rule)
 const quotaFormSchema = z.object({
@@ -126,9 +127,7 @@ export function QuotaPlanificationFormDialog({
       <DialogStyledContent className="sm:max-w-md">
         <DialogStyledHeader>
           <DialogHeader>
-            <DialogTitle>
-              {isEdit ? "Modifier le quota" : "Configurer le quota de planification"}
-            </DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><CalendarRange className="text-primary h-4 w-4" />{isEdit ? "Modifier le quota" : "Configurer le quota de planification"}</DialogTitle>
           </DialogHeader>
         </DialogStyledHeader>
 
@@ -193,7 +192,7 @@ export function QuotaPlanificationFormDialog({
             onClick={form.handleSubmit(onSubmit)}
             disabled={isSubmitting}
           >
-            {isSubmitting && <Spinner />}
+            {isSubmitting ? <Spinner className="size-3" /> : <CalendarRange className="size-3" />}
             {isEdit ? "Enregistrer" : "Configurer"}
           </Button>
         </DialogStyledFooter>

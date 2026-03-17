@@ -7,21 +7,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DialogStyledBody,
   DialogStyledContent,
   DialogStyledFooter,
   DialogStyledHeader,
 } from "@/components/ui/dialog-styled";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -33,7 +29,7 @@ import type { EntrepriseContactWithInvitationType } from "@/server/queries/entre
 import type { EntrepriseWithDetails } from "@/zod-schemas/entreprise.schema";
 import {
   ArrowLeft,
-  Building2,
+  Building,
   Calendar,
   Clock,
   HandPlatter,
@@ -101,8 +97,9 @@ export function EntrepriseDetailsClient({
   const [editLogoOpen, setEditLogoOpen] = useState(false);
 
   // Contacts state — synchronisé avec initialContacts quand le serveur re-fetch (router.refresh())
-  const [contacts, setContacts] =
-    useState<EntrepriseContactWithInvitationType[]>(initialContacts ?? []);
+  const [contacts, setContacts] = useState<
+    EntrepriseContactWithInvitationType[]
+  >(initialContacts ?? []);
   useEffect(() => {
     if (initialContacts !== undefined) {
       setContacts(initialContacts);
@@ -296,7 +293,7 @@ export function EntrepriseDetailsClient({
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-medium">
-                <Building2 className="text-primary h-4 w-4" />
+                <Building className="text-primary h-4 w-4" />
                 Informations
               </CardTitle>
               {canEdit && (
@@ -478,7 +475,7 @@ export function EntrepriseDetailsClient({
                       {c.userId ? (
                         <Badge
                           variant="outline"
-                          className="border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-950/30 dark:text-green-400 text-xs"
+                          className="border-green-300 bg-green-50 text-xs text-green-700 dark:border-green-700 dark:bg-green-950/30 dark:text-green-400"
                         >
                           Utilisateur
                         </Badge>
@@ -587,26 +584,36 @@ export function EntrepriseDetailsClient({
           <DialogStyledContent className="max-w-md">
             <DialogStyledHeader>
               <DialogHeader>
-                <DialogTitle>Envoyer une invitation ?</DialogTitle>
+                <DialogTitle className="flex items-center gap-2">
+                  <Send className="text-primary size-5" />
+                  Envoyer une invitation ?
+                </DialogTitle>
               </DialogHeader>
             </DialogStyledHeader>
             <DialogStyledBody>
-              Un email sera envoyé à{" "}
-              <strong>{confirmInviteContact?.email}</strong> pour inviter{" "}
-              {confirmInviteContact?.prenom} {confirmInviteContact?.nom} à créer
-              son compte.
-              {confirmInviteContact?.pendingInvitationSentAt && (
-                <span className="mt-1 block">
-                  Une invitation précédente avait été envoyée le{" "}
-                  {formatEntrepriseDate(
-                    confirmInviteContact.pendingInvitationSentAt,
-                  )}
-                  . Elle sera remplacée par la nouvelle.
-                </span>
-              )}
+              <p className="text-sm">
+                Un email sera envoyé à{" "}
+                <strong>{confirmInviteContact?.email}</strong> pour inviter{" "}
+                {confirmInviteContact?.prenom} {confirmInviteContact?.nom} à
+                créer son compte.
+                {confirmInviteContact?.pendingInvitationSentAt && (
+                  <span className="mt-1 block">
+                    Une invitation précédente avait été envoyée le{" "}
+                    {formatEntrepriseDate(
+                      confirmInviteContact.pendingInvitationSentAt,
+                    )}
+                    . Elle sera remplacée par la nouvelle.
+                  </span>
+                )}
+              </p>
             </DialogStyledBody>
             <DialogStyledFooter>
-              <Button variant="outline" onClick={() => setConfirmInviteContact(null)}>Annuler</Button>
+              <Button
+                variant="outline"
+                onClick={() => setConfirmInviteContact(null)}
+              >
+                Annuler
+              </Button>
               <Button
                 onClick={() =>
                   confirmInviteContact &&
@@ -630,10 +637,13 @@ export function EntrepriseDetailsClient({
               if (!v) setConfirmDeleteContact(null);
             }}
           >
-            <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
-              <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+            <AlertDialogContent className="max-w-md gap-0 overflow-hidden p-0">
+              <div className="bg-primary/8 border-b px-5 pt-5 pr-12 pb-4">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Supprimer ce contact ?</AlertDialogTitle>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <Trash2 className="text-primary size-5" />
+                    Supprimer ce contact ?
+                  </AlertDialogTitle>
                 </AlertDialogHeader>
               </div>
               <div className="px-5 py-4 text-sm">
@@ -641,13 +651,18 @@ export function EntrepriseDetailsClient({
                 définitivement supprimé de la liste des contacts.
                 {confirmDeleteContact?.pendingInvitationSentAt && (
                   <span className="text-destructive mt-1 block font-medium">
-                    Une invitation est en attente pour ce contact. Elle deviendra
-                    caduque si vous supprimez le contact.
+                    Une invitation est en attente pour ce contact. Elle
+                    deviendra caduque si vous supprimez le contact.
                   </span>
                 )}
               </div>
               <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
-                <Button variant="outline" onClick={() => setConfirmDeleteContact(null)}>Annuler</Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmDeleteContact(null)}
+                >
+                  Annuler
+                </Button>
                 <Button
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   onClick={() =>
@@ -655,6 +670,7 @@ export function EntrepriseDetailsClient({
                     handleDeleteContact(confirmDeleteContact.id)
                   }
                 >
+                  <Trash2 />
                   Supprimer
                 </Button>
               </AlertDialogFooter>

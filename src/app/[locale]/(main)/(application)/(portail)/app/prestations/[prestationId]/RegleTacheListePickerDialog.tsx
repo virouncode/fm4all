@@ -13,6 +13,7 @@ import {
   DialogStyledHeader,
 } from "@/components/ui/dialog-styled";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Spinner } from "@/components/ui/spinner";
 import { updateRegleTacheListeAction } from "@/server/actions/clientServiceReglesRecurrenceActions";
 import { getAvailableTacheListesTemplatesAction } from "@/server/actions/tacheListesTemplatesActions";
 import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
@@ -296,7 +297,7 @@ export function RegleTacheListePickerDialog({
             onClick={handleSave}
             disabled={saving || !isDirty}
           >
-            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            {saving ? <Spinner className="size-3" /> : <ClipboardList className="size-3" />}
             Confirmer
           </Button>
         </DialogStyledFooter>

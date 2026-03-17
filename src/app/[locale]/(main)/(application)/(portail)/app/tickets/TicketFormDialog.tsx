@@ -5,11 +5,7 @@ import { RhfFileInput } from "@/components/rhf/RhfFileInput";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DialogStyledBody,
   DialogStyledContent,
@@ -18,10 +14,20 @@ import {
 } from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { getEntreprisesClientesAction, getEntreprisesPrestatairesAction } from "@/server/actions/entreprisesActions";
-import { getAccessibleSitesAction, getPrestataireSitesForClientAction } from "@/server/actions/sitesActions";
-import { getPrestataireMesClientsForTicketAction, insertTicketAction } from "@/server/actions/ticketsActions";
+import { Spinner } from "@/components/ui/spinner";
 import { getClientPrestatairesAction } from "@/server/actions/clientServiceExecutionsActions";
+import {
+  getEntreprisesClientesAction,
+  getEntreprisesPrestatairesAction,
+} from "@/server/actions/entreprisesActions";
+import {
+  getAccessibleSitesAction,
+  getPrestataireSitesForClientAction,
+} from "@/server/actions/sitesActions";
+import {
+  getPrestataireMesClientsForTicketAction,
+  insertTicketAction,
+} from "@/server/actions/ticketsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
   insertTicketFormSchema,
@@ -31,14 +37,19 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useFieldArray, useForm, useFormState, useWatch } from "react-hook-form";
+import {
+  useFieldArray,
+  useForm,
+  useFormState,
+  useWatch,
+} from "react-hook-form";
 import { toast } from "sonner";
 
 type TicketFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: (ticket: SelectTicketType) => void;
-}
+};
 
 export function TicketFormDialog({
   open,
@@ -54,10 +65,14 @@ export function TicketFormDialog({
   // Pour posture prestataire : selectedClientId = l'id du CLIENT choisi (pas du prestataire)
   // Pour posture plateforme/client : selectedClientId = l'id de l'entreprise cliente
   const [selectedClientId, setSelectedClientId] = useState<string>(
-    posture === "prestataire" || posture === "plateforme" ? "" : (entreprise?.id || ""),
+    posture === "prestataire" || posture === "plateforme"
+      ? ""
+      : entreprise?.id || "",
   );
   const [loadingSites, setLoadingSites] = useState(false);
-  const [prestataires, setPrestataires] = useState<Array<{ id: string; nom: string }>>([]);
+  const [prestataires, setPrestataires] = useState<
+    Array<{ id: string; nom: string }>
+  >([]);
   const [loadingPrestataires, setLoadingPrestataires] = useState(false);
 
   const form = useForm<InsertTicketFormType>({
@@ -72,7 +87,7 @@ export function TicketFormDialog({
       proprietaireEntrepriseId:
         posture === "plateforme" || posture === "prestataire"
           ? ""
-          : (entreprise?.id || ""),
+          : entreprise?.id || "",
       assigneEntrepriseId: "",
       attachments: [],
     },
@@ -93,7 +108,8 @@ export function TicketFormDialog({
 
   // Charger clients si posture plateforme ou prestataire
   useEffect(() => {
-    if ((posture !== "plateforme" && posture !== "prestataire") || !open) return;
+    if ((posture !== "plateforme" && posture !== "prestataire") || !open)
+      return;
 
     async function loadClients() {
       try {
@@ -190,7 +206,7 @@ export function TicketFormDialog({
       const defaultProprietaireId =
         posture === "plateforme" || posture === "prestataire"
           ? ""
-          : (entreprise?.id || "");
+          : entreprise?.id || "";
       form.reset({
         titre: "",
         description: "",
@@ -205,7 +221,7 @@ export function TicketFormDialog({
       setSelectedClientId(
         posture === "plateforme" || posture === "prestataire"
           ? ""
-          : (entreprise?.id || ""),
+          : entreprise?.id || "",
       );
     }
   }, [open, form, entreprise?.id, posture]);
@@ -291,131 +307,133 @@ export function TicketFormDialog({
             {/* Contenu scrollable */}
             <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
               <div className="space-y-4">
-              {/* Si posture plateforme ou prestataire : Select Client */}
-              {(posture === "plateforme" || posture === "prestataire") && (
-                <RhfControlledSelect<InsertTicketFormType>
-                  name="proprietaireEntrepriseId"
-                  label="Client"
-                  requiredMark
-                  placeholder="Sélectionnez un client"
-                  onChange={(value) => handleClientChange(value as string)}
-                  selectClassName="w-full"
-                >
-                  {clients.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.nom}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-              )}
-
-              <RhfControlledSelect<InsertTicketFormType>
-                name="siteId"
-                label="Site"
-                requiredMark
-                placeholder="Sélectionnez un site"
-                disabled={!selectedClientId || loadingSites || sites.length === 0}
-                selectClassName="w-full"
-              >
-                {sites.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.nom}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
-
-              {/* Select Prestataire (si disponibles) */}
-              {prestataires.length > 0 && (
-                <RhfControlledSelect<InsertTicketFormType>
-                  name="assigneEntrepriseId"
-                  label="Prestataire (optionnel)"
-                  placeholder="Laisser vide pour assignation ultérieure"
-                  disabled={loadingPrestataires}
-                  selectClassName="w-full"
-                >
-                  {prestataires.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.nom}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-              )}
-
-              <RhfInput<InsertTicketFormType>
-                name="titre"
-                label="Titre"
-                requiredMark
-                placeholder="Résumé du problème ou de la demande"
-              />
-
-              <RhfTextArea<InsertTicketFormType>
-                name="description"
-                label="Description"
-                placeholder="Détails supplémentaires..."
-                textareaClassName="h-40"
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <RhfControlledSelect<InsertTicketFormType>
-                  name="type"
-                  label="Type"
-                  requiredMark
-                  className="col-span-1"
-                  selectClassName="w-full"
-                >
-                  <SelectItem value="incident">Incident</SelectItem>
-                  <SelectItem value="demande">Demande</SelectItem>
-                  <SelectItem value="autre">Autre</SelectItem>
-                </RhfControlledSelect>
-
-                <RhfControlledSelect<InsertTicketFormType>
-                  name="priorite"
-                  label="Priorité"
-                  requiredMark
-                  className="col-span-1"
-                  selectClassName="w-full"
-                >
-                  <SelectItem value="critique">Critique</SelectItem>
-                  <SelectItem value="haute">Haute</SelectItem>
-                  <SelectItem value="normale">Normale</SelectItem>
-                  <SelectItem value="basse">Basse</SelectItem>
-                </RhfControlledSelect>
-              </div>
-
-              {/* Section Pièces Jointes */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">
-                    Pièces jointes (max 2 Mo)
-                  </label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddAttachment}
-                    disabled={hasPendingAttachment || !selectedClientId}
+                {/* Si posture plateforme ou prestataire : Select Client */}
+                {(posture === "plateforme" || posture === "prestataire") && (
+                  <RhfControlledSelect<InsertTicketFormType>
+                    name="proprietaireEntrepriseId"
+                    label="Client"
+                    requiredMark
+                    placeholder="Sélectionnez un client"
+                    onChange={(value) => handleClientChange(value as string)}
+                    selectClassName="w-full"
                   >
-                    Ajouter
-                  </Button>
+                    {clients.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.nom}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                )}
+
+                <RhfControlledSelect<InsertTicketFormType>
+                  name="siteId"
+                  label="Site"
+                  requiredMark
+                  placeholder="Sélectionnez un site"
+                  disabled={
+                    !selectedClientId || loadingSites || sites.length === 0
+                  }
+                  selectClassName="w-full"
+                >
+                  {sites.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.nom}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
+
+                {/* Select Prestataire (si disponibles) */}
+                {prestataires.length > 0 && (
+                  <RhfControlledSelect<InsertTicketFormType>
+                    name="assigneEntrepriseId"
+                    label="Prestataire (optionnel)"
+                    placeholder="Laisser vide pour assignation ultérieure"
+                    disabled={loadingPrestataires}
+                    selectClassName="w-full"
+                  >
+                    {prestataires.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.nom}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                )}
+
+                <RhfInput<InsertTicketFormType>
+                  name="titre"
+                  label="Titre"
+                  requiredMark
+                  placeholder="Résumé du problème ou de la demande"
+                />
+
+                <RhfTextArea<InsertTicketFormType>
+                  name="description"
+                  label="Description"
+                  placeholder="Détails supplémentaires..."
+                  textareaClassName="h-40"
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <RhfControlledSelect<InsertTicketFormType>
+                    name="type"
+                    label="Type"
+                    requiredMark
+                    className="col-span-1"
+                    selectClassName="w-full"
+                  >
+                    <SelectItem value="incident">Incident</SelectItem>
+                    <SelectItem value="demande">Demande</SelectItem>
+                    <SelectItem value="autre">Autre</SelectItem>
+                  </RhfControlledSelect>
+
+                  <RhfControlledSelect<InsertTicketFormType>
+                    name="priorite"
+                    label="Priorité"
+                    requiredMark
+                    className="col-span-1"
+                    selectClassName="w-full"
+                  >
+                    <SelectItem value="critique">Critique</SelectItem>
+                    <SelectItem value="haute">Haute</SelectItem>
+                    <SelectItem value="normale">Normale</SelectItem>
+                    <SelectItem value="basse">Basse</SelectItem>
+                  </RhfControlledSelect>
                 </div>
 
-                {fields.length > 0 && (
-                  <div className="space-y-2">
-                    {fields.map((field, index) => (
-                      <RhfFileInput<InsertTicketFormType>
-                        key={field.id}
-                        name={`attachments.${index}` as const}
-                        proprietaireEntrepriseId={selectedClientId || ""}
-                        categorie="ticket_piece_jointe"
-                        onClear={() => remove(index)}
-                        deleteOnClear
-                        maxSizeBytes={2 * 1024 * 1024} // 2MB
-                      />
-                    ))}
+                {/* Section Pièces Jointes */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">
+                      Pièces jointes (max 2 Mo)
+                    </label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddAttachment}
+                      disabled={hasPendingAttachment || !selectedClientId}
+                    >
+                      Ajouter
+                    </Button>
                   </div>
-                )}
+
+                  {fields.length > 0 && (
+                    <div className="space-y-2">
+                      {fields.map((field, index) => (
+                        <RhfFileInput<InsertTicketFormType>
+                          key={field.id}
+                          name={`attachments.${index}` as const}
+                          proprietaireEntrepriseId={selectedClientId || ""}
+                          categorie="ticket_piece_jointe"
+                          onClear={() => remove(index)}
+                          deleteOnClear
+                          maxSizeBytes={2 * 1024 * 1024} // 2MB
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
             </DialogStyledBody>
 
             <DialogStyledFooter>
@@ -427,7 +445,12 @@ export function TicketFormDialog({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting ? "Création..." : "Créer le ticket"}
+                {isSubmitting ? (
+                  <Spinner className="size-3" />
+                ) : (
+                  <Ticket className="size-3" />
+                )}
+                Créer le ticket
               </Button>
             </DialogStyledFooter>
           </form>

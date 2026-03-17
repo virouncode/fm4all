@@ -56,6 +56,7 @@ import {
   Pencil,
   Plus,
   Trash2,
+  Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState, useWatch } from "react-hook-form";
@@ -351,7 +352,7 @@ export function ExecutionFormDialog({
       <DialogStyledContent className="flex max-h-[90vh] max-w-2xl flex-col">
         <DialogStyledHeader>
           <DialogHeader>
-            <DialogTitle>Ajouter une exécution</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Zap className="text-primary h-4 w-4" />Ajouter une exécution</DialogTitle>
             {postureActive === "prestataire" && (
               <p className="text-muted-foreground text-sm">
                 {clientNom} — {serviceNom}
@@ -893,7 +894,7 @@ export function ExecutionFormDialog({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Spinner />}
+                {isSubmitting ? <Spinner className="size-3" /> : <Zap className="size-3" />}
                 Ajouter une exécution
               </Button>
             </DialogStyledFooter>

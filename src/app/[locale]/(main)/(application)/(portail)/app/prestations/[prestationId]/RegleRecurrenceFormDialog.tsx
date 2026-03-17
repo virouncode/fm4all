@@ -30,7 +30,7 @@ import type { SelectRegleRecurrenceType } from "@/zod-schemas/clientServiceRegle
 import type { PrestationListItem } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTime } from "luxon";
-import { ClipboardList, Info, Pencil, X } from "lucide-react";
+import { ClipboardList, Info, Pencil, Repeat, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -458,9 +458,7 @@ export function RegleRecurrenceFormDialog({
       <DialogStyledContent className="flex max-h-[90vh] max-w-lg flex-col">
         <DialogStyledHeader>
           <DialogHeader>
-            <DialogTitle>
-              {isEdit ? "Modifier la règle" : "Ajouter une règle de récurrence"}
-            </DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Repeat className="text-primary h-4 w-4" />{isEdit ? "Modifier la règle" : "Ajouter une règle de récurrence"}</DialogTitle>
           </DialogHeader>
         </DialogStyledHeader>
 
@@ -834,7 +832,7 @@ export function RegleRecurrenceFormDialog({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Spinner />}
+                {isSubmitting ? <Spinner className="size-3" /> : <Repeat className="size-3" />}
                 {isEdit ? "Enregistrer" : "Ajouter la règle"}
               </Button>
             </DialogStyledFooter>

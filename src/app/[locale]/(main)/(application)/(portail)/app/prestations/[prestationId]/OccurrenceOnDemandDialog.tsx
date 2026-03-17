@@ -25,7 +25,7 @@ import {
 } from "@/zod-schemas/clientServiceOccurrences.schema";
 import type { PrestationListItem } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CalendarPlus } from "lucide-react";
 import { useEffect } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -98,7 +98,7 @@ export function OccurrenceOnDemandDialog({
       <DialogStyledContent className="sm:max-w-md">
         <DialogStyledHeader>
           <DialogHeader>
-            <DialogTitle>Ajouter une intervention</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><CalendarPlus className="text-primary h-4 w-4" />Ajouter une intervention</DialogTitle>
           </DialogHeader>
         </DialogStyledHeader>
 
@@ -158,7 +158,7 @@ export function OccurrenceOnDemandDialog({
             onClick={form.handleSubmit(onSubmit)}
             disabled={isSubmitting}
           >
-            {isSubmitting && <Spinner />}
+            {isSubmitting ? <Spinner className="size-3" /> : <CalendarPlus className="size-3" />}
             Créer le passage
           </Button>
         </DialogStyledFooter>

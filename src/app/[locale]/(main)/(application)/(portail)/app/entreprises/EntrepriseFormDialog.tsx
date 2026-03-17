@@ -655,7 +655,7 @@ export function EntrepriseFormDialog({
                           (watchedServiceIds ?? []).length === 0)
                       }
                     >
-                      {isSubmitting && <Spinner />}
+                      {isSubmitting ? <Spinner className="size-3" /> : <Building2 className="size-3" />}
                       <Check className="h-4 w-4" />
                       Créer l&apos;entreprise
                     </Button>

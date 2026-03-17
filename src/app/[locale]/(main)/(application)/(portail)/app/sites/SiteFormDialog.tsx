@@ -5,11 +5,7 @@ import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DialogStyledBody,
   DialogStyledContent,
@@ -225,7 +221,7 @@ export function SiteFormDialog({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <MapPin className="text-primary size-6" />
+                <MapPin className="text-primary size-5" />
                 {mode === "create" ? "Créer un site" : "Modifier le site"}
               </div>
             </DialogTitle>
@@ -239,119 +235,123 @@ export function SiteFormDialog({
           >
             <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
               <div className="space-y-6">
-              {/* Nom */}
-              <RhfInput<InsertSiteFormType | UpdateSiteFormType>
-                name="nom"
-                label="Nom du site"
-                requiredMark
-              />
-
-              {/* Statut (seulement en mode edit) */}
-              {mode === "edit" && (
-                <div className="space-y-4">
-                  <h3 className="font-semibold">Statut</h3>
-                  <RhfCheckbox<UpdateSiteFormType>
-                    name="actif"
-                    label="Site actif"
-                    orientation="horizontal"
-                  />
-                </div>
-              )}
-
-              {/* Adresse */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Adresse</h3>
-                  {parentSite && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyParentAddress}
-                      className="text-xs"
-                    >
-                      <Copy className="h-3 w-3" />
-                      Copier site parent
-                    </Button>
-                  )}
-                </div>
+                {/* Nom */}
                 <RhfInput<InsertSiteFormType | UpdateSiteFormType>
-                  name="adresseLigne1"
-                  label="Adresse ligne 1"
+                  name="nom"
+                  label="Nom du site"
                   requiredMark
                 />
-                <RhfInput<InsertSiteFormType | UpdateSiteFormType>
-                  name="adresseLigne2"
-                  label="Adresse ligne 2"
+
+                {/* Statut (seulement en mode edit) */}
+                {mode === "edit" && (
+                  <div className="space-y-4">
+                    <h3 className="font-semibold">Statut</h3>
+                    <RhfCheckbox<UpdateSiteFormType>
+                      name="actif"
+                      label="Site actif"
+                      orientation="horizontal"
+                    />
+                  </div>
+                )}
+
+                {/* Adresse */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Adresse</h3>
+                    {parentSite && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopyParentAddress}
+                        className="text-xs"
+                      >
+                        <Copy className="h-3 w-3" />
+                        Copier site parent
+                      </Button>
+                    )}
+                  </div>
+                  <RhfInput<InsertSiteFormType | UpdateSiteFormType>
+                    name="adresseLigne1"
+                    label="Adresse ligne 1"
+                    requiredMark
+                  />
+                  <RhfInput<InsertSiteFormType | UpdateSiteFormType>
+                    name="adresseLigne2"
+                    label="Adresse ligne 2"
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <RhfInput<InsertSiteFormType | UpdateSiteFormType>
+                      name="codePostal"
+                      label="Code postal"
+                      requiredMark
+                    />
+                    <RhfInput<InsertSiteFormType | UpdateSiteFormType>
+                      name="ville"
+                      label="Ville"
+                      requiredMark
+                    />
+                  </div>
+                </div>
+
+                {/* Caractéristiques */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Caractéristiques</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <RhfInput<InsertSiteFormType | UpdateSiteFormType>
+                      name="surface"
+                      label="Surface (m²)"
+                      type="number"
+                      requiredMark
+                    />
+                    <RhfInput<InsertSiteFormType | UpdateSiteFormType>
+                      name="effectif"
+                      label="Effectif"
+                      type="number"
+                      requiredMark
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <RhfControlledSelect<
+                      InsertSiteFormType | UpdateSiteFormType
+                    >
+                      name="typeBatiment"
+                      label="Type de bâtiment"
+                      requiredMark
+                      className="col-span-1"
+                      selectClassName="w-full"
+                    >
+                      {typeBatimentCT.map((type) => (
+                        <SelectItem key={type.code} value={type.code}>
+                          {t(type.name)}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+                    <RhfControlledSelect<
+                      InsertSiteFormType | UpdateSiteFormType
+                    >
+                      name="typeOccupation"
+                      label="Type d'occupation"
+                      requiredMark
+                      className="col-span-1"
+                      selectClassName="w-full"
+                    >
+                      {typeOccupationCT.map((type) => (
+                        <SelectItem key={type.code} value={type.code}>
+                          {t(type.name)}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+                  </div>
+                </div>
+
+                {/* Commentaires */}
+                <RhfTextArea<InsertSiteFormType | UpdateSiteFormType>
+                  name="commentaires"
+                  label="Commentaires"
+                  textareaClassName="h-40"
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  <RhfInput<InsertSiteFormType | UpdateSiteFormType>
-                    name="codePostal"
-                    label="Code postal"
-                    requiredMark
-                  />
-                  <RhfInput<InsertSiteFormType | UpdateSiteFormType>
-                    name="ville"
-                    label="Ville"
-                    requiredMark
-                  />
-                </div>
               </div>
-
-              {/* Caractéristiques */}
-              <div className="space-y-4">
-                <h3 className="font-semibold">Caractéristiques</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <RhfInput<InsertSiteFormType | UpdateSiteFormType>
-                    name="surface"
-                    label="Surface (m²)"
-                    type="number"
-                    requiredMark
-                  />
-                  <RhfInput<InsertSiteFormType | UpdateSiteFormType>
-                    name="effectif"
-                    label="Effectif"
-                    type="number"
-                    requiredMark
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <RhfControlledSelect<InsertSiteFormType | UpdateSiteFormType>
-                    name="typeBatiment"
-                    label="Type de bâtiment"
-                    requiredMark
-                    className="col-span-1"
-                    selectClassName="w-full"
-                  >
-                    {typeBatimentCT.map((type) => (
-                      <SelectItem key={type.code} value={type.code}>
-                        {t(type.name)}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
-                  <RhfControlledSelect<InsertSiteFormType | UpdateSiteFormType>
-                    name="typeOccupation"
-                    label="Type d'occupation"
-                    requiredMark
-                    className="col-span-1"
-                    selectClassName="w-full"
-                  >
-                    {typeOccupationCT.map((type) => (
-                      <SelectItem key={type.code} value={type.code}>
-                        {t(type.name)}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
-                </div>
-              </div>
-
-              {/* Commentaires */}
-              <RhfTextArea<InsertSiteFormType | UpdateSiteFormType>
-                name="commentaires"
-                label="Commentaires"
-                textareaClassName="h-40"
-              />
-            </div>
             </DialogStyledBody>
 
             <DialogStyledFooter>
@@ -364,7 +364,11 @@ export function SiteFormDialog({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && <Spinner />}
+                {isSubmitting ? (
+                  <Spinner className="size-3" />
+                ) : (
+                  <MapPin className="size-3" />
+                )}
 
                 {mode === "create" ? "Créer" : "Enregistrer"}
               </Button>

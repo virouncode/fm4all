@@ -3,12 +3,12 @@
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  DialogStyledContent,
+  DialogStyledHeader,
+  DialogStyledBody,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -16,7 +16,7 @@ import { useRouter } from "@/i18n/navigation";
 import { EntrepriseMinimalType } from "@/zod-schemas/documents.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Filter, RotateCcw } from "lucide-react";
-import { useMemo, useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
@@ -72,7 +72,13 @@ export function DocumentsFiltersDialog({
         partenaireEntrepriseId: searchParams.partenaireEntrepriseId || "all",
       });
     }
-  }, [open, searchParams.search, searchParams.visibilite, searchParams.partenaireEntrepriseId, form]);
+  }, [
+    open,
+    searchParams.search,
+    searchParams.visibilite,
+    searchParams.partenaireEntrepriseId,
+    form,
+  ]);
 
   const filters = useWatch({ control: form.control });
   const debouncedSearch = useDebounce(filters.search, 500);
@@ -88,7 +94,8 @@ export function DocumentsFiltersDialog({
     if (searchParams.orderDir) query.orderDir = searchParams.orderDir;
 
     if (debouncedSearch) query.search = debouncedSearch;
-    if (filters.visibilite && filters.visibilite !== "all") query.visibilite = filters.visibilite;
+    if (filters.visibilite && filters.visibilite !== "all")
+      query.visibilite = filters.visibilite;
     if (
       filters.partenaireEntrepriseId &&
       filters.partenaireEntrepriseId !== "all"
@@ -104,80 +111,91 @@ export function DocumentsFiltersDialog({
     let count = 0;
     if (filters.search) count++;
     if (filters.visibilite && filters.visibilite !== "all") count++;
-    if (filters.partenaireEntrepriseId && filters.partenaireEntrepriseId !== "all") count++;
+    if (
+      filters.partenaireEntrepriseId &&
+      filters.partenaireEntrepriseId !== "all"
+    )
+      count++;
     return count;
   }, [filters]);
 
   const handleReset = () => {
-    form.reset({ search: "", visibilite: "all", partenaireEntrepriseId: "all" });
+    form.reset({
+      search: "",
+      visibilite: "all",
+      partenaireEntrepriseId: "all",
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Filter className="text-primary size-5" />
-            Filtrer les documents
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          <Form {...form}>
-            <form className="flex flex-col gap-4">
-              {/* Search */}
-              <RhfInput
-                label="Recherche"
-                name="search"
-                placeholder="Titre, nom de fichier..."
-                withError={false}
-              />
-
-              {/* Visibilité (only "Mes documents" tab) */}
-              {!isPartagesTab && (
-                <RhfControlledSelect
-                  label="Visibilité"
-                  name="visibilite"
-                  selectClassName="w-full"
+      <DialogStyledContent className="sm:max-w-lg">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Filter className="text-primary size-5" />
+              Filtrer les documents
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
+        <DialogStyledBody>
+          <div className="space-y-6">
+            <Form {...form}>
+              <form className="flex flex-col gap-4">
+                {/* Search */}
+                <RhfInput
+                  label="Recherche"
+                  name="search"
+                  placeholder="Titre, nom de fichier..."
                   withError={false}
-                >
-                  <SelectItem value="all">Toutes</SelectItem>
-                  <SelectItem value="prive">Privé</SelectItem>
-                  <SelectItem value="public">Partagé</SelectItem>
-                </RhfControlledSelect>
-              )}
+                />
 
-              {/* Partner filter (only "Documents partagés" tab) */}
-              {isPartagesTab && partners.length > 0 && (
-                <RhfControlledSelect
-                  label="Entreprise partenaire"
-                  name="partenaireEntrepriseId"
-                  selectClassName="w-full"
-                  withError={false}
-                >
-                  <SelectItem value="all">Toutes les entreprises</SelectItem>
-                  {partners.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.nom}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-              )}
-            </form>
-          </Form>
+                {/* Visibilité (only "Mes documents" tab) */}
+                {!isPartagesTab && (
+                  <RhfControlledSelect
+                    label="Visibilité"
+                    name="visibilite"
+                    selectClassName="w-full"
+                    withError={false}
+                  >
+                    <SelectItem value="all">Toutes</SelectItem>
+                    <SelectItem value="prive">Privé</SelectItem>
+                    <SelectItem value="public">Partagé</SelectItem>
+                  </RhfControlledSelect>
+                )}
 
-          <div className="flex items-center justify-end">
-            <Button
-              type="button"
-              onClick={handleReset}
-              disabled={activeFiltersCount === 0}
-            >
-              <RotateCcw />
-              Réinitialiser ({activeFiltersCount})
-            </Button>
+                {/* Partner filter (only "Documents partagés" tab) */}
+                {isPartagesTab && partners.length > 0 && (
+                  <RhfControlledSelect
+                    label="Entreprise partenaire"
+                    name="partenaireEntrepriseId"
+                    selectClassName="w-full"
+                    withError={false}
+                  >
+                    <SelectItem value="all">Toutes les entreprises</SelectItem>
+                    {partners.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.nom}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                )}
+              </form>
+            </Form>
+
+            <div className="flex items-center justify-end">
+              <Button
+                type="button"
+                onClick={handleReset}
+                disabled={activeFiltersCount === 0}
+              >
+                <RotateCcw />
+                Réinitialiser ({activeFiltersCount})
+              </Button>
+            </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogStyledBody>
+      </DialogStyledContent>
     </Dialog>
   );
 }

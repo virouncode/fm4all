@@ -19,8 +19,9 @@ import {
   updateEntrepriseLogoSchema,
   type UpdateEntrepriseLogoType,
 } from "@/zod-schemas/entreprise.schema";
+import { Spinner } from "@/components/ui/spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageIcon, Loader2 } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { useEffect } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -124,9 +125,7 @@ export function EditEntrepriseLogoDialog({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+                {isSubmitting ? <Spinner className="size-3" /> : <ImageIcon className="size-3" />}
                 Enregistrer
               </Button>
             </DialogStyledFooter>

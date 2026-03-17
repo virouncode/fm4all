@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -14,7 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { adhesionStatutCodes, roleClientAdhesionCodes } from "@/constants/codeTables";
+import {
+  adhesionStatutCodes,
+  roleClientAdhesionCodes,
+} from "@/constants/codeTables";
 import {
   getEntreprisesClientesAction,
   getEntreprisesPrestatairesAction,
@@ -24,26 +22,34 @@ import { useAppStore } from "@/stores/application/appStore";
 import { UserWithAdhesionType } from "@/zod-schemas/user.schema";
 import { Filter, Plus, Users } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { buildUserTree, getPathToRoot } from "./helpers";
 import { UserDetails } from "./UserDetails";
 import { UserFormDialog } from "./UserFormDialog";
 import { UsersFiltersForm } from "./UsersFiltersForm";
 import { UsersTree } from "./UsersTree";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 
 export function UsersClient() {
   const entreprise = useAppStore((state) => state.entreprise);
   const currentUser = useAppStore((state) => state.user);
   const roleClientAdhesion = useAppStore((state) => state.roleClientAdhesion);
-  const rolePrestataireAdhesion = useAppStore((state) => state.rolePrestataireAdhesion);
+  const rolePrestataireAdhesion = useAppStore(
+    (state) => state.rolePrestataireAdhesion,
+  );
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
   const postureActive = useAppStore((state) => state.postureActive);
 
   const currentUserRole =
-    postureActive === "prestataire" ? rolePrestataireAdhesion : roleClientAdhesion;
+    postureActive === "prestataire"
+      ? rolePrestataireAdhesion
+      : roleClientAdhesion;
   const searchParams = useSearchParams();
 
   // Déterminer si l'utilisateur peut créer des utilisateurs RACINE
@@ -53,11 +59,22 @@ export function UsersClient() {
     currentUserRole === "admin";
 
   // Pour la posture plateforme : sélecteur de type + entreprise
-  const [viewType, setViewType] = useState<"plateforme" | "client" | "prestataire">(
-    postureActive === "plateforme" ? "plateforme" : ((postureActive ?? "client") as "plateforme" | "client" | "prestataire"),
+  const [viewType, setViewType] = useState<
+    "plateforme" | "client" | "prestataire"
+  >(
+    postureActive === "plateforme"
+      ? "plateforme"
+      : ((postureActive ?? "client") as
+          | "plateforme"
+          | "client"
+          | "prestataire"),
   );
-  const [viewEntreprises, setViewEntreprises] = useState<Array<{ id: string; nom: string }>>([]);
-  const [viewEntrepriseId, setViewEntrepriseId] = useState<string>(entreprise?.id ?? "");
+  const [viewEntreprises, setViewEntreprises] = useState<
+    Array<{ id: string; nom: string }>
+  >([]);
+  const [viewEntrepriseId, setViewEntrepriseId] = useState<string>(
+    entreprise?.id ?? "",
+  );
   const [loadingEntreprises, setLoadingEntreprises] = useState(false);
 
   const [users, setUsers] = useState<UserWithAdhesionType[]>([]);
@@ -93,8 +110,10 @@ export function UsersClient() {
     if (!entreprise?.id) return;
 
     // En posture plateforme : utiliser le sélecteur de type/entreprise
-    const queryPosture = postureActive === "plateforme" ? viewType : (postureActive ?? "client");
-    const queryEntrepriseId = postureActive === "plateforme" ? viewEntrepriseId : entreprise.id;
+    const queryPosture =
+      postureActive === "plateforme" ? viewType : (postureActive ?? "client");
+    const queryEntrepriseId =
+      postureActive === "plateforme" ? viewEntrepriseId : entreprise.id;
 
     // Ne pas charger si on n'a pas encore d'entreprise sélectionnée (client/prestataire sans sélection)
     if (!queryEntrepriseId) return;
@@ -182,7 +201,15 @@ export function UsersClient() {
   useEffect(() => {
     loadUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entreprise?.id, postureActive, viewType, viewEntrepriseId, searchFilter, roleFilter, statutFilter]);
+  }, [
+    entreprise?.id,
+    postureActive,
+    viewType,
+    viewEntrepriseId,
+    searchFilter,
+    roleFilter,
+    statutFilter,
+  ]);
 
   // Déplier les ancêtres quand un utilisateur est sélectionné (par défaut ou par clic)
   useEffect(() => {
@@ -276,16 +303,22 @@ export function UsersClient() {
 
                 {viewType !== "plateforme" && (
                   <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm">Entreprise :</span>
+                    <span className="text-muted-foreground text-sm">
+                      Entreprise :
+                    </span>
                     <Select
                       value={viewEntrepriseId}
                       onValueChange={setViewEntrepriseId}
-                      disabled={loadingEntreprises || viewEntreprises.length === 0}
+                      disabled={
+                        loadingEntreprises || viewEntreprises.length === 0
+                      }
                     >
                       <SelectTrigger className="w-52">
                         <SelectValue
                           placeholder={
-                            loadingEntreprises ? "Chargement..." : "Sélectionner"
+                            loadingEntreprises
+                              ? "Chargement..."
+                              : "Sélectionner"
                           }
                         />
                       </SelectTrigger>
@@ -412,19 +445,19 @@ export function UsersClient() {
 
       {/* Filters Dialog */}
       <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
-        <DialogContent className="!w-2/3 !max-w-none">
-          <DialogHeader>
-            <DialogTitle>
-              <div className="flex items-center gap-2">
-                <Filter className="text-primary size-6" />
-                <h3 className="text-xl font-semibold">
+        <DialogStyledContent className="!w-2/3 !max-w-none">
+          <DialogStyledHeader>
+            <DialogHeader>
+              <DialogTitle>
+                <div className="flex items-center gap-2">
+                  <Filter className="text-primary size-5" />
                   Filtrer les utilisateurs
-                </h3>
-              </div>
-            </DialogTitle>
-          </DialogHeader>
+                </div>
+              </DialogTitle>
+            </DialogHeader>
+          </DialogStyledHeader>
           <UsersFiltersForm />
-        </DialogContent>
+        </DialogStyledContent>
       </Dialog>
     </div>
   );

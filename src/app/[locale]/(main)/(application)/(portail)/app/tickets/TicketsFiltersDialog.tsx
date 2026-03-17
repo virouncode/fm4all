@@ -3,11 +3,7 @@
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DialogStyledBody,
   DialogStyledContent,
@@ -49,7 +45,7 @@ type TicketsFiltersDialogProps = {
   onOpenChange: (open: boolean) => void;
   currentFilters: FiltersType;
   onApply: (filters: FiltersType) => void;
-}
+};
 
 export function TicketsFiltersDialog({
   open,
@@ -286,7 +282,7 @@ export function TicketsFiltersDialog({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <Filter className="text-primary size-6" />
+                <Filter className="text-primary size-5" />
                 Filtrer les tickets
               </div>
             </DialogTitle>
@@ -295,150 +291,152 @@ export function TicketsFiltersDialog({
 
         <DialogStyledBody>
           <div className="space-y-6">
-          <Form {...form}>
-            <form className="flex flex-col gap-4">
-              {/* Ligne 1 */}
-              <div className="grid grid-cols-4 gap-4">
-                <RhfInput
-                  label="Recherche"
-                  name="search"
-                  placeholder="Titre, description..."
-                  className="col-span-1"
-                  withError={false}
-                />
+            <Form {...form}>
+              <form className="flex flex-col gap-4">
+                {/* Ligne 1 */}
+                <div className="grid grid-cols-4 gap-4">
+                  <RhfInput
+                    label="Recherche"
+                    name="search"
+                    placeholder="Titre, description..."
+                    className="col-span-1"
+                    withError={false}
+                  />
 
-                <RhfControlledSelect
-                  label="Statut"
-                  name="statut"
-                  className="col-span-1"
-                  selectClassName="w-full"
-                  withError={false}
-                >
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="nouveau">Nouveau</SelectItem>
-                  <SelectItem value="pris_en_charge">Pris en charge</SelectItem>
-                  <SelectItem value="en_attente_prestataire">
-                    En attente prestataire
-                  </SelectItem>
-                  <SelectItem value="en_attente_client">
-                    En attente client
-                  </SelectItem>
-                  <SelectItem value="a_valider">À valider</SelectItem>
-                  <SelectItem value="clos">Clos</SelectItem>
-                  <SelectItem value="annule">Annulé</SelectItem>
-                  <SelectItem value="rejete">Rejeté</SelectItem>
-                </RhfControlledSelect>
-
-                <RhfControlledSelect
-                  label="Priorité"
-                  name="priorite"
-                  className="col-span-1"
-                  selectClassName="w-full"
-                  withError={false}
-                >
-                  <SelectItem value="all">Toutes</SelectItem>
-                  <SelectItem value="critique">Critique</SelectItem>
-                  <SelectItem value="haute">Haute</SelectItem>
-                  <SelectItem value="normale">Normale</SelectItem>
-                  <SelectItem value="basse">Basse</SelectItem>
-                </RhfControlledSelect>
-                <RhfControlledSelect
-                  label="Type"
-                  name="type"
-                  className="col-span-1"
-                  selectClassName="w-full"
-                  withError={false}
-                >
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="incident">Incident</SelectItem>
-                  <SelectItem value="demande">Demande</SelectItem>
-                  <SelectItem value="autre">Autre</SelectItem>
-                </RhfControlledSelect>
-              </div>
-
-              {/* Ligne 2: 4-column grid for flexible layout */}
-              <div className="grid grid-cols-4 gap-4">
-                {/* Client Filter - Show for plateforme and prestataire */}
-                {(postureActive === "plateforme" ||
-                  postureActive === "prestataire") && (
                   <RhfControlledSelect
-                    label="Client"
-                    name="proprietaireEntrepriseId"
+                    label="Statut"
+                    name="statut"
                     className="col-span-1"
                     selectClassName="w-full"
                     withError={false}
                   >
-                    <SelectItem value="all">Tous les clients</SelectItem>
-                    {clientEntreprises.map((e) => (
-                      <SelectItem key={e.id} value={e.id}>
-                        {e.nom}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
-                )}
-
-                {/* Prestataire Filter - Show for plateforme and client */}
-                {(postureActive === "plateforme" ||
-                  postureActive === "client") && (
-                  <RhfControlledSelect
-                    label="Prestataire"
-                    name="assigneEntrepriseId"
-                    className="col-span-1"
-                    selectClassName="w-full"
-                    withError={false}
-                  >
-                    <SelectItem value="all">Tous les prestataires</SelectItem>
-                    {prestataireEntreprises.map((e) => (
-                      <SelectItem key={e.id} value={e.id}>
-                        {e.nom}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
-                )}
-
-                <RhfControlledSelect
-                  label="Site"
-                  name="siteId"
-                  className="col-span-1"
-                  selectClassName="w-full"
-                  withError={false}
-                  disabled={
-                    loadingSites ||
-                    (postureActive === "prestataire" &&
-                      (!proprietaireEntrepriseId ||
-                        proprietaireEntrepriseId === "all"))
-                  }
-                >
-                  <SelectItem value="all">
-                    {loadingSites
-                      ? "Chargement..."
-                      : postureActive === "prestataire" &&
-                          (!proprietaireEntrepriseId ||
-                            proprietaireEntrepriseId === "all")
-                        ? "Sélectionnez d'abord un client"
-                        : "Tous les sites"}
-                  </SelectItem>
-                  {sites.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.nom}
+                    <SelectItem value="all">Tous</SelectItem>
+                    <SelectItem value="nouveau">Nouveau</SelectItem>
+                    <SelectItem value="pris_en_charge">
+                      Pris en charge
                     </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-              </div>
-            </form>
-          </Form>
+                    <SelectItem value="en_attente_prestataire">
+                      En attente prestataire
+                    </SelectItem>
+                    <SelectItem value="en_attente_client">
+                      En attente client
+                    </SelectItem>
+                    <SelectItem value="a_valider">À valider</SelectItem>
+                    <SelectItem value="clos">Clos</SelectItem>
+                    <SelectItem value="annule">Annulé</SelectItem>
+                    <SelectItem value="rejete">Rejeté</SelectItem>
+                  </RhfControlledSelect>
 
-          <div className="flex items-center justify-end">
-            <Button
-              type="button"
-              onClick={handleReset}
-              disabled={activeFiltersCount === 0}
-            >
-              <RotateCcw />
-              Réinitialiser ({activeFiltersCount})
-            </Button>
+                  <RhfControlledSelect
+                    label="Priorité"
+                    name="priorite"
+                    className="col-span-1"
+                    selectClassName="w-full"
+                    withError={false}
+                  >
+                    <SelectItem value="all">Toutes</SelectItem>
+                    <SelectItem value="critique">Critique</SelectItem>
+                    <SelectItem value="haute">Haute</SelectItem>
+                    <SelectItem value="normale">Normale</SelectItem>
+                    <SelectItem value="basse">Basse</SelectItem>
+                  </RhfControlledSelect>
+                  <RhfControlledSelect
+                    label="Type"
+                    name="type"
+                    className="col-span-1"
+                    selectClassName="w-full"
+                    withError={false}
+                  >
+                    <SelectItem value="all">Tous</SelectItem>
+                    <SelectItem value="incident">Incident</SelectItem>
+                    <SelectItem value="demande">Demande</SelectItem>
+                    <SelectItem value="autre">Autre</SelectItem>
+                  </RhfControlledSelect>
+                </div>
+
+                {/* Ligne 2: 4-column grid for flexible layout */}
+                <div className="grid grid-cols-4 gap-4">
+                  {/* Client Filter - Show for plateforme and prestataire */}
+                  {(postureActive === "plateforme" ||
+                    postureActive === "prestataire") && (
+                    <RhfControlledSelect
+                      label="Client"
+                      name="proprietaireEntrepriseId"
+                      className="col-span-1"
+                      selectClassName="w-full"
+                      withError={false}
+                    >
+                      <SelectItem value="all">Tous les clients</SelectItem>
+                      {clientEntreprises.map((e) => (
+                        <SelectItem key={e.id} value={e.id}>
+                          {e.nom}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+                  )}
+
+                  {/* Prestataire Filter - Show for plateforme and client */}
+                  {(postureActive === "plateforme" ||
+                    postureActive === "client") && (
+                    <RhfControlledSelect
+                      label="Prestataire"
+                      name="assigneEntrepriseId"
+                      className="col-span-1"
+                      selectClassName="w-full"
+                      withError={false}
+                    >
+                      <SelectItem value="all">Tous les prestataires</SelectItem>
+                      {prestataireEntreprises.map((e) => (
+                        <SelectItem key={e.id} value={e.id}>
+                          {e.nom}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+                  )}
+
+                  <RhfControlledSelect
+                    label="Site"
+                    name="siteId"
+                    className="col-span-1"
+                    selectClassName="w-full"
+                    withError={false}
+                    disabled={
+                      loadingSites ||
+                      (postureActive === "prestataire" &&
+                        (!proprietaireEntrepriseId ||
+                          proprietaireEntrepriseId === "all"))
+                    }
+                  >
+                    <SelectItem value="all">
+                      {loadingSites
+                        ? "Chargement..."
+                        : postureActive === "prestataire" &&
+                            (!proprietaireEntrepriseId ||
+                              proprietaireEntrepriseId === "all")
+                          ? "Sélectionnez d'abord un client"
+                          : "Tous les sites"}
+                    </SelectItem>
+                    {sites.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.nom}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                </div>
+              </form>
+            </Form>
+
+            <div className="flex items-center justify-end">
+              <Button
+                type="button"
+                onClick={handleReset}
+                disabled={activeFiltersCount === 0}
+              >
+                <RotateCcw />
+                Réinitialiser ({activeFiltersCount})
+              </Button>
+            </div>
           </div>
-        </div>
         </DialogStyledBody>
       </DialogStyledContent>
     </Dialog>

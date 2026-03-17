@@ -4,11 +4,7 @@ import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfFileInput } from "@/components/rhf/RhfFileInput";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DialogStyledBody,
   DialogStyledContent,
@@ -184,7 +180,7 @@ function CreateOrLinkUserForm({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <UserPlus className="text-primary" />
+                <UserPlus className="text-primary size-5" />
                 {title}
               </div>
             </DialogTitle>
@@ -526,7 +522,11 @@ function CreateUserFormInner({
                 name="prenom"
                 requiredMark
               />
-              <RhfInput<InsertUserFormType> label="Nom" name="nom" requiredMark />
+              <RhfInput<InsertUserFormType>
+                label="Nom"
+                name="nom"
+                requiredMark
+              />
             </div>
 
             <RhfInput<InsertUserFormType>
@@ -535,7 +535,10 @@ function CreateUserFormInner({
               type="email"
               requiredMark
             />
-            <RhfInput<InsertUserFormType> label="N° de téléphone" name="phone" />
+            <RhfInput<InsertUserFormType>
+              label="N° de téléphone"
+              name="phone"
+            />
             <RhfControlledSelect<InsertUserFormType>
               label="Rôle"
               name="roleAdhesion"
@@ -571,7 +574,12 @@ function CreateUserFormInner({
             Annuler
           </Button>
           <Button type="submit" disabled={isSubmitting || !isDirty}>
-            {isSubmitting && <Spinner />}Créer
+            {isSubmitting ? (
+              <Spinner className="size-3" />
+            ) : (
+              <UserPlus className="size-3" />
+            )}
+            Créer
           </Button>
         </DialogStyledFooter>
       </form>
@@ -694,7 +702,12 @@ function CreatePlateformeUserFormInner({
             Annuler
           </Button>
           <Button type="submit" disabled={isSubmitting || !isDirty}>
-            {isSubmitting && <Spinner />}Créer
+            {isSubmitting ? (
+              <Spinner className="size-3" />
+            ) : (
+              <UserPlus className="size-3" />
+            )}
+            Créer
           </Button>
         </DialogStyledFooter>
       </form>
@@ -869,7 +882,7 @@ function EditUserForm({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <User className="text-primary" />
+                <User className="text-primary size-5" />
                 Modifier un utilisateur
               </div>
             </DialogTitle>
@@ -963,7 +976,12 @@ function EditUserForm({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && <Spinner />}Enregistrer
+                {isSubmitting ? (
+                  <Spinner className="size-3" />
+                ) : (
+                  <User className="size-3" />
+                )}
+                Enregistrer
               </Button>
             </DialogStyledFooter>
           </form>

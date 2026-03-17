@@ -22,6 +22,7 @@ import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectItem } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
 import {
   bulkInsertMixedPrestataireAttributionsAction,
@@ -465,7 +466,7 @@ export function UserSiteAttributionDialog({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <MapPin className="text-primary" />
+                <MapPin className="text-primary size-5" />
                 Attribuer des sites
               </div>
             </DialogTitle>
@@ -580,7 +581,7 @@ export function UserSiteAttributionDialog({
                   (isPrestataire && !selectedClientId)
                 }
               >
-                {isSubmitting ? "Attribution..." : "Attribuer"}
+                {isSubmitting ? <Spinner className="size-3" /> : <MapPin className="size-3" />}Attribuer
               </Button>
             </DialogStyledFooter>
           </form>

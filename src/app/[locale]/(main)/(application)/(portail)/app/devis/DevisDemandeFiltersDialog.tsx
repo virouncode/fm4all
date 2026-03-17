@@ -3,21 +3,20 @@
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
+  DialogStyledBody,
   DialogStyledContent,
   DialogStyledHeader,
-  DialogStyledBody,
 } from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
-import { getServicesByPrestataireAction, getServicesAction } from "@/server/actions/servicesActions";
+import {
+  getServicesAction,
+  getServicesByPrestataireAction,
+} from "@/server/actions/servicesActions";
 import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,13 +53,18 @@ export function DevisDemandeFiltersDialog({
 }: DevisDemandeFiltersDialogProps) {
   const entreprise = useAppStore((state) => state.entreprise);
   const isPrestataire = posture === "prestataire";
-  const showClientFilter = posture === "prestataire" || posture === "plateforme";
+  const showClientFilter =
+    posture === "prestataire" || posture === "plateforme";
 
   const [sites, setSites] = useState<Array<{ id: string; nom: string }>>([]);
   const [loadingSites, setLoadingSites] = useState(false);
-  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>([]);
+  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
   const [loadingClients, setLoadingClients] = useState(false);
-  const [services, setServices] = useState<Array<{ id: string; nom: string }>>([]);
+  const [services, setServices] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
   const [loadingServices, setLoadingServices] = useState(false);
 
   const form = useForm<FiltersType>({
@@ -86,7 +90,9 @@ export function DevisDemandeFiltersDialog({
       try {
         const result = await getEntreprisesClientesAction();
         if (result?.data?.clients) {
-          setClients(result.data.clients.map((c) => ({ id: c.id, nom: c.nom })));
+          setClients(
+            result.data.clients.map((c) => ({ id: c.id, nom: c.nom })),
+          );
         }
       } catch {
         toast.error("Erreur lors du chargement des clients");
@@ -110,12 +116,16 @@ export function DevisDemandeFiltersDialog({
             prestataireEntrepriseId: entreprise.id,
           });
           if (result?.data?.services) {
-            setServices(result.data.services.map((s) => ({ id: s.id, nom: s.nom })));
+            setServices(
+              result.data.services.map((s) => ({ id: s.id, nom: s.nom })),
+            );
           }
         } else {
           const result = await getServicesAction();
           if (result?.data?.services) {
-            setServices(result.data.services.map((s) => ({ id: s.id, nom: s.nom })));
+            setServices(
+              result.data.services.map((s) => ({ id: s.id, nom: s.nom })),
+            );
           }
         }
       } catch {
@@ -140,7 +150,9 @@ export function DevisDemandeFiltersDialog({
     async function loadSites() {
       setLoadingSites(true);
       try {
-        const result = await getAccessibleSitesAction({ entrepriseId: clientId! });
+        const result = await getAccessibleSitesAction({
+          entrepriseId: clientId!,
+        });
         if (result?.data) {
           setSites(result.data.map((s) => ({ id: s.id, nom: s.nom })));
         }
@@ -188,7 +200,13 @@ export function DevisDemandeFiltersDialog({
     };
     onApply(cleaned);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, filters.statut, filters.siteId, filters.clientId, filters.serviceId]);
+  }, [
+    debouncedSearch,
+    filters.statut,
+    filters.siteId,
+    filters.clientId,
+    filters.serviceId,
+  ]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -201,7 +219,13 @@ export function DevisDemandeFiltersDialog({
   }, [filters]);
 
   const handleReset = () => {
-    form.reset({ search: "", statut: "all", siteId: "all", clientId: "all", serviceId: "all" });
+    form.reset({
+      search: "",
+      statut: "all",
+      siteId: "all",
+      clientId: "all",
+      serviceId: "all",
+    });
   };
 
   const siteSelectDisabled =
@@ -215,7 +239,7 @@ export function DevisDemandeFiltersDialog({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <Filter className="text-primary size-6" />
+                <Filter className="text-primary size-5" />
                 Filtrer les demandes
               </div>
             </DialogTitle>
@@ -227,83 +251,84 @@ export function DevisDemandeFiltersDialog({
             <Form {...form}>
               <form className="flex flex-col gap-4">
                 <div className="grid grid-cols-3 gap-4">
-                <RhfInput
-                  label="Recherche"
-                  name="search"
-                  placeholder="Titre, description…"
-                  withError={false}
-                />
+                  <RhfInput
+                    label="Recherche"
+                    name="search"
+                    placeholder="Titre, description…"
+                    withError={false}
+                  />
 
-                <RhfControlledSelect
-                  label="Statut"
-                  name="statut"
-                  selectClassName="w-full"
-                  withError={false}
-                >
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="ouverte">Ouverte</SelectItem>
-                  <SelectItem value="en_cours">En cours</SelectItem>
-                  <SelectItem value="cloturee">Clôturée</SelectItem>
-                  <SelectItem value="annulee">Annulée</SelectItem>
-                  <SelectItem value="archivee">Archivée</SelectItem>
-                </RhfControlledSelect>
-
-                {showClientFilter && (
                   <RhfControlledSelect
-                    label="Client"
-                    name="clientId"
+                    label="Statut"
+                    name="statut"
                     selectClassName="w-full"
                     withError={false}
-                    disabled={loadingClients}
+                  >
+                    <SelectItem value="all">Tous</SelectItem>
+                    <SelectItem value="ouverte">Ouverte</SelectItem>
+                    <SelectItem value="en_cours">En cours</SelectItem>
+                    <SelectItem value="cloturee">Clôturée</SelectItem>
+                    <SelectItem value="annulee">Annulée</SelectItem>
+                    <SelectItem value="archivee">Archivée</SelectItem>
+                  </RhfControlledSelect>
+
+                  {showClientFilter && (
+                    <RhfControlledSelect
+                      label="Client"
+                      name="clientId"
+                      selectClassName="w-full"
+                      withError={false}
+                      disabled={loadingClients}
+                    >
+                      <SelectItem value="all">
+                        {loadingClients ? "Chargement…" : "Tous les clients"}
+                      </SelectItem>
+                      {clients.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.nom}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+                  )}
+
+                  <RhfControlledSelect
+                    label="Site"
+                    name="siteId"
+                    selectClassName="w-full"
+                    withError={false}
+                    disabled={siteSelectDisabled}
                   >
                     <SelectItem value="all">
-                      {loadingClients ? "Chargement…" : "Tous les clients"}
+                      {loadingSites
+                        ? "Chargement…"
+                        : showClientFilter &&
+                            (!filters.clientId || filters.clientId === "all")
+                          ? "Sélectionnez un client"
+                          : "Tous les sites"}
                     </SelectItem>
-                    {clients.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.nom}
+                    {sites.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.nom}
                       </SelectItem>
                     ))}
                   </RhfControlledSelect>
-                )}
 
-                <RhfControlledSelect
-                  label="Site"
-                  name="siteId"
-                  selectClassName="w-full"
-                  withError={false}
-                  disabled={siteSelectDisabled}
-                >
-                  <SelectItem value="all">
-                    {loadingSites
-                      ? "Chargement…"
-                      : showClientFilter && (!filters.clientId || filters.clientId === "all")
-                      ? "Sélectionnez un client"
-                      : "Tous les sites"}
-                  </SelectItem>
-                  {sites.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.nom}
+                  <RhfControlledSelect
+                    label="Service"
+                    name="serviceId"
+                    selectClassName="w-full"
+                    withError={false}
+                    disabled={loadingServices}
+                  >
+                    <SelectItem value="all">
+                      {loadingServices ? "Chargement…" : "Tous les services"}
                     </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-
-                <RhfControlledSelect
-                  label="Service"
-                  name="serviceId"
-                  selectClassName="w-full"
-                  withError={false}
-                  disabled={loadingServices}
-                >
-                  <SelectItem value="all">
-                    {loadingServices ? "Chargement…" : "Tous les services"}
-                  </SelectItem>
-                  {services.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.nom}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
+                    {services.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.nom}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
                 </div>
               </form>
             </Form>

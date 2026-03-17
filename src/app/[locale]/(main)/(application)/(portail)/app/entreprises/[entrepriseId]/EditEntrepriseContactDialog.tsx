@@ -1,23 +1,21 @@
 "use client";
 
+import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DialogStyledContent,
-  DialogStyledHeader,
   DialogStyledBody,
+  DialogStyledContent,
   DialogStyledFooter,
+  DialogStyledHeader,
 } from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
-import { RhfInput } from "@/components/rhf/RhfInput";
+import { Spinner } from "@/components/ui/spinner";
 import {
   insertEntrepriseContactAction,
   updateEntrepriseContactAction,
 } from "@/server/actions/entreprisesActions";
+import type { EntrepriseContactSelectType } from "@/zod-schemas/entreprise.schema";
 import {
   insertEntrepriseContactSchema,
   updateEntrepriseContactSchema,
@@ -25,11 +23,10 @@ import {
   type UpdateEntrepriseContactType,
 } from "@/zod-schemas/entreprise.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { useEffect } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
-import type { EntrepriseContactSelectType } from "@/zod-schemas/entreprise.schema";
 
 type CreateMode = {
   mode: "create";
@@ -85,7 +82,9 @@ export function EditEntrepriseContactDialog({
 
   const insertState = useFormState({ control: insertForm.control });
   const editState = useFormState({ control: editForm.control });
-  const isSubmitting = isCreate ? insertState.isSubmitting : editState.isSubmitting;
+  const isSubmitting = isCreate
+    ? insertState.isSubmitting
+    : editState.isSubmitting;
   const isDirty = isCreate ? insertState.isDirty : editState.isDirty;
 
   useEffect(() => {
@@ -140,7 +139,7 @@ export function EditEntrepriseContactDialog({
         <DialogStyledHeader>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <UserPlus className="text-primary h-5 w-5" />
+              <UserPlus className="text-primary size-5" />
               {isCreate ? "Ajouter un contact" : "Modifier le contact"}
             </DialogTitle>
           </DialogHeader>
@@ -148,9 +147,7 @@ export function EditEntrepriseContactDialog({
 
         {isCreate ? (
           <Form {...insertForm}>
-            <form
-              onSubmit={insertForm.handleSubmit(onSubmitCreate)}
-            >
+            <form onSubmit={insertForm.handleSubmit(onSubmitCreate)}>
               <DialogStyledBody>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
@@ -193,8 +190,10 @@ export function EditEntrepriseContactDialog({
                   Annuler
                 </Button>
                 <Button type="submit" disabled={isSubmitting || !isDirty}>
-                  {isSubmitting && (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                  {isSubmitting ? (
+                    <Spinner className="size-3" />
+                  ) : (
+                    <UserPlus className="size-3" />
                   )}
                   Créer
                 </Button>
@@ -203,9 +202,7 @@ export function EditEntrepriseContactDialog({
           </Form>
         ) : (
           <Form {...editForm}>
-            <form
-              onSubmit={editForm.handleSubmit(onSubmitEdit)}
-            >
+            <form onSubmit={editForm.handleSubmit(onSubmitEdit)}>
               <DialogStyledBody>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
@@ -248,8 +245,10 @@ export function EditEntrepriseContactDialog({
                   Annuler
                 </Button>
                 <Button type="submit" disabled={isSubmitting || !isDirty}>
-                  {isSubmitting && (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                  {isSubmitting ? (
+                    <Spinner className="size-3" />
+                  ) : (
+                    <UserPlus className="size-3" />
                   )}
                   Enregistrer
                 </Button>

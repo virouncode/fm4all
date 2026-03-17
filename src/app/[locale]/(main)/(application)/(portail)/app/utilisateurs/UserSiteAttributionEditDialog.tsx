@@ -25,7 +25,9 @@ import {
   updateUserSiteAttributionFormSchema,
   type UpdateUserSiteAttributionFormType,
 } from "@/zod-schemas/userSiteAttribution.schema";
+import { Spinner } from "@/components/ui/spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Pencil } from "lucide-react";
 import { useEffect } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -162,7 +164,8 @@ export function UserSiteAttributionEditDialog({
       <DialogStyledContent className="max-w-md">
         <DialogStyledHeader>
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="text-primary h-4 w-4" />
               {attribution.isInherited
                 ? "Créer un override"
                 : "Modifier l'attribution"}
@@ -210,7 +213,7 @@ export function UserSiteAttributionEditDialog({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting ? "Enregistrement..." : "Enregistrer"}
+                {isSubmitting ? <Spinner className="size-3" /> : <Pencil className="size-3" />}Enregistrer
               </Button>
             </DialogStyledFooter>
           </form>

@@ -5,11 +5,15 @@ import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { getServicesAction } from "@/server/actions/servicesActions";
@@ -102,67 +106,73 @@ export function NewChecklistDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <ListChecks className="text-primary h-5 w-5" />
-            {isSystem ? "Nouvelle checklist système" : "Nouvelle checklist"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ListChecks className="text-primary size-5" />
+              {isSystem ? "Nouvelle checklist système" : "Nouvelle checklist"}
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
+        <DialogStyledBody>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 py-2"
+            >
+              {loadingServices ? (
+                <div className="text-muted-foreground flex h-9 items-center gap-2 text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Chargement des services...
+                </div>
+              ) : (
+                <RhfControlledSelect<NewChecklistFormType>
+                  name="serviceId"
+                  label="Service"
+                  requiredMark
+                  placeholder="Sélectionnez un service"
+                  disabled={isSubmitting}
+                  selectClassName="w-full"
+                >
+                  {services.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.nom}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
+              )}
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 py-2"
-          >
-            {loadingServices ? (
-              <div className="text-muted-foreground flex h-9 items-center gap-2 text-sm">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Chargement des services...
-              </div>
-            ) : (
-              <RhfControlledSelect<NewChecklistFormType>
-                name="serviceId"
-                label="Service"
+              <RhfInput<NewChecklistFormType>
+                name="nom"
+                label="Nom de la checklist"
                 requiredMark
-                placeholder="Sélectionnez un service"
+                placeholder="Ex : Protocole nettoyage standard"
+                autoFocus
                 disabled={isSubmitting}
-                selectClassName="w-full"
-              >
-                {services.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.nom}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
-            )}
+              />
 
-            <RhfInput<NewChecklistFormType>
-              name="nom"
-              label="Nom de la checklist"
-              requiredMark
-              placeholder="Ex : Protocole nettoyage standard"
-              autoFocus
-              disabled={isSubmitting}
-            />
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting || loadingServices}>
-                {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                Créer
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isSubmitting}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || loadingServices}
+                >
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Créer
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogStyledBody>
+      </DialogStyledContent>
     </Dialog>
   );
 }

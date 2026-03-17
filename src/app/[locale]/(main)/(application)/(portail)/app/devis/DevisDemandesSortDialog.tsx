@@ -1,15 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
+  DialogStyledBody,
   DialogStyledContent,
   DialogStyledHeader,
-  DialogStyledBody,
 } from "@/components/ui/dialog-styled";
 import {
   Select,
@@ -65,7 +61,7 @@ export function DevisDemandesSortDialog({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <ArrowDownUp className="text-primary size-6" />
+                <ArrowDownUp className="text-primary size-5" />
                 Trier les demandes
               </div>
             </DialogTitle>

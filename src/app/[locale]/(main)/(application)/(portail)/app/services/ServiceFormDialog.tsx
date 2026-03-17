@@ -3,18 +3,15 @@
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DialogStyledContent,
-  DialogStyledHeader,
   DialogStyledBody,
+  DialogStyledContent,
   DialogStyledFooter,
+  DialogStyledHeader,
 } from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
+import { Spinner } from "@/components/ui/spinner";
 import {
   insertServiceAction,
   updateServiceAction,
@@ -27,7 +24,7 @@ import {
   type UpdateServiceFormType,
 } from "@/zod-schemas/service.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClipboardList, Loader2 } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import { useEffect } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -143,7 +140,7 @@ export function ServiceFormDialog({
         <DialogStyledHeader>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <ClipboardList className="h-5 w-5 text-primary" />
+              <ClipboardList className="text-primary size-5" />
               {isEdit ? "Modifier le service" : "Nouveau service"}
             </DialogTitle>
           </DialogHeader>
@@ -178,8 +175,10 @@ export function ServiceFormDialog({
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isSubmitting ? (
+                  <Spinner className="size-3" />
+                ) : (
+                  <ClipboardList className="size-3" />
                 )}
                 {isEdit ? "Enregistrer" : "Créer"}
               </Button>

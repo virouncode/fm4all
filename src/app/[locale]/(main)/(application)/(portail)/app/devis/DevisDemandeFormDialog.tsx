@@ -5,25 +5,22 @@ import { RhfFileInput } from "@/components/rhf/RhfFileInput";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DialogStyledContent,
-  DialogStyledHeader,
   DialogStyledBody,
+  DialogStyledContent,
   DialogStyledFooter,
+  DialogStyledHeader,
 } from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
-import { getServicesAction } from "@/server/actions/servicesActions";
+import { Spinner } from "@/components/ui/spinner";
 import {
   insertDevisDemandeAction,
   updateDevisDemandeAction,
 } from "@/server/actions/devisDemandesActions";
+import { getServicesAction } from "@/server/actions/servicesActions";
+import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import type { DevisDemandeAvecDetails } from "@/server/queries/devisDemandes.query";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -33,7 +30,7 @@ import {
   type UpdateDevisDemandeFormType,
 } from "@/zod-schemas/devis.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileText, Paperclip } from "lucide-react";
+import { ClipboardPenLine, Paperclip } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -62,7 +59,9 @@ export function DevisDemandeFormDialog({
   const [loadingSites, setLoadingSites] = useState(false);
 
   const schema =
-    mode === "create" ? insertDevisDemandeFormSchema : updateDevisDemandeFormSchema;
+    mode === "create"
+      ? insertDevisDemandeFormSchema
+      : updateDevisDemandeFormSchema;
 
   const form = useForm<InsertDevisDemandeFormType | UpdateDevisDemandeFormType>(
     {
@@ -122,7 +121,9 @@ export function DevisDemandeFormDialog({
     getServicesAction()
       .then((result) => {
         if (result?.data?.services) {
-          setServices(result.data.services.map((s) => ({ id: s.id, nom: s.nom })));
+          setServices(
+            result.data.services.map((s) => ({ id: s.id, nom: s.nom })),
+          );
         }
       })
       .catch(() => toast.error("Erreur lors du chargement des services"));
@@ -230,7 +231,7 @@ export function DevisDemandeFormDialog({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <FileText className="text-primary" />
+                <ClipboardPenLine className="text-primary size-5" />
                 {mode === "create"
                   ? "Nouvelle demande de devis"
                   : "Modifier la demande"}
@@ -246,105 +247,113 @@ export function DevisDemandeFormDialog({
           >
             <DialogStyledBody className="flex-1 overflow-y-auto px-5 py-4">
               <div className="space-y-4">
-              {/* Site — désactivé en mode edit */}
-              <RhfControlledSelect<
-                InsertDevisDemandeFormType | UpdateDevisDemandeFormType
-              >
-                name="siteId"
-                label="Site"
-                requiredMark
-                placeholder="Sélectionnez un site"
-                disabled={
-                  mode === "edit" || loadingSites || sites.length === 0
-                }
-                selectClassName="w-full"
-              >
-                {sites.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.nom}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
+                {/* Site — désactivé en mode edit */}
+                <RhfControlledSelect<
+                  InsertDevisDemandeFormType | UpdateDevisDemandeFormType
+                >
+                  name="siteId"
+                  label="Site"
+                  requiredMark
+                  placeholder="Sélectionnez un site"
+                  disabled={
+                    mode === "edit" || loadingSites || sites.length === 0
+                  }
+                  selectClassName="w-full"
+                >
+                  {sites.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.nom}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
 
-              {/* Service — désactivé en mode edit */}
-              <RhfControlledSelect<
-                InsertDevisDemandeFormType | UpdateDevisDemandeFormType
-              >
-                name="serviceId"
-                label="Service concerné"
-                requiredMark
-                placeholder="Sélectionnez un service"
-                disabled={mode === "edit" || services.length === 0}
-                selectClassName="w-full"
-              >
-                {services.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.nom}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
+                {/* Service — désactivé en mode edit */}
+                <RhfControlledSelect<
+                  InsertDevisDemandeFormType | UpdateDevisDemandeFormType
+                >
+                  name="serviceId"
+                  label="Service concerné"
+                  requiredMark
+                  placeholder="Sélectionnez un service"
+                  disabled={mode === "edit" || services.length === 0}
+                  selectClassName="w-full"
+                >
+                  {services.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.nom}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
 
-              <RhfInput<InsertDevisDemandeFormType | UpdateDevisDemandeFormType>
-                name="titre"
-                label="Titre"
-                requiredMark
-                placeholder="Objet de la demande"
-              />
+                <RhfInput<
+                  InsertDevisDemandeFormType | UpdateDevisDemandeFormType
+                >
+                  name="titre"
+                  label="Titre"
+                  requiredMark
+                  placeholder="Objet de la demande"
+                />
 
-              <RhfTextArea<
-                InsertDevisDemandeFormType | UpdateDevisDemandeFormType
-              >
-                name="description"
-                label="Description"
-                requiredMark
-                placeholder="Détails, contraintes, délais souhaités..."
-                textareaClassName="h-32"
-              />
+                <RhfTextArea<
+                  InsertDevisDemandeFormType | UpdateDevisDemandeFormType
+                >
+                  name="description"
+                  label="Description"
+                  requiredMark
+                  placeholder="Détails, contraintes, délais souhaités..."
+                  textareaClassName="h-32"
+                />
 
-              {/* Pièces jointes */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Pièces jointes <span className="text-muted-foreground font-normal">(max 5 Mo)</span></p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      append({
-                        storageKey: "",
-                        filename: "",
-                        mimeType: "",
-                        sizeBytes: 0,
-                      })
-                    }
-                  >
-                    <Paperclip className="mr-1 h-3 w-3" />
-                    Ajouter
-                  </Button>
-                </div>
-
-                {fields.length > 0 && (
-                  <div className="space-y-2">
-                    {fields.map((field, index) => (
-                      <RhfFileInput<
-                        InsertDevisDemandeFormType | UpdateDevisDemandeFormType
-                      >
-                        key={field.id}
-                        name={
-                          `attachments.${index}` as
-                            | "attachments.0"
-                            | `attachments.${number}`
-                        }
-                        proprietaireEntrepriseId={entreprise?.id ?? ""}
-                        categorie="devis_demande"
-                        onClear={() => remove(index)}
-                        deleteOnClear
-                        maxSizeBytes={5 * 1024 * 1024}
-                      />
-                    ))}
+                {/* Pièces jointes */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">
+                      Pièces jointes{" "}
+                      <span className="text-muted-foreground font-normal">
+                        (max 5 Mo)
+                      </span>
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        append({
+                          storageKey: "",
+                          filename: "",
+                          mimeType: "",
+                          sizeBytes: 0,
+                        })
+                      }
+                    >
+                      <Paperclip className="mr-1 h-3 w-3" />
+                      Ajouter
+                    </Button>
                   </div>
-                )}
-              </div>
+
+                  {fields.length > 0 && (
+                    <div className="space-y-2">
+                      {fields.map((field, index) => (
+                        <RhfFileInput<
+                          | InsertDevisDemandeFormType
+                          | UpdateDevisDemandeFormType
+                        >
+                          key={field.id}
+                          name={
+                            `attachments.${index}` as
+                              | "attachments.0"
+                              | `attachments.${number}`
+                          }
+                          proprietaireEntrepriseId={entreprise?.id ?? ""}
+                          categorie="devis_demande"
+                          onClear={() => remove(index)}
+                          deleteOnClear
+                          maxSizeBytes={5 * 1024 * 1024}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </DialogStyledBody>
 
@@ -360,13 +369,12 @@ export function DevisDemandeFormDialog({
                 type="submit"
                 disabled={isSubmitting || !isDirty || hasPendingAttachment}
               >
-                {isSubmitting
-                  ? mode === "create"
-                    ? "Création..."
-                    : "Enregistrement..."
-                  : mode === "create"
-                    ? "Créer la demande"
-                    : "Enregistrer"}
+                {isSubmitting ? (
+                  <Spinner className="size-3" />
+                ) : (
+                  <ClipboardPenLine className="size-3" />
+                )}
+                {mode === "create" ? "Créer la demande" : "Enregistrer"}
               </Button>
             </DialogStyledFooter>
           </form>

@@ -116,7 +116,7 @@ export function SiteDetails({
             </Button>
           )}
           {canCreateChild && (
-            <Button variant="outline" size="sm" onClick={onCreateChild}>
+            <Button size="sm" onClick={onCreateChild}>
               <Plus className="h-4 w-4" />
               Sous-site
             </Button>

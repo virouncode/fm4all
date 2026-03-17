@@ -1,16 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DialogStyledContent,
-  DialogStyledHeader,
   DialogStyledBody,
+  DialogStyledContent,
   DialogStyledFooter,
+  DialogStyledHeader,
 } from "@/components/ui/dialog-styled";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -18,7 +14,7 @@ import {
   updateEntrepriseSireneFieldsAction,
 } from "@/server/actions/entreprisesActions";
 import type { SireneDataType } from "@/server/utils/sirene.utils";
-import { Building2, Lock, Search } from "lucide-react";
+import { Building, Lock, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -114,7 +110,7 @@ export function EditEntrepriseInfosDialog({
         <DialogStyledHeader>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Building2 className="text-primary h-5 w-5" />
+              <Building className="text-primary size-5" />
               Mettre à jour depuis l&apos;API SIRENE
             </DialogTitle>
           </DialogHeader>
@@ -149,7 +145,9 @@ export function EditEntrepriseInfosDialog({
                 </Button>
               </div>
               {searchState.status === "error" && (
-                <p className="text-destructive text-xs">{searchState.message}</p>
+                <p className="text-destructive text-xs">
+                  {searchState.message}
+                </p>
               )}
               {searchState.status === "found" && (
                 <p className="text-muted-foreground text-xs">
@@ -201,7 +199,11 @@ export function EditEntrepriseInfosDialog({
             disabled={searchState.status !== "found" || isSaving}
             onClick={handleSave}
           >
-            {isSaving && <Spinner />}
+            {isSaving ? (
+              <Spinner className="size-3" />
+            ) : (
+              <Building className="size-3" />
+            )}
             Enregistrer
           </Button>
         </DialogStyledFooter>

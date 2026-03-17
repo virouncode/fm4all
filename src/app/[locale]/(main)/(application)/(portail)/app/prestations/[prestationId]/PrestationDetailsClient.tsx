@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,13 +15,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -89,6 +89,7 @@ import {
   Loader2,
   type LucideIcon,
   MapPin,
+  Pause,
   Pencil,
   PencilLine,
   Plus,
@@ -96,6 +97,7 @@ import {
   Repeat,
   RotateCcw,
   Settings,
+  Square,
   Tag,
   Trash2,
   Zap,
@@ -307,15 +309,17 @@ export function PrestationDetailsClient({
                 onClick={() => setConfirmPauseOpen(true)}
                 disabled={isUpdatingStatut}
               >
+                <Pause className="h-3 w-3" />
                 Mettre en pause
               </Button>
               {canAdmin && (
                 <Button
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
                   onClick={() => setConfirmTerminerOpen(true)}
                   disabled={isUpdatingStatut}
                 >
+                  <Square className="h-3 w-3" />
                   Terminer
                 </Button>
               )}
@@ -336,11 +340,12 @@ export function PrestationDetailsClient({
               </Button>
               {canAdmin && (
                 <Button
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
                   onClick={() => setConfirmTerminerOpen(true)}
                   disabled={isUpdatingStatut}
                 >
+                  <Square className="h-3 w-3" />
                   Terminer
                 </Button>
               )}
@@ -475,8 +480,8 @@ export function PrestationDetailsClient({
           <DialogStyledBody className="space-y-3 text-sm">
             {prestation.famillePlanification === "recurrence_auto" && (
               <p>
-                Les interventions seront générées automatiquement selon la
-                règle de récurrence configurée.
+                Les interventions seront générées automatiquement selon la règle
+                de récurrence configurée.
               </p>
             )}
             <p className="text-muted-foreground text-xs">
@@ -514,14 +519,16 @@ export function PrestationDetailsClient({
         <DialogStyledContent className="max-w-md">
           <DialogStyledHeader>
             <DialogHeader>
-              <DialogTitle>Mettre la prestation en pause ?</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Pause className="size-6" />
+                Mettre la prestation en pause ?
+              </DialogTitle>
             </DialogHeader>
           </DialogStyledHeader>
           <DialogStyledBody className="space-y-2 text-sm">
             <p>
-              Les interventions{" "}
-              <strong>à venir non encore démarrées</strong> seront{" "}
-              <strong>supprimées définitivement</strong> — pas annulées,
+              Les interventions <strong>à venir non encore démarrées</strong>{" "}
+              seront <strong>supprimées définitivement</strong> — pas annulées,
               vraiment effacées.
             </p>
             <p className="text-muted-foreground text-xs">
@@ -547,7 +554,10 @@ export function PrestationDetailsClient({
                   Mise en pause...
                 </>
               ) : (
-                "Mettre en pause"
+                <>
+                  <Pause className="h-4 w-4" />
+                  Mettre en pause
+                </>
               )}
             </Button>
           </DialogStyledFooter>
@@ -559,15 +569,17 @@ export function PrestationDetailsClient({
         <DialogStyledContent className="max-w-md">
           <DialogStyledHeader>
             <DialogHeader>
-              <DialogTitle>Terminer la prestation ?</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Square className="size-6" />
+                Terminer la prestation ?
+              </DialogTitle>
             </DialogHeader>
           </DialogStyledHeader>
           <DialogStyledBody className="space-y-2 text-sm">
             <p>
-              Les interventions{" "}
-              <strong>à venir non encore démarrées</strong> passeront en{" "}
-              <strong>annulée</strong> — elles resteront visibles dans
-              l&apos;historique.
+              Les interventions <strong>à venir non encore démarrées</strong>{" "}
+              passeront en <strong>annulée</strong> — elles resteront visibles
+              dans l&apos;historique.
             </p>
             <p className="text-muted-foreground text-xs">
               Cette action est irréversible. Tout le passé est conservé
@@ -583,6 +595,7 @@ export function PrestationDetailsClient({
               Annuler
             </Button>
             <Button
+              variant="destructive"
               onClick={() => doStatutTransition("termine")}
               disabled={isUpdatingStatut}
             >
@@ -592,7 +605,10 @@ export function PrestationDetailsClient({
                   Clôture en cours...
                 </>
               ) : (
-                "Terminer la prestation"
+                <>
+                  <Square className="h-4 w-4" />
+                  Terminer la prestation
+                </>
               )}
             </Button>
           </DialogStyledFooter>
@@ -907,19 +923,23 @@ export function PrestationDetailsClient({
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
-          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+        <AlertDialogContent className="max-w-md gap-0 overflow-hidden p-0">
+          <div className="bg-primary/8 border-b px-5 pt-5 pr-12 pb-4">
             <AlertDialogHeader>
               <AlertDialogTitle>Supprimer la prestation ?</AlertDialogTitle>
             </AlertDialogHeader>
           </div>
           <div className="px-5 py-4 text-sm">
             La prestation <strong>{prestation.serviceNom}</strong> —{" "}
-            {prestation.siteNom} sera définitivement supprimée. Cette action
-            est irréversible.
+            {prestation.siteNom} sera définitivement supprimée. Cette action est
+            irréversible.
           </div>
           <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
               Annuler
             </Button>
             <Button
@@ -1290,12 +1310,13 @@ function PlanificationTab({
                       ...r,
                       tacheListeTemplateId: pack?.id ?? null,
                       tacheListeTemplateName: pack?.nom ?? null,
-                      tacheListeItems: pack?.items.map((i) => ({
-                        id: i.id,
-                        ordre: i.ordre,
-                        titre: i.titre,
-                        dureeEstimeeMinutes: i.dureeEstimeeMinutes,
-                      })) ?? [],
+                      tacheListeItems:
+                        pack?.items.map((i) => ({
+                          id: i.id,
+                          ordre: i.ordre,
+                          titre: i.titre,
+                          dureeEstimeeMinutes: i.dureeEstimeeMinutes,
+                        })) ?? [],
                     }
                   : r,
               ),
@@ -1394,7 +1415,9 @@ function RegleCard({
                         type="button"
                         className="text-muted-foreground hover:text-foreground flex-shrink-0"
                         onClick={() => setChecklistExpanded((v) => !v)}
-                        aria-label={checklistExpanded ? "Réduire" : "Développer"}
+                        aria-label={
+                          checklistExpanded ? "Réduire" : "Développer"
+                        }
                       >
                         {checklistExpanded ? (
                           <ChevronDown className="h-3.5 w-3.5" />
@@ -1409,7 +1432,10 @@ function RegleCard({
                       <span className="truncate text-xs font-medium">
                         {regle.tacheListeTemplateName}
                       </span>
-                      <Badge variant="outline" className="flex-shrink-0 text-xs">
+                      <Badge
+                        variant="outline"
+                        className="flex-shrink-0 text-xs"
+                      >
                         {regle.tacheListeItems.length} tâche
                         {regle.tacheListeItems.length !== 1 ? "s" : ""}
                       </Badge>
@@ -2075,13 +2101,13 @@ function ExecutionCard({
       )}
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
-          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+        <AlertDialogContent className="max-w-md gap-0 overflow-hidden p-0">
+          <div className="bg-primary/8 border-b px-5 pt-5 pr-12 pb-4">
             <AlertDialogHeader>
               <AlertDialogTitle>Supprimer cette exécution ?</AlertDialogTitle>
             </AlertDialogHeader>
           </div>
-          <div className="px-5 py-4 space-y-2 text-sm">
+          <div className="space-y-2 px-5 py-4 text-sm">
             <p>
               L&apos;exécution{" "}
               <strong>{execution.prestataireNom ?? "inconnu"}</strong>, ses
@@ -2090,14 +2116,20 @@ function ExecutionCard({
               associées seront supprimés définitivement.
             </p>
             <p>
-              Les interventions existantes perdront leur référence
-              prestataire. Cette action est <strong>irréversible</strong> —
-              à n&apos;utiliser que si aucune intervention réalisée
-              n&apos;est associée à cette exécution.
+              Les interventions existantes perdront leur référence prestataire.
+              Cette action est <strong>irréversible</strong> — à n&apos;utiliser
+              que si aucune intervention réalisée n&apos;est associée à cette
+              exécution.
             </p>
           </div>
           <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
-            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={isDeleting}>Annuler</Button>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteOpen(false)}
+              disabled={isDeleting}
+            >
+              Annuler
+            </Button>
             <Button
               onClick={handleDelete}
               disabled={isDeleting}
@@ -2318,7 +2350,8 @@ function InterventionsTab({
           <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <p>
             Seules les prochaines interventions déjà générées sont affichées.{" "}
-            <strong>D&apos;autres apparaîtront automatiquement</strong> au fil du temps.
+            <strong>D&apos;autres apparaîtront automatiquement</strong> au fil
+            du temps.
           </p>
         </div>
       )}

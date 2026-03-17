@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog-styled";
 import { Textarea } from "@/components/ui/textarea";
 import { updateDevisDemandeAction } from "@/server/actions/devisDemandesActions";
+import { Spinner } from "@/components/ui/spinner";
 import { FileText, Pencil } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -104,7 +105,7 @@ export function EditDescriptionDemandeDialog({
               Annuler
             </Button>
             <Button onClick={() => void handleSubmit()} disabled={isUpdating}>
-              {isUpdating ? "Enregistrement..." : "Enregistrer"}
+              {isUpdating ? <Spinner className="size-3" /> : <Pencil className="size-3" />}Enregistrer
             </Button>
           </DialogStyledFooter>
         </DialogStyledContent>

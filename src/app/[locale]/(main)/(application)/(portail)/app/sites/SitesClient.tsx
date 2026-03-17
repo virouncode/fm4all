@@ -1,30 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   getSiteResponsablesAction,
   getSitesAction,
 } from "@/server/actions/sitesActions";
 import { getUserClientSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
+import type { SiteResponsable } from "@/server/queries/sites.query";
 import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType, SiteTreeNode } from "@/zod-schemas/sites.schema";
 import type { SelectUserSiteAttributionWithInheritanceType } from "@/zod-schemas/userSiteAttribution.schema";
 import { Filter, Network, Plus } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import type { SiteResponsable } from "@/server/queries/sites.query";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { buildSiteTree, getPathToRoot } from "./helpers";
 import { SiteDetails } from "./SiteDetails";
 import { SiteFormDialog } from "./SiteFormDialog";
 import { SitesFiltersForm } from "./SitesFiltersForm";
 import { SitesTree } from "./SitesTree";
+import {
+  DialogStyledContent,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
 
 export function SitesClient() {
   const entreprise = useAppStore((state) => state.entreprise);
@@ -195,7 +194,8 @@ export function SitesClient() {
           setTree(builtTree);
         }
 
-        const attributions: SelectUserSiteAttributionWithInheritanceType[] = attributionsResult?.data?.attributions ?? [];
+        const attributions: SelectUserSiteAttributionWithInheritanceType[] =
+          attributionsResult?.data?.attributions ?? [];
 
         // Responsable IDs
         setResponsableSiteIds(
@@ -308,9 +308,15 @@ export function SitesClient() {
 
   const handleFormSuccess = async (newSite: SelectSiteType) => {
     // Si le statut actif a changé, recharger tous les sites pour refléter la cascade
-    if (formMode === "edit" && selectedSite && selectedSite.actif !== newSite.actif) {
+    if (
+      formMode === "edit" &&
+      selectedSite &&
+      selectedSite.actif !== newSite.actif
+    ) {
       try {
-        const sitesResult = await getSitesAction({ entrepriseId: entreprise!.id });
+        const sitesResult = await getSitesAction({
+          entrepriseId: entreprise!.id,
+        });
         if (sitesResult?.data) {
           setSites(sitesResult.data);
           setTree(buildSiteTree(sitesResult.data));
@@ -420,17 +426,19 @@ export function SitesClient() {
 
       {/* Filters Dialog */}
       <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
-        <DialogContent className="!w-2/3 !max-w-none">
-          <DialogHeader>
-            <DialogTitle>
-              <div className="flex items-center gap-2">
-                <Filter className="text-primary size-6" />
-                <h3 className="text-xl font-semibold">Filtrer les sites</h3>
-              </div>
-            </DialogTitle>
-          </DialogHeader>
+        <DialogStyledContent className="!w-2/3 !max-w-none">
+          <DialogStyledHeader>
+            <DialogHeader>
+              <DialogTitle>
+                <div className="flex items-center gap-2">
+                  <Filter className="text-primary size-5" />
+                  Filtrer les sites
+                </div>
+              </DialogTitle>
+            </DialogHeader>
+          </DialogStyledHeader>
           <SitesFiltersForm />
-        </DialogContent>
+        </DialogStyledContent>
       </Dialog>
 
       {/* Form Dialog */}

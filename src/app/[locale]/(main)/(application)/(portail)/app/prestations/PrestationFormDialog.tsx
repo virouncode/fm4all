@@ -1065,7 +1065,7 @@ export function PrestationFormDialog({
             Retour
           </Button>
           <Button type="submit" disabled={isSubmittingStep2}>
-            {isSubmittingStep2 && <Spinner />}
+            {isSubmittingStep2 ? <Spinner className="size-3" /> : <HandPlatter className="size-3" />}
             Créer prestation + exécution
           </Button>
         </DialogStyledFooter>
@@ -1395,7 +1395,7 @@ export function PrestationFormDialog({
                     isSubmittingStep1 || (!isEdit && !isDirtyStep1Check())
                   }
                 >
-                  {isSubmittingStep1 && <Spinner />}
+                  {isSubmittingStep1 ? <Spinner className="size-3" /> : <HandPlatter className="size-3" />}
                   {isEdit
                     ? "Enregistrer"
                     : isPrestataireCreate
