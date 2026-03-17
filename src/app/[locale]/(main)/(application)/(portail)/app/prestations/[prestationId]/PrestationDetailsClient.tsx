@@ -2350,8 +2350,15 @@ function InterventionsTab({
           <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <p>
             Cette liste affiche uniquement les interventions réellement créées.
-            Le calendrier peut afficher aussi des occurrences prévisionnelles
-            issues de la planification.
+            Le{" "}
+            <Link
+              href="/app/calendrier"
+              className="font-medium underline underline-offset-2"
+            >
+              calendrier
+            </Link>{" "}
+            peut afficher aussi des occurrences prévisionnelles issues de la
+            planification.
           </p>
         </div>
       )}
