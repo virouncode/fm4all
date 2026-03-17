@@ -35,7 +35,7 @@ type MessageAttachmentType = {
   storageKey: string;
   filename: string;
   mimeType: string;
-  sizeBytes: number;
+  sizeBytes: number | null;
 };
 
 type MessageType = {

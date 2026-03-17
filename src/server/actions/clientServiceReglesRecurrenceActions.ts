@@ -126,7 +126,7 @@ export const getReglesRecurrenceByPrestationAction = actionClient
           .filter((id): id is string => id !== null),
       ),
     ];
-    const itemsByTemplate = new Map<string, { id: string; ordre: number; titre: string; dureeEstimeeMinutes: number | null }[]>();
+    const itemsByTemplate = new Map<string, { id: string; ordre: number; titre: string; emoji: string | null; dureeEstimeeMinutes: number | null }[]>();
     if (templateIds.length > 0) {
       const itemRows = await db
         .select({
@@ -134,6 +134,7 @@ export const getReglesRecurrenceByPrestationAction = actionClient
           templateId: tacheListeItems.listeTemplateId,
           ordre: tacheListeItems.ordre,
           titre: tacheListeItems.titre,
+          emoji: tacheListeItems.emoji,
           dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
         })
         .from(tacheListeItems)
@@ -149,6 +150,7 @@ export const getReglesRecurrenceByPrestationAction = actionClient
           id: item.id,
           ordre: item.ordre,
           titre: item.titre,
+          emoji: item.emoji,
           dureeEstimeeMinutes: item.dureeEstimeeMinutes,
         });
         itemsByTemplate.set(item.templateId, list);

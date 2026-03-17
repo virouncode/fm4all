@@ -169,6 +169,7 @@ export const serviceEntreprises = pgTable(
   (table) => [
     index("service_entreprises_entreprise_id_idx").on(table.entrepriseId),
     index("service_entreprises_service_id_idx").on(table.serviceId),
+    index("service_entreprises_actif_idx").on(table.actif),
     uniqueIndex("service_entreprises_entreprise_service_udx").on(
       table.entrepriseId,
       table.serviceId,

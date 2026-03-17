@@ -73,7 +73,7 @@ type MessageAttachmentType = {
   storageKey: string;
   filename: string;
   mimeType: string;
-  sizeBytes: number;
+  sizeBytes: number | null;
 };
 
 type MessageType = {
@@ -717,7 +717,7 @@ export function TicketDetailsClient({
                       <div className="text-muted-foreground flex items-center justify-between gap-2 text-xs">
                         <div className="flex items-center gap-2">
                           <span className="font-medium">
-                            {(attachment.sizeBytes / 1024).toFixed(1)} Ko
+                            {attachment.sizeBytes != null ? `${(attachment.sizeBytes / 1024).toFixed(1)} Ko` : ""}
                           </span>
                           <span className="text-muted-foreground/50">•</span>
                           <span>

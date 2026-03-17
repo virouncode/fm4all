@@ -28,6 +28,7 @@ function toEntrepriseCard(p: PrestataireAvecDetails): EntrepriseWithDetails {
     formeJuridique: p.formeJuridique,
     sireneSyncedAt: p.sireneSyncedAt,
     createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
     logoId: null,
     logoStorageKey: p.logoStorageKey,
     roles: p.roles as RoleEntrepriseType[],

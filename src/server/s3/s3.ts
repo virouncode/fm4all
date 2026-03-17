@@ -153,12 +153,10 @@ export async function promoteS3Key(params: {
 
   // already promoted (or not a temp key)
   if (!tempKey.startsWith("temp/")) {
-    console.log(`[S3] Key already promoted or not temp: ${tempKey}`);
     return tempKey;
   }
 
   const newKey = tempKey.replace(/^temp\//, "documents/");
-  console.log(`[S3] Promoting ${tempKey} → ${newKey}`);
 
   try {
     await s3.send(
@@ -176,7 +174,6 @@ export async function promoteS3Key(params: {
       }),
     );
 
-    console.log(`[S3] Successfully promoted to ${newKey}`);
     return newKey;
   } catch (e) {
     console.error(`[S3] Failed to promote ${tempKey}:`, e);

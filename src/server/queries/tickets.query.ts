@@ -3,6 +3,7 @@ import "server-only";
 import { db } from "@/db";
 import { tickets, ticketMessages } from "@/db/schema/tickets";
 import { sites } from "@/db/schema/sites";
+import { entreprises } from "@/db/schema/entreprises";
 import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { getAllPrestataireSiteIds } from "@/server/queries/userPrestataireSiteAttributions.query";
 import { user } from "@/db/schema/auth";
@@ -12,7 +13,12 @@ import {
   SelectTicketType,
   TicketsQueryType,
 } from "@/zod-schemas/ticket.schema";
-import { and, asc, count, desc, eq, inArray, like, or, sql, SQL } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+import { and, asc, count, desc, eq, inArray, like, or, SQL } from "drizzle-orm";
+
+const proprietaireEntreprise = alias(entreprises, "proprietaire_entreprise");
+const demandeurEntreprise = alias(entreprises, "demandeur_entreprise");
+const assigneEntreprise = alias(entreprises, "assigne_entreprise");
 import type { TicketMessageVisibiliteType } from "@/zod-schemas/enums";
 
 /**
@@ -202,24 +208,24 @@ export async function getTicketsByPerimetre({
     case "proprietaireEntrepriseNom":
       orderByClauses.push(
         filters.orderDir === "desc"
-          ? desc(sql`proprietaire_entreprise.nom`)
-          : asc(sql`proprietaire_entreprise.nom`),
+          ? desc(proprietaireEntreprise.nom)
+          : asc(proprietaireEntreprise.nom),
       );
       break;
 
     case "demandeurEntrepriseNom":
       orderByClauses.push(
         filters.orderDir === "desc"
-          ? desc(sql`demandeur_entreprise.nom`)
-          : asc(sql`demandeur_entreprise.nom`),
+          ? desc(demandeurEntreprise.nom)
+          : asc(demandeurEntreprise.nom),
       );
       break;
 
     case "assigneEntrepriseNom":
       orderByClauses.push(
         filters.orderDir === "desc"
-          ? desc(sql`assigne_entreprise.nom`)
-          : asc(sql`assigne_entreprise.nom`),
+          ? desc(assigneEntreprise.nom)
+          : asc(assigneEntreprise.nom),
       );
       break;
 
@@ -265,16 +271,16 @@ export async function getTicketsByPerimetre({
     .from(tickets)
     .leftJoin(sites, eq(tickets.siteId, sites.id))
     .leftJoin(
-      sql`entreprises AS proprietaire_entreprise`,
-      eq(tickets.proprietaireEntrepriseId, sql`proprietaire_entreprise.id`),
+      proprietaireEntreprise,
+      eq(tickets.proprietaireEntrepriseId, proprietaireEntreprise.id),
     )
     .leftJoin(
-      sql`entreprises AS demandeur_entreprise`,
-      eq(tickets.demandeurEntrepriseId, sql`demandeur_entreprise.id`),
+      demandeurEntreprise,
+      eq(tickets.demandeurEntrepriseId, demandeurEntreprise.id),
     )
     .leftJoin(
-      sql`entreprises AS assigne_entreprise`,
-      eq(tickets.assigneEntrepriseId, sql`assigne_entreprise.id`),
+      assigneEntreprise,
+      eq(tickets.assigneEntrepriseId, assigneEntreprise.id),
     );
 
   const items = whereClause
@@ -368,28 +374,51 @@ export async function getTicketMessagesWithAttachments(
     )
     .orderBy(asc(ticketMessages.createdAt));
 
-  // 2. Récupérer les pièces jointes pour chaque message
-  const messagesWithAttachments = await Promise.all(
-    messages.map(async (msg) => {
-      const attachments = await db
-        .select({
-          id: documents.id,
-          storageKey: documents.storageKey,
-          filename: documents.filename,
-          mimeType: documents.mimeType,
-          sizeBytes: documents.sizeBytes,
-        })
-        .from(documents)
-        .innerJoin(documentsLinks, eq(documentsLinks.documentId, documents.id))
-        .where(eq(documentsLinks.ticketMessageId, msg.id))
-        .orderBy(asc(documents.createdAt));
+  // 2. Récupérer les pièces jointes en une seule query batch
+  const messageIds = messages.map((m) => m.id);
 
-      return {
-        ...msg,
-        attachments,
-      };
-    }),
-  );
+  const allAttachments =
+    messageIds.length > 0
+      ? await db
+          .select({
+            messageId: documentsLinks.ticketMessageId,
+            id: documents.id,
+            storageKey: documents.storageKey,
+            filename: documents.filename,
+            mimeType: documents.mimeType,
+            sizeBytes: documents.sizeBytes,
+          })
+          .from(documents)
+          .innerJoin(documentsLinks, eq(documentsLinks.documentId, documents.id))
+          .where(inArray(documentsLinks.ticketMessageId, messageIds))
+          .orderBy(asc(documents.createdAt))
+      : [];
 
-  return messagesWithAttachments;
+  const attachmentsByMessageId = new Map<
+    string,
+    Array<{
+      id: string;
+      storageKey: string;
+      filename: string;
+      mimeType: string;
+      sizeBytes: number | null;
+    }>
+  >();
+  for (const att of allAttachments) {
+    if (!att.messageId) continue;
+    const list = attachmentsByMessageId.get(att.messageId) ?? [];
+    list.push({
+      id: att.id,
+      storageKey: att.storageKey,
+      filename: att.filename,
+      mimeType: att.mimeType,
+      sizeBytes: att.sizeBytes,
+    });
+    attachmentsByMessageId.set(att.messageId, list);
+  }
+
+  return messages.map((msg) => ({
+    ...msg,
+    attachments: attachmentsByMessageId.get(msg.id) ?? [],
+  }));
 }

@@ -77,5 +77,6 @@ export const sitesArborescence = pgTable(
     primaryKey({ columns: [t.entrepriseId, t.ancetreId, t.descendantId] }),
     index("sites_arborescence_anc_idx").on(t.entrepriseId, t.ancetreId),
     index("sites_arborescence_desc_idx").on(t.entrepriseId, t.descendantId),
+    index("sites_arborescence_profondeur_idx").on(t.profondeur),
   ],
 );

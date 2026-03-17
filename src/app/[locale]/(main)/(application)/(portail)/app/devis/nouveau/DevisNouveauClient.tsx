@@ -271,6 +271,7 @@ export function DevisNouveauClient({ emetteur, services, posture }: DevisNouveau
                 formeJuridique: null,
                 sireneSyncedAt: null,
                 createdAt: new Date(),
+                updatedAt: new Date(),
                 logoStorageKey: null,
                 roles: [],
                 hasActiveAdmin: false,

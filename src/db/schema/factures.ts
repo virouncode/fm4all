@@ -281,5 +281,6 @@ export const factureLigneAllocations = pgTable(
     index("facture_ligne_allocations_client_service_idx").on(t.clientServiceId),
     index("facture_ligne_allocations_occurrence_idx").on(t.occurrenceId),
     index("facture_ligne_allocations_ticket_idx").on(t.ticketId),
+    index("facture_ligne_allocations_created_at_idx").on(t.createdAt),
   ],
 );

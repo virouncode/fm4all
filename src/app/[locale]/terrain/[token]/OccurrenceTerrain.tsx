@@ -163,13 +163,26 @@ export function OccurrenceTerrain({
     if (sid) setSessionId(sid);
   }, [occurrenceId]);
 
-  // Pusher — temps réel
+  // Pusher — temps réel (private channel, auth via /api/pusher/auth-terrain)
   useEffect(() => {
     let channel: Channel | null = null;
+    let pusherInstance: import("pusher-js").default | null = null;
 
     async function subscribe() {
-      const { pusherClient } = await import("@/lib/pusher");
-      channel = pusherClient.subscribe(`terrain-${occurrenceId}`);
+      const PusherClientModule = await import("pusher-js");
+      const PusherClientClass = PusherClientModule.default;
+      pusherInstance = new PusherClientClass(
+        process.env.NEXT_PUBLIC_PUSHER_KEY!,
+        {
+          cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+          channelAuthorization: {
+            endpoint: "/api/pusher/auth-terrain",
+            transport: "ajax",
+            headers: { "x-terrain-token": token },
+          },
+        },
+      );
+      channel = pusherInstance.subscribe(`private-terrain-${occurrenceId}`);
 
       channel.bind(
         "occurrence-updated",
@@ -239,8 +252,9 @@ export function OccurrenceTerrain({
 
     return () => {
       if (channel) channel.unsubscribe();
+      if (pusherInstance) pusherInstance.disconnect();
     };
-  }, [occurrenceId]);
+  }, [occurrenceId, token]);
 
   const tachesDone = taches.filter(
     (t) =>

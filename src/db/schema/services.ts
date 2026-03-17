@@ -367,6 +367,9 @@ export const clientServiceOccurrences = pgTable(
     index("cso_type_source_idx").on(t.typeSource),
     index("cso_regle_recurrence_idx").on(t.regleRecurrenceId),
     index("cso_dates_prevues_idx").on(t.dateDebutPrevue, t.dateFinPrevue),
+    index("cso_created_at_idx").on(t.createdAt),
+    index("cso_started_by_field_session_idx").on(t.startedByFieldSessionId),
+    index("cso_done_by_field_session_idx").on(t.doneByFieldSessionId),
     // Contrainte unique partielle — une seule occurrence matérialisée par (règle, site, date originale)
     uniqueIndex("cso_regle_recurrence_udx")
       .on(
@@ -591,6 +594,8 @@ export const occurrenceTaches = pgTable(
     index("ot_occurrence_idx").on(t.occurrenceId),
     index("ot_statut_idx").on(t.statut),
     index("ot_liste_item_idx").on(t.listeItemId),
+    index("ot_started_by_field_session_idx").on(t.startedByFieldSessionId),
+    index("ot_done_by_field_session_idx").on(t.doneByFieldSessionId),
     uniqueIndex("ot_order_udx").on(t.occurrenceId, t.ordre),
   ],
 );

@@ -37,7 +37,7 @@ export const env = {
 
   // Optionnels serveur
   MAILGUN_BCC_EMAIL: optional("MAILGUN_BCC_EMAIL"),
-  CRON_SECRET: optional("CRON_SECRET"),
+  CRON_SECRET: required("CRON_SECRET"),
   S3_PRESIGN_READ_EXPIRES_SECONDS: Number(
     optionalWithDefault("S3_PRESIGN_READ_EXPIRES_SECONDS", "60"),
   ),
@@ -55,7 +55,7 @@ export const env = {
   // ---------------------------------------------------------------------------
   NEXT_PUBLIC_PUSHER_APP_ID: optional("NEXT_PUBLIC_PUSHER_APP_ID"),
   NEXT_PUBLIC_PUSHER_KEY: optional("NEXT_PUBLIC_PUSHER_KEY"),
-  PUSHER_SECRET: optional("PUSHER_SECRET"),
+  PUSHER_SECRET: required("PUSHER_SECRET"),
   NEXT_PUBLIC_PUSHER_CLUSTER: optional("NEXT_PUBLIC_PUSHER_CLUSTER"),
   NEXT_PUBLIC_GA_MEASUREMENT_ID: optional("NEXT_PUBLIC_GA_MEASUREMENT_ID"),
   NEXT_PUBLIC_SANITY_PROJECT_ID: optional("NEXT_PUBLIC_SANITY_PROJECT_ID"),

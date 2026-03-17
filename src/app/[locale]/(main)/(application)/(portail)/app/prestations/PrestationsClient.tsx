@@ -228,6 +228,7 @@ export default function PrestationsClient({
   }, [entreprise?.id, posture, searchParams]);
 
   // Sync filters state avec searchParams
+  // Utilise searchParams comme objet (nouvelle référence à chaque navigation) pour détecter les changements
   useEffect(() => {
     setFilters({
       statut: searchParams.statut,
@@ -236,13 +237,7 @@ export default function PrestationsClient({
       modeCommercial: searchParams.modeCommercial,
       famillePlanification: searchParams.famillePlanification,
     });
-  }, [
-    searchParams.statut,
-    searchParams.serviceId,
-    searchParams.siteId,
-    searchParams.modeCommercial,
-    searchParams.famillePlanification,
-  ]);
+  }, [searchParams]);
 
   const handlePrestationClick = (p: PrestationListItem) => {
     router.push({

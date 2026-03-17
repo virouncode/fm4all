@@ -87,6 +87,7 @@ export type PrestataireAvecDetails = {
   formeJuridique: string | null;
   sireneSyncedAt: Date | null;
   createdAt: Date;
+  updatedAt: Date;
   logoStorageKey: string | null;
   roles: string[];
   hasActiveAdmin: boolean;
@@ -146,35 +147,87 @@ export async function getClientPrestatairesAvecDetails(
   ];
   if (allIds.length === 0) return [];
 
-  // 4. Fetch détails entreprises (+ logo via LEFT JOIN documents)
-  const rows = await db
-    .select({
-      id: entreprises.id,
-      nom: entreprises.nom,
-      siret: entreprises.siret,
-      numeroTva: entreprises.numeroTva,
-      adresseLigne1: entreprises.adresseLigne1,
-      adresseLigne2: entreprises.adresseLigne2,
-      codePostal: entreprises.codePostal,
-      ville: entreprises.ville,
-      formeJuridique: entreprises.formeJuridique,
-      sireneSyncedAt: entreprises.sireneSyncedAt,
-      createdAt: entreprises.createdAt,
-      logoStorageKey: documents.storageKey,
-    })
-    .from(entreprises)
-    .leftJoin(documents, eq(documents.id, entreprises.logoId))
-    .where(inArray(entreprises.id, allIds))
-    .orderBy(entreprises.nom);
+  // 4-8. Fetch toutes les données enrichissement en parallèle (elles dépendent uniquement de allIds)
+  const [rows, rolesRows, adminRows, serviceRows, relationRows] =
+    await Promise.all([
+      // 4. Fetch détails entreprises (+ logo via LEFT JOIN documents)
+      db
+        .select({
+          id: entreprises.id,
+          nom: entreprises.nom,
+          siret: entreprises.siret,
+          numeroTva: entreprises.numeroTva,
+          adresseLigne1: entreprises.adresseLigne1,
+          adresseLigne2: entreprises.adresseLigne2,
+          codePostal: entreprises.codePostal,
+          ville: entreprises.ville,
+          formeJuridique: entreprises.formeJuridique,
+          sireneSyncedAt: entreprises.sireneSyncedAt,
+          createdAt: entreprises.createdAt,
+          updatedAt: entreprises.updatedAt,
+          logoStorageKey: documents.storageKey,
+        })
+        .from(entreprises)
+        .leftJoin(documents, eq(documents.id, entreprises.logoId))
+        .where(inArray(entreprises.id, allIds))
+        .orderBy(entreprises.nom),
 
-  // 5. Fetch rôles
-  const rolesRows = await db
-    .select({
-      entrepriseId: entrepriseRoles.entrepriseId,
-      role: entrepriseRoles.role,
-    })
-    .from(entrepriseRoles)
-    .where(inArray(entrepriseRoles.entrepriseId, allIds));
+      // 5. Fetch rôles
+      db
+        .select({
+          entrepriseId: entrepriseRoles.entrepriseId,
+          role: entrepriseRoles.role,
+        })
+        .from(entrepriseRoles)
+        .where(inArray(entrepriseRoles.entrepriseId, allIds)),
+
+      // 6. Check hasActiveAdmin + email du premier admin actif prestataire
+      db
+        .select({
+          entrepriseId: userPrestataireAdhesions.entrepriseId,
+          email: user.email,
+        })
+        .from(userPrestataireAdhesions)
+        .innerJoin(user, eq(user.id, userPrestataireAdhesions.userId))
+        .where(
+          and(
+            inArray(userPrestataireAdhesions.entrepriseId, allIds),
+            eq(userPrestataireAdhesions.role, "admin"),
+            eq(userPrestataireAdhesions.statut, "actif"),
+          ),
+        ),
+
+      // 7. Fetch services offerts par chaque prestataire
+      db
+        .select({
+          entrepriseId: serviceEntreprises.entrepriseId,
+          serviceId: services.id,
+          serviceNom: services.nom,
+        })
+        .from(serviceEntreprises)
+        .innerJoin(services, eq(services.id, serviceEntreprises.serviceId))
+        .where(
+          and(
+            inArray(serviceEntreprises.entrepriseId, allIds),
+            eq(serviceEntreprises.actif, true),
+          ),
+        ),
+
+      // 8. Fetch relation IDs
+      db
+        .select({
+          prestataireEntrepriseId:
+            clientPrestataireRelations.prestataireEntrepriseId,
+          relationId: clientPrestataireRelations.id,
+        })
+        .from(clientPrestataireRelations)
+        .where(
+          and(
+            eq(clientPrestataireRelations.clientEntrepriseId, clientEntrepriseId),
+            inArray(clientPrestataireRelations.prestataireEntrepriseId, allIds),
+          ),
+        ),
+    ]);
 
   const rolesByEntrepriseId = new Map<string, string[]>();
   for (const r of rolesRows) {
@@ -184,45 +237,13 @@ export async function getClientPrestatairesAvecDetails(
     rolesByEntrepriseId.get(r.entrepriseId)!.push(r.role);
   }
 
-  // 6. Check hasActiveAdmin + fetch email du premier admin actif prestataire
-  const adminRows = await db
-    .select({
-      entrepriseId: userPrestataireAdhesions.entrepriseId,
-      email: user.email,
-    })
-    .from(userPrestataireAdhesions)
-    .innerJoin(user, eq(user.id, userPrestataireAdhesions.userId))
-    .where(
-      and(
-        inArray(userPrestataireAdhesions.entrepriseId, allIds),
-        eq(userPrestataireAdhesions.role, "admin"),
-        eq(userPrestataireAdhesions.statut, "actif"),
-      ),
-    );
   const hasAdminSet = new Set(adminRows.map((r) => r.entrepriseId));
-  // Premier admin actif par entreprise (ordre non garanti, on prend le premier)
   const adminEmailByEntrepriseId = new Map<string, string>();
   for (const r of adminRows) {
     if (!adminEmailByEntrepriseId.has(r.entrepriseId)) {
       adminEmailByEntrepriseId.set(r.entrepriseId, r.email);
     }
   }
-
-  // 7. Fetch services offerts par chaque prestataire
-  const serviceRows = await db
-    .select({
-      entrepriseId: serviceEntreprises.entrepriseId,
-      serviceId: services.id,
-      serviceNom: services.nom,
-    })
-    .from(serviceEntreprises)
-    .innerJoin(services, eq(services.id, serviceEntreprises.serviceId))
-    .where(
-      and(
-        inArray(serviceEntreprises.entrepriseId, allIds),
-        eq(serviceEntreprises.actif, true),
-      ),
-    );
 
   const servicesByEntrepriseId = new Map<
     string,
@@ -237,20 +258,6 @@ export async function getClientPrestatairesAvecDetails(
       nom: r.serviceNom,
     });
   }
-
-  // 8. Fetch relation IDs
-  const relationRows = await db
-    .select({
-      prestataireEntrepriseId: clientPrestataireRelations.prestataireEntrepriseId,
-      relationId: clientPrestataireRelations.id,
-    })
-    .from(clientPrestataireRelations)
-    .where(
-      and(
-        eq(clientPrestataireRelations.clientEntrepriseId, clientEntrepriseId),
-        inArray(clientPrestataireRelations.prestataireEntrepriseId, allIds),
-      ),
-    );
 
   const relationByPrestataireId = new Map<string, string>();
   for (const r of relationRows) {
@@ -1035,6 +1042,7 @@ export type ClientAvecDetails = {
   formeJuridique: string | null;
   sireneSyncedAt: Date | null;
   createdAt: Date;
+  updatedAt: Date;
   logoStorageKey: string | null;
   roles: string[];
   hasActiveAdmin: boolean;
@@ -1111,6 +1119,7 @@ export async function getMesClients(
       formeJuridique: entreprises.formeJuridique,
       sireneSyncedAt: entreprises.sireneSyncedAt,
       createdAt: entreprises.createdAt,
+      updatedAt: entreprises.updatedAt,
       logoStorageKey: documents.storageKey,
     })
     .from(entreprises)

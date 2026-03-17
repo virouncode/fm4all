@@ -9,6 +9,7 @@ import {
   clientServiceReglesRecurrence,
   clientServices,
 } from "@/db/schema/services";
+import { clientPrestataireRelations } from "@/db/schema/entreprises";
 import { userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
@@ -81,7 +82,19 @@ async function canManagePrestation(
   } else if (posture === "prestataire") {
     const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
     if (prestataireAdhesion?.role === "admin") {
-      return { allowed: true, isPlateforme: false, isAdmin: true };
+      const relation = await db.query.clientPrestataireRelations.findFirst({
+        where: and(
+          eq(
+            clientPrestataireRelations.prestataireEntrepriseId,
+            prestataireAdhesion.entrepriseId,
+          ),
+          eq(clientPrestataireRelations.clientEntrepriseId, entrepriseId),
+        ),
+        columns: { id: true },
+      });
+      if (relation) {
+        return { allowed: true, isPlateforme: false, isAdmin: true };
+      }
     }
   }
 
@@ -112,7 +125,20 @@ async function canArchiveDeletePrestation(
 
   if (posture === "prestataire") {
     const prestataireAdhesion = await getUserPrestataireAdhesion({ userId });
-    return prestataireAdhesion?.role === "admin";
+    if (prestataireAdhesion?.role === "admin") {
+      const relation = await db.query.clientPrestataireRelations.findFirst({
+        where: and(
+          eq(
+            clientPrestataireRelations.prestataireEntrepriseId,
+            prestataireAdhesion.entrepriseId,
+          ),
+          eq(clientPrestataireRelations.clientEntrepriseId, entrepriseId),
+        ),
+        columns: { id: true },
+      });
+      return !!relation;
+    }
+    return false;
   }
 
   return false;

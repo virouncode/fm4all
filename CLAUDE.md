@@ -2750,6 +2750,105 @@ const hasActiveExecution = executions.some(                     // bandeau UI
 - Pattern d'affichage standard : `{item.emoji && <span className="mr-1.5">{item.emoji}</span>}` AVANT `{item.titre}`
 - Les tâches créées avant la feature ont `emoji = null` → rien n'est affiché (comportement attendu)
 
+---
+
+## Changelog (2026-03-17 — session 3)
+
+**Audit sécurité + performance + qualité — 14 corrections** :
+
+- 🔴 **C1/C2** — Routes API S3 `/api/s3/presign-upload` et `/api/s3/presign-read` supprimées (non utilisées, tout passe par les server actions ; ces routes exposaient S3 sans vérification d'accès)
+- 🔴 **C3** — `canManagePrestation` + `canArchiveDeletePrestation` : branche `prestataire` vérifiait seulement l'adhésion sans contrôler que le prestataire est bien lié au client via `clientPrestataireRelations` → bypass total sur toutes les prestations
+- 🔴 **C4** — Canal Pusher terrain migré de `public` (non authentifié) vers `private-terrain-${occurrenceId}`. Création de `/api/pusher/auth-terrain` (POST, token-based via header `x-terrain-token`, valide `occurrenceFieldLinks`). `OccurrenceTerrain.tsx` instancie son propre `PusherClient` avec `channelAuthorization: { endpoint, headers: { "x-terrain-token": token } }`.
+- 🟠 **C5** — Limite 2 pièces jointes par tâche vérifiée côté serveur dans `addTachePieceJointeFieldAction` (COUNT avant insertion)
+- 🟠 **M1** — `CRON_SECRET` rendu `required()` dans `env.ts` + guard `401` explicite dans la route cron si secret absent/invalide
+- 🟠 **M2** — `PUSHER_SECRET` : suppression du préfixe `NEXT_PUBLIC_` (qui l'exposait dans le bundle client) → renommé `PUSHER_SECRET` dans `env.ts` et `pusher.ts`
+- 🟠 **M3** — N+1 query dans `getTicketMessagesWithAttachments` : remplacé `Promise.all(messages.map(...))` par une batch query `inArray(documentsLinks.ticketMessageId, messageIds)` + regroupement par `Map`
+- 🟠 **M4** — `import "server-only"` ajouté en ligne 1 de `documents.query.ts`
+- 🟠 **M5/M7** — `console.log` supprimés dans `s3.ts` et `terrain/not-found.tsx`
+- 🟠 **M6** — `next/link` remplacé par `@/i18n/navigation` dans `terrain/not-found.tsx`
+- 🟠 **M8** — 5 queries indépendantes dans `getClientPrestatairesAvecDetails` parallélisées avec `Promise.all`
+- 🟡 **M9/N3** — 8 index DB manquants ajoutés + migration `0053_clammy_wallow.sql` : `serviceEntreprises.actif`, `sitesArborescence.profondeur`, `clientServiceOccurrences.createdAt`, `clientServiceOccurrences.started/done_by_field_session_id`, `occurrenceTaches.started/done_by_field_session_id`, `factureLigneAllocations.createdAt`
+- 🟡 **N5** — Multi-JOIN sur `entreprises` dans `tickets.query.ts` utilisait `sql\`entreprises AS xxx\`` (non typé) → remplacé par `alias(entreprises, "xxx")` de `drizzle-orm/pg-core`
+- 🟡 **N7** — `useEffect` secondaire de `PrestationsClient.tsx` utilisait les propriétés individuelles de `searchParams` → remplacé par l'objet entier (fix navigation client-side bloquée)
+
+**Nouveaux patterns** :
+
+#### Pusher canaux privés terrain (token-based)
+```typescript
+// OccurrenceTerrain.tsx — créer un PusherClient dédié avec auth custom
+const PusherClientClass = (await import("pusher-js")).default;
+pusherInstance = new PusherClientClass(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+  channelAuthorization: {
+    endpoint: "/api/pusher/auth-terrain",
+    transport: "ajax",
+    headers: { "x-terrain-token": token },
+  },
+});
+channel = pusherInstance.subscribe(`private-terrain-${occurrenceId}`);
+```
+- Utiliser `pusherInstance.disconnect()` dans le cleanup du useEffect
+- Ne JAMAIS utiliser `import("@/lib/pusher")` pour le client terrain (ce fichier est le client authentifié standard)
+
+#### Drizzle — Multi-JOIN sur la même table
+```typescript
+// ❌ FAUX — sql`alias` perd le typage Drizzle
+.leftJoin(sql`entreprises AS demandeur_entreprise`, ...)
+.orderBy(desc(sql`demandeur_entreprise.nom`)) // ← string non typée
+
+// ✅ CORRECT — alias() de drizzle-orm/pg-core
+import { alias } from "drizzle-orm/pg-core";
+const demandeurEntreprise = alias(entreprises, "demandeur_entreprise");
+const assigneEntreprise = alias(entreprises, "assigne_entreprise");
+// Utiliser comme une vraie table Drizzle :
+.leftJoin(demandeurEntreprise, eq(demandeurEntreprise.id, tickets.demandeurEntrepriseId))
+.orderBy(desc(demandeurEntreprise.nom)) // ← typé
+```
+Déclarer les alias au **niveau module** (pas dans la fonction) pour éviter les recréations.
+
+#### Pattern N+1 → batch query (listes avec attachements)
+```typescript
+// ❌ FAUX — N+1
+const withAttachments = await Promise.all(
+  messages.map(async (msg) => ({
+    ...msg,
+    attachments: await db.select(...).where(eq(..., msg.id)),
+  }))
+);
+
+// ✅ CORRECT — 1 query + Map
+const messageIds = messages.map((m) => m.id);
+const allAttachments = messageIds.length > 0
+  ? await db.select({ messageId: documentsLinks.ticketMessageId, ...fields })
+      .from(documents)
+      .innerJoin(documentsLinks, eq(documentsLinks.documentId, documents.id))
+      .where(inArray(documentsLinks.ticketMessageId, messageIds))
+  : [];
+const byId = new Map<string, typeof allAttachments>();
+for (const att of allAttachments) {
+  if (!att.messageId) continue;
+  if (!byId.has(att.messageId)) byId.set(att.messageId, []);
+  byId.get(att.messageId)!.push(att);
+}
+return messages.map((m) => ({ ...m, attachments: byId.get(m.id) ?? [] }));
+```
+
+#### clientPrestataireRelations — check obligatoire pour prestataire gérant prestations client
+```typescript
+// Dans canManagePrestation, branche prestataire
+const relation = await db.query.clientPrestataireRelations.findFirst({
+  where: and(
+    eq(clientPrestataireRelations.prestataireEntrepriseId, prestataireAdhesion.entrepriseId),
+    eq(clientPrestataireRelations.clientEntrepriseId, entrepriseId),
+  ),
+  columns: { id: true },
+});
+if (!relation) return { allowed: false };
+```
+**Règle** : Un prestataire admin peut gérer les prestations d'un client **uniquement** s'il existe une entrée dans `clientPrestataireRelations`. Sans ce check, n'importe quel prestataire admin pouvait gérer toutes les prestations de tous les clients.
+
+---
+
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 
 - `/app/sites` - Gestion hiérarchique avec closure table

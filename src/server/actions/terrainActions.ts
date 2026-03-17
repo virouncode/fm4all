@@ -20,7 +20,7 @@ import {
   terminateOccurrenceFieldSchema,
   updateTacheFieldSchema,
 } from "@/zod-schemas/terrain.schema";
-import { and, eq, gt, isNull } from "drizzle-orm";
+import { and, count, eq, gt, isNull } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { headers } from "next/headers";
 
@@ -145,7 +145,7 @@ export const startOccurrenceFieldAction = actionClient
         ),
       );
 
-    await pusherServer.trigger(`terrain-${occurrenceId}`, "occurrence-updated", {
+    await pusherServer.trigger(`private-terrain-${occurrenceId}`, "occurrence-updated", {
       statut: "en_cours",
       startedByNom: session.assigneeNom,
     });
@@ -208,7 +208,7 @@ export const updateTacheFieldAction = actionClient
       .set(updateValues)
       .where(eq(occurrenceTaches.id, tacheId));
 
-    await pusherServer.trigger(`terrain-${occurrenceId}`, "tache-updated", {
+    await pusherServer.trigger(`private-terrain-${occurrenceId}`, "tache-updated", {
       tacheId,
       statut,
       assigneeNom: statut === "en_cours" ? session.assigneeNom : tache.assigneeNom,
@@ -250,7 +250,7 @@ export const terminateOccurrenceFieldAction = actionClient
       .set({ endedAt: now })
       .where(eq(occurrenceFieldSessions.id, sessionId));
 
-    await pusherServer.trigger(`terrain-${occurrenceId}`, "occurrence-updated", {
+    await pusherServer.trigger(`private-terrain-${occurrenceId}`, "occurrence-updated", {
       statut: "terminee",
       startedByNom: session.assigneeNom,
     });
@@ -287,6 +287,15 @@ export const addTachePieceJointeFieldAction = actionClient
 
     if (!tache) throw errors.forbidden("Tâche introuvable pour cette intervention.");
 
+    // Limite : 2 pièces jointes max par tâche
+    const [countRow] = await db
+      .select({ nb: count(documentsLinks.id) })
+      .from(documentsLinks)
+      .where(eq(documentsLinks.occurrenceTacheId, tacheId));
+    if ((countRow?.nb ?? 0) >= 2) {
+      throw errors.conflict("Limite de 2 pièces jointes par tâche atteinte.");
+    }
+
     // Promouvoir le fichier temp → permanent
     const permanentKey = await promoteS3Key({ tempKey: storageKey });
 
@@ -321,7 +330,7 @@ export const addTachePieceJointeFieldAction = actionClient
       return { documentId: doc.id, linkId: link.id };
     });
 
-    await pusherServer.trigger(`terrain-${occurrenceId}`, "piece-jointe-added", {
+    await pusherServer.trigger(`private-terrain-${occurrenceId}`, "piece-jointe-added", {
       tacheId,
       linkId: result.linkId,
       documentId: result.documentId,
