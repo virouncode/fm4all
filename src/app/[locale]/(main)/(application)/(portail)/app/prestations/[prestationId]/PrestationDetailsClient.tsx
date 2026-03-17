@@ -584,23 +584,6 @@ export function PrestationDetailsClient({
         </DialogStyledContent>
       </Dialog>
 
-      {/* Bouton accès interventions */}
-      {prestation.statut === "actif" && (
-        <div className="mb-4 flex flex-shrink-0 justify-end">
-          <Button asChild>
-            <Link
-              href={{
-                pathname: "/app/prestations/[prestationId]/interventions",
-                params: { prestationId: prestation.id },
-              }}
-            >
-              <CalendarCheck className="h-4 w-4" />
-              Gérer les interventions
-            </Link>
-          </Button>
-        </div>
-      )}
-
       {/* ==================== TABS ==================== */}
       <Tabs
         value={activeTab}
