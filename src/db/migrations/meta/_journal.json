@@ -351,6 +351,13 @@
       "when": 1773755650717,
       "tag": "0049_nostalgic_chamber",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1773761625637,
+      "tag": "0050_melted_tarantula",
+      "breakpoints": true
     }
   ]
 }

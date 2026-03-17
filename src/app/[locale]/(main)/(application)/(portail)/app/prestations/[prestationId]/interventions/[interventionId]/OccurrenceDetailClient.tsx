@@ -798,9 +798,12 @@ export function OccurrenceDetailClient({
         </div>
       )}
 
+      {/* ===== ZONE SCROLLABLE (à partir du disclaimer amber) ===== */}
+      <div className="min-h-0 flex-1 overflow-y-auto pb-6">
+
       {/* ==================== ALERTE FENÊTRE DÉPASSÉE ==================== */}
       {occurrenceStatut === "planifiee" && isPastStartWindow && canManage && (
-        <div className="mb-4 flex flex-shrink-0 items-start gap-2 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800 dark:border-orange-800 dark:bg-orange-950/40 dark:text-orange-200">
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800 dark:border-orange-800 dark:bg-orange-950/40 dark:text-orange-200">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" />
           <div>
             Cette intervention a dépassé sa fenêtre de démarrage. Si elle
@@ -944,7 +947,7 @@ export function OccurrenceDetailClient({
       )}
 
       {/* ==================== CONTENT ==================== */}
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pb-6">
+      <div className="space-y-4">
         {/* Dates */}
         <Card>
           <CardHeader className="pb-3">
@@ -1330,6 +1333,7 @@ export function OccurrenceDetailClient({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div> {/* fin zone scrollable */}
     </div>
   );
 }

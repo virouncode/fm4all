@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import {
   boolean,
   date,
@@ -344,6 +345,14 @@ export const clientServiceOccurrences = pgTable(
       onDelete: "set null",
     }),
     notes: text("notes"),
+    startedByFieldSessionId: uuid("started_by_field_session_id").references(
+      (): AnyPgColumn => occurrenceFieldSessions.id,
+      { onDelete: "set null" },
+    ),
+    doneByFieldSessionId: uuid("done_by_field_session_id").references(
+      (): AnyPgColumn => occurrenceFieldSessions.id,
+      { onDelete: "set null" },
+    ),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),
@@ -563,6 +572,14 @@ export const occurrenceTaches = pgTable(
     notes: text("notes"),
     startedAt: timestamptz("started_at"),
     doneAt: timestamptz("done_at"),
+    startedByFieldSessionId: uuid("started_by_field_session_id").references(
+      (): AnyPgColumn => occurrenceFieldSessions.id,
+      { onDelete: "set null" },
+    ),
+    doneByFieldSessionId: uuid("done_by_field_session_id").references(
+      (): AnyPgColumn => occurrenceFieldSessions.id,
+      { onDelete: "set null" },
+    ),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),
