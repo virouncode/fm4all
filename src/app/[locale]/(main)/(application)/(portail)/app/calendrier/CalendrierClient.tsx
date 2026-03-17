@@ -218,8 +218,8 @@ export function CalendrierClient() {
   /** Sites groupés par client — actif en posture prestataire/plateforme */
   const [siteGroups, setSiteGroups] = useState<SiteGroupType[]>([]);
 
-  // true si l'utilisateur est admin dans son entreprise pour la posture active
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [canEditCalendar, setCanEditCalendar] = useState(false);
+  const [responsableSiteIds, setResponsableSiteIds] = useState<string[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [pendingEdit, setPendingEdit] = useState<PendingEditType | null>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -266,13 +266,15 @@ export function CalendrierClient() {
         prestataires: p,
         clients: c,
         defaultSiteIds,
-        isAdmin: admin,
+        canEditCalendar: editCal,
+        responsableSiteIds: respSiteIds,
       } = result.data;
 
       setServices(svc);
       setPrestataires(p);
       setClients(c);
-      setIsAdmin(admin);
+      setCanEditCalendar(editCal);
+      setResponsableSiteIds(respSiteIds);
 
       // ── Sélection clients ───────────────────────────────────────────────
       // Posture client : on force l'id de l'entreprise (pas de filtre client dans l'UI)
@@ -796,15 +798,28 @@ export function CalendrierClient() {
           height="100%"
           stickyHeaderDates
           timeZone="Europe/Paris"
-          editable={isAdmin}
-          eventResizableFromStart={isAdmin}
+          editable={canEditCalendar || responsableSiteIds.length > 0}
+          eventResizableFromStart={canEditCalendar || responsableSiteIds.length > 0}
           eventAllow={(_, draggedEvent) => {
             if (!draggedEvent) return false;
-            const { type, statut } = draggedEvent.extendedProps as {
-              type?: string;
-              statut?: string;
-            };
-            return type === "materialized" && statut === "planifiee";
+            const { type, statut, siteId, modePilotage } =
+              draggedEvent.extendedProps as {
+                type?: string;
+                statut?: string;
+                siteId?: string;
+                modePilotage?: string;
+              };
+            if (type !== "materialized" || statut !== "planifiee") return false;
+            if (canEditCalendar) return true;
+            // responsable_site : vérifier modePilotage + siteId
+            if (!siteId || !modePilotage) return false;
+            const postureAllows =
+              posture === "client"
+                ? modePilotage === "client" || modePilotage === "collaboration"
+                : posture === "prestataire"
+                  ? modePilotage === "prestataire" || modePilotage === "collaboration"
+                  : false;
+            return postureAllows && responsableSiteIds.includes(siteId);
           }}
           eventDrop={(info) => {
             const { type, statut, occurrenceId, regleId } =

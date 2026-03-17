@@ -17,6 +17,8 @@ import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import { getClientPrestataires, getMesClients } from "@/server/queries/clientServiceExecutions.query";
 import { getEntreprisesClientes } from "@/server/queries/entreprises.query";
+import { getResponsableSiteIdsByPrestataire } from "@/server/queries/userPrestataireSiteAttributions.query";
+import { resolveUserEffectiveRolesOnSites } from "@/server/utils/userClientSiteAttributions.utils";
 import {
   getAccessibleSitesByUser,
   getSitesByEntrepriseId,
@@ -54,6 +56,8 @@ export type CalendarEventItemType = {
     siteAdresse?: string;
     prestataireNom?: string;
     clientNom?: string;
+    siteId?: string;
+    modePilotage?: string;
     famillePlanification: string;
     dateDebutOriginale?: string;
   };
@@ -75,8 +79,16 @@ export type CalendarFilterOptionsType = {
   clients: { id: string; nom: string }[];
   /** IDs des sites pré-sélectionnés au chargement */
   defaultSiteIds: string[];
-  /** true si l'utilisateur est admin dans son entreprise pour cette posture */
-  isAdmin: boolean;
+  /**
+   * true si l'utilisateur peut éditer toutes les occurrences (admin ou plateforme).
+   * false si seule une partie des occurrences est éditable (responsable_site).
+   */
+  canEditCalendar: boolean;
+  /**
+   * IDs des sites où l'utilisateur est responsable_site (vide si canEditCalendar=true).
+   * Utilisé pour le drag/resize per-event côté client.
+   */
+  responsableSiteIds: string[];
 };
 
 // ==================== CONSTANTS ====================
@@ -342,6 +354,31 @@ export const getCalendarFilterOptionsAction = actionClient
     const defaultSiteIds =
       posture !== "plateforme" ? sitesRows.map((s) => s.id) : [];
 
+    // ── canEditCalendar + responsableSiteIds ───────────────────────────────
+    // canEditCalendar = admin transverse (plateforme ou admin de l'entreprise)
+    // responsableSiteIds = sites où l'user est responsable_site (si non-admin)
+    let responsableSiteIds: string[] = [];
+
+    if (!isAdmin && posture === "client" && sitesRows.length > 0) {
+      const siteIds = sitesRows.map((s) => s.id);
+      const rolesMap = await resolveUserEffectiveRolesOnSites({
+        userId,
+        siteIds,
+        entrepriseId: parsedInput.entrepriseId,
+      });
+      responsableSiteIds = siteIds.filter(
+        (id) => rolesMap.get(id) === "responsable_site",
+      );
+    } else if (!isAdmin && posture === "prestataire" && sitesParClient.length > 0) {
+      for (const clientGroup of sitesParClient) {
+        const ids = await getResponsableSiteIdsByPrestataire({
+          userId,
+          clientEntrepriseId: clientGroup.clientId,
+        });
+        responsableSiteIds.push(...ids);
+      }
+    }
+
     return {
       sites: sitesRows,
       sitesParClient,
@@ -349,7 +386,8 @@ export const getCalendarFilterOptionsAction = actionClient
       prestataires: prestatairesRows,
       clients: clientsRows,
       defaultSiteIds,
-      isAdmin,
+      canEditCalendar: isAdmin,
+      responsableSiteIds,
     } satisfies CalendarFilterOptionsType;
   });
 
@@ -625,11 +663,12 @@ export const getCalendarEventsAction = actionClient
     const prestationMap = new Map(prestations.map((p) => [p.id, p]));
     const events: CalendarEventItemType[] = [];
 
-    // ── Batch lookup prestataireNom par prestation ──────────────────────────
+    // ── Batch lookup prestataireNom + modePilotage par prestation ───────────
     const executionRows = await db
       .selectDistinct({
         clientServiceId: clientServiceExecutions.clientServiceId,
         prestataireNom: entreprises.nom,
+        modePilotage: clientServiceExecutions.modePilotage,
       })
       .from(clientServiceExecutions)
       .innerJoin(
@@ -648,6 +687,10 @@ export const getCalendarEventsAction = actionClient
       );
     const prestataireMap = new Map(
       executionRows.map((e) => [e.clientServiceId, e.prestataireNom]),
+    );
+    // Défaut "client" si pas d'exécution active (cohérent avec getExecutionContext)
+    const modePilotageMap = new Map(
+      executionRows.map((e) => [e.clientServiceId, e.modePilotage as string]),
     );
 
     // ── Batch lookup clientNom par entrepriseId ──────────────────────────────
@@ -733,6 +776,8 @@ export const getCalendarEventsAction = actionClient
           siteAdresse: formatSiteAdresse(prestation),
           prestataireNom: prestataireMap.get(occ.clientServiceId),
           clientNom: clientMap.get(prestation.entrepriseId),
+          siteId: occ.siteId,
+          modePilotage: modePilotageMap.get(occ.clientServiceId) ?? "client",
           famillePlanification: prestation.famillePlanification,
           dateDebutOriginale: occ.dateDebutOriginale?.toISOString(),
         },
@@ -886,6 +931,8 @@ export const getCalendarEventsAction = actionClient
                   siteAdresse,
                   prestataireNom: prestataireMap.get(regle.clientServiceId),
                   clientNom: clientMap.get(prestation.entrepriseId),
+                  siteId,
+                  modePilotage: modePilotageMap.get(regle.clientServiceId) ?? "client",
                   famillePlanification: prestation.famillePlanification,
                 },
               });
