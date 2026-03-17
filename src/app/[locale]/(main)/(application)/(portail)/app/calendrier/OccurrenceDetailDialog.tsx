@@ -21,7 +21,9 @@ import {
   ExternalLink,
   ListChecks,
   MapPin,
+  PencilOff,
   Repeat2,
+  Settings2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -36,6 +38,9 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   eventProps: DetailPropsType | null;
+  canEditCalendar: boolean;
+  responsableSiteIds: string[];
+  posture: string;
 };
 
 type TacheItemType = {
@@ -96,6 +101,12 @@ const STATUT_CONFIG: Record<string, { label: string; className: string }> = {
   },
 };
 
+const MODE_PILOTAGE_LABELS: Record<string, string> = {
+  client: "Géré par le client",
+  prestataire: "Géré par le prestataire",
+  collaboration: "Géré en commun",
+};
+
 const TACHE_STATUT_CONFIG: Record<string, { label: string; dotClass: string }> =
   {
     a_faire: { label: "À faire", dotClass: "bg-slate-400" },
@@ -112,6 +123,9 @@ export function OccurrenceDetailDialog({
   open,
   onOpenChange,
   eventProps,
+  canEditCalendar,
+  responsableSiteIds,
+  posture,
 }: Props) {
   const [taches, setTaches] = useState<TacheItemType[]>([]);
   const [loadingTaches, setLoadingTaches] = useState(false);
@@ -178,6 +192,8 @@ export function OccurrenceDetailDialog({
     siteAdresse,
     prestataireNom,
     clientNom,
+    siteId,
+    modePilotage,
     start,
     end,
   } = eventProps;
@@ -185,6 +201,17 @@ export function OccurrenceDetailDialog({
   const statutConfig = statut ? STATUT_CONFIG[statut] : null;
   const canNavigate =
     type === "materialized" && !!occurrenceId && !!prestationId;
+
+  // Calcul canEdit : même logique que eventAllow dans CalendrierClient
+  const postureAllows =
+    posture === "client"
+      ? modePilotage === "client" || modePilotage === "collaboration"
+      : posture === "prestataire"
+        ? modePilotage === "prestataire" || modePilotage === "collaboration"
+        : posture === "plateforme";
+  const canEdit =
+    canEditCalendar ||
+    (!!siteId && postureAllows && responsableSiteIds.includes(siteId));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -231,6 +258,24 @@ export function OccurrenceDetailDialog({
                 <p className="text-sm font-medium">{siteNom}</p>
                 {siteAdresse && (
                   <p className="text-muted-foreground text-xs">{siteAdresse}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Mode de pilotage */}
+          {modePilotage && (
+            <div className="flex items-center gap-3 py-3">
+              <Settings2 className="text-primary h-4 w-4 shrink-0" />
+              <div className="flex flex-1 items-center justify-between gap-2">
+                <span className="text-sm">
+                  {MODE_PILOTAGE_LABELS[modePilotage] ?? modePilotage}
+                </span>
+                {!canEdit && posture !== "plateforme" && (
+                  <span className="flex items-center gap-1 text-xs text-amber-600">
+                    <PencilOff className="h-3 w-3" />
+                    Non modifiable
+                  </span>
                 )}
               </div>
             </div>

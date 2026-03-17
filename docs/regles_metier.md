@@ -747,7 +747,28 @@ L'assignation est un **effet du démarrage** (`assigneeUserId = currentUser.id`)
 
 ---
 
-_Dernière mise à jour : 2026-03-11_
+### 9. Déplacement et redimensionnement depuis le calendrier
+
+> Ces actions correspondent à `canManageOccurrence`. Seule une occurrence `planifiee` peut être déplacée ou redimensionnée.
+
+**Qui peut déplacer / redimensionner une occurrence depuis le calendrier :**
+
+| Acteur | Condition |
+|---|---|
+| **Plateforme** | Toujours |
+| **Client `admin`** | `modePilotage = "client"` ou `"collaboration"` |
+| **Client `responsable_site`** | `modePilotage = "client"` ou `"collaboration"` + site attribué (avec héritage subtree et exclusions) |
+| **Prestataire `admin`** | `modePilotage = "prestataire"` ou `"collaboration"` |
+| **Prestataire `responsable_site`** | `modePilotage = "prestataire"` ou `"collaboration"` + site client attribué (avec héritage subtree) |
+| **Tous les autres rôles** | ❌ Jamais (`manager`, `collaborateur`, `demandeur_site`, `observateur_site`, `intervenant_site`) |
+
+**Implémentation :**
+- Guard serveur : `canManageOccurrence` dans `clientServiceOccurrencesActions.ts`
+- Guard UI : `eventAllow` + `editable` calculés depuis `canEditCalendar` (admin) et `responsableSiteIds` (responsable_site) retournés par `getCalendarFilterOptionsAction`
+- Résolution arborescence client : `resolveUserEffectiveRolesOnSites` (closure table + exclusions `mode=exclure`)
+- Résolution arborescence prestataire : `getResponsableSiteIdsByPrestataire` (closure table + exclusions)
+
+_Dernière mise à jour : 2026-03-17_
 
 ---
 

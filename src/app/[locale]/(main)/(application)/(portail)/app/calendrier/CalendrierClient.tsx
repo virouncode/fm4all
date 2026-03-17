@@ -970,6 +970,9 @@ export function CalendrierClient() {
         open={detailEventProps !== null}
         onOpenChange={(open) => { if (!open) setDetailEventProps(null); }}
         eventProps={detailEventProps}
+        canEditCalendar={canEditCalendar}
+        responsableSiteIds={responsableSiteIds}
+        posture={posture ?? "client"}
       />
       <OccurrenceEditScopeDialog
         open={pendingEdit !== null}
