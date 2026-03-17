@@ -48,11 +48,9 @@ import {
 import {
   type ExecutionChecklistItem,
   type ExecutionWithPrix,
-  type OccurrenceListItem,
 } from "@/server/queries/clientServiceExecutions.query";
 import type {
   QuotaConfigType,
-  QuotaInfoType,
   RegleRecurrenceAvecTemplateType,
 } from "@/server/queries/clientServices.query";
 import {
@@ -62,7 +60,6 @@ import {
 import {
   ArrowLeft,
   Building,
-  Calendar,
   CalendarCheck,
   CalendarPlus,
   CalendarX,
@@ -70,7 +67,6 @@ import {
   ChevronRight,
   ClipboardList,
   Clock,
-  ExternalLink,
   HandPlatter,
   Info,
   ListChecks,
@@ -102,7 +98,6 @@ import {
 } from "../helpers";
 import { ExecutionEditDialog } from "./ExecutionEditDialog";
 import { ExecutionFormDialog } from "./ExecutionFormDialog";
-import { InterventionsTab } from "./InterventionsTab";
 import { QuotaPlanificationFormDialog } from "./QuotaPlanificationFormDialog";
 import { RegleRecurrenceFormDialog } from "./RegleRecurrenceFormDialog";
 import { RegleTacheListePickerDialog } from "./RegleTacheListePickerDialog";
@@ -118,11 +113,6 @@ type PrestationDetailsClientProps = {
   canChangeModePilotage: boolean;
   clientHasActiveAdmin: boolean;
   executions: ExecutionWithPrix[];
-  occurrences: OccurrenceListItem[];
-  totalOccurrences: number;
-  availableSites: Array<{ id: string; nom: string }>;
-  /** Quota de la période courante — null si pas de config quota ou si mode ≠ quota_manuel */
-  quotaInfo: QuotaInfoType | null;
   /** Règles de récurrence pré-chargées côté serveur (recurrence_auto uniquement) */
   initialRegles: RegleRecurrenceAvecTemplateType[];
   /** Config quota pré-chargée côté serveur (quota_manuel uniquement) */
@@ -138,10 +128,6 @@ export function PrestationDetailsClient({
   canChangeModePilotage,
   clientHasActiveAdmin,
   executions: initialExecutions,
-  occurrences,
-  totalOccurrences,
-  availableSites,
-  quotaInfo,
   initialRegles,
   initialQuotaConfig,
   defaultTab = "parametres",
@@ -158,16 +144,8 @@ export function PrestationDetailsClient({
   const [confirmPauseOpen, setConfirmPauseOpen] = useState(false);
   const [confirmTerminerOpen, setConfirmTerminerOpen] = useState(false);
 
-  const today = new Date();
   // Pour canActivate : aligné avec le check serveur (actif suffit, pas besoin de dates valides aujourd'hui)
   const hasAnyActiveExecution = executions.some((e) => e.actif);
-  // Pour le bandeau Interventions : exécution valide AUJOURD'HUI (bornes de dates respectées)
-  const hasActiveExecution = executions.some(
-    (e) =>
-      e.actif &&
-      e.dateDebutValidite <= today &&
-      (e.dateFinValidite === null || e.dateFinValidite >= today),
-  );
   const [hasActiveRegle, setHasActiveRegle] = useState(
     initialRegles.some((r) => r.actif),
   );
@@ -390,7 +368,11 @@ export function PrestationDetailsClient({
               label: "Gérer les interventions",
               done: step5Enabled,
               enabled: step5Enabled,
-              onClick: () => setActiveTab("interventions"),
+              onClick: () =>
+                router.push({
+                  pathname: "/app/prestations/[prestationId]/interventions",
+                  params: { prestationId: prestation.id },
+                }),
             },
           ] as const;
 
@@ -602,6 +584,23 @@ export function PrestationDetailsClient({
         </DialogStyledContent>
       </Dialog>
 
+      {/* Bouton accès interventions */}
+      {prestation.statut === "actif" && (
+        <div className="mb-4 flex flex-shrink-0 justify-end">
+          <Button asChild>
+            <Link
+              href={{
+                pathname: "/app/prestations/[prestationId]/interventions",
+                params: { prestationId: prestation.id },
+              }}
+            >
+              <CalendarCheck className="h-4 w-4" />
+              Gérer les interventions
+            </Link>
+          </Button>
+        </div>
+      )}
+
       {/* ==================== TABS ==================== */}
       <Tabs
         value={activeTab}
@@ -615,7 +614,7 @@ export function PrestationDetailsClient({
         }}
         className="flex min-h-0 flex-1 flex-col"
       >
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger
             value="parametres"
             className="gap-1.5 text-xs sm:text-sm"
@@ -638,14 +637,6 @@ export function PrestationDetailsClient({
           >
             <Repeat className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Planification</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="interventions"
-            className="gap-1.5 text-xs sm:text-sm"
-            disabled={prestation.statut !== "actif"}
-          >
-            <CalendarCheck className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Interventions</span>
           </TabsTrigger>
         </TabsList>
 
@@ -884,34 +875,6 @@ export function PrestationDetailsClient({
           />
         </TabsContent>
 
-        {/* ============ TAB: INTERVENTIONS ============ */}
-        <TabsContent
-          value="interventions"
-          className="mt-6 flex min-h-0 flex-1 flex-col gap-2 overflow-hidden"
-        >
-          <div className="flex flex-shrink-0 justify-end">
-            <Button variant="outline" size="sm" className="gap-1.5 h-7 text-xs" asChild>
-              <Link
-                href={{
-                  pathname: "/app/prestations/[prestationId]/interventions",
-                  params: { prestationId: prestation.id },
-                }}
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                Vue pleine page
-              </Link>
-            </Button>
-          </div>
-          <InterventionsTab
-            initialOccurrences={occurrences}
-            totalOccurrences={totalOccurrences}
-            prestation={prestation}
-            availableSites={availableSites}
-            canManage={canManage}
-            quotaInfo={quotaInfo}
-            hasActiveExecution={hasActiveExecution}
-          />
-        </TabsContent>
       </Tabs>
 
       {/* ==================== DIALOGS ==================== */}

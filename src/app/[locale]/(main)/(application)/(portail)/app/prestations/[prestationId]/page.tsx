@@ -1,15 +1,9 @@
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
-import {
-  countOccurrencesByPrestationId,
-  getDistinctSitesForPrestation,
-  getExecutionsWithPrixByPrestationId,
-  getOccurrencesByPrestationId,
-} from "@/server/queries/clientServiceExecutions.query";
+import { getExecutionsWithPrixByPrestationId } from "@/server/queries/clientServiceExecutions.query";
 import {
   getPrestationWithJoinsById,
   getQuotaConfigByPrestationId,
-  getQuotaInfoForPrestation,
   getReglesRecurrenceByPrestationId,
   hasClientActiveAdmin,
   prestataireHasExecutionOnPrestation,
@@ -164,7 +158,7 @@ export default async function PrestationDetailPage({
   // Référence : docs/regles_metier.md — Exécutions §3b & §4b
   const canSeeFinancials = isPlateforme || canManage;
 
-  const VALID_TABS = ["parametres", "planification", "execution", "interventions"] as const;
+  const VALID_TABS = ["parametres", "planification", "execution"] as const;
   const rawTab = resolvedSearchParams.tab;
   const defaultTab = VALID_TABS.includes(rawTab as (typeof VALID_TABS)[number]) ? rawTab! : "parametres";
 
@@ -176,23 +170,13 @@ export default async function PrestationDetailPage({
     ? rawExecutions
     : rawExecutions.map((e) => ({ ...e, prix: [] }));
 
-  // 7. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin + quota
+  // 7. Charger hasActiveAdmin + règles/quota pour la planification
   const [
-    occurrences,
-    totalOccurrences,
-    availableSites,
     clientHasActiveAdmin,
-    quotaInfo,
     initialRegles,
     initialQuotaConfig,
   ] = await Promise.all([
-    getOccurrencesByPrestationId(prestationId, { limit: 50, sortDir: "asc" }),
-    countOccurrencesByPrestationId(prestationId),
-    getDistinctSitesForPrestation(prestationId),
     hasClientActiveAdmin(prestation.entrepriseId),
-    prestation.famillePlanification === "quota_manuel"
-      ? getQuotaInfoForPrestation(prestationId)
-      : Promise.resolve(null),
     prestation.famillePlanification === "recurrence_auto"
       ? getReglesRecurrenceByPrestationId(prestationId)
       : Promise.resolve([]),
@@ -210,10 +194,6 @@ export default async function PrestationDetailPage({
       canChangeModePilotage={canChangeModePilotage}
       clientHasActiveAdmin={clientHasActiveAdmin}
       executions={executions}
-      occurrences={occurrences}
-      totalOccurrences={totalOccurrences}
-      availableSites={availableSites}
-      quotaInfo={quotaInfo}
       initialRegles={initialRegles}
       initialQuotaConfig={initialQuotaConfig}
       defaultTab={defaultTab}
