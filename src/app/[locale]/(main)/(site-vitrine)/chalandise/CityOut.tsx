@@ -101,7 +101,6 @@ const CityOut = ({
         else router.back();
       }, 1000);
     } catch (err) {
-      console.log(err);
       if (err instanceof Error) {
         toast({
           title: t("erreur"),

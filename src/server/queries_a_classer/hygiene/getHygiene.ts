@@ -35,7 +35,6 @@ import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 export const getHygieneDistribQuantite = async (effectif: string) => {
   "use cache";
   cacheTag(getEffectifTag("hygieneDistribQuantites", effectif));
-  console.log(`🔍 DB REQUEST: getHygieneDistribQuantite(${effectif})`);
   const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
     const results = await db
@@ -64,7 +63,6 @@ export const getHygieneDistribQuantite = async (effectif: string) => {
 export const getHygieneDistribTarifs = async () => {
   "use cache";
   cacheTag(getGlobalTag("hygieneDistribTarifs"));
-  console.log(`🔍 DB REQUEST: getHygieneDistribTarifs`);
   try {
     const results = await db
       .select({
@@ -107,7 +105,6 @@ export const getHygieneDistribTarifs = async () => {
 export const getHygieneMinFacturation = async () => {
   "use cache";
   cacheTag(getGlobalTag("hygieneMinFacturation"));
-  console.log(`🔍 DB REQUEST: getHygieneMinFacturation`);
   try {
     const results = await db.select().from(hygieneMinFacturation);
     if (results.length === 0) {
@@ -133,7 +130,6 @@ export const getHygieneMinFacturationFournisseur = async (
 ) => {
   "use cache";
   cacheTag(getFournisseurTag("hygieneMinFacturation", fournisseurId));
-  console.log(`🔍 DB REQUEST: getHygieneMinFacturationFournisseur`);
   try {
     const results = await db
       .select()
@@ -162,9 +158,6 @@ export const getHygieneDistribTarifsFournisseur = async (
 ) => {
   "use cache";
   cacheTag(getFournisseurTag("hygieneDistribTarifs", fournisseurId));
-  console.log(
-    `🔍 DB REQUEST: getHygieneDistribTarifsFournisseur(${fournisseurId})`,
-  );
   try {
     const results = await db
       .select()
@@ -192,7 +185,6 @@ export const getHygieneDistribTarifsFournisseur = async (
 export const getHygieneInstalDistribTarifs = async (effectif: string) => {
   "use cache";
   cacheTag(getEffectifTag("hygieneInstalDistribTarifs", effectif));
-  console.log(`🔍 DB REQUEST: getHygieneInstalDistribTarifs(${effectif})`);
   const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
     const results = await db
@@ -221,9 +213,6 @@ export const getHygieneInstalDistribTarifsFournisseur = async (
 ) => {
   "use cache";
   cacheTag(getFournisseurTag("hygieneInstalDistribTarifs", fournisseurId));
-  console.log(
-    `🔍 DB REQUEST: getHygieneInstalDistribTarifsFournisseur(${fournisseurId})`,
-  );
   try {
     const results = await db
       .select()
@@ -249,7 +238,6 @@ export const getHygieneInstalDistribTarifsFournisseur = async (
 export const getHygieneConsosTarifs = async (effectif: string) => {
   "use cache";
   cacheTag(getEffectifTag("hygieneConsosTarifs", effectif));
-  console.log(`🔍 DB REQUEST: getHygieneConsosTarifs(${effectif})`);
   const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
     const results = await db
@@ -298,9 +286,6 @@ export const getHygieneConsosTarifsFournisseur = async (
 ) => {
   "use cache";
   cacheTag(getFournisseurTag("hygieneConsosTarifs", fournisseurId));
-  console.log(
-    `🔍 DB REQUEST: getHygieneConsosTarifsFournisseur(${fournisseurId})`,
-  );
   try {
     const results = await db
       .select()

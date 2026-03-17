@@ -120,11 +120,6 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         });
       },
       onError: ({ error }) => {
-        console.error("[finaliserDevisAction error]", error);
-        // Pour voir plus clair :
-        console.log("serverError:", error.serverError);
-        console.log("validationErrors:", error.validationErrors);
-
         toast({
           variant: "destructive",
           title: tSauver("erreur"),
@@ -199,8 +194,8 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         setIsLoading(false);
         return;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      // géo API indisponible — on continue quand même
     }
 
     // 1) fusionner prospect store + valeurs form

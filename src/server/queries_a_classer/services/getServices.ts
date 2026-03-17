@@ -24,7 +24,6 @@ export const getAllServices = async () => {
 export const getServicesForFournisseur = async (fournisseurId: number) => {
   "use cache";
   cacheTag(getFournisseurTag("services", fournisseurId));
-  console.log(`🔍 DB REQUEST: getServicesForFournisseur(${fournisseurId})`);
   try {
     const results = await db
       .select({
