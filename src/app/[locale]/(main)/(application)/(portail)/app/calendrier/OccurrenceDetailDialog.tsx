@@ -23,7 +23,7 @@ import {
   MapPin,
   PencilOff,
   Repeat2,
-  Settings2,
+  ShipWheel,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -266,7 +266,7 @@ export function OccurrenceDetailDialog({
           {/* Mode de pilotage */}
           {modePilotage && (
             <div className="flex items-center gap-3 py-3">
-              <Settings2 className="text-primary h-4 w-4 shrink-0" />
+              <ShipWheel className="text-primary h-4 w-4 shrink-0" />
               <div className="flex flex-1 items-center justify-between gap-2">
                 <span className="text-sm">
                   {MODE_PILOTAGE_LABELS[modePilotage] ?? modePilotage}
