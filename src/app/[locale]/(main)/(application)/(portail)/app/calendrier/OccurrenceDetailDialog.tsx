@@ -137,10 +137,23 @@ export function OccurrenceDetailDialog({
       setTachesError(null);
       return;
     }
-    const { type, occurrenceId, prestationId, clientEntrepriseId, tacheListeTemplateId } = eventProps;
+    const {
+      type,
+      occurrenceId,
+      prestationId,
+      clientEntrepriseId,
+      tacheListeTemplateId,
+    } = eventProps;
 
-    const mapTaches = (items: { id: string; titre: string; statut: string; ordre: number }[]) =>
-      items.map((t) => ({ id: t.id, titre: t.titre, statut: t.statut, ordre: t.ordre }));
+    const mapTaches = (
+      items: { id: string; titre: string; statut: string; ordre: number }[],
+    ) =>
+      items.map((t) => ({
+        id: t.id,
+        titre: t.titre,
+        statut: t.statut,
+        ordre: t.ordre,
+      }));
 
     setLoadingTaches(true);
     setTachesError(null);
@@ -153,7 +166,10 @@ export function OccurrenceDetailDialog({
       }
       getTacheItemsByTemplateAction({ tacheListeTemplateId })
         .then((result) => {
-          if (result?.serverError) { setTachesError(String(result.serverError)); return; }
+          if (result?.serverError) {
+            setTachesError(String(result.serverError));
+            return;
+          }
           setTaches(mapTaches(result?.data?.taches ?? []));
         })
         .catch(() => setTachesError("Erreur de chargement."))
@@ -162,17 +178,30 @@ export function OccurrenceDetailDialog({
     }
 
     // Occurrence matérialisée : tâches réelles ou fallback template
-    if (!occurrenceId || !prestationId) { setLoadingTaches(false); return; }
+    if (!occurrenceId || !prestationId) {
+      setLoadingTaches(false);
+      return;
+    }
     if (!clientEntrepriseId) {
       setTachesError("Rechargez la page pour voir les tâches.");
       setLoadingTaches(false);
       return;
     }
 
-    getOccurrenceTachesAction({ occurrenceId, prestationId, entrepriseId: clientEntrepriseId })
+    getOccurrenceTachesAction({
+      occurrenceId,
+      prestationId,
+      entrepriseId: clientEntrepriseId,
+    })
       .then((result) => {
-        if (result?.serverError) { setTachesError(String(result.serverError)); return; }
-        if (result?.validationErrors) { setTachesError("Données invalides."); return; }
+        if (result?.serverError) {
+          setTachesError(String(result.serverError));
+          return;
+        }
+        if (result?.validationErrors) {
+          setTachesError("Données invalides.");
+          return;
+        }
         setTaches(mapTaches(result?.data?.taches ?? []));
       })
       .catch(() => setTachesError("Erreur de chargement."))
@@ -247,7 +276,9 @@ export function OccurrenceDetailDialog({
           {/* Date / créneau */}
           <div className="flex items-center gap-3 py-3">
             <Clock className="text-primary h-4 w-4 shrink-0" />
-            <span className="text-sm capitalize">{formatDateRange(start, end)}</span>
+            <span className="text-sm capitalize">
+              {formatDateRange(start, end)}
+            </span>
           </div>
 
           {/* Site */}
@@ -308,17 +339,23 @@ export function OccurrenceDetailDialog({
               <ListChecks className="text-primary mt-0.5 h-4 w-4 shrink-0" />
               <div className="flex-1 space-y-1.5">
                 {loadingTaches ? (
-                  <span className="text-muted-foreground text-xs">Chargement…</span>
+                  <span className="text-muted-foreground text-xs">
+                    Chargement…
+                  </span>
                 ) : tachesError ? (
                   <span className="text-xs text-amber-600">{tachesError}</span>
                 ) : taches.length === 0 ? (
-                  <span className="text-muted-foreground text-xs italic">Aucune tâche</span>
+                  <span className="text-muted-foreground text-xs italic">
+                    Aucune tâche
+                  </span>
                 ) : (
                   taches.map((t) => {
                     const tConfig = TACHE_STATUT_CONFIG[t.statut];
                     return (
                       <div key={t.id} className="flex items-center gap-2">
-                        <span className={`h-2 w-2 shrink-0 rounded-full ${tConfig?.dotClass ?? "bg-slate-400"}`} />
+                        <span
+                          className={`h-2 w-2 shrink-0 rounded-full ${tConfig?.dotClass ?? "bg-slate-400"}`}
+                        />
                         <span className="truncate text-sm">{t.titre}</span>
                       </div>
                     );
@@ -331,21 +368,26 @@ export function OccurrenceDetailDialog({
 
         {/* Footer */}
         <div className="bg-muted/30 flex justify-end gap-2 border-t px-5 py-3">
-          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+          >
             Fermer
           </Button>
           {canNavigate && (
             <Button size="sm" asChild onClick={() => onOpenChange(false)}>
               <Link
                 href={{
-                  pathname: "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
+                  pathname:
+                    "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
                   params: {
                     prestationId: prestationId!,
                     occurrenceId: occurrenceId!,
                   },
                 }}
               >
-                <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                <ExternalLink className="h-3 w-3" />
                 Modifier
               </Link>
             </Button>
