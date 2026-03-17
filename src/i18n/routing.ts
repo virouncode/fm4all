@@ -497,6 +497,10 @@ export const routing = defineRouting({
       fr: "/auth/login",
       en: "/auth/login",
     },
+    "/terrain/[token]": {
+      fr: "/terrain/[token]",
+      en: "/terrain/[token]",
+    },
   },
 });
 

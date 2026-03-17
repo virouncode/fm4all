@@ -6,6 +6,7 @@ import {
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServiceReglesRecurrence,
+  occurrenceFieldLinks,
   occurrenceTaches,
   tacheListeItems,
 } from "@/db/schema/services";
@@ -52,6 +53,7 @@ import {
   deleteTachePieceJointeSchema,
   dragOccurrenceSchema,
   getAssignableUsersForOccurrenceSchema,
+  getOccurrenceFieldLinkSchema,
   getOccurrencesPageSchema,
   getOccurrenceTachesSchema,
   insertAdHocTacheSchema,
@@ -69,7 +71,7 @@ import {
   updateTacheTempsPasseSchema,
 } from "@/zod-schemas/clientServiceOccurrences.schema";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { and, asc, count, eq, inArray, isNotNull, isNull, max, or } from "drizzle-orm";
+import { and, asc, count, eq, gt, inArray, isNotNull, isNull, max, or } from "drizzle-orm";
 import { DateTime } from "luxon";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
@@ -2625,3 +2627,55 @@ export const updateOccurrenceTacheListeAction = actionClient
 
     return { success: true };
   });
+
+// ==================== LIEN TERRAIN — LECTURE ====================
+
+export const getOccurrenceFieldLinkAction = actionClient
+  .metadata({ actionName: "getOccurrenceFieldLinkAction" })
+  .inputSchema(getOccurrenceFieldLinkSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const { occurrenceId, entrepriseId } = parsedInput;
+
+    const session = await getSession();
+    if (!session?.user) throw errors.unauthorized();
+    const currentUser = session.user;
+
+    // Vérifier accès à la prestation de l'occurrence
+    const occurrence = await getOccurrenceWithDetailsById(occurrenceId);
+    if (!occurrence) throw errors.notFound("Occurrence");
+
+    const prestation = await getPrestationById(occurrence.clientServiceId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.forbidden("Accès refusé.");
+    }
+
+    const modePilotage = await getExecutionContext(occurrence.executionId);
+    const canManage = await canManageOccurrence(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+      modePilotage,
+    );
+    if (!canManage) {
+      throw errors.forbidden("Vous n'êtes pas autorisé à consulter le lien terrain.");
+    }
+
+    const now = new Date();
+    const [link] = await db
+      .select({ token: occurrenceFieldLinks.token, expiresAt: occurrenceFieldLinks.expiresAt })
+      .from(occurrenceFieldLinks)
+      .where(
+        and(
+          eq(occurrenceFieldLinks.occurrenceId, occurrenceId),
+          isNull(occurrenceFieldLinks.revokedAt),
+          gt(occurrenceFieldLinks.expiresAt, now),
+        ),
+      )
+      .limit(1);
+
+    return { token: link?.token ?? null };
+  });
+

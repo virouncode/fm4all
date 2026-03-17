@@ -39,6 +39,7 @@ import {
   deleteTachePieceJointeAction,
   getAssignableUsersForOccurrenceAction,
   getAvailableTicketsForLinkingAction,
+  getOccurrenceFieldLinkAction,
   getTicketsByOccurrenceAction,
   insertAdHocTacheAction,
   linkTicketToOccurrenceAction,
@@ -67,6 +68,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Clock,
+  Copy,
   ImageIcon,
   Info,
   Link2,
@@ -78,6 +80,7 @@ import {
   Pencil,
   Play,
   Plus,
+  Smartphone,
   ThumbsDown,
   Ticket,
   Timer,
@@ -158,7 +161,7 @@ const TACHE_STATUT: Record<
     className: "bg-red-100 text-red-700",
   },
   non_applicable: {
-    label: "N/A",
+    label: "Non applicable",
     className: "bg-slate-100 text-slate-500",
   },
   annulee: { label: "Annulée", className: "bg-gray-100 text-gray-400" },
@@ -206,6 +209,36 @@ export function OccurrenceDetailClient({
   const [loadingAssignees, setLoadingAssignees] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
   const [applyToTaches, setApplyToTaches] = useState(false);
+
+  // Lien terrain
+  const [terrainToken, setTerrainToken] = useState<string | null>(null);
+  const [isLoadingTerrainLink, setIsLoadingTerrainLink] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+    if (!canManage) return;
+    async function loadTerrainLink() {
+      setIsLoadingTerrainLink(true);
+      const result = await getOccurrenceFieldLinkAction({
+        occurrenceId: occurrence.id,
+        entrepriseId: prestation.entrepriseId,
+      });
+      if (result?.data?.token) {
+        setTerrainToken(result.data.token);
+      }
+      setIsLoadingTerrainLink(false);
+    }
+    void loadTerrainLink();
+  }, [occurrence.id, prestation.entrepriseId, canManage]);
+
+  const handleCopyTerrainLink = async () => {
+    if (!terrainToken) return;
+    const url = `${window.location.origin}/fr/terrain/${terrainToken}`;
+    await navigator.clipboard.writeText(url);
+    setIsCopied(true);
+    toast.success("Lien terrain copié dans le presse-papiers");
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   // Charger les tickets liés à l'occurrence
   useEffect(() => {
@@ -725,33 +758,40 @@ export function OccurrenceDetailClient({
       {/* ==================== BANNIÈRE MODE DE PILOTAGE ==================== */}
       {occurrence.executionId && (
         <div
-          className={`mb-4 flex flex-shrink-0 items-start gap-2 rounded-lg border px-4 py-3 text-sm ${
+          className={`mb-4 flex flex-shrink-0 items-start gap-2 rounded-lg border px-4 py-3 text-xs ${
             modePilotage === "collaboration"
               ? "border-green-200 bg-green-50 text-green-800"
               : modePilotage === "prestataire"
-              ? "border-blue-200 bg-blue-50 text-blue-800"
-              : "border-amber-200 bg-amber-50 text-amber-800"
+                ? "border-blue-200 bg-blue-50 text-blue-800"
+                : "border-amber-200 bg-amber-50 text-amber-800"
           }`}
         >
           <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <div>
             {modePilotage === "collaboration" ? (
               <>
-                <span className="font-semibold">Mode de pilotage : Collaboration</span>
+                <span className="font-semibold">
+                  Mode de pilotage : Collaboration
+                </span>
                 {" — "}
-                Géré conjointement par le client (admin, responsable de site) et le prestataire (admin, responsable de site, intervenant).
+                Géré conjointement par le client (admin, responsable de site) et
+                le prestataire (admin, responsable de site, intervenant).
               </>
             ) : modePilotage === "prestataire" ? (
               <>
-                <span className="font-semibold">Mode de pilotage : Prestataire</span>
+                <span className="font-semibold">
+                  Mode de pilotage : Prestataire
+                </span>
                 {" — "}
-                Géré par le prestataire (admin, responsable de site, intervenant). Le client est en lecture seule.
+                Géré par le prestataire (admin, responsable de site,
+                intervenant). Le client est en lecture seule.
               </>
             ) : (
               <>
                 <span className="font-semibold">Mode de pilotage : Client</span>
                 {" — "}
-                Géré par le client (admin, responsable de site). Le prestataire est en lecture seule.
+                Géré par le client (admin, responsable de site). Le prestataire
+                est en lecture seule.
               </>
             )}
           </div>
@@ -844,11 +884,62 @@ export function OccurrenceDetailClient({
                         prestation.
                       </span>
                     </li>
+                    {canManage && (
+                      <li className="flex items-start gap-2">
+                        <span className="mt-0.5 shrink-0">•</span>
+                        <span>
+                          Le <strong>lien terrain</strong> (ci-dessous) permet à
+                          un agent sans compte de réaliser l&apos;intervention
+                          depuis son mobile. Il est généré automatiquement la
+                          veille (J-1) et peut aussi être créé manuellement.
+                        </span>
+                      </li>
+                    )}
                   </ul>
                 </CollapsibleContent>
               </div>
             </div>
           </Collapsible>
+        </div>
+      )}
+
+      {/* ==================== LIEN TERRAIN ==================== */}
+      {canManage && (
+        <div className="mb-4 flex-shrink-0">
+          <div className="rounded-lg border border-violet-200 bg-violet-50 p-4">
+            <div className="flex items-start gap-3">
+              <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+              <div className="w-full space-y-2.5 text-xs text-violet-700">
+                <p className="font-medium text-violet-900">Lien terrain</p>
+                <p>
+                  Partagez ce lien avec votre agent pour qu&apos;il puisse
+                  réaliser cette intervention depuis son mobile, sans compte.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1.5 border-violet-300 bg-white text-violet-700 hover:bg-violet-50"
+                    disabled={isLoadingTerrainLink || !terrainToken}
+                    onClick={handleCopyTerrainLink}
+                  >
+                    {isCopied ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5" />
+                    )}
+                    {isCopied ? "Lien copié !" : "Copier le lien"}
+                  </Button>
+                </div>
+                {!terrainToken && !isLoadingTerrainLink && (
+                  <p className="text-violet-500">
+                    Lien disponible automatiquement la veille de
+                    l&apos;intervention (J-1).
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

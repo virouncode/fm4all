@@ -344,6 +344,13 @@
       "when": 1773746932146,
       "tag": "0048_nappy_colonel_america",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1773755650717,
+      "tag": "0049_nostalgic_chamber",
+      "breakpoints": true
     }
   ]
 }

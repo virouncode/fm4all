@@ -3,24 +3,27 @@ import {
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServiceReglesRecurrence,
+  occurrenceFieldLinks,
   occurrenceTaches,
 } from "@/db/schema/services";
 import { env } from "@/lib/env";
 import { snapshotOccurrenceTaches } from "@/server/utils/clientServiceOccurrences.utils";
-import { and, count, eq, gte, isNotNull, lt } from "drizzle-orm";
+import { and, count, eq, gte, isNotNull, isNull, lt } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 
 /**
- * Cron — Snapshot des tâches.
+ * Cron — Snapshot des tâches + génération des liens terrain.
  *
  * Pour chaque occurrence planifiée dont le début est dans les prochaines 8 jours
- * (aligné sur la fenêtre de matérialisation J+7), snapshot les items de la checklist
- * associée (si pas encore fait).
+ * (aligné sur la fenêtre de matérialisation J+7) et qui a un prestataire assigné :
  *
- * Priorité : occurrence.tacheListeTemplateId > regle.tacheListeTemplateId > execution.tacheListeTemplateId
+ * 1. Snapshot les items de la checklist associée (si pas encore fait)
+ * 2. Génère un lien terrain (token) si aucun lien actif n'existe déjà
  *
- * Idempotent : si occurrenceTaches existe déjà pour une occurrence, on skip.
- * Aucune occurrence sans executionId ou sans tacheListeTemplateId n'est touchée.
+ * Le lien terrain n'est PAS envoyé automatiquement. Il apparaît dans le back-office
+ * pour que le responsable_site le copie et le transmette à ses équipes.
+ *
+ * Idempotent sur les deux opérations.
  *
  * Schedule : "0 21 * * *" (UTC) → 22h heure de Paris (hiver)
  */
@@ -38,13 +41,17 @@ export async function GET(request: NextRequest) {
     .select({
       id: clientServiceOccurrences.id,
       executionId: clientServiceOccurrences.executionId,
+      dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
       occurrenceTemplateId: clientServiceOccurrences.tacheListeTemplateId,
       regleTemplateId: clientServiceReglesRecurrence.tacheListeTemplateId,
     })
     .from(clientServiceOccurrences)
     .leftJoin(
       clientServiceReglesRecurrence,
-      eq(clientServiceReglesRecurrence.id, clientServiceOccurrences.regleRecurrenceId),
+      eq(
+        clientServiceReglesRecurrence.id,
+        clientServiceOccurrences.regleRecurrenceId,
+      ),
     )
     .where(
       and(
@@ -56,52 +63,103 @@ export async function GET(request: NextRequest) {
     );
 
   let snapshotted = 0;
-  let alreadyDone = 0;
-  let errors = 0;
+  let snapshotAlreadyDone = 0;
+  let snapshotErrors = 0;
+  let linksGenerated = 0;
+  let linksAlreadyExist = 0;
+  let linkErrors = 0;
 
   for (const occ of occurrences) {
     if (!occ.executionId) continue;
 
-    // Idempotence : skip si des tâches issues d'un template existent déjà
-    // (les tâches ad-hoc ont listeItemId IS NULL et ne comptent pas)
+    // ── 1. SNAPSHOT DES TÂCHES ─────────────────────────────────────────────
+
     const [existing] = await db
       .select({ nb: count() })
       .from(occurrenceTaches)
-      .where(and(
-        eq(occurrenceTaches.occurrenceId, occ.id),
-        isNotNull(occurrenceTaches.listeItemId),
-      ));
+      .where(
+        and(
+          eq(occurrenceTaches.occurrenceId, occ.id),
+          isNotNull(occurrenceTaches.listeItemId),
+        ),
+      );
 
     if ((existing?.nb ?? 0) > 0) {
-      alreadyDone++;
+      snapshotAlreadyDone++;
+    } else {
+      // Priorité : occurrence > regle > execution
+      const templateId =
+        occ.occurrenceTemplateId ??
+        occ.regleTemplateId ??
+        (await db
+          .select({
+            tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
+          })
+          .from(clientServiceExecutions)
+          .where(eq(clientServiceExecutions.id, occ.executionId))
+          .then((rows) => rows[0]?.tacheListeTemplateId ?? null));
+
+      if (templateId) {
+        try {
+          await snapshotOccurrenceTaches({
+            occurrenceId: occ.id,
+            tacheListeTemplateId: templateId,
+          });
+          snapshotted++;
+        } catch {
+          snapshotErrors++;
+        }
+      }
+    }
+
+    // ── 2. GÉNÉRATION DU LIEN TERRAIN ─────────────────────────────────────
+    // Même occurrence, même passe — pas besoin d'un second cron.
+
+    const hasActiveLink = await db
+      .select({ nb: count() })
+      .from(occurrenceFieldLinks)
+      .where(
+        and(
+          eq(occurrenceFieldLinks.occurrenceId, occ.id),
+          isNull(occurrenceFieldLinks.revokedAt),
+        ),
+      )
+      .then((rows) => (rows[0]?.nb ?? 0) > 0);
+
+    if (hasActiveLink) {
+      linksAlreadyExist++;
       continue;
     }
 
-    // Priorité : occurrence > regle > execution
-    const templateId = occ.occurrenceTemplateId ?? occ.regleTemplateId ?? (await db
-      .select({ tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId })
-      .from(clientServiceExecutions)
-      .where(eq(clientServiceExecutions.id, occ.executionId))
-      .then((rows) => rows[0]?.tacheListeTemplateId ?? null));
-
-    if (!templateId) continue;
+    if (!occ.dateDebutPrevue) {
+      linkErrors++;
+      continue;
+    }
 
     try {
-      await snapshotOccurrenceTaches({
+      const token = crypto.randomUUID();
+      // Expiration : date de début prévue + 2 jours (marge pour clôture tardive)
+      const expiresAt = new Date(
+        occ.dateDebutPrevue.getTime() + 2 * 24 * 60 * 60 * 1000,
+      );
+
+      await db.insert(occurrenceFieldLinks).values({
         occurrenceId: occ.id,
-        tacheListeTemplateId: templateId,
+        token,
+        expiresAt,
+        autoGenerated: true,
       });
-      snapshotted++;
+
+      linksGenerated++;
     } catch {
-      errors++;
+      linkErrors++;
     }
   }
 
   return Response.json({
     success: true,
     processed: occurrences.length,
-    snapshotted,
-    alreadyDone,
-    errors,
+    snapshot: { snapshotted, alreadyDone: snapshotAlreadyDone, errors: snapshotErrors },
+    links: { generated: linksGenerated, alreadyExist: linksAlreadyExist, errors: linkErrors },
   });
 }

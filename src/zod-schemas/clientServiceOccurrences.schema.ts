@@ -208,6 +208,17 @@ export type InsertOccurrenceOnDemandFormType = z.infer<
   typeof insertOccurrenceOnDemandFormSchema
 >;
 
+// ==================== LIEN TERRAIN ====================
+
+export const getOccurrenceFieldLinkSchema = z.object({
+  occurrenceId: z.uuid("ID de l'occurrence invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+});
+export type GetOccurrenceFieldLinkType = z.infer<
+  typeof getOccurrenceFieldLinkSchema
+>;
+
+
 // ==================== UPDATE OCCURRENCE TACHE LISTE ====================
 
 export const updateOccurrenceTacheListeSchema = z.object({
