@@ -177,6 +177,7 @@ export function OccurrenceDetailDialog({
     siteNom,
     siteAdresse,
     prestataireNom,
+    clientNom,
     start,
     end,
   } = eventProps;
@@ -235,11 +236,24 @@ export function OccurrenceDetailDialog({
             </div>
           )}
 
-          {/* Prestataire */}
-          {prestataireNom && (
-            <div className="flex items-center gap-3 py-3">
-              <Building2 className="text-primary h-4 w-4 shrink-0" />
-              <span className="text-sm">{prestataireNom}</span>
+          {/* Client / Prestataire */}
+          {(clientNom || prestataireNom) && (
+            <div className="flex items-start gap-3 py-3">
+              <Building2 className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+              <div className="space-y-0.5">
+                {clientNom && (
+                  <p className="text-sm">
+                    <span className="text-muted-foreground">Client :</span>{" "}
+                    {clientNom}
+                  </p>
+                )}
+                {prestataireNom && (
+                  <p className="text-sm">
+                    <span className="text-muted-foreground">Prestataire :</span>{" "}
+                    {prestataireNom}
+                  </p>
+                )}
+              </div>
             </div>
           )}
 

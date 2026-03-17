@@ -53,6 +53,7 @@ export type CalendarEventItemType = {
     siteNom?: string;
     siteAdresse?: string;
     prestataireNom?: string;
+    clientNom?: string;
     famillePlanification: string;
     dateDebutOriginale?: string;
   };
@@ -649,6 +650,16 @@ export const getCalendarEventsAction = actionClient
       executionRows.map((e) => [e.clientServiceId, e.prestataireNom]),
     );
 
+    // ── Batch lookup clientNom par entrepriseId ──────────────────────────────
+    const uniqueClientIds = [...new Set(prestations.map((p) => p.entrepriseId))];
+    const clientRows = uniqueClientIds.length > 0
+      ? await db
+          .select({ id: entreprises.id, nom: entreprises.nom })
+          .from(entreprises)
+          .where(inArray(entreprises.id, uniqueClientIds))
+      : [];
+    const clientMap = new Map(clientRows.map((c) => [c.id, c.nom]));
+
     // ── Helper adresse ──────────────────────────────────────────────────────
     function formatSiteAdresse(p: PrestationRowType): string {
       return [
@@ -721,6 +732,7 @@ export const getCalendarEventsAction = actionClient
           siteNom: occ.siteNom,
           siteAdresse: formatSiteAdresse(prestation),
           prestataireNom: prestataireMap.get(occ.clientServiceId),
+          clientNom: clientMap.get(prestation.entrepriseId),
           famillePlanification: prestation.famillePlanification,
           dateDebutOriginale: occ.dateDebutOriginale?.toISOString(),
         },
@@ -873,6 +885,7 @@ export const getCalendarEventsAction = actionClient
                   siteNom,
                   siteAdresse,
                   prestataireNom: prestataireMap.get(regle.clientServiceId),
+                  clientNom: clientMap.get(prestation.entrepriseId),
                   famillePlanification: prestation.famillePlanification,
                 },
               });
