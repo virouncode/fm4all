@@ -325,6 +325,16 @@ export const clientServiceOccurrences = pgTable(
       { onDelete: "set null" },
     ),
     statut: occurrenceStatutEnum("statut").notNull().default("planifiee"),
+    /**
+     * Override de checklist pour cette occurrence spécifique.
+     * Priorité : occurrence.tacheListeTemplateId > regle.tacheListeTemplateId > execution.tacheListeTemplateId
+     * Cas d'usage : intervention ponctuelle avec une liste de tâches différente du planning habituel.
+     * NULL = héritage (résolu au snapshot J-1 / passage → en_cours).
+     */
+    tacheListeTemplateId: uuid("tache_liste_template_id").references(
+      () => tacheListesTemplates.id,
+      { onDelete: "set null" },
+    ),
     assigneeUserId: uuid("assignee_user_id").references(() => user.id, {
       onDelete: "set null",
     }),

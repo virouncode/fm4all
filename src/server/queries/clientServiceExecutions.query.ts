@@ -721,6 +721,7 @@ export type OccurrenceDetail = {
   siteId: string;
   siteNom: string | null;
   executionId: string | null;
+  regleRecurrenceId: string | null;
   modePilotage: ModePilotageType | null;
   prestataireNom: string | null;
   prestataireEntrepriseId: string | null;
@@ -730,6 +731,8 @@ export type OccurrenceDetail = {
   dateFinReelle: Date | null;
   statut: OccurrenceStatutType;
   notes: string | null;
+  /** Override de checklist pour cette occurrence — null = héritage */
+  tacheListeTemplateId: string | null;
   createdAt: Date;
   updatedAt: Date;
   assigneeUserId: string | null;
@@ -779,6 +782,7 @@ export async function getOccurrenceWithDetailsById(
       siteId: clientServiceOccurrences.siteId,
       siteNom: sites.nom,
       executionId: clientServiceOccurrences.executionId,
+      regleRecurrenceId: clientServiceOccurrences.regleRecurrenceId,
       modePilotage: clientServiceExecutions.modePilotage,
       prestataireNom: entreprises.nom,
       prestataireEntrepriseId: serviceEntreprises.entrepriseId,
@@ -788,6 +792,7 @@ export async function getOccurrenceWithDetailsById(
       dateFinReelle: clientServiceOccurrences.dateFinReelle,
       statut: clientServiceOccurrences.statut,
       notes: clientServiceOccurrences.notes,
+      tacheListeTemplateId: clientServiceOccurrences.tacheListeTemplateId,
       createdAt: clientServiceOccurrences.createdAt,
       updatedAt: clientServiceOccurrences.updatedAt,
       assigneeUserId: clientServiceOccurrences.assigneeUserId,

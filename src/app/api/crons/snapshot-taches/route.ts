@@ -17,7 +17,7 @@ import type { NextRequest } from "next/server";
  * (aligné sur la fenêtre de matérialisation J+7), snapshot les items de la checklist
  * associée (si pas encore fait).
  *
- * Priorité : regle.tacheListeTemplateId > execution.tacheListeTemplateId
+ * Priorité : occurrence.tacheListeTemplateId > regle.tacheListeTemplateId > execution.tacheListeTemplateId
  *
  * Idempotent : si occurrenceTaches existe déjà pour une occurrence, on skip.
  * Aucune occurrence sans executionId ou sans tacheListeTemplateId n'est touchée.
@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
     .select({
       id: clientServiceOccurrences.id,
       executionId: clientServiceOccurrences.executionId,
+      occurrenceTemplateId: clientServiceOccurrences.tacheListeTemplateId,
       regleTemplateId: clientServiceReglesRecurrence.tacheListeTemplateId,
     })
     .from(clientServiceOccurrences)
@@ -61,19 +62,23 @@ export async function GET(request: NextRequest) {
   for (const occ of occurrences) {
     if (!occ.executionId) continue;
 
-    // Idempotence : skip si tâches déjà snapshotées pour cette occurrence
+    // Idempotence : skip si des tâches issues d'un template existent déjà
+    // (les tâches ad-hoc ont listeItemId IS NULL et ne comptent pas)
     const [existing] = await db
       .select({ nb: count() })
       .from(occurrenceTaches)
-      .where(eq(occurrenceTaches.occurrenceId, occ.id));
+      .where(and(
+        eq(occurrenceTaches.occurrenceId, occ.id),
+        isNotNull(occurrenceTaches.listeItemId),
+      ));
 
     if ((existing?.nb ?? 0) > 0) {
       alreadyDone++;
       continue;
     }
 
-    // Priorité : regle.tacheListeTemplateId > execution.tacheListeTemplateId
-    const templateId = occ.regleTemplateId ?? (await db
+    // Priorité : occurrence > regle > execution
+    const templateId = occ.occurrenceTemplateId ?? occ.regleTemplateId ?? (await db
       .select({ tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId })
       .from(clientServiceExecutions)
       .where(eq(clientServiceExecutions.id, occ.executionId))

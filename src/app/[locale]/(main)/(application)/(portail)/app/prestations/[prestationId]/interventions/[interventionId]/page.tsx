@@ -1,6 +1,9 @@
 import { db } from "@/db";
-import { sitesArborescence } from "@/db/schema/sites";
-import { userPrestataireAdhesions, userPrestataireSiteAttributions } from "@/db/schema/users";
+import {
+  clientServiceExecutions,
+  clientServiceReglesRecurrence,
+  tacheListeItems,
+} from "@/db/schema/services";
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import {
@@ -20,55 +23,12 @@ import {
   getEffectivePlateformeRole,
   resolvePostureAwareSiteRole,
 } from "@/server/utils/permissions.utils";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { OccurrenceDetailClient } from "./OccurrenceDetailClient";
 
-/**
- * Vérifie si le prestataire a au moins un utilisateur attribué (mode=inclure)
- * au site de l'occurrence ou à un ancêtre de ce site.
- *
- * userPrestataireSiteAttributions.entrepriseId = ID du client (pas du prestataire).
- * On joint userPrestataireAdhesions pour s'assurer que l'utilisateur appartient
- * bien à l'entreprise prestataire concernée.
- */
-async function hasPrestataireUsersOnSite(
-  prestataireEntrepriseId: string,
-  clientEntrepriseId: string,
-  siteId: string,
-): Promise<boolean> {
-  // Récupérer les ancêtres du site (y compris lui-même)
-  const ancestors = await db
-    .select({ ancetreId: sitesArborescence.ancetreId })
-    .from(sitesArborescence)
-    .where(eq(sitesArborescence.descendantId, siteId));
-
-  const ancestorIds = ancestors.map((a) => a.ancetreId);
-  if (ancestorIds.length === 0) return false;
-
-  const rows = await db
-    .select({ userId: userPrestataireSiteAttributions.userId })
-    .from(userPrestataireSiteAttributions)
-    .innerJoin(
-      userPrestataireAdhesions,
-      and(
-        eq(userPrestataireAdhesions.userId, userPrestataireSiteAttributions.userId),
-        eq(userPrestataireAdhesions.entrepriseId, prestataireEntrepriseId),
-      ),
-    )
-    .where(
-      and(
-        eq(userPrestataireSiteAttributions.entrepriseId, clientEntrepriseId),
-        eq(userPrestataireSiteAttributions.mode, "inclure"),
-        inArray(userPrestataireSiteAttributions.siteId, ancestorIds),
-      ),
-    )
-    .limit(1);
-
-  return rows.length > 0;
-}
 
 export default async function OccurrenceDetailPage({
   params,
@@ -190,8 +150,7 @@ export default async function OccurrenceDetailPage({
             entrepriseId: prestation.entrepriseId,
           });
           canManage = siteRole === "responsable_site";
-          canExecute =
-            siteRole === "responsable_site" || siteRole === "demandeur_site";
+          canExecute = siteRole === "responsable_site";
         }
       }
       // modePilotage=prestataire → client n'a que Voir (canManage=false, canExecute=false)
@@ -203,29 +162,64 @@ export default async function OccurrenceDetailPage({
   const canAssignOccurrence =
     isPlateforme || (posture === "prestataire" && canManage);
 
-  // 8. Déterminer le mode de suivi (interne vs prestataire)
-  let suiviMode: "interne" | "prestataire" = "interne";
-  if (occurrence.prestataireEntrepriseId) {
-    const hasPrestataireUsers = await hasPrestataireUsersOnSite(
-      occurrence.prestataireEntrepriseId,
-      prestation.entrepriseId,
-      occurrence.siteId,
-    );
-    if (hasPrestataireUsers) suiviMode = "prestataire";
-  }
-
   // 8. Charger les tâches
   const taches = await getOccurrenceTaches(occurrenceId);
+
+  // 9. Si aucune tâche réelle, résoudre le template pour afficher les tâches virtuelles
+  let virtualTacheItems: { id: string; titre: string; description: string | null; ordre: number; dureeEstimeeMinutes: number | null }[] = [];
+  if (taches.length === 0) {
+    // Résolution prioritaire : occurrence override → règle → exécution
+    let resolvedTemplateId: string | null = occurrence.tacheListeTemplateId ?? null;
+
+    if (!resolvedTemplateId && occurrence.regleRecurrenceId) {
+      const regleRow = await db
+        .select({ tacheListeTemplateId: clientServiceReglesRecurrence.tacheListeTemplateId })
+        .from(clientServiceReglesRecurrence)
+        .where(eq(clientServiceReglesRecurrence.id, occurrence.regleRecurrenceId))
+        .limit(1);
+      resolvedTemplateId = regleRow[0]?.tacheListeTemplateId ?? null;
+    }
+
+    if (!resolvedTemplateId && occurrence.executionId) {
+      const execRow = await db
+        .select({ tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId })
+        .from(clientServiceExecutions)
+        .where(eq(clientServiceExecutions.id, occurrence.executionId))
+        .limit(1);
+      resolvedTemplateId = execRow[0]?.tacheListeTemplateId ?? null;
+    }
+
+    if (resolvedTemplateId) {
+      const items = await db
+        .select({
+          id: tacheListeItems.id,
+          titre: tacheListeItems.titre,
+          description: tacheListeItems.description,
+          ordre: tacheListeItems.ordre,
+          dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+        })
+        .from(tacheListeItems)
+        .where(
+          and(
+            eq(tacheListeItems.listeTemplateId, resolvedTemplateId),
+            eq(tacheListeItems.actif, true),
+          ),
+        )
+        .orderBy(asc(tacheListeItems.ordre));
+      virtualTacheItems = items;
+    }
+  }
 
   return (
     <OccurrenceDetailClient
       occurrence={occurrence}
       prestation={prestation}
       taches={taches}
+      virtualTacheItems={virtualTacheItems}
       canManage={canManage}
       canExecute={canExecute}
       canAssignOccurrence={canAssignOccurrence}
-      suiviMode={suiviMode}
+      modePilotage={modePilotage}
       currentUserId={currentUser.id}
       currentUserPrenom={currentUser.prenom ?? null}
       currentUserNom={currentUser.nom ?? null}

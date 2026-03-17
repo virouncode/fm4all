@@ -64,11 +64,12 @@ import {
   updateOccurrenceDatesSchema,
   updateOccurrenceStatutSchema,
   updateOccurrenceTacheStatutSchema,
+  updateOccurrenceTacheListeSchema,
   updateTacheAssigneeSchema,
   updateTacheTempsPasseSchema,
 } from "@/zod-schemas/clientServiceOccurrences.schema";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { and, asc, count, eq, isNull, max, or } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNotNull, isNull, max, or } from "drizzle-orm";
 import { DateTime } from "luxon";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
@@ -91,12 +92,12 @@ async function getExecutionContext(
 }
 
 /**
- * Vérifie si une date est aujourd'hui (même jour calendaire en heure de Paris).
+ * Vérifie si une date est dans la fenêtre autorisée pour le démarrage : J-1 / J / J+1.
  * null → démarrage autorisé (occurrence sans date prévue).
  *
  * Utilise le fuseau Europe/Paris pour éviter les décalages entre 00h et 02h du matin.
  */
-function isSameDayAsToday(date: Date | null): boolean {
+function isWithinStartWindow(date: Date | null): boolean {
   if (!date) return true;
   const formatter = new Intl.DateTimeFormat("fr-FR", {
     timeZone: "Europe/Paris",
@@ -104,9 +105,11 @@ function isSameDayAsToday(date: Date | null): boolean {
     month: "2-digit",
     day: "2-digit",
   });
-  const todayStr = formatter.format(new Date()).split("/").reverse().join("-"); // → "YYYY-MM-DD"
-  const dateStr = formatter.format(date).split("/").reverse().join("-"); // → "YYYY-MM-DD"
-  return dateStr === todayStr;
+  const toDateStr = (d: Date) => formatter.format(d).split("/").reverse().join("-");
+  const dateStr = toDateStr(date);
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  return dateStr >= toDateStr(yesterday) && dateStr <= toDateStr(tomorrow);
 }
 
 /**
@@ -162,11 +165,13 @@ async function canManageOccurrence(
 
 /**
  * Peut exécuter (démarrer, faire les tâches, terminer).
- * Rôles étendus par rapport à canManageOccurrence.
  *
- * modePilotage=client ou collaboration → client admin | responsable_site | demandeur_site
+ * modePilotage=client ou collaboration → client admin | responsable_site
  * modePilotage=prestataire ou collaboration → prestataire admin | responsable_site | intervenant_site
  * Plateforme → toujours autorisé
+ *
+ * Note : demandeur_site n'a PAS canExecute — il peut demander des interventions mais
+ * pas les démarrer/exécuter (acte terrain réservé aux responsables et intervenants).
  */
 async function canExecuteOccurrence(
   userId: string,
@@ -192,7 +197,7 @@ async function canExecuteOccurrence(
       siteId,
       entrepriseId: clientEntrepriseId,
     });
-    return siteRole === "responsable_site" || siteRole === "demandeur_site";
+    return siteRole === "responsable_site";
   }
 
   if (posture === "prestataire") {
@@ -314,9 +319,9 @@ export const updateOccurrenceStatutAction = actionClient
           "Aucun prestataire assigné à cette intervention. Attribuez un prestataire actif avant de démarrer.",
         );
       }
-      if (!isSameDayAsToday(occurrence.dateDebutPrevue)) {
+      if (!isWithinStartWindow(occurrence.dateDebutPrevue)) {
         throw errors.conflict(
-          "Cette intervention n'est pas prévue aujourd'hui. Elle ne peut être démarrée que le jour prévu.",
+          "Cette intervention ne peut être démarrée qu'entre la veille et le lendemain de la date prévue.",
         );
       }
     }
@@ -364,18 +369,40 @@ export const updateOccurrenceStatutAction = actionClient
 
       if (!row) throw errors.internal("Échec de la mise à jour du statut.");
 
+      // Cascade statut sur les tâches réelles en cours ou à faire
+      if (newStatut === "annulee" || newStatut === "non_honoree") {
+        await tx
+          .update(occurrenceTaches)
+          .set({ statut: newStatut, updatedAt: now })
+          .where(
+            and(
+              eq(occurrenceTaches.occurrenceId, occurrenceId),
+              inArray(occurrenceTaches.statut, ["a_faire", "en_cours"]),
+            ),
+          );
+      }
+
       // Snapshot des tâches au démarrage si pas encore fait (idempotent)
       // Priorité checklist : règle de récurrence > exécution
+      // Note : on ne compte que les tâches issues d'un template (listeItemId IS NOT NULL)
+      // pour ne pas bloquer le snapshot si des tâches ad-hoc existent déjà.
       if (newStatut === "en_cours" && resolvedExecutionId) {
         const [existing] = await tx
           .select({ nb: count() })
           .from(occurrenceTaches)
-          .where(eq(occurrenceTaches.occurrenceId, occurrenceId));
+          .where(and(
+            eq(occurrenceTaches.occurrenceId, occurrenceId),
+            isNotNull(occurrenceTaches.listeItemId),
+          ));
         if ((existing?.nb ?? 0) === 0) {
-          // 1. Chercher la checklist sur la règle de récurrence (override)
-          let resolvedTacheListeTemplateId: string | null = null;
+          // Résolution de la checklist par ordre de priorité :
+          // 1. Override explicite sur l'occurrence (on-demand ou modification manuelle)
+          // 2. Override sur la règle de récurrence
+          // 3. Fallback sur l'exécution
+          let resolvedTacheListeTemplateId: string | null =
+            occurrence.tacheListeTemplateId ?? null;
 
-          if (occurrence.regleRecurrenceId) {
+          if (!resolvedTacheListeTemplateId && occurrence.regleRecurrenceId) {
             const [regle] = await tx
               .select({
                 tacheListeTemplateId:
@@ -392,7 +419,7 @@ export const updateOccurrenceStatutAction = actionClient
             resolvedTacheListeTemplateId = regle?.tacheListeTemplateId ?? null;
           }
 
-          // 2. Fallback sur la checklist de l'exécution
+          // 3. Fallback sur la checklist de l'exécution
           if (!resolvedTacheListeTemplateId) {
             const [exec] = await tx
               .select({
@@ -1986,6 +2013,7 @@ export const insertOccurrenceOnDemandAction = actionClient
       dateDebutPrevue,
       dateFinPrevue,
       notes,
+      tacheListeTemplateId,
     } = parsedInput;
 
     // 1. Vérifier que la prestation existe et appartient à l'entreprise
@@ -2060,6 +2088,7 @@ export const insertOccurrenceOnDemandAction = actionClient
           executionId,
           statut: "planifiee",
           notes: notes ?? null,
+          tacheListeTemplateId: tacheListeTemplateId ?? null,
           createdById: currentUser.id,
           updatedById: currentUser.id,
         })
@@ -2543,4 +2572,56 @@ export const resizeOccurrenceAction = actionClient
     });
 
     return { success: true, warningNoExecution: createdResize === 0 };
+  });
+
+// ==================== UPDATE OCCURRENCE TACHE LISTE ====================
+
+export const updateOccurrenceTacheListeAction = actionClient
+  .metadata({ actionName: "updateOccurrenceTacheListeAction" })
+  .inputSchema(updateOccurrenceTacheListeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { occurrenceId, prestationId, entrepriseId, tacheListeTemplateId } =
+      parsedInput;
+
+    // 1. Vérifier accès à la prestation
+    const prestation = await getPrestationWithJoinsById(prestationId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation");
+    }
+
+    // 2. Vérifier permissions (canManage)
+    const occurrence = await getOccurrenceWithDetailsById(occurrenceId);
+    if (!occurrence || occurrence.clientServiceId !== prestationId) {
+      throw errors.notFound("Occurrence");
+    }
+    const modePilotage = await getExecutionContext(occurrence.executionId);
+    const canManage = await canManageOccurrence(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+      modePilotage,
+    );
+    if (!canManage) {
+      throw errors.forbidden(
+        "Vous n'êtes pas autorisé à modifier la checklist de cette intervention.",
+      );
+    }
+
+    // 3. Mettre à jour
+    await db
+      .update(clientServiceOccurrences)
+      .set({
+        tacheListeTemplateId,
+        updatedById: currentUser.id,
+      })
+      .where(eq(clientServiceOccurrences.id, occurrenceId));
+
+    return { success: true };
   });

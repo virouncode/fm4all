@@ -630,20 +630,20 @@ export function PrestationDetailsClient({
         >
           {/* Disclaimer paramètres */}
           <Collapsible defaultOpen>
-            <div className="bg-muted/40 flex items-start gap-3 rounded-lg border p-4">
-              <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
-              <div className="text-muted-foreground w-full space-y-2 text-xs">
+            <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <Info className="text-blue-600 mt-0.5 h-4 w-4 shrink-0" />
+              <div className="text-blue-700 w-full space-y-2 text-xs">
                 <CollapsibleTrigger className="group flex w-full cursor-pointer items-center justify-between">
-                  <p className="text-foreground font-medium">
+                  <p className="text-blue-900 font-medium">
                     Impact des modifications sur les données
                   </p>
-                  <ChevronDown className="text-muted-foreground h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
+                  <ChevronDown className="text-blue-600 h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
 
                 <CollapsibleContent>
                   <div className="space-y-2">
                     <div className="space-y-1">
-                      <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                      <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                         Activer la prestation
                       </p>
                       <p>
@@ -668,7 +668,7 @@ export function PrestationDetailsClient({
                     </div>
 
                     <div className="space-y-1">
-                      <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                      <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                         Modifier la configuration (mode, dates, règles)
                       </p>
                       <p>
@@ -685,7 +685,7 @@ export function PrestationDetailsClient({
                     </div>
 
                     <div className="space-y-1">
-                      <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                      <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                         Mettre en pause
                       </p>
                       <p>
@@ -699,7 +699,7 @@ export function PrestationDetailsClient({
                     </div>
 
                     <div className="space-y-1">
-                      <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                      <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                         Terminer la prestation
                       </p>
                       <p>
@@ -1019,20 +1019,20 @@ function PlanificationTab({
 
   const planificationInfoBlock = (
     <Collapsible defaultOpen>
-      <div className="bg-muted/40 flex items-start gap-3 rounded-lg border p-4">
-        <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
-        <div className="text-muted-foreground w-full space-y-2 text-xs">
+      <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <Info className="text-blue-600 mt-0.5 h-4 w-4 shrink-0" />
+        <div className="text-blue-700 w-full space-y-2 text-xs">
           <CollapsibleTrigger className="group flex w-full cursor-pointer items-center justify-between">
-            <p className="text-foreground font-medium">
+            <p className="text-blue-900 font-medium">
               Comment fonctionne le système de planification ?
             </p>
-            <ChevronDown className="text-muted-foreground h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
+            <ChevronDown className="text-blue-600 h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
           </CollapsibleTrigger>
 
           <CollapsibleContent>
             <div className="space-y-3">
               <div className="space-y-1">
-                <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                   Récurrence automatique
                 </p>
                 <p>
@@ -1047,7 +1047,7 @@ function PlanificationTab({
               </div>
 
               <div className="space-y-1">
-                <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                   Quota manuel
                 </p>
                 <p>
@@ -1062,7 +1062,7 @@ function PlanificationTab({
               </div>
 
               <div className="space-y-1">
-                <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                   Ponctuel
                 </p>
                 <p>
@@ -1506,14 +1506,14 @@ function ExecutionTab({
 
       {/* Disclaimer exécutions */}
       <Collapsible defaultOpen>
-        <div className="bg-muted/40 flex items-start gap-3 rounded-lg border p-4">
-          <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
-          <div className="text-muted-foreground w-full space-y-2 text-xs">
+        <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <Info className="text-blue-600 mt-0.5 h-4 w-4 shrink-0" />
+          <div className="text-blue-700 w-full space-y-2 text-xs">
             <CollapsibleTrigger className="group flex w-full cursor-pointer items-center justify-between">
-              <p className="text-foreground font-medium">
+              <p className="text-blue-900 font-medium">
                 Comment fonctionne le système d&apos;exécution ?
               </p>
-              <ChevronDown className="text-muted-foreground h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
+              <ChevronDown className="text-blue-600 h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
             </CollapsibleTrigger>
 
             <CollapsibleContent>
@@ -1532,7 +1532,7 @@ function ExecutionTab({
                 </p>
 
                 <div className="space-y-1">
-                  <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                  <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                     Sélection automatique de l&apos;exécution
                   </p>
                   <p>
@@ -1548,7 +1548,7 @@ function ExecutionTab({
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                  <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                     Modifier une exécution (tarifs, dates, priorité)
                   </p>
                   <p>
@@ -1562,7 +1562,7 @@ function ExecutionTab({
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                  <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                     Changer d&apos;exécution en cours de prestation
                   </p>
                   <p>
@@ -1576,7 +1576,7 @@ function ExecutionTab({
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                  <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                     Désactiver une exécution
                   </p>
                   <p>
@@ -1589,7 +1589,7 @@ function ExecutionTab({
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-foreground text-[11px] font-medium tracking-wide uppercase">
+                  <p className="text-blue-900 text-[11px] font-medium tracking-wide uppercase">
                     ⚠ Supprimer une exécution (corbeille)
                   </p>
                   <p>

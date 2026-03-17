@@ -12,6 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Form } from "@/components/ui/form";
 import {
   Popover,
@@ -30,11 +35,11 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { getPresignedReadUrl, uploadFileToS3 } from "@/lib/s3/upload-helper";
 import {
   addTachePieceJointeAction,
+  deleteAdHocTacheAction,
   deleteTachePieceJointeAction,
   getAssignableUsersForOccurrenceAction,
   getAvailableTicketsForLinkingAction,
   getTicketsByOccurrenceAction,
-  deleteAdHocTacheAction,
   insertAdHocTacheAction,
   linkTicketToOccurrenceAction,
   unlinkTicketFromOccurrenceAction,
@@ -60,9 +65,8 @@ import {
   Calendar,
   Camera,
   CheckCircle2,
-
+  ChevronDown,
   Clock,
-
   ImageIcon,
   Info,
   Link2,
@@ -73,10 +77,11 @@ import {
   Paperclip,
   Pencil,
   Play,
-  Trash2,
   Plus,
+  ThumbsDown,
   Ticket,
   Timer,
+  Trash2,
   User,
   Users,
   X,
@@ -87,18 +92,27 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { formatDate, formatDateTime } from "../../../helpers";
 
+type VirtualTacheItem = {
+  id: string;
+  titre: string;
+  description: string | null;
+  ordre: number;
+  dureeEstimeeMinutes: number | null;
+};
+
 type OccurrenceDetailClientProps = {
   occurrence: OccurrenceDetail;
   prestation: PrestationListItem;
   taches: OccurrenceTacheDetail[];
+  virtualTacheItems: VirtualTacheItem[];
   canManage: boolean; // contrôle total : annuler, non honorée, modifier dates, supprimer tâches ad-hoc
   canExecute: boolean; // travail terrain : démarrer, terminer, tâches, auto-assign
   canAssignOccurrence: boolean; // assigner/modifier l'intervenant prestataire de l'occurrence
-  suiviMode: "interne" | "prestataire";
+  modePilotage: "client" | "prestataire" | "collaboration";
   currentUserId: string;
   currentUserPrenom: string | null;
   currentUserNom: string | null;
-}
+};
 
 type LinkedTicketType = {
   id: string;
@@ -107,14 +121,14 @@ type LinkedTicketType = {
   priorite: string;
   type: string;
   createdAt: Date;
-}
+};
 
 type AssignableUserType = {
   id: string;
   prenom: string;
   nom: string;
   email: string;
-}
+};
 
 // ==================== STATUT BADGES ====================
 
@@ -156,16 +170,19 @@ export function OccurrenceDetailClient({
   occurrence,
   prestation,
   taches: initialTaches,
+  virtualTacheItems,
   canManage,
   canExecute,
   canAssignOccurrence,
-  suiviMode,
+  modePilotage,
   currentUserId,
   currentUserPrenom,
   currentUserNom,
 }: OccurrenceDetailClientProps) {
   const router = useRouter();
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [startDialogOpen, setStartDialogOpen] = useState(false);
+  const [nonHonoreeDialogOpen, setNonHonoreeDialogOpen] = useState(false);
   const [isUpdatingStatut, setIsUpdatingStatut] = useState(false);
   const [taches, setTaches] = useState<OccurrenceTacheDetail[]>(initialTaches);
   const [occurrenceStatut, setOccurrenceStatut] = useState(occurrence.statut);
@@ -173,17 +190,19 @@ export function OccurrenceDetailClient({
   const [linkedTickets, setLinkedTickets] = useState<LinkedTicketType[]>([]);
 
   // Occurrence-level assignee (mutable)
-  const [occurrenceAssigneeUserId, setOccurrenceAssigneeUserId] = useState<string | null>(
-    occurrence.assigneeUserId,
-  );
-  const [occurrenceAssigneePrenom, setOccurrenceAssigneePrenom] = useState<string | null>(
-    occurrence.assigneePrenom,
-  );
-  const [occurrenceAssigneeNom, setOccurrenceAssigneeNom] = useState<string | null>(
-    occurrence.assigneeNom,
-  );
+  const [occurrenceAssigneeUserId, setOccurrenceAssigneeUserId] = useState<
+    string | null
+  >(occurrence.assigneeUserId);
+  const [occurrenceAssigneePrenom, setOccurrenceAssigneePrenom] = useState<
+    string | null
+  >(occurrence.assigneePrenom);
+  const [occurrenceAssigneeNom, setOccurrenceAssigneeNom] = useState<
+    string | null
+  >(occurrence.assigneeNom);
   const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
-  const [assignableUsers, setAssignableUsers] = useState<AssignableUserType[]>([]);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUserType[]>(
+    [],
+  );
   const [loadingAssignees, setLoadingAssignees] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
   const [applyToTaches, setApplyToTaches] = useState(false);
@@ -300,7 +319,9 @@ export function OccurrenceDetailClient({
         t.id === tacheId
           ? {
               ...t,
-              piecesJointes: t.piecesJointes.filter((pj) => pj.linkId !== linkId),
+              piecesJointes: t.piecesJointes.filter(
+                (pj) => pj.linkId !== linkId,
+              ),
             }
           : t,
       ),
@@ -314,7 +335,9 @@ export function OccurrenceDetailClient({
 
   const handleAdHocUpdated = (updatedTache: OccurrenceTacheDetail) => {
     setTaches((prev) =>
-      prev.map((t) => (t.id === updatedTache.id ? { ...t, ...updatedTache } : t)),
+      prev.map((t) =>
+        t.id === updatedTache.id ? { ...t, ...updatedTache } : t,
+      ),
     );
   };
 
@@ -322,10 +345,17 @@ export function OccurrenceDetailClient({
     setTaches((prev) => prev.filter((t) => t.id !== tacheId));
   };
 
-  const handleAssigneeChanged = (tacheId: string, assigneeUserId: string | null, assigneePrenom: string | null, assigneeNom: string | null) => {
+  const handleAssigneeChanged = (
+    tacheId: string,
+    assigneeUserId: string | null,
+    assigneePrenom: string | null,
+    assigneeNom: string | null,
+  ) => {
     setTaches((prev) =>
       prev.map((t) =>
-        t.id === tacheId ? { ...t, assigneeUserId, assigneePrenom, assigneeNom } : t,
+        t.id === tacheId
+          ? { ...t, assigneeUserId, assigneePrenom, assigneeNom }
+          : t,
       ),
     );
   };
@@ -417,6 +447,40 @@ export function OccurrenceDetailClient({
     setLinkedTickets((prev) => prev.filter((t) => t.id !== ticketId));
   };
 
+  // Fenêtre autorisée pour démarrer : J-1 / J / J+1 (en heure de Paris)
+  const { isInStartWindow, isPastStartWindow, startWindowLabel } = (() => {
+    if (!occurrence.dateDebutPrevue)
+      return {
+        isInStartWindow: true,
+        isPastStartWindow: false,
+        startWindowLabel: null,
+      };
+    const fmt = new Intl.DateTimeFormat("fr-FR", {
+      timeZone: "Europe/Paris",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    const toStr = (d: Date) => fmt.format(d).split("/").reverse().join("-");
+    const base = new Date(occurrence.dateDebutPrevue);
+    const jMoins1 = new Date(base);
+    jMoins1.setDate(jMoins1.getDate() - 1);
+    const jPlus1 = new Date(base);
+    jPlus1.setDate(jPlus1.getDate() + 1);
+    const dateStr = toStr(base);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const inWindow = dateStr >= toStr(yesterday) && dateStr <= toStr(tomorrow);
+    const past = dateStr < toStr(yesterday);
+    return {
+      isInStartWindow: inWindow,
+      isPastStartWindow: past,
+      startWindowLabel: `du ${fmt.format(jMoins1)} au ${fmt.format(jPlus1)}`,
+    };
+  })();
+
   const canEditDates =
     canManage &&
     (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours");
@@ -437,7 +501,11 @@ export function OccurrenceDetailClient({
         <div className="flex flex-wrap items-start gap-4">
           <div className="min-w-0 flex-1 space-y-1">
             <h1 className="text-2xl font-bold tracking-tight">
-              Intervention — {prestation.serviceNom}
+              Intervention
+              {occurrence.dateDebutPrevue
+                ? ` ${formatDateTime(occurrence.dateDebutPrevue)}`
+                : ""}{" "}
+              — {prestation.serviceNom}
             </h1>
             <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-sm">
               <span className="flex items-center gap-1">
@@ -543,7 +611,7 @@ export function OccurrenceDetailClient({
               }}
             >
               <ArrowLeft className="h-4 w-4" />
-              Retour
+              Retour aux interventions
             </Link>
           </Button>
         </div>
@@ -587,12 +655,18 @@ export function OccurrenceDetailClient({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => handleTransition("en_cours")}
-                disabled={isUpdatingStatut || !occurrence.executionId}
+                onClick={() => setStartDialogOpen(true)}
+                disabled={
+                  isUpdatingStatut ||
+                  !occurrence.executionId ||
+                  !isInStartWindow
+                }
                 title={
                   !occurrence.executionId
                     ? "Attribuez un prestataire avant de démarrer"
-                    : undefined
+                    : !isInStartWindow
+                      ? `Démarrage autorisé ${startWindowLabel ?? "entre la veille et le lendemain de la date prévue"}`
+                      : undefined
                 }
               >
                 <Play className="h-4 w-4" />
@@ -603,23 +677,25 @@ export function OccurrenceDetailClient({
             {canManage && occurrenceStatut === "planifiee" && (
               <Button
                 size="sm"
-                variant="destructive"
-                onClick={() => setCancelDialogOpen(true)}
+                variant="outline"
+                className="text-destructive border-destructive/40 hover:bg-destructive/10"
+                onClick={() => setNonHonoreeDialogOpen(true)}
                 disabled={isUpdatingStatut}
               >
-                Annuler
+                <ThumbsDown className="h-3.5 w-3.5" />
+                Non honorée
               </Button>
             )}
 
             {canManage && occurrenceStatut === "planifiee" && (
               <Button
                 size="sm"
-                variant="outline"
-                className="text-destructive"
-                onClick={() => handleTransition("non_honoree")}
+                variant="destructive"
+                onClick={() => setCancelDialogOpen(true)}
                 disabled={isUpdatingStatut}
               >
-                Non honorée
+                <X className="h-3.5 w-3.5" />
+                Annuler
               </Button>
             )}
           </div>
@@ -646,31 +722,133 @@ export function OccurrenceDetailClient({
 
       <Separator className="my-5 flex-shrink-0" />
 
-      {/* ==================== BANNIÈRE MODE DE SUIVI ==================== */}
+      {/* ==================== BANNIÈRE MODE DE PILOTAGE ==================== */}
       {occurrence.executionId && (
         <div
-          className={`flex-shrink-0 flex items-start gap-2 rounded-lg border px-4 py-3 text-sm mb-4 ${
-            suiviMode === "prestataire"
+          className={`mb-4 flex flex-shrink-0 items-start gap-2 rounded-lg border px-4 py-3 text-sm ${
+            modePilotage === "collaboration"
+              ? "border-green-200 bg-green-50 text-green-800"
+              : modePilotage === "prestataire"
               ? "border-blue-200 bg-blue-50 text-blue-800"
               : "border-amber-200 bg-amber-50 text-amber-800"
           }`}
         >
           <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <div>
-            {suiviMode === "prestataire" ? (
+            {modePilotage === "collaboration" ? (
               <>
-                <span className="font-semibold">Suivi prestataire</span>
+                <span className="font-semibold">Mode de pilotage : Collaboration</span>
                 {" — "}
-                Des agents du prestataire suivent cette intervention depuis la plateforme.
+                Géré conjointement par le client (admin, responsable de site) et le prestataire (admin, responsable de site, intervenant).
+              </>
+            ) : modePilotage === "prestataire" ? (
+              <>
+                <span className="font-semibold">Mode de pilotage : Prestataire</span>
+                {" — "}
+                Géré par le prestataire (admin, responsable de site, intervenant). Le client est en lecture seule.
               </>
             ) : (
               <>
-                <span className="font-semibold">Suivi interne</span>
+                <span className="font-semibold">Mode de pilotage : Client</span>
                 {" — "}
-                Le prestataire n&apos;est pas sur la plateforme pour ce site. L&apos;avancement est géré en interne.
+                Géré par le client (admin, responsable de site). Le prestataire est en lecture seule.
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* ==================== ALERTE FENÊTRE DÉPASSÉE ==================== */}
+      {occurrenceStatut === "planifiee" && isPastStartWindow && canManage && (
+        <div className="mb-4 flex flex-shrink-0 items-start gap-2 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800 dark:border-orange-800 dark:bg-orange-950/40 dark:text-orange-200">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" />
+          <div>
+            Cette intervention a dépassé sa fenêtre de démarrage. Si elle
+            n&apos;a pas été réalisée, marquez-la comme{" "}
+            <button
+              type="button"
+              className="font-semibold underline underline-offset-2 hover:no-underline"
+              onClick={() => setNonHonoreeDialogOpen(true)}
+            >
+              non honorée
+            </button>
+            .
+          </div>
+        </div>
+      )}
+
+      {/* ==================== DISCLAIMER COLLAPSIBLE ==================== */}
+      {(occurrenceStatut === "planifiee" ||
+        occurrenceStatut === "en_cours") && (
+        <div className="mb-4 flex-shrink-0">
+          <Collapsible defaultOpen={occurrenceStatut === "planifiee"}>
+            <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+              <div className="w-full space-y-2 text-xs text-blue-700">
+                <CollapsibleTrigger className="group flex w-full cursor-pointer items-center justify-between">
+                  <p className="font-medium text-blue-900">
+                    Comment fonctionne cette intervention ?
+                  </p>
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0 text-blue-600 transition-transform group-data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <ul className="space-y-1.5">
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 shrink-0">•</span>
+                      <span>
+                        Les <strong>tâches prévues</strong> sont affichées en
+                        aperçu avant démarrage. Elles deviennent modifiables au
+                        démarrage de l&apos;intervention.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 shrink-0">•</span>
+                      <span>
+                        Le <strong>démarrage</strong> est autorisé{" "}
+                        {startWindowLabel ? (
+                          <>
+                            <strong>{startWindowLabel}</strong>
+                            {" — "}
+                          </>
+                        ) : (
+                          "entre la veille et le lendemain de la date prévue — "
+                        )}
+                        {isInStartWindow ? (
+                          <span className="font-medium text-green-700">
+                            fenêtre active.
+                          </span>
+                        ) : isPastStartWindow ? (
+                          <span className="font-medium text-red-600">
+                            fenêtre dépassée.
+                          </span>
+                        ) : (
+                          <span className="font-medium text-blue-600">
+                            pas encore ouverte.
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 shrink-0">•</span>
+                      <span>
+                        <strong>Modifier les dates</strong> ne modifie que cette
+                        intervention. La série de planification n&apos;est pas
+                        touchée.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 shrink-0">•</span>
+                      <span>
+                        <strong>Ajouter une tâche</strong> l&apos;ajoute
+                        uniquement à cette intervention, pas au modèle de la
+                        prestation.
+                      </span>
+                    </li>
+                  </ul>
+                </CollapsibleContent>
+              </div>
+            </div>
+          </Collapsible>
         </div>
       )}
 
@@ -772,26 +950,67 @@ export function OccurrenceDetailClient({
                   /{taches.length} traitées)
                 </span>
               )}
-              {canAssignOccurrence && occurrenceAssigneeUserId && taches.length > 0 && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="ml-auto h-7 gap-1.5 px-2 text-xs"
-                  onClick={handleAssignAllTaches}
-                  disabled={isAssigning}
-                >
-                  <Users className="h-3.5 w-3.5" />
-                  Assigner toutes
-                </Button>
-              )}
+              {canAssignOccurrence &&
+                occurrenceAssigneeUserId &&
+                taches.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto h-7 gap-1.5 px-2 text-xs"
+                    onClick={handleAssignAllTaches}
+                    disabled={isAssigning}
+                  >
+                    <Users className="h-3.5 w-3.5" />
+                    Assigner toutes
+                  </Button>
+                )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {taches.length === 0 && !isAddingAdHoc && (
-              <p className="text-muted-foreground py-4 text-center text-sm">
-                Aucune tâche associée à cette intervention.
-              </p>
-            )}
+            {taches.length === 0 &&
+              virtualTacheItems.length > 0 &&
+              !isAddingAdHoc && (
+                <div className="space-y-1.5">
+                  <div className="border-muted-foreground/30 bg-muted/20 flex items-center gap-2 rounded-md border border-dashed px-3 py-2">
+                    <span className="text-muted-foreground text-xs">
+                      Tâches prévues — seront créées au démarrage ou à J-1
+                    </span>
+                  </div>
+                  {virtualTacheItems.map((item, idx) => (
+                    <div
+                      key={item.id}
+                      className="border-muted-foreground/20 bg-muted/10 flex items-center gap-3 rounded-md border border-dashed px-3 py-2 opacity-70"
+                    >
+                      <span className="text-muted-foreground w-5 shrink-0 text-center text-xs">
+                        {idx + 1}.
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-muted-foreground text-sm font-medium">
+                          {item.titre}
+                        </span>
+                        {item.description && (
+                          <p className="text-muted-foreground/70 mt-0.5 text-xs">
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+                      {item.dureeEstimeeMinutes && (
+                        <span className="text-muted-foreground/60 flex shrink-0 items-center gap-1 text-xs">
+                          <Clock className="h-3 w-3" />
+                          {item.dureeEstimeeMinutes}min
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            {taches.length === 0 &&
+              virtualTacheItems.length === 0 &&
+              !isAddingAdHoc && (
+                <p className="text-muted-foreground py-4 text-center text-sm">
+                  Aucune tâche associée à cette intervention.
+                </p>
+              )}
             {taches.map((tache) => (
               <TacheRow
                 key={tache.id}
@@ -876,20 +1095,82 @@ export function OccurrenceDetailClient({
         />
       </div>
 
-      {/* ==================== CANCEL DIALOG ==================== */}
-      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
-          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+      {/* ==================== START DIALOG ==================== */}
+      <AlertDialog open={startDialogOpen} onOpenChange={setStartDialogOpen}>
+        <AlertDialogContent className="max-w-md gap-0 overflow-hidden p-0">
+          <div className="bg-primary/8 border-b px-5 pt-5 pr-12 pb-4">
             <AlertDialogHeader>
-              <AlertDialogTitle>Annuler cette intervention ?</AlertDialogTitle>
+              <AlertDialogTitle>Démarrer cette intervention ?</AlertDialogTitle>
             </AlertDialogHeader>
           </div>
-          <div className="px-5 py-4 text-sm">
-            L&apos;intervention passera au statut <strong>Annulée</strong>.
-            Cette action est irréversible.
+          <div className="space-y-2 px-5 py-4 text-sm">
+            <p>Vous allez démarrer cette intervention.</p>
+            <ul className="text-muted-foreground space-y-1 text-xs">
+              <li>
+                • Les tâches prévues seront créées si elles ne le sont pas
+                encore.
+              </li>
+              <li>
+                • Le démarrage réel sera enregistré à l&apos;heure actuelle.
+              </li>
+              <li>
+                • Cette action ouvre le suivi opérationnel de
+                l&apos;intervention.
+              </li>
+            </ul>
           </div>
           <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
-            <Button variant="outline" onClick={() => setCancelDialogOpen(false)} disabled={isUpdatingStatut}>
+            <Button
+              variant="outline"
+              onClick={() => setStartDialogOpen(false)}
+              disabled={isUpdatingStatut}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={() => {
+                setStartDialogOpen(false);
+                void handleTransition("en_cours");
+              }}
+              disabled={isUpdatingStatut}
+            >
+              <Play className="h-4 w-4" />
+              Confirmer le démarrage
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* ==================== CANCEL DIALOG ==================== */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent className="max-w-md gap-0 overflow-hidden p-0">
+          <div className="bg-primary/8 border-b px-5 pt-5 pr-12 pb-4">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <X className="text-primary h-4 w-4" />
+                Annuler cette intervention ?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="space-y-2 px-5 py-4 text-sm">
+            <p>Cette intervention ne pourra plus être démarrée.</p>
+            <ul className="text-muted-foreground space-y-1 text-xs">
+              <li>
+                • Elle restera visible dans l&apos;historique avec le statut{" "}
+                <strong>Annulée</strong>.
+              </li>
+              <li>
+                • Si des tâches existent déjà, elles seront également annulées.
+              </li>
+              <li>• Cette action est irréversible.</li>
+            </ul>
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setCancelDialogOpen(false)}
+              disabled={isUpdatingStatut}
+            >
               Conserver
             </Button>
             <Button
@@ -900,7 +1181,60 @@ export function OccurrenceDetailClient({
               }}
               disabled={isUpdatingStatut}
             >
+              <X className="h-3.5 w-3.5" />
               Confirmer l&apos;annulation
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* ==================== NON HONOREE DIALOG ==================== */}
+      <AlertDialog
+        open={nonHonoreeDialogOpen}
+        onOpenChange={setNonHonoreeDialogOpen}
+      >
+        <AlertDialogContent className="max-w-md gap-0 overflow-hidden p-0">
+          <div className="bg-primary/8 border-b px-5 pt-5 pr-12 pb-4">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <ThumbsDown className="text-primary h-4 w-4" />
+                Marquer comme non honorée ?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+          </div>
+          <div className="space-y-2 px-5 py-4 text-sm">
+            <p>Vous allez marquer cette intervention comme non honorée.</p>
+            <ul className="text-muted-foreground space-y-1 text-xs">
+              <li>
+                • L&apos;intervention restera dans l&apos;historique comme{" "}
+                <strong>non réalisée</strong>.
+              </li>
+              <li>• Elle ne pourra plus être démarrée ensuite.</li>
+              <li>
+                • Si des tâches existent, elles passeront également en non
+                honorées.
+              </li>
+            </ul>
+          </div>
+          <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setNonHonoreeDialogOpen(false)}
+              disabled={isUpdatingStatut}
+            >
+              Conserver
+            </Button>
+            <Button
+              variant="outline"
+              className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+              onClick={() => {
+                setNonHonoreeDialogOpen(false);
+                void handleTransition("non_honoree");
+              }}
+              disabled={isUpdatingStatut}
+            >
+              <ThumbsDown className="h-3.5 w-3.5" />
+              Confirmer
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -968,16 +1302,24 @@ function TacheRow({
   onPjDeleted: (linkId: string) => void;
   onAdHocUpdated: (tache: OccurrenceTacheDetail) => void;
   onAdHocDeleted: (tacheId: string) => void;
-  onAssigneeChanged: (userId: string | null, prenom: string | null, nom: string | null) => void;
+  onAssigneeChanged: (
+    userId: string | null,
+    prenom: string | null,
+    nom: string | null,
+  ) => void;
 }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditingAdHoc, setIsEditingAdHoc] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
-  const [assignableUsers, setAssignableUsers] = useState<AssignableUserType[]>([]);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUserType[]>(
+    [],
+  );
   const [isAssigning, setIsAssigning] = useState(false);
-  const [localTempsPasseSecondes, setLocalTempsPasseSecondes] = useState<number | null>(tache.tempsPasseSecondes ?? null);
+  const [localTempsPasseSecondes, setLocalTempsPasseSecondes] = useState<
+    number | null
+  >(tache.tempsPasseSecondes ?? null);
   const [isEditingTempsPasse, setIsEditingTempsPasse] = useState(false);
   const [tempsPasseInputMinutes, setTempsPasseInputMinutes] = useState("");
   const badge = TACHE_STATUT[tache.statut];
@@ -1067,7 +1409,9 @@ function TacheRow({
     tache.statut === "en_cours";
 
   return (
-    <div className={`rounded-lg border p-3 text-sm ${isAdHoc ? "border-dashed" : ""}`}>
+    <div
+      className={`rounded-lg border p-3 text-sm ${isAdHoc ? "border-dashed" : ""}`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
@@ -1101,7 +1445,8 @@ function TacheRow({
                 {isAdHoc &&
                   canManage &&
                   (tache.statut === "a_faire" || tache.statut === "en_cours") &&
-                  (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
+                  (occurrenceStatut === "planifiee" ||
+                    occurrenceStatut === "en_cours") && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -1116,7 +1461,8 @@ function TacheRow({
                   canManage &&
                   !isEditingAdHoc &&
                   (tache.statut === "a_faire" || tache.statut === "en_cours") &&
-                  (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
+                  (occurrenceStatut === "planifiee" ||
+                    occurrenceStatut === "en_cours") && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -1139,25 +1485,28 @@ function TacheRow({
             <p className="text-muted-foreground ml-7 flex items-center gap-1 text-xs">
               <Clock className="h-3 w-3" />
               {formatDateTime(tache.doneAt)}
-              {localTempsPasseSecondes !== null && localTempsPasseSecondes !== undefined && (
-                <span className="ml-1 flex items-center gap-0.5">
-                  <Timer className="h-3 w-3" />
-                  {formatTemps(localTempsPasseSecondes)}
-                  {canManage && !isEditingTempsPasse && (
-                    <button
-                      type="button"
-                      className="text-muted-foreground hover:text-foreground ml-0.5 rounded p-0.5"
-                      title="Corriger le temps passé"
-                      onClick={() => {
-                        setTempsPasseInputMinutes(String(Math.round(localTempsPasseSecondes / 60)));
-                        setIsEditingTempsPasse(true);
-                      }}
-                    >
-                      <Pencil className="h-2.5 w-2.5" />
-                    </button>
-                  )}
-                </span>
-              )}
+              {localTempsPasseSecondes !== null &&
+                localTempsPasseSecondes !== undefined && (
+                  <span className="ml-1 flex items-center gap-0.5">
+                    <Timer className="h-3 w-3" />
+                    {formatTemps(localTempsPasseSecondes)}
+                    {canManage && !isEditingTempsPasse && (
+                      <button
+                        type="button"
+                        className="text-muted-foreground hover:text-foreground ml-0.5 rounded p-0.5"
+                        title="Corriger le temps passé"
+                        onClick={() => {
+                          setTempsPasseInputMinutes(
+                            String(Math.round(localTempsPasseSecondes / 60)),
+                          );
+                          setIsEditingTempsPasse(true);
+                        }}
+                      >
+                        <Pencil className="h-2.5 w-2.5" />
+                      </button>
+                    )}
+                  </span>
+                )}
             </p>
           )}
           {isEditingTempsPasse && canManage && tache.statut === "terminee" && (
@@ -1168,7 +1517,7 @@ function TacheRow({
                 max={10080}
                 value={tempsPasseInputMinutes}
                 onChange={(e) => setTempsPasseInputMinutes(e.target.value)}
-                className="border-input focus-visible:ring-ring h-6 w-20 rounded border px-2 text-xs focus-visible:outline-none focus-visible:ring-1"
+                className="border-input focus-visible:ring-ring h-6 w-20 rounded border px-2 text-xs focus-visible:ring-1 focus-visible:outline-none"
                 placeholder="min"
               />
               <span className="text-muted-foreground text-xs">min</span>
@@ -1215,108 +1564,135 @@ function TacheRow({
           <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
 
           {/* Assignee — visible quand l'occurrence est active */}
-          {canExecute && (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
-            canAssignOccurrence && prestataireEntrepriseId ? (
-              // Responsable / plateforme : popover complet — uniquement si un prestataire est assigné
-              <Popover open={assigneePopoverOpen} onOpenChange={handleOpenAssigneePopover}>
-                <PopoverTrigger asChild>
+          {
+            canExecute &&
+              (occurrenceStatut === "planifiee" ||
+                occurrenceStatut === "en_cours") &&
+              (canAssignOccurrence && prestataireEntrepriseId ? (
+                // Responsable / plateforme : popover complet — uniquement si un prestataire est assigné
+                <Popover
+                  open={assigneePopoverOpen}
+                  onOpenChange={handleOpenAssigneePopover}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-6 gap-1 px-2 text-xs"
+                      title={
+                        tache.assigneePrenom
+                          ? `Assigné à ${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`
+                          : "Assigner un intervenant"
+                      }
+                      aria-label={
+                        tache.assigneePrenom
+                          ? `Intervenant assigné : ${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`
+                          : "Assigner un intervenant à cette tâche"
+                      }
+                    >
+                      {tache.assigneeUserId ? (
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700">
+                          {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}
+                          {(tache.assigneeNom?.[0] ?? "").toUpperCase()}
+                        </span>
+                      ) : (
+                        "Assigner"
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-1" align="end">
+                    {isAssigning && (
+                      <div className="flex items-center justify-center py-3">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </div>
+                    )}
+                    {!isAssigning && assignableUsers.length === 0 && (
+                      <p className="text-muted-foreground px-2 py-2 text-xs">
+                        Aucun intervenant disponible
+                      </p>
+                    )}
+                    {!isAssigning && assignableUsers.length > 0 && (
+                      <div className="space-y-0.5">
+                        {tache.assigneeUserId && (
+                          <button
+                            className="text-muted-foreground hover:bg-muted w-full rounded px-2 py-1.5 text-left text-xs italic"
+                            onClick={() => handleAssignUser(null)}
+                          >
+                            Désassigner
+                          </button>
+                        )}
+                        {assignableUsers.map((u) => (
+                          <button
+                            key={u.id}
+                            className={`hover:bg-muted w-full rounded px-2 py-1.5 text-left text-xs ${u.id === tache.assigneeUserId ? "font-semibold" : ""}`}
+                            onClick={() => handleAssignUser(u.id)}
+                          >
+                            {u.prenom} {u.nom}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              ) : !canAssignOccurrence ? (
+                // Intervenant — UI selon état d'assignation
+                tache.assigneeUserId === null ? (
+                  // Tâche non assignée → "Je prends"
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-6 gap-1 px-2 text-xs"
-                    title={tache.assigneePrenom ? `Assigné à ${tache.assigneePrenom} ${tache.assigneeNom ?? ""}` : "Assigner un intervenant"}
-                    aria-label={tache.assigneePrenom ? `Intervenant assigné : ${tache.assigneePrenom} ${tache.assigneeNom ?? ""}` : "Assigner un intervenant à cette tâche"}
+                    className="h-6 px-2 text-xs"
+                    onClick={() => handleAssignUser(currentUserId)}
+                    disabled={isAssigning}
+                    title="M'assigner cette tâche"
                   >
-                    {tache.assigneeUserId ? (
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700">
-                        {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
-                      </span>
+                    {isAssigning ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
-                      "Assigner"
+                      "Je prends"
                     )}
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-1" align="end">
-                  {isAssigning && (
-                    <div className="flex items-center justify-center py-3">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    </div>
-                  )}
-                  {!isAssigning && assignableUsers.length === 0 && (
-                    <p className="text-muted-foreground px-2 py-2 text-xs">Aucun intervenant disponible</p>
-                  )}
-                  {!isAssigning && assignableUsers.length > 0 && (
-                    <div className="space-y-0.5">
-                      {tache.assigneeUserId && (
-                        <button
-                          className="text-muted-foreground hover:bg-muted w-full rounded px-2 py-1.5 text-left text-xs italic"
-                          onClick={() => handleAssignUser(null)}
-                        >
-                          Désassigner
-                        </button>
-                      )}
-                      {assignableUsers.map((u) => (
-                        <button
-                          key={u.id}
-                          className={`hover:bg-muted w-full rounded px-2 py-1.5 text-left text-xs ${u.id === tache.assigneeUserId ? "font-semibold" : ""}`}
-                          onClick={() => handleAssignUser(u.id)}
-                        >
-                          {u.prenom} {u.nom}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </PopoverContent>
-              </Popover>
-            ) : !canAssignOccurrence ? (
-              // Intervenant — UI selon état d'assignation
-              tache.assigneeUserId === null ? (
-                // Tâche non assignée → "Je prends"
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-6 px-2 text-xs"
-                  onClick={() => handleAssignUser(currentUserId)}
-                  disabled={isAssigning}
-                  title="M'assigner cette tâche"
-                >
-                  {isAssigning ? <Loader2 className="h-3 w-3 animate-spin" /> : "Je prends"}
-                </Button>
-              ) : tache.assigneeUserId === currentUserId ? (
-                // Assignée à soi-même → avatar cliquable pour se désassigner
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-6 w-6 rounded-full p-0"
-                  onClick={() => handleAssignUser(null)}
-                  disabled={isAssigning}
-                  title="Me désassigner"
-                  aria-label={`Assigné à vous — cliquer pour se désassigner`}
-                >
-                  {isAssigning ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <span className="text-[10px] font-medium text-blue-700">
-                      {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
-                    </span>
-                  )}
-                </Button>
-              ) : (
-                // Assignée à quelqu'un d'autre → lecture seule
-                <span
-                  className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700"
-                  title={`${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`}
-                >
-                  {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
-                </span>
-              )
-            ) : null /* canAssignOccurrence sans prestataire assigné : pas d'UI d'assignation */
-          )}
+                ) : tache.assigneeUserId === currentUserId ? (
+                  // Assignée à soi-même → avatar cliquable pour se désassigner
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 w-6 rounded-full p-0"
+                    onClick={() => handleAssignUser(null)}
+                    disabled={isAssigning}
+                    title="Me désassigner"
+                    aria-label={`Assigné à vous — cliquer pour se désassigner`}
+                  >
+                    {isAssigning ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <span className="text-[10px] font-medium text-blue-700">
+                        {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}
+                        {(tache.assigneeNom?.[0] ?? "").toUpperCase()}
+                      </span>
+                    )}
+                  </Button>
+                ) : (
+                  // Assignée à quelqu'un d'autre → lecture seule
+                  <span
+                    className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700"
+                    title={`${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`}
+                  >
+                    {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}
+                    {(tache.assigneeNom?.[0] ?? "").toUpperCase()}
+                  </span>
+                )
+              ) : null) /* canAssignOccurrence sans prestataire assigné : pas d'UI d'assignation */
+          }
 
           {/* Assignee lecture seule (non-interactif) */}
           {!canExecute && tache.assigneeUserId && (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700" title={`${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`}>
-              {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
+            <span
+              className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700"
+              title={`${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`}
+            >
+              {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}
+              {(tache.assigneeNom?.[0] ?? "").toUpperCase()}
             </span>
           )}
 
@@ -1364,18 +1740,19 @@ function TacheRow({
               )}
               {tache.statut === "en_cours" && (
                 <>
-                  {canExecute && (tache.assigneeUserId === currentUserId || canManage) && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-6 px-2 text-xs"
-                      onClick={() => handleTransition("terminee")}
-                      disabled={buttonsDisabled}
-                      title={disabledTitle}
-                    >
-                      Terminer
-                    </Button>
-                  )}
+                  {canExecute &&
+                    (tache.assigneeUserId === currentUserId || canManage) && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => handleTransition("terminee")}
+                        disabled={buttonsDisabled}
+                        title={disabledTitle}
+                      >
+                        Terminer
+                      </Button>
+                    )}
                   <Button
                     size="sm"
                     variant="outline"
@@ -1430,17 +1807,24 @@ function TacheRow({
 
       {/* Dialog annulation tâche ad-hoc */}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent className="gap-0 overflow-hidden p-0 max-w-md">
-          <div className="bg-primary/8 border-b px-5 pb-4 pt-5 pr-12">
+        <AlertDialogContent className="max-w-md gap-0 overflow-hidden p-0">
+          <div className="bg-primary/8 border-b px-5 pt-5 pr-12 pb-4">
             <AlertDialogHeader>
               <AlertDialogTitle>Annuler cette tâche ?</AlertDialogTitle>
             </AlertDialogHeader>
           </div>
           <div className="px-5 py-4 text-sm">
-            La tâche sera marquée comme annulée. Elle restera visible dans la liste avec le statut &quot;annulée&quot;.
+            La tâche sera marquée comme annulée. Elle restera visible dans la
+            liste avec le statut &quot;annulée&quot;.
           </div>
           <AlertDialogFooter className="bg-muted/30 border-t px-5 py-3 sm:justify-end">
-            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)} disabled={isDeleting}>Retour</Button>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteConfirmOpen(false)}
+              disabled={isDeleting}
+            >
+              Retour
+            </Button>
             <Button
               disabled={isDeleting}
               onClick={async (e) => {
@@ -1465,7 +1849,11 @@ function TacheRow({
               }}
               className="bg-red-600 hover:bg-red-700"
             >
-              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Annuler la tâche"}
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Annuler la tâche"
+              )}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1534,7 +1922,9 @@ function PjUploadZone({
         toast.success("Photo ajoutée");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur lors de l'upload");
+      toast.error(
+        err instanceof Error ? err.message : "Erreur lors de l'upload",
+      );
     } finally {
       setIsUploading(false);
       // Réinitialiser les inputs pour permettre le même fichier à nouveau
@@ -1573,7 +1963,7 @@ function PjUploadZone({
               <button
                 onClick={() => handleDelete(pj)}
                 disabled={isDeleting === pj.linkId || isUploading}
-                className="bg-destructive text-destructive-foreground absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full shadow-sm disabled:opacity-50"
+                className="bg-destructive text-destructive-foreground absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full shadow-sm disabled:opacity-50"
                 title="Supprimer"
               >
                 {isDeleting === pj.linkId ? (
@@ -1749,7 +2139,7 @@ function AdHocTacheForm({
         onChange={(e) => setTitre(e.target.value)}
         placeholder="Titre de la tâche *"
         maxLength={255}
-        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2.5 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-1"
+        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2.5 py-1.5 text-sm focus-visible:ring-1 focus-visible:outline-none"
       />
       <textarea
         value={description}
@@ -1757,7 +2147,7 @@ function AdHocTacheForm({
         placeholder="Description (optionnel)"
         maxLength={1000}
         rows={2}
-        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2.5 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-1"
+        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2.5 py-1.5 text-sm focus-visible:ring-1 focus-visible:outline-none"
       />
       <div className="flex gap-2">
         <Button
@@ -1840,7 +2230,7 @@ function AdHocTacheInlineEdit({
         value={titre}
         onChange={(e) => setTitre(e.target.value)}
         maxLength={255}
-        className="border-input bg-background focus-visible:ring-ring w-full rounded-md border px-2 py-1 text-sm font-medium focus-visible:outline-none focus-visible:ring-1"
+        className="border-input bg-background focus-visible:ring-ring w-full rounded-md border px-2 py-1 text-sm font-medium focus-visible:ring-1 focus-visible:outline-none"
       />
       <textarea
         value={description}
@@ -1848,7 +2238,7 @@ function AdHocTacheInlineEdit({
         placeholder="Description (optionnel)"
         maxLength={1000}
         rows={2}
-        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2 py-1 text-xs focus-visible:outline-none focus-visible:ring-1"
+        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2 py-1 text-xs focus-visible:ring-1 focus-visible:outline-none"
       />
       <div className="flex gap-1.5">
         <Button
@@ -1972,10 +2362,19 @@ function DateEditForm({
 
 // ==================== LINKED TICKETS CARD ====================
 
-const TICKET_STATUT_LABELS: Record<string, { label: string; className: string }> = {
+const TICKET_STATUT_LABELS: Record<
+  string,
+  { label: string; className: string }
+> = {
   ouvert: { label: "Ouvert", className: "bg-blue-100 text-blue-700" },
-  en_attente_prestataire: { label: "En attente prestataire", className: "bg-orange-100 text-orange-700" },
-  en_attente_client: { label: "En attente client", className: "bg-yellow-100 text-yellow-700" },
+  en_attente_prestataire: {
+    label: "En attente prestataire",
+    className: "bg-orange-100 text-orange-700",
+  },
+  en_attente_client: {
+    label: "En attente client",
+    className: "bg-yellow-100 text-yellow-700",
+  },
   resolu: { label: "Résolu", className: "bg-green-100 text-green-700" },
   ferme: { label: "Fermé", className: "bg-gray-100 text-gray-500" },
 };
@@ -1994,7 +2393,9 @@ function LinkedTicketsCard({
   onUnlinked: (ticketId: string) => void;
 }) {
   const [linkPopoverOpen, setLinkPopoverOpen] = useState(false);
-  const [availableTickets, setAvailableTickets] = useState<LinkedTicketType[]>([]);
+  const [availableTickets, setAvailableTickets] = useState<LinkedTicketType[]>(
+    [],
+  );
   const [isLoadingAvailable, setIsLoadingAvailable] = useState(false);
   const [isLinking, setIsLinking] = useState<string | null>(null);
   const [isUnlinking, setIsUnlinking] = useState<string | null>(null);
@@ -2062,7 +2463,11 @@ function LinkedTicketsCard({
           </span>
           <Popover open={linkPopoverOpen} onOpenChange={handleOpenLinkPopover}>
             <PopoverTrigger asChild>
-              <Button size="sm" variant="outline" className="h-7 gap-1.5 px-2 text-xs">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 gap-1.5 px-2 text-xs"
+              >
                 <Link2 className="h-3.5 w-3.5" />
                 Lier un ticket
               </Button>
@@ -2084,7 +2489,9 @@ function LinkedTicketsCard({
               {!isLoadingAvailable && availableTickets.length > 0 && (
                 <div className="max-h-52 space-y-1 overflow-y-auto">
                   {availableTickets.map((t) => {
-                    const alreadyLinked = linkedTickets.some((l) => l.id === t.id);
+                    const alreadyLinked = linkedTickets.some(
+                      (l) => l.id === t.id,
+                    );
                     if (alreadyLinked) return null;
                     const statutInfo = TICKET_STATUT_LABELS[t.statut];
                     return (
@@ -2101,9 +2508,13 @@ function LinkedTicketsCard({
                             <Link2 className="text-muted-foreground h-3.5 w-3.5 flex-shrink-0" />
                           )}
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate text-xs font-medium">{t.titre}</span>
+                            <span className="block truncate text-xs font-medium">
+                              {t.titre}
+                            </span>
                             {statutInfo && (
-                              <span className={`mt-0.5 inline-block rounded px-1 py-0.5 text-[10px] ${statutInfo.className}`}>
+                              <span
+                                className={`mt-0.5 inline-block rounded px-1 py-0.5 text-[10px] ${statutInfo.className}`}
+                              >
                                 {statutInfo.label}
                               </span>
                             )}
@@ -2135,9 +2546,13 @@ function LinkedTicketsCard({
                 >
                   <Ticket className="text-muted-foreground h-4 w-4 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <span className="block truncate font-medium">{ticket.titre}</span>
+                    <span className="block truncate font-medium">
+                      {ticket.titre}
+                    </span>
                     {statutInfo && (
-                      <span className={`mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] ${statutInfo.className}`}>
+                      <span
+                        className={`mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] ${statutInfo.className}`}
+                      >
                         {statutInfo.label}
                       </span>
                     )}

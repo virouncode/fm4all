@@ -201,9 +201,23 @@ export const insertOccurrenceOnDemandFormSchema = z.object({
   dateDebutPrevue: z.string().min(1, "Date de début obligatoire"),
   dateFinPrevue: z.string().optional(),
   notes: z.string().max(2000).optional(),
+  /** Override de checklist — null = héritage (règle → exécution) */
+  tacheListeTemplateId: z.uuid().optional(),
 });
 export type InsertOccurrenceOnDemandFormType = z.infer<
   typeof insertOccurrenceOnDemandFormSchema
+>;
+
+// ==================== UPDATE OCCURRENCE TACHE LISTE ====================
+
+export const updateOccurrenceTacheListeSchema = z.object({
+  occurrenceId: z.uuid("ID de l'occurrence invalide"),
+  prestationId: z.uuid("ID de la prestation invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  tacheListeTemplateId: z.uuid().nullable(),
+});
+export type UpdateOccurrenceTacheListeType = z.infer<
+  typeof updateOccurrenceTacheListeSchema
 >;
 
 // ==================== DRAG OCCURRENCE (FC) ====================
