@@ -73,10 +73,11 @@ async function hasPrestataireUsersOnSite(
 export default async function OccurrenceDetailPage({
   params,
 }: {
-  params: Promise<{ prestationId: string; occurrenceId: string }>;
+  params: Promise<{ prestationId: string; interventionId: string }>;
 }) {
   const resolvedParams = await params;
-  const { prestationId, occurrenceId } = resolvedParams;
+  const { prestationId, interventionId } = resolvedParams;
+  const occurrenceId = interventionId;
 
   // 1. Auth
   const session = await getSession();
@@ -89,7 +90,7 @@ export default async function OccurrenceDetailPage({
   const uuidSchema = z.uuid();
   if (
     !uuidSchema.safeParse(prestationId).success ||
-    !uuidSchema.safeParse(occurrenceId).success
+    !uuidSchema.safeParse(interventionId).success
   ) {
     notFound();
   }

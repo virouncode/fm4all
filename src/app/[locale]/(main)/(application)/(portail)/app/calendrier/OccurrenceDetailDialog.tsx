@@ -380,10 +380,10 @@ export function OccurrenceDetailDialog({
               <Link
                 href={{
                   pathname:
-                    "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
+                    "/app/prestations/[prestationId]/interventions/[interventionId]",
                   params: {
                     prestationId: prestationId!,
-                    occurrenceId: occurrenceId!,
+                    interventionId: occurrenceId!,
                   },
                 }}
               >

@@ -538,9 +538,8 @@ export function OccurrenceDetailClient({
           >
             <Link
               href={{
-                pathname: "/app/prestations/[prestationId]",
+                pathname: "/app/prestations/[prestationId]/interventions",
                 params: { prestationId: prestation.id },
-                query: { tab: "interventions" },
               }}
             >
               <ArrowLeft className="h-4 w-4" />
