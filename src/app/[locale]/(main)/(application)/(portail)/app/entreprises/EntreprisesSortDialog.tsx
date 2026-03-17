@@ -1,15 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
+  DialogStyledBody,
   DialogStyledContent,
   DialogStyledHeader,
-  DialogStyledBody,
 } from "@/components/ui/dialog-styled";
 import {
   Select,
@@ -29,7 +25,10 @@ type EntreprisesSortDialogProps = {
 
 const SORT_OPTIONS = [
   { value: "nom", label: "Nom" },
+  { value: "formeJuridique", label: "Forme juridique" },
+  { value: "nbSites", label: "Nombre de sites" },
   { value: "createdAt", label: "Date de création" },
+  { value: "updatedAt", label: "Date de modification" },
 ] as const;
 
 export function EntreprisesSortDialog({
@@ -63,7 +62,7 @@ export function EntreprisesSortDialog({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <ArrowDownUp className="text-primary size-6" />
+                <ArrowDownUp className="text-primary size-5" />
                 Trier les entreprises
               </div>
             </DialogTitle>

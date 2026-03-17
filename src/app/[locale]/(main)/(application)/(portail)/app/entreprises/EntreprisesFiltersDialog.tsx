@@ -3,15 +3,11 @@
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
+  DialogStyledBody,
   DialogStyledContent,
   DialogStyledHeader,
-  DialogStyledBody,
 } from "@/components/ui/dialog-styled";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
@@ -94,7 +90,7 @@ export function EntreprisesFiltersDialog({
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
-                <Filter className="text-primary size-6" />
+                <Filter className="text-primary size-5" />
                 Filtrer les entreprises
               </div>
             </DialogTitle>
@@ -109,7 +105,7 @@ export function EntreprisesFiltersDialog({
                   <RhfInput
                     label="Recherche"
                     name="search"
-                    placeholder="Nom, SIRET, email..."
+                    placeholder="Nom, SIRET..."
                     className="col-span-1"
                     withError={false}
                   />

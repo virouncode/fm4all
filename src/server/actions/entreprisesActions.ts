@@ -187,7 +187,7 @@ export const getEntreprisesPrestatairesAction = actionClient
 const entreprisesQuerySchema = z.object({
   search: z.string().optional(),
   role: z.enum(["client", "prestataire", "plateforme"]).optional(),
-  orderBy: z.enum(["nom", "createdAt"]).optional(),
+  orderBy: z.enum(["nom", "createdAt", "updatedAt", "formeJuridique", "nbSites"]).optional(),
   orderDir: z.enum(["asc", "desc"]).optional(),
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(100).default(30),

@@ -134,7 +134,7 @@ export async function getEntreprisesPrestataires(): Promise<
 type GetEntreprisesPaginatedParamsType = {
   search?: string;
   role?: RoleEntrepriseType;
-  orderBy?: "nom" | "createdAt";
+  orderBy?: "nom" | "createdAt" | "updatedAt" | "formeJuridique" | "nbSites";
   orderDir?: "asc" | "desc";
   page: number;
   pageSize: number;
@@ -173,9 +173,17 @@ export async function getEntreprisesPaginated({
 
   const whereConditions = [searchFilter, roleSubquery].filter(Boolean);
 
-  const orderColumn =
-    orderBy === "nom" ? entreprises.nom : entreprises.createdAt;
   const orderFn = orderDir === "asc" ? sql`ASC` : sql`DESC`;
+
+  const orderByClause =
+    orderBy === "nbSites"
+      ? sql`COUNT(DISTINCT ${sites.id}) ${orderFn}`
+      : sql`${
+          orderBy === "updatedAt" ? entreprises.updatedAt
+          : orderBy === "formeJuridique" ? entreprises.formeJuridique
+          : orderBy === "createdAt" ? entreprises.createdAt
+          : entreprises.nom
+        } ${orderFn}`;
 
   const results = await db
     .select({
@@ -192,6 +200,7 @@ export async function getEntreprisesPaginated({
       logoId: entreprises.logoId,
       logoStorageKey: sql<string | null>`MAX(${documents.storageKey})`,
       createdAt: entreprises.createdAt,
+      updatedAt: entreprises.updatedAt,
       roles: sql<string[] | null>`array_agg(DISTINCT ${entrepriseRoles.role}::text) FILTER (WHERE ${entrepriseRoles.role} IS NOT NULL)`,
       nbSites: sql<number>`COUNT(DISTINCT ${sites.id})::integer`,
       hasActiveAdmin: sql<boolean>`EXISTS (
@@ -227,7 +236,7 @@ export async function getEntreprisesPaginated({
     .leftJoin(documents, eq(entreprises.logoId, documents.id))
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
     .groupBy(entreprises.id)
-    .orderBy(sql`${orderColumn} ${orderFn}`)
+    .orderBy(orderByClause)
     .limit(pageSize)
     .offset(offset);
 
@@ -301,6 +310,7 @@ export async function getEntrepriseWithDetailsById(
       logoId: entreprises.logoId,
       logoStorageKey: sql<string | null>`MAX(${documents.storageKey})`,
       createdAt: entreprises.createdAt,
+      updatedAt: entreprises.updatedAt,
       roles: sql<string[] | null>`array_agg(DISTINCT ${entrepriseRoles.role}::text) FILTER (WHERE ${entrepriseRoles.role} IS NOT NULL)`,
       nbSites: sql<number>`COUNT(DISTINCT ${sites.id})::integer`,
       hasActiveAdmin: sql<boolean>`EXISTS (

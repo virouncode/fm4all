@@ -165,6 +165,7 @@ export type EntrepriseWithDetails = {
   logoId: string | null;
   logoStorageKey: string | null;
   createdAt: Date;
+  updatedAt: Date;
   roles: RoleEntrepriseType[];
   nbSites: number;
   hasActiveAdmin: boolean;

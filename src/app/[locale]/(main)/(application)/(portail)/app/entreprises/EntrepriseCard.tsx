@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { EntrepriseWithDetails } from "@/zod-schemas/entreprise.schema";
-import { Building2, Calendar, HandPlatter } from "lucide-react";
+import { Calendar, HandPlatter, MapPin } from "lucide-react";
 import { formatEntrepriseDate, getRoleBadgeStyles } from "./helpers";
 import { LogoAvatar } from "./LogoAvatar";
 
@@ -140,7 +140,7 @@ export function EntrepriseCard({ entreprise, onClick }: EntrepriseCardProps) {
             <div className="flex items-center gap-1.5 border-t pt-2">
               {isClient && (
                 <>
-                  <Building2 className="text-primary h-3.5 w-3.5 shrink-0" />
+                  <MapPin className="text-primary h-3.5 w-3.5 shrink-0" />
                   <span className="text-xs">
                     {nbSites === 0
                       ? "Aucun site"

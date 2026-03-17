@@ -34,10 +34,12 @@ type FiltersType = {
   role?: string;
 };
 
-type OrderByType = "nom" | "createdAt";
+type OrderByType = "nom" | "createdAt" | "updatedAt" | "formeJuridique" | "nbSites";
 
 function toOrderBy(value: string | undefined): OrderByType {
-  return value === "nom" || value === "createdAt" ? value : "nom";
+  return value === "nom" || value === "createdAt" || value === "updatedAt" || value === "formeJuridique" || value === "nbSites"
+    ? value
+    : "nom";
 }
 
 function toOrderDir(value: string | undefined): "asc" | "desc" {

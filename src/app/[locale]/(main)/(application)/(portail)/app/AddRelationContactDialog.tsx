@@ -1,17 +1,17 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
 import { RhfCheckbox } from "@/components/rhf/RhfCheckbox";
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  DialogStyledBody,
+  DialogStyledContent,
+  DialogStyledFooter,
+  DialogStyledHeader,
+} from "@/components/ui/dialog-styled";
+import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
@@ -20,6 +20,14 @@ import {
   insertEntrepriseContactAndLinkToRelationAction,
   insertRelationContactAction,
 } from "@/server/actions/entreprisesActions";
+import { phoneNumberSchemaEmpty } from "@/zod-schemas/phone.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { UserPlus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm, useFormState } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 type ContactOptionType = {
   id: string;
   prenom: string;
@@ -28,13 +36,6 @@ type ContactOptionType = {
   email: string | null;
   phone: string | null;
 };
-import { phoneNumberSchemaEmpty } from "@/zod-schemas/phone.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { UserPlus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useForm, useFormState } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
 
 // Schemas locaux sans .default() (conflit RHF input/output types)
 const existingContactFormSchema = z.object({
@@ -176,40 +177,41 @@ export function AddRelationContactDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !isSubmitting && onOpenChange(v)}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="text-primary h-6 w-6" />
-            Ajouter un contact
-          </DialogTitle>
-        </DialogHeader>
+      <DialogStyledContent className="max-w-md">
+        <DialogStyledHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="text-primary size-5" />
+              Ajouter un contact
+            </DialogTitle>
+          </DialogHeader>
+        </DialogStyledHeader>
 
         {/* Sélecteur de mode */}
-        <div className="flex overflow-hidden rounded-md border text-sm">
-          <button
-            type="button"
-            className={`flex-1 px-3 py-2 transition-colors ${
-              mode === "existing"
-                ? "bg-primary text-primary-foreground"
-                : "bg-background hover:bg-muted"
-            }`}
-            onClick={() => setMode("existing")}
-            disabled={loadingContacts}
+        <DialogStyledBody className="px-5 py-4">
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            size="sm"
+            value={mode}
+            onValueChange={(v) => v && setMode(v as "existing" | "new")}
+            className="self-start"
           >
-            Choisir existant
-          </button>
-          <button
-            type="button"
-            className={`flex-1 px-3 py-2 transition-colors ${
-              mode === "new"
-                ? "bg-primary text-primary-foreground"
-                : "bg-background hover:bg-muted"
-            }`}
-            onClick={() => setMode("new")}
-          >
-            Créer nouveau
-          </button>
-        </div>
+            <ToggleGroupItem
+              value="existing"
+              disabled={loadingContacts}
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3 text-xs"
+            >
+              Choisir existant
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="new"
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3 text-xs"
+            >
+              Créer nouveau
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </DialogStyledBody>
 
         {mode === "existing" ? (
           <Form {...existingForm}>
@@ -217,49 +219,50 @@ export function AddRelationContactDialog({
               onSubmit={existingForm.handleSubmit(onSubmitExisting)}
               className="space-y-4"
             >
-              {loadingContacts ? (
-                <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                  <Spinner className="h-4 w-4" />
-                  Chargement des contacts…
-                </div>
-              ) : availableContacts.length === 0 ? (
-                <p className="text-muted-foreground text-sm">
-                  {totalContactCount > 0
-                    ? `Tous les contacts de ${targetNom} ont déjà été ajoutés. Vous pouvez en créer un nouveau.`
-                    : `${targetNom} n'a pas encore de contacts. Créez-en un nouveau.`}
-                </p>
-              ) : (
-                <>
-                  <RhfControlledSelect<ExistingContactFormType>
-                    name="contactId"
-                    label="Contact"
-                    requiredMark
-                    placeholder="Sélectionnez un contact"
-                    selectClassName="w-full"
-                  >
-                    {availableContacts.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.prenom} {c.nom}
-                        {c.fonction ? ` — ${c.fonction}` : ""}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
+              <DialogStyledBody>
+                {loadingContacts ? (
+                  <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                    <Spinner className="h-4 w-4" />
+                    Chargement des contacts…
+                  </div>
+                ) : availableContacts.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">
+                    {totalContactCount > 0
+                      ? `Tous les contacts de ${targetNom} ont déjà été ajoutés. Vous pouvez en créer un nouveau.`
+                      : `${targetNom} n'a pas encore de contacts. Créez-en un nouveau.`}
+                  </p>
+                ) : (
+                  <>
+                    <RhfControlledSelect<ExistingContactFormType>
+                      name="contactId"
+                      label="Contact"
+                      requiredMark
+                      placeholder="Sélectionnez un contact"
+                      selectClassName="w-full"
+                    >
+                      {availableContacts.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.prenom} {c.nom}
+                          {c.fonction ? ` — ${c.fonction}` : ""}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
 
-                  <RhfInput<ExistingContactFormType>
-                    name="role"
-                    label="Rôle dans la relation"
-                    placeholder="ex: Responsable compte"
-                  />
+                    <RhfInput<ExistingContactFormType>
+                      name="role"
+                      label="Rôle dans la relation"
+                      placeholder="ex: Responsable compte"
+                    />
 
-                  <RhfCheckbox<ExistingContactFormType>
-                    name="estPrincipal"
-                    label="Interlocuteur principal"
-                    orientation="horizontal"
-                  />
-                </>
-              )}
-
-              <DialogFooter>
+                    <RhfCheckbox<ExistingContactFormType>
+                      name="estPrincipal"
+                      label="Interlocuteur principal"
+                      orientation="horizontal"
+                    />
+                  </>
+                )}
+              </DialogStyledBody>
+              <DialogStyledFooter>
                 <Button
                   type="button"
                   variant="outline"
@@ -280,7 +283,7 @@ export function AddRelationContactDialog({
                   <UserPlus className="h-4 w-4" />
                   Ajouter
                 </Button>
-              </DialogFooter>
+              </DialogStyledFooter>
             </form>
           </Form>
         ) : (
@@ -289,52 +292,53 @@ export function AddRelationContactDialog({
               onSubmit={newForm.handleSubmit(onSubmitNew)}
               className="space-y-4"
             >
-              <div className="grid grid-cols-2 gap-3">
+              <DialogStyledBody>
+                <div className="grid grid-cols-2 gap-3">
+                  <RhfInput<NewContactFormType>
+                    name="prenom"
+                    label="Prénom"
+                    requiredMark
+                  />
+                  <RhfInput<NewContactFormType>
+                    name="nom"
+                    label="Nom"
+                    requiredMark
+                  />
+                </div>
+
                 <RhfInput<NewContactFormType>
-                  name="prenom"
-                  label="Prénom"
-                  requiredMark
+                  name="email"
+                  label="Email"
+                  type="email"
                 />
+
+                <div className="grid grid-cols-2 gap-3">
+                  <RhfInput<NewContactFormType>
+                    name="phone"
+                    label="Téléphone"
+                    type="tel"
+                  />
+                  <RhfInput<NewContactFormType>
+                    name="fonction"
+                    label="Fonction"
+                  />
+                </div>
+
+                <Separator />
+
                 <RhfInput<NewContactFormType>
-                  name="nom"
-                  label="Nom"
-                  requiredMark
+                  name="role"
+                  label="Rôle dans la relation"
+                  placeholder="ex: Responsable compte"
                 />
-              </div>
 
-              <RhfInput<NewContactFormType>
-                name="email"
-                label="Email"
-                type="email"
-              />
-
-              <div className="grid grid-cols-2 gap-3">
-                <RhfInput<NewContactFormType>
-                  name="phone"
-                  label="Téléphone"
-                  type="tel"
+                <RhfCheckbox<NewContactFormType>
+                  name="estPrincipal"
+                  label="Interlocuteur principal"
+                  orientation="horizontal"
                 />
-                <RhfInput<NewContactFormType>
-                  name="fonction"
-                  label="Fonction"
-                />
-              </div>
-
-              <Separator />
-
-              <RhfInput<NewContactFormType>
-                name="role"
-                label="Rôle dans la relation"
-                placeholder="ex: Responsable compte"
-              />
-
-              <RhfCheckbox<NewContactFormType>
-                name="estPrincipal"
-                label="Interlocuteur principal"
-                orientation="horizontal"
-              />
-
-              <DialogFooter>
+              </DialogStyledBody>
+              <DialogStyledFooter>
                 <Button
                   type="button"
                   variant="outline"
@@ -351,11 +355,11 @@ export function AddRelationContactDialog({
                   <UserPlus className="h-4 w-4" />
                   Créer et ajouter
                 </Button>
-              </DialogFooter>
+              </DialogStyledFooter>
             </form>
           </Form>
         )}
-      </DialogContent>
+      </DialogStyledContent>
     </Dialog>
   );
 }
