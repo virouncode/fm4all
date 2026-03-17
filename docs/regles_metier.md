@@ -1765,6 +1765,60 @@ La page est un **server component** qui re-fetche depuis la DB à chaque ouvertu
 
 Créée au démarrage de l'intervention par l'agent (clic sur "Démarrer"). Tracée pour audit et preuve de réalisation même sans compte utilisateur.
 
+| Champ | Contenu |
+|-------|---------|
+| `fieldLinkId` | FK → `occurrenceFieldLinks.id` |
+| `assigneeNom` | Nom déclaré librement par l'agent |
+| `startedAt` | Timestamp d'ouverture de session |
+| `endedAt` | Timestamp de clôture (posé par `terminateOccurrenceFieldAction`) |
+| `ip` | IP de l'agent (header `x-forwarded-for`) |
+| `userAgent` | User-agent du navigateur |
+
+**Stockage côté client** : `sessionId` sauvegardé en `localStorage` avec la clé `fm4all:terrainSessionId_${occurrenceId}`. Nom de l'agent : `fm4all:terrainAgentNom` (pour autocomplete).
+
+### Traçabilité DB — colonnes ajoutées (migration 0050)
+
+| Colonne | Table | Type |
+|---------|-------|------|
+| `startedByFieldSessionId` | `client_service_occurrences` | UUID FK → `occurrence_field_sessions.id` |
+| `doneByFieldSessionId` | `client_service_occurrences` | UUID FK → `occurrence_field_sessions.id` |
+| `startedByFieldSessionId` | `occurrence_taches` | UUID FK → `occurrence_field_sessions.id` |
+| `doneByFieldSessionId` | `occurrence_taches` | UUID FK → `occurrence_field_sessions.id` |
+
+Ces colonnes sont **lecture seule** côté back-office — elles servent uniquement à l'audit. Elles ne créent **aucun verrou de propriété** : n'importe quel agent peut terminer une tâche démarrée par un autre.
+
+### Actions terrain (`terrainActions.ts`) — sans authentification
+
+Toutes les actions valident le token via `validateToken()` qui vérifie :
+- `revokedAt IS NULL`
+- `expiresAt > now`
+
+| Action | Règle |
+|--------|-------|
+| `openTerrainSessionAction({ token, agentNom })` | Crée une `occurrenceFieldSession`, retourne `{ sessionId, occurrenceId, linkId }` |
+| `startOccurrenceFieldAction({ token, sessionId })` | Occurrence `planifiee → en_cours`, pose `startedByFieldSessionId`, `dateDebutReelle` |
+| `updateTacheFieldAction({ token, tacheId, statut, sessionId })` | Transition tâche (sauf `a_faire`) ; si `en_cours` → pose `assigneeNom`, `startedAt` ; si terminal → pose `completeeParNom`, `doneAt` |
+| `terminateOccurrenceFieldAction({ token, sessionId })` | Occurrence `→ terminee`, pose `doneByFieldSessionId`, `dateFinReelle`, clôt la session |
+| `addTachePieceJointeFieldAction({ token, tacheId, storageKey, ... })` | Valide appartenance tâche, promeut S3 temp→permanent, crée `documents` + `documentsLinks` (avec `proprietaireEntrepriseId = clientEntrepriseId`) |
+
+**Pas de garde posture** (accès public par token). `proprietaireEntrepriseId` = `clientServices.entrepriseId` du service lié à l'occurrence.
+
+### Upload S3 terrain (`/api/s3/presign-upload-terrain`)
+
+Route POST publique (pas de session). Valide le token DB, génère une URL présignée avec `makeTempKey` (catégorie `tache_piece_jointe`). L'URL temporaire est promue en permanente lors de l'appel à `addTachePieceJointeFieldAction`.
+
+### Temps réel — Pusher
+
+Canal : `terrain-${occurrenceId}`
+
+| Événement | Payload | Déclencheur |
+|-----------|---------|-------------|
+| `occurrence-updated` | `{ statut, startedByNom }` | `startOccurrenceFieldAction` + `terminateOccurrenceFieldAction` |
+| `tache-updated` | `{ tacheId, statut, assigneeNom, completeeParNom }` | `updateTacheFieldAction` |
+| `piece-jointe-added` | `{ tacheId, linkId, documentId, storageKey, filename }` | `addTachePieceJointeFieldAction` |
+
+Le client Pusher (`pusherClient`) est importé dynamiquement (`await import("@/lib/pusher")`) pour éviter les problèmes SSR.
+
 ---
 
 _Dernière mise à jour : 2026-03-13_

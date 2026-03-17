@@ -2696,6 +2696,26 @@ const hasActiveExecution = executions.some(                     // bandeau UI
 - ✅ Auth (`auth.ts`, `inscription-admin/`, `reset-password/`, `email-ok/`, `unauthorized/`, `env.ts`) — flows corrects, 1 bug critique corrigé (Pusher secret)
 - 🚧 Devis (`devisActions.ts`, `devisDemandesActions.ts`, `devisPermissions.utils.ts`) — 3 bugs corrigés, module encore en cours de développement
 
+## Changelog (2026-03-17)
+
+**Module Terrain — backend complet (migration 0050)** :
+
+- ✅ **Migration 0050** (`pnpm db:generate`) : colonnes `startedByFieldSessionId` + `doneByFieldSessionId` sur `client_service_occurrences` et `occurrence_taches` (FK → `occurrenceFieldSessions.id`, traçabilité sans verrou de propriété)
+- ✅ **`terrain.schema.ts`** : 5 schemas Zod (`openTerrainSessionSchema`, `startOccurrenceFieldSchema`, `updateTacheFieldSchema`, `terminateOccurrenceFieldSchema`, `addTachePieceJointeFieldSchema`)
+- ✅ **`terrain.query.ts`** : `getTerrainDataByToken()` — joins occurrence + service + client + prestataire + site + session; queries séparées tâches (ordre asc) + PJ (batch par tacheIds)
+- ✅ **`terrainActions.ts`** : 5 actions token-based sans auth (`openTerrainSession`, `startOccurrenceField`, `updateTacheField`, `terminateOccurrenceField`, `addTachePieceJointeField`). Pusher triggé sur canal `terrain-${occurrenceId}`.
+- ✅ **`/api/s3/presign-upload-terrain`** : route POST token-based, génère URL présignée avec `makeTempKey(categorie: "tache_piece_jointe")`
+- ✅ **`OccurrenceTerrain.tsx`** : branché sur les vraies actions + Pusher temps réel + localStorage session. `Channel` type importé depuis `pusher-js`.
+- ✅ **`page.tsx`** : chargement initial via `getTerrainDataByToken` → `notFound()` si token invalide/expiré
+
+**Pièges terrain à retenir** :
+
+- `documentsLinks.values()` requiert `proprietaireEntrepriseId` (not null) → passer `clientEntrepriseId` de `validateToken()`
+- `Channel` de pusher-js : typer via `import type { Channel } from "pusher-js"` (évite l'erreur `.bind()` sur type inline `{ unsubscribe }`)
+- `handleTacheTransition` doit prendre `OccurrenceTacheTransitionStatutType` (exclut `"a_faire"`) — jamais `OccurrenceTacheStatutType`
+- Pusher client : `await import("@/lib/pusher")` dynamique (evite SSR issues)
+- Migrations : **toujours** `pnpm db:generate` → jamais écrire le SQL manuellement
+
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 
 - `/app/sites` - Gestion hiérarchique avec closure table
