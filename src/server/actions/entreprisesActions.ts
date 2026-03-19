@@ -1757,7 +1757,7 @@ export const inviterContactAction = actionClient
 
     if (existingUser.length > 0) {
       throw errors.conflict(
-        "Cette adresse email est déjà associée à un compte existant.",
+        `Un compte existe déjà avec l'adresse "${contact.email}".`,
       );
     }
 
@@ -1882,7 +1882,7 @@ export const accepterInvitationContactAction = actionClient
       const msg = error instanceof Error ? error.message : String(error);
       if (msg.toLowerCase().includes("already exists")) {
         throw errors.conflict(
-          "Cette adresse email est déjà associée à un compte existant.",
+          `Un compte avec l'email "${invitation.email}" existe déjà.`,
         );
       }
       throw errors.internal(`Erreur lors de la création du compte : ${msg}`);

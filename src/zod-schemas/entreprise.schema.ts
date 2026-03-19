@@ -211,7 +211,7 @@ export const insertRelationContactSchema = z.object({
   contactId: z.uuid("ID du contact invalide"),
   side: z.enum(["client", "prestataire"]),
   role: z.string().optional(),
-  estPrincipal: z.boolean(),
+  estPrincipal: z.boolean().default(false),
 });
 export type InsertRelationContactType = z.infer<typeof insertRelationContactSchema>;
 
@@ -227,7 +227,7 @@ export const insertEntrepriseContactAndLinkToRelationSchema = z.object({
   targetEntrepriseId: z.uuid("ID entreprise invalide"),
   side: z.enum(["client", "prestataire"]),
   role: z.string().optional(),
-  estPrincipal: z.boolean(),
+  estPrincipal: z.boolean().default(false),
   prenom: z.string().min(1, "Prénom obligatoire"),
   nom: z.string().min(1, "Nom obligatoire"),
   email: z.string().email("Email invalide").or(z.literal("")).optional(),

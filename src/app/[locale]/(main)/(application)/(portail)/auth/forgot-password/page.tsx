@@ -1,7 +1,7 @@
 "use client";
 
 import BackgroundClient from "@/components/backgrounds/BackgroundClient";
-import { RhfInput } from "@/components/rhf/RhfInput";
+import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,19 +18,24 @@ import {
 } from "@/zod-schemas/forgotPassword";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { useForm, useFormState } from "react-hook-form";
+
+import { useForm } from "react-hook-form";
 
 export default function ForgotPassword() {
+  const [loading, setLoading] = useState(false);
+  const defaultValues: ForgotPasswordType = {
+    email: "",
+  };
   const form = useForm<ForgotPasswordType>({
-    mode: "onTouched",
+    mode: "all",
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: "" },
+    defaultValues,
   });
 
-  const { isSubmitting } = useFormState({ control: form.control });
-
   const submitForm = async (data: ForgotPasswordType) => {
+    setLoading(true);
     const { error } = await authClient.requestPasswordReset({
       email: data.email.toLowerCase(),
       redirectTo: "/auth/reset-password",
@@ -42,6 +47,7 @@ export default function ForgotPassword() {
         "Email envoyé !, si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation de mot de passe.",
       );
     }
+    setLoading(false);
   };
 
   return (
@@ -61,17 +67,17 @@ export default function ForgotPassword() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(submitForm)}>
                 <div className="grid gap-4">
-                  <RhfInput<ForgotPasswordType>
-                    name="email"
-                    label="Email"
+                  <InputWithLabel<ForgotPasswordType>
+                    fieldTitle="Email"
+                    nameInSchema="email"
                     type="email"
                   />
                   <Button
                     className="w-full text-base"
-                    disabled={isSubmitting}
+                    disabled={loading}
                     size="lg"
                   >
-                    {isSubmitting ? (
+                    {loading ? (
                       <Loader2 size={16} className="animate-spin" />
                     ) : (
                       "Envoyer le lien"

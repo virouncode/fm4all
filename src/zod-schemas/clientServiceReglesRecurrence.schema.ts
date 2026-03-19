@@ -20,11 +20,11 @@ export const insertRegleRecurrenceFormSchema = z.object({
   libelle: z.string().optional(),
   // ISO datetime string (local wall-clock time, sans timezone)
   dtstartLocal: z.string().min(1, "Date de début obligatoire"),
-  fuseauHoraire: z.string(),
+  fuseauHoraire: z.string().default("Europe/Paris"),
   // RRULE pure sans DTSTART — ex: "FREQ=WEEKLY;BYDAY=MO,WE,FR"
   regleRrule: z.string().min(1, "Règle de récurrence obligatoire"),
   dureePrevueMinutes: z.string().optional(), // string dans le form, converti en number côté action
-  actif: z.boolean(),
+  actif: z.boolean().default(true),
   ordre: z.string().optional(), // string dans le form, converti en number côté action
   /** Checklist optionnelle — null = hérite de l'exécution */
   tacheListeTemplateId: z.uuid().nullable().optional(),
@@ -110,7 +110,7 @@ export const upsertQuotaPlanificationFormSchema = z.object({
       "Le nombre d'occurrences doit être un entier entre 1 et 52",
     ),
   periodeQuota: periodeQuotaSchema,
-  modeAncragePeriode: modeAncragePeriodeSchema,
+  modeAncragePeriode: modeAncragePeriodeSchema.default("contrat"),
   // dateAncragePeriode calculée côté serveur (depuis dateDebut du clientService ou calendrier civil)
   notes: z.string().optional(),
 });

@@ -56,7 +56,7 @@ const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
           className="cursor-pointer text-center underline"
           onClick={handleSignOut}
         >
-          Me déconnecter
+          Me connecter
         </p>
       </CardContent>
     </Card>
