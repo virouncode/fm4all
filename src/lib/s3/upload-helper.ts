@@ -17,8 +17,6 @@ export async function uploadFileToS3(params: {
 }): Promise<{ key: string; previewUrl: string }> {
   const { file, proprietaireEntrepriseId, categorie } = params;
 
-  console.log("uploadFileToS3");
-
   // 1. Obtenir URLs présignées (upload + preview) depuis Server Action
   const result = await getPresignedUploadUrlAction({
     proprietaireEntrepriseId,
@@ -27,13 +25,7 @@ export async function uploadFileToS3(params: {
     originalName: file.name,
   });
 
-  // DEBUG: Log complet du résultat
-  console.log("=== Server Action Result ===");
-  console.log("Full result:", JSON.stringify(result, null, 2));
-  console.log("result.data:", result?.data);
-
   if (result?.serverError) {
-    console.error("Server error detected:", result.serverError);
     throw new Error(
       result.serverError.message ||
         "Erreur lors de la génération de l'URL présignée",
@@ -41,24 +33,17 @@ export async function uploadFileToS3(params: {
   }
 
   if (result?.validationErrors) {
-    console.error("Validation errors detected:", result.validationErrors);
     const errors = Object.values(result.validationErrors).flat();
     throw new Error(errors[0] || "Données invalides");
   }
 
   if (!result?.data) {
-    console.error("result.data is missing! Full result:", result);
     throw new Error("Impossible d'obtenir l'URL présignée");
   }
 
-  console.log("Destructuring result.data...");
-  console.log("result.data keys:", Object.keys(result.data));
   const { uploadUrl, key, previewUrl, headers } = result.data;
-  console.log("Destructured values:", { uploadUrl, key, previewUrl, headers });
 
-  // Validation des données retournées
   if (!uploadUrl || !key || !previewUrl) {
-    console.error("Missing data from presigned URL action:", result.data);
     throw new Error(
       `Données incomplètes: uploadUrl=${!!uploadUrl}, key=${!!key}, previewUrl=${!!previewUrl}`,
     );
@@ -70,10 +55,6 @@ export async function uploadFileToS3(params: {
     body: file,
     headers: headers ?? undefined,
   });
-
-  const text = await uploadResponse.text();
-  console.log("S3 upload response status:", uploadResponse.status);
-  console.log("S3 upload response text:", text);
 
   if (!uploadResponse.ok) {
     throw new Error(

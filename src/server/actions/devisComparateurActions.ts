@@ -123,7 +123,7 @@ export const saveProgressAction = actionClient
         useTemplate: false, //car trop long pour les templates Mailgun (limite de 10k caractères)
       });
     } catch (err) {
-      console.log("Erreur envoi email", err);
+      void err;
     }
 
     return {
@@ -244,7 +244,7 @@ export const finaliserDevisAction = actionClient
         useTemplate: true,
       });
     } catch (err) {
-      console.error("Erreur lors de l'envoi de l'e-mail de devis", err);
+      void err;
     }
 
     return {

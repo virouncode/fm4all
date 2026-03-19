@@ -33,24 +33,19 @@ export default function PortalCacheInvalidationListener() {
     channel.bind(
       CACHE_INVALIDATION.EVENT,
       async (message: CacheInvalidationEvent) => {
-        console.log("Événement d'invalidation de cache reçu:", message);
-
         // Vérifier si cet événement a déjà été traité
         if (processedEvents.has(message.timestamp)) {
-          console.log("Événement déjà traité, ignoré:", message.timestamp);
           return;
         }
 
         // Vérifier si une invalidation est déjà en cours
         if (isInvalidatingRef.current) {
-          console.log("Invalidation déjà en cours, ignoré");
           return;
         }
 
         // Vérifier si une invalidation a été effectuée récemment
         const now = Date.now();
         if (now - lastInvalidationTimeRef.current < DEBOUNCE_DELAY) {
-          console.log("Invalidation trop récente, ignoré");
           return;
         }
 

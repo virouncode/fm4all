@@ -118,11 +118,8 @@ export function RhfFileInput<S extends FieldValues>({
         const handleFileChange: React.ChangeEventHandler<
           HTMLInputElement
         > = async (e) => {
-          console.log("=== handleFileChange START ===");
           const file = e.target.files?.[0];
-          console.log("File selected:", file?.name, file?.type, file?.size);
           if (!file) {
-            console.log("No file selected, returning");
             return;
           }
 

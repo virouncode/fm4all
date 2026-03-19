@@ -41,7 +41,6 @@ export const actionClient = createSafeActionClient({
 
     // 0) Erreurs métier (AppError) - retourner directement l'apiError
     if (error instanceof AppError) {
-      console.log("[Server action] AppError détectée, code:", error.apiError.code);
       return error.apiError;
     }
 

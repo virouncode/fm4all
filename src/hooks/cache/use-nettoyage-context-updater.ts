@@ -34,10 +34,6 @@ export function useNettoyageContextUpdater() {
       if (data.serviceType !== "nettoyage") return;
       const tarifType = data.tarifType as string;
       const clientSurfaceRounded = roundSurface(prospect.surface);
-      console.log(
-        `Mise à jour du contexte nettoyage (${tarifType}): ${data.field} -> ${data.value}`,
-      );
-
       switch (tarifType) {
         case "standard":
           if (clientSurfaceRounded === data.surface) {

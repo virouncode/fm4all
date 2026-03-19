@@ -207,7 +207,6 @@ export const fillDevis = async (
           description:
             "Impossible d'intégrer la synthèse dans le devis : " + err.message,
         });
-      console.log(err);
     }
 
     //DETAILS
@@ -293,7 +292,6 @@ export const fillDevis = async (
             "Impossible d'intégrer le détail des prestations dans le devis : " +
             err.message,
         });
-      console.log(err);
     }
 
     const pdfBytes = await pdfDoc.save();
@@ -303,7 +301,7 @@ export const fillDevis = async (
     const docUrl = URL.createObjectURL(blob);
     return docUrl;
   } catch (error) {
-    console.error("Error processing PDF form: ", error);
+    void error;
     return null;
   }
 };

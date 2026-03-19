@@ -88,7 +88,6 @@ export function UsersClient() {
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
-  // Extract search params for useEffect dependencies
   const searchFilter = searchParams.get("search") || undefined;
   const roleFilter = searchParams.get("roleAdhesion") || undefined;
   const statutFilter = searchParams.get("statutAdhesion") || undefined;
@@ -201,15 +200,7 @@ export function UsersClient() {
   useEffect(() => {
     loadUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    entreprise?.id,
-    postureActive,
-    viewType,
-    viewEntrepriseId,
-    searchFilter,
-    roleFilter,
-    statutFilter,
-  ]);
+  }, [entreprise?.id, postureActive, viewType, viewEntrepriseId, searchParams]);
 
   // Déplier les ancêtres quand un utilisateur est sélectionné (par défaut ou par clic)
   useEffect(() => {

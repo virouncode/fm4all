@@ -232,12 +232,13 @@ export async function getUsers(query: UsersQueryBackendType) {
   };
 
   // Shared: order + pagination
-  const orderColumn = {
-    prenom: user.prenom,
-    nom: user.nom,
-    email: user.email,
-    createdAt: user.createdAt,
-  }[orderBy];
+  const orderColumn =
+    ({
+      prenom: user.prenom,
+      nom: user.nom,
+      email: user.email,
+      createdAt: user.createdAt,
+    } as Record<string, typeof user.createdAt>)[orderBy] ?? user.createdAt;
   const orderExpr = orderDir === "asc" ? asc(orderColumn) : desc(orderColumn);
   const offset = (page - 1) * pageSize;
 
@@ -309,7 +310,7 @@ export async function getUsers(query: UsersQueryBackendType) {
       ...buildSearchClauses(),
     ];
     if (roleAdhesion) {
-      whereClauses.push(sql`${userPrestataireAdhesions.role} = ${roleAdhesion}`);
+      whereClauses.push(eq(userPrestataireAdhesions.role, roleAdhesion));
     }
     if (statutAdhesion) {
       whereClauses.push(eq(userPrestataireAdhesions.statut, statutAdhesion));
