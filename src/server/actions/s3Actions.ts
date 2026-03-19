@@ -48,11 +48,6 @@ export const getPresignedUploadUrlAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // TODO: Vérifier que currentUser a accès à proprietaireEntrepriseId
-    // if (!(await userHasEntrepriseAccess(currentUser.id, parsedInput.proprietaireEntrepriseId))) {
-    //   throw errors.forbidden("Accès refusé à cette entreprise.");
-    // }
-
     const key = makeTempKey({
       proprietaireEntrepriseId: parsedInput.proprietaireEntrepriseId,
       categorie: parsedInput.categorie,
@@ -110,11 +105,6 @@ export const getPresignedReadUrlAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // TODO: Vérifier accès userId -> proprietaireEntrepriseId
-    // if (!(await userHasEntrepriseAccess(currentUser.id, parsedInput.proprietaireEntrepriseId))) {
-    //   throw errors.forbidden("Accès refusé à cette entreprise.");
-    // }
-
     const validation = validateKeyAllowed({
       key: parsedInput.key,
       proprietaireEntrepriseId: parsedInput.proprietaireEntrepriseId,
@@ -160,11 +150,6 @@ export const deleteS3ObjectAction = actionClient
     if (!currentUser) {
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
-
-    // TODO: Vérifier accès userId -> proprietaireEntrepriseId
-    // if (!(await userHasEntrepriseAccess(currentUser.id, parsedInput.proprietaireEntrepriseId))) {
-    //   throw errors.forbidden("Accès refusé à cette entreprise.");
-    // }
 
     const validation = validateKeyAllowed({
       key: parsedInput.key,
