@@ -8,10 +8,6 @@ import { z } from "zod";
 import { parseJson } from "@/app/api/(helpers)/parseJson";
 import { errorResponse, successResponse } from "@/app/api/(helpers)/responses";
 import { env } from "@/lib/env";
-import { getSession } from "@/server/auth/get-session";
-
-import { getDocumentById } from "@/server/queries/documents.query";
-import { getS3ObjectAsBuffer, validateKeyAllowed } from "@/server/s3/s3";
 
 const emailSchema = z.object({
   from: z.email().optional(), // utilisé en Reply-To uniquement
@@ -20,14 +16,10 @@ const emailSchema = z.object({
   text: z.string().min(1, "Le corps du message est obligatoire"),
   html: z.string().optional(),
 
-  attachmentDocumentId: z.uuid().optional(),
-
   nomDestinataire: z.string().optional(),
   prenomDestinataire: z.string().optional(),
   useTemplate: z.boolean().optional(),
 });
-
-type MailgunAttachmentType = { data: Buffer; filename: string };
 
 type EmailWithTemplateType = {
   from: string;
@@ -37,7 +29,6 @@ type EmailWithTemplateType = {
   template: string;
   "h:X-Mailgun-Variables": string;
   "h:Reply-To"?: string;
-  attachment?: MailgunAttachmentType[];
 };
 
 type EmailWithoutTemplateType = {
@@ -48,21 +39,9 @@ type EmailWithoutTemplateType = {
   text: string;
   html?: string;
   "h:Reply-To"?: string;
-  attachment?: MailgunAttachmentType[];
 };
 
-const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10MB (ajuste)
-
 export async function POST(req: NextRequest) {
-  const session = await getSession();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return errorResponse("UNAUTHORIZED", "Authentication required", {
-      status: 401,
-    });
-  }
-
   const mailgun = new Mailgun(formData);
   const mg = mailgun.client({ username: "api", key: env.MAILGUN_API_KEY });
 
@@ -74,67 +53,12 @@ export async function POST(req: NextRequest) {
         ? body.from
         : undefined;
 
-    // 1) Si attachmentDocumentId: on récupère le doc en DB
-    let attachment: MailgunAttachmentType[] | undefined;
-
-    if (body.attachmentDocumentId) {
-      const doc = await getDocumentById(body.attachmentDocumentId);
-
-      if (!doc) {
-        return errorResponse("NOT_FOUND", "Document introuvable.", {
-          status: 404,
-        });
-      }
-
-      // 2) Ownership: doc.proprietaireEntrepriseId est la vérité
-      // TODO: vérifie que userId a accès à doc.proprietaireEntrepriseId
-      // if (!(await userHasEntrepriseAccess(userId, doc.proprietaireEntrepriseId))) {
-      //   return errorResponse("FORBIDDEN", "Access denied.", { status: 403 });
-      // }
-
-      // 3) Vérifs storage
-      if (doc.storageProvider !== "s3") {
-        return errorResponse("DEPENDENCY", "Document non stocké sur S3.", {
-          status: 502,
-          details: { storageProvider: doc.storageProvider },
-        });
-      }
-
-      if (doc.sizeBytes > MAX_ATTACHMENT_BYTES) {
-        return errorResponse("VALIDATION", "Pièce jointe trop volumineuse.", {
-          status: 422,
-          details: { sizeBytes: doc.sizeBytes, maxBytes: MAX_ATTACHMENT_BYTES },
-        });
-      }
-
-      const v = validateKeyAllowed({
-        key: doc.storageKey,
-        proprietaireEntrepriseId: doc.proprietaireEntrepriseId,
-      });
-      if (!v.ok)
-        return errorResponse(
-          v.status === 400 ? "VALIDATION" : "FORBIDDEN",
-          v.message,
-          { status: v.status, details: v.details },
-        );
-
-      const fileBuffer = await getS3ObjectAsBuffer(doc.storageKey);
-
-      attachment = [
-        {
-          data: fileBuffer,
-          filename: doc.filename,
-        },
-      ];
-    }
-
     const base = {
       from: `fm4all: Le Facility Management pour tous <noreply@mg.fm4all.com>`,
       to: [body.to],
       ...(env.MAILGUN_BCC_EMAIL ? { bcc: [env.MAILGUN_BCC_EMAIL] } : {}),
       subject: body.subject,
       ...(replyTo ? { "h:Reply-To": replyTo } : {}),
-      ...(attachment ? { attachment } : {}),
     };
 
     // Sans template

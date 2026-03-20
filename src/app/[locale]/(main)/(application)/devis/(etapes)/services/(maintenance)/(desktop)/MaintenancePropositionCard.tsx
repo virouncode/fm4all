@@ -12,20 +12,19 @@ import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type MaintenancePropositionCardProps = {
   proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -42,13 +41,12 @@ type MaintenancePropositionCardProps = {
     totalAnnuel: number | null;
   };
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -168,7 +166,7 @@ const MaintenancePropositionCard = ({
   return (
     <div
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
-        maintenance.infos.fournisseurId === proposition.fournisseurId &&
+        maintenance.infos.entrepriseId === proposition.entrepriseId &&
         maintenance.infos.gammeSelected === proposition.gamme
           ? "ring-destructive ring-4 ring-inset"
           : ""
@@ -177,7 +175,7 @@ const MaintenancePropositionCard = ({
     >
       <Switch
         checked={
-          maintenance.infos.fournisseurId === proposition.fournisseurId &&
+          maintenance.infos.entrepriseId === proposition.entrepriseId &&
           maintenance.infos.gammeSelected === proposition.gamme
         }
         onCheckedChange={() => handleClickProposition(proposition)}

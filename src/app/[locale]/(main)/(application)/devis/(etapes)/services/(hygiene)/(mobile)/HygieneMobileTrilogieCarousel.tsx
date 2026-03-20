@@ -12,10 +12,9 @@ type HygieneMobilePropositionsProps = {
   prixInstalDistrib: number | null;
   propositions: {
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -38,10 +37,9 @@ type HygieneMobilePropositionsProps = {
   }[];
   handleClickProposition: (proposition: {
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -82,7 +80,7 @@ const HygieneMobileTrilogieCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!hygiene.infos.fournisseurId || !api) {
+    if (!hygiene.infos.entrepriseId || !api) {
       return;
     }
     if (hygiene.infos.trilogieGammeSelected) {
@@ -94,7 +92,7 @@ const HygieneMobileTrilogieCarousel = ({
             : 2,
       );
     }
-  }, [api, hygiene.infos.fournisseurId, hygiene.infos.trilogieGammeSelected]);
+  }, [api, hygiene.infos.entrepriseId, hygiene.infos.trilogieGammeSelected]);
   return (
     <Carousel
       opts={{

@@ -2,8 +2,8 @@
 
 import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
 import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
-import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
-import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
+import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites.schema";
+import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs.schema";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
@@ -58,11 +58,11 @@ const OfficeManagerPropositions = ({
       : null;
 
   const propositions = officeManagerTarifs.map((tarif) => {
-    let { fournisseurId, nomFournisseur, slogan } = tarif;
-    const { id, demiTjm, demiTjmPremium, logoUrl } = tarif;
-    if (fournisseurId === 14) {
-      fournisseurId = 16;
-      nomFournisseur = "FM4ALL";
+    let { entrepriseId, nomPrestataire, slogan } = tarif;
+    const { id, demiTjm, demiTjmPremium, logoStorageKey } = tarif;
+    if (false) {
+      entrepriseId = "00000000-0000-0000-0000-000000000000";
+      nomPrestataire = "FM4ALL";
       slogan = tOfficeManager("le-facility-management-pour-tous");
     }
     const demiTauxJournalier = officeManager.infos.premium
@@ -77,10 +77,10 @@ const OfficeManagerPropositions = ({
 
     return {
       id,
-      fournisseurId,
-      nomFournisseur,
-      sloganFournisseur: slogan,
-      logoUrl,
+      entrepriseId,
+      nomPrestataire,
+      sloganPrestataire: slogan,
+      logoStorageKey,
       totalAnnuel,
       demiJParSemaine,
       demiTjm,
@@ -89,21 +89,21 @@ const OfficeManagerPropositions = ({
   });
 
   const handleClickProposition = (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
   }) => {
     const {
-      fournisseurId,
-      nomFournisseur,
-      sloganFournisseur,
-      logoUrl,
+      entrepriseId,
+      nomPrestataire,
+      sloganPrestataire,
+      logoStorageKey,
       totalAnnuel,
       demiJParSemaine,
       demiTjm,
@@ -111,17 +111,17 @@ const OfficeManagerPropositions = ({
     } = proposition;
 
     if (
-      officeManager.infos.fournisseurId === fournisseurId &&
+      officeManager.infos.entrepriseId === entrepriseId &&
       officeManager.infos.gammeSelected
     ) {
       setOfficeManager((prev) => ({
         ...prev,
         infos: {
           ...prev.infos,
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           gammeSelected: null,
         },
         // quantites: {
@@ -140,10 +140,10 @@ const OfficeManagerPropositions = ({
     setOfficeManager((prev) => ({
       infos: {
         ...prev.infos,
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur,
-        logoUrl,
+        entrepriseId,
+        nomPrestataire,
+        sloganPrestataire,
+        logoStorageKey,
         gammeSelected:
           demiJParSemaine !== null &&
           demiJParSemaineConfort !== null &&

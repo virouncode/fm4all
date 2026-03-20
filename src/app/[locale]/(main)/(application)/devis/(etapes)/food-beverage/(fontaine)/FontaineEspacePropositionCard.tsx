@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { TypesPoseType } from "@/constants/typesPose";
 import { capitalize } from "@/lib/utils/capitalize";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
@@ -16,92 +15,12 @@ import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { getTypeFontaine } from "./getTypeFontaine";
+import { FontaineMobilePropositionItem } from "./(mobile)/FontaineMobileEspacePropositionCard";
 
 type FontaineEspacePropositionCardProps = {
-  proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: TypesPoseType;
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  };
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: TypesPoseType;
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
-  handleClickFirstEspaceProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: TypesPoseType;
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
+  proposition: FontaineMobilePropositionItem;
+  handleClickProposition: (proposition: FontaineMobilePropositionItem) => void;
+  handleClickFirstEspaceProposition: (proposition: FontaineMobilePropositionItem) => void;
   espace: FontaineEspaceType;
   fontainesEspacesIds: number[];
 };
@@ -192,7 +111,7 @@ const FontaineEspacePropositionCard = ({
             1 {tFontaines("fontaine")}{" "}
             <span
               className={`${
-                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+                ""
               }`}
             >
               {proposition.marque}
@@ -205,7 +124,7 @@ const FontaineEspacePropositionCard = ({
             1{" "}
             <span
               className={`${
-                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+                ""
               }`}
             >
               {proposition.marque}
@@ -239,7 +158,7 @@ const FontaineEspacePropositionCard = ({
             1 {tFontaines("fontaine")}{" "}
             <span
               className={`${
-                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+                ""
               }`}
             >
               {proposition.marque}
@@ -252,7 +171,7 @@ const FontaineEspacePropositionCard = ({
             1{" "}
             <span
               className={`${
-                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+                ""
               }`}
             >
               {proposition.marque}
@@ -299,7 +218,7 @@ const FontaineEspacePropositionCard = ({
   return (
     <div
       className={`flex flex-1 cursor-pointer items-center justify-center gap-4 border-r bg-slate-100 p-4 text-2xl ${
-        fontaines.infos.fournisseurId === proposition.fournisseurId &&
+        fontaines.infos.entrepriseId === proposition.entrepriseId &&
         espace.infos.poseSelected === proposition.typePose
           ? "ring-destructive ring-4 ring-inset"
           : ""
@@ -312,7 +231,7 @@ const FontaineEspacePropositionCard = ({
     >
       <Switch
         checked={
-          fontaines.infos.fournisseurId === proposition.fournisseurId &&
+          fontaines.infos.entrepriseId === proposition.entrepriseId &&
           (espace.infos.poseSelected === proposition.typePose ? true : false)
         }
         onCheckedChange={() => () =>

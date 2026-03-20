@@ -10,13 +10,12 @@ import MaintenanceMobilePropositionCard from "./MaintenanceMobilePropositionCard
 
 type MaintenanceMobilePropositionsCarouselProps = {
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -33,13 +32,12 @@ type MaintenanceMobilePropositionsCarouselProps = {
     totalAnnuel: number | null;
   }) => void;
   propositions: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -74,11 +72,11 @@ const MaintenanceMobilePropositionsCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!maintenance.infos.fournisseurId && !api) {
+    if (!maintenance.infos.entrepriseId && !api) {
       return;
     }
     if (
-      propositions[0].fournisseurId === maintenance.infos.fournisseurId &&
+      propositions[0].entrepriseId === maintenance.infos.entrepriseId &&
       maintenance.infos.gammeSelected
     ) {
       api?.scrollTo(
@@ -91,7 +89,7 @@ const MaintenanceMobilePropositionsCarousel = ({
     }
   }, [
     api,
-    maintenance.infos.fournisseurId,
+    maintenance.infos.entrepriseId,
     maintenance.infos.gammeSelected,
     propositions,
   ]);

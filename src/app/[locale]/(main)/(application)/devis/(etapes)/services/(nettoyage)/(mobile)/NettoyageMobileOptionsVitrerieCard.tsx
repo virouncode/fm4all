@@ -23,17 +23,16 @@ import { useShallow } from "zustand/shallow";
 
 type NettoyageMobileOptionsVitrerieCardProps = {
   vitrerieProposition: {
-    id: number;
+    id: string;
     tauxHoraire: number;
     cadenceCloisons: number;
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
     prixAnnuel: number | null;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -42,17 +41,16 @@ type NettoyageMobileOptionsVitrerieCardProps = {
     nbAvis: number | null;
   };
   handleClickVitrerieProposition: (proposition: {
-    id: number;
+    id: string;
     tauxHoraire: number;
     cadenceCloisons: number;
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
     prixAnnuel: number | null;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -82,7 +80,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
     })),
   );
   const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
-  const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
+  const { gammeSelected: gamme, nomPrestataire } = nettoyage.infos;
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
     <p className="text-end text-sm font-bold">
       {formatNumber((vitrerieProposition.prixAnnuel * MARGE) / 12)}{" "}
@@ -285,16 +283,16 @@ const NettoyageMobileOptionsVitrerieCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             {vitrerieProposition.prixAnnuel ? (
               <>
                 <Dialog>
                   <DialogTrigger asChild>
-                    {nettoyage.infos.logoUrl ? (
+                    {nettoyage.infos.logoStorageKey ? (
                       <div className="relative h-10">
                         <Image
-                          src={nettoyage.infos.logoUrl}
-                          alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
+                          src={nettoyage.infos.logoStorageKey}
+                          alt={`logo-de-${nettoyage.infos.nomPrestataire}`}
                           fill
                           className="cursor-pointer object-contain object-left"
                           sizes="(max-width:768px) 100vw"
@@ -305,14 +303,14 @@ const NettoyageMobileOptionsVitrerieCard = ({
                   <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                     <DialogHeader>
                       <DialogTitle>
-                        {nettoyage.infos.nomFournisseur}
+                        {nettoyage.infos.nomPrestataire}
                       </DialogTitle>
                     </DialogHeader>
                     <FournisseurDialog
-                      sloganFournisseur={vitrerieProposition.slogan}
-                      logoUrl={vitrerieProposition.logoUrl}
-                      nomFournisseur={vitrerieProposition.nomFournisseur}
-                      locationUrl={vitrerieProposition.locationUrl}
+                      sloganPrestataire={vitrerieProposition.slogan}
+                      logoStorageKey={vitrerieProposition.logoStorageKey}
+                      nomPrestataire={vitrerieProposition.nomPrestataire}
+                      locationUrl={null}
                       anneeCreation={vitrerieProposition.anneeCreation}
                       ca={vitrerieProposition.ca}
                       effectif={vitrerieProposition.effectif}
@@ -337,11 +335,11 @@ const NettoyageMobileOptionsVitrerieCard = ({
                     </div>
                   )}
               </>
-            ) : nettoyage.infos.logoUrl ? (
+            ) : nettoyage.infos.logoStorageKey ? (
               <div className="relative h-10">
                 <Image
-                  src={nettoyage.infos.logoUrl}
-                  alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
+                  src={nettoyage.infos.logoStorageKey}
+                  alt={`logo-de-${nettoyage.infos.nomPrestataire}`}
                   fill
                   className="cursor-pointer object-contain object-left"
                   sizes="(max-width:768px) 100vw"

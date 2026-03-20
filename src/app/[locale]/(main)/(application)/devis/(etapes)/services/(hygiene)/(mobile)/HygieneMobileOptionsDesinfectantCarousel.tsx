@@ -11,16 +11,15 @@ import HygieneMobileOptionsDesinfectantCard from "./HygieneMobileOptionsDesinfec
 
 type HygieneMobileOptionsDesinfectantCarouselProps = {
   propositions: {
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
     anneeCreation: number | null;
-    logoUrl: string | null;
+    logoStorageKey: string | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -39,16 +38,15 @@ type HygieneMobileOptionsDesinfectantCarouselProps = {
   handleClickProposition: (
     type: HygieneOptionsType,
     proposition: {
-      nomFournisseur: string;
-      sloganFournisseur: string | null;
+      nomPrestataire: string;
+      sloganPrestataire: string | null;
       anneeCreation: number | null;
-      logoUrl: string | null;
+      logoStorageKey: string | null;
       ca: string | null;
       effectifFournisseur: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
-      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
@@ -85,7 +83,7 @@ const HygieneMobileOptionsDesinfectantCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!hygiene.infos.fournisseurId && !api) {
+    if (!hygiene.infos.entrepriseId && !api) {
       return;
     }
     if (hygiene.infos.desinfectantGammeSelected) {
@@ -100,7 +98,7 @@ const HygieneMobileOptionsDesinfectantCarousel = ({
   }, [
     api,
     hygiene.infos.desinfectantGammeSelected,
-    hygiene.infos.fournisseurId,
+    hygiene.infos.entrepriseId,
   ]);
 
   return (

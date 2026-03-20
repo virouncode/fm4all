@@ -5,15 +5,15 @@ import {
   CarouselContent,
 } from "@/components/ui/carousel";
 import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
-import { GammeType } from "@/zod-schemas/gamme";
-import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
+import { GammeType } from "@/zod-schemas/gamme.schema";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All.schema";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import ServicesFm4AllMobilePropositionCard from "./ServicesFm4AllMobilePropositionCard";
 
 type ServicesFm4allMobilePropositionsProps = {
   formattedPropositions: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
@@ -43,7 +43,7 @@ type ServicesFm4allMobilePropositionsProps = {
     totalAnnuelSansRemise: number;
   }[];
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;

@@ -27,7 +27,7 @@ const TotalMaintenance = () => {
       <div className="flex flex-col gap-4">
         <div>
           {tMaintenance("maintenance-multi-technique")} (
-          {maintenance.infos.nomFournisseur})
+          {maintenance.infos.nomPrestataire})
         </div>
         <div className="ml-4 flex flex-col text-xs">
           {totalService ? (

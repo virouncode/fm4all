@@ -5,7 +5,7 @@ import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
@@ -28,16 +28,16 @@ type HygieneMobileOptionsDesinfectantInputProps = {
       | "parfum"
       | "balai"
       | "poubelle";
-    fournisseurId: number;
-    nomFournisseur: string;
-    logoUrl: string | null;
+    entrepriseId: string;
+    nomPrestataire: string;
+    logoStorageKey: string | null;
     pa12M: number | null;
     pa24M: number | null;
     pa36M: number | null;
     oneShot: number | null;
-    id: number;
+    id: string;
     slogan: string | null;
-    locationUrl: string | null;
+
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -46,7 +46,7 @@ type HygieneMobileOptionsDesinfectantInputProps = {
     nbAvis: number | null;
     createdAt: Date;
     gamme: "essentiel" | "confort" | "excellence";
-    imageUrl: string | null;
+
   }[];
 };
 

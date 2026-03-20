@@ -2,10 +2,10 @@ import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
-import { gammes } from "@/zod-schemas/gamme";
-import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
-import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
+import { gammes } from "@/zod-schemas/gamme.schema";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs.schema";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs.schema";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
@@ -76,22 +76,10 @@ const HygieneOptionsPropositions = ({
         (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
-    const imageUrlDesinfectant =
-      hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme,
-      )?.imageUrl ?? null;
-    const imageUrlParfum =
-      hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme,
-      )?.imageUrl ?? null;
-    const imageUrlBalai =
-      hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "balai" && tarif.gamme === gamme,
-      )?.imageUrl ?? null;
-    const imageUrlPoubelle =
-      hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme,
-      )?.imageUrl ?? null;
+    const imageUrlDesinfectant = null;
+    const imageUrlParfum = null;
+    const imageUrlBalai = null;
+    const imageUrlPoubelle = null;
 
     const totalDesinfectant =
       paParPersonneDesinfectant !== null &&
@@ -113,28 +101,25 @@ const HygieneOptionsPropositions = ({
         ? nbDistribPoubelle * prixDistribPoubelle
         : null;
 
-    const nomFournisseur = hygieneDistribTarifsFournisseur[0].nomFournisseur;
-    const sloganFournisseur = hygieneDistribTarifsFournisseur[0].slogan;
+    const nomPrestataire = hygieneDistribTarifsFournisseur[0].nomPrestataire;
+    const sloganPrestataire = hygieneDistribTarifsFournisseur[0].slogan;
     const anneeCreation = hygieneDistribTarifsFournisseur[0].anneeCreation;
-    const logoUrl = hygieneDistribTarifsFournisseur[0].logoUrl;
+    const logoStorageKey = hygieneDistribTarifsFournisseur[0].logoStorageKey;
     const ca = hygieneDistribTarifsFournisseur[0].ca;
     const effectifFournisseur = hygieneDistribTarifsFournisseur[0].effectif;
     const nbClients = hygieneDistribTarifsFournisseur[0].nbClients;
     const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
     const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
-    const locationUrl = hygieneDistribTarifsFournisseur[0].locationUrl;
-
     return {
-      nomFournisseur,
-      sloganFournisseur,
+      nomPrestataire,
+      sloganPrestataire,
       anneeCreation,
-      logoUrl,
+      logoStorageKey,
       ca,
       effectifFournisseur,
       nbClients,
       noteGoogle,
       nbAvis,
-      locationUrl,
       gamme,
       prixDistribDesinfectant,
       prixDistribParfum,
@@ -155,16 +140,15 @@ const HygieneOptionsPropositions = ({
   const handleClickProposition = (
     type: HygieneOptionsType,
     proposition: {
-      nomFournisseur: string;
-      sloganFournisseur: string | null;
+      nomPrestataire: string;
+      sloganPrestataire: string | null;
       anneeCreation: number | null;
-      logoUrl: string | null;
+      logoStorageKey: string | null;
       ca: string | null;
       effectifFournisseur: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
-      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;

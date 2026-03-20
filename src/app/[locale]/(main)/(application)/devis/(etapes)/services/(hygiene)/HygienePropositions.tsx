@@ -2,12 +2,12 @@ import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
-import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
-import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
-import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
-import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
-import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
+import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation.schema";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs.schema";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs.schema";
+import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs.schema";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation.schema";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
@@ -80,10 +80,10 @@ const HygienePropositions = ({
 
   const handleClickProposition = (proposition: {
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
+
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;

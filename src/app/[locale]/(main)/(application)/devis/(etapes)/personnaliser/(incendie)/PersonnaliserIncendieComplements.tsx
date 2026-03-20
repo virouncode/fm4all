@@ -11,11 +11,11 @@ import { roundNbExutoires } from "@/lib/utils/roundNbExutoires";
 import { useIncendieStore } from "@/stores/devis/incendieStore";
 import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
-import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs";
-import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs";
-import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
-import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs";
-import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
+import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs.schema";
+import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs.schema";
+import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs.schema";
+import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs.schema";
+import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs.schema";
 import { FireExtinguisher } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useRef, useState } from "react";
@@ -87,22 +87,22 @@ const PersonnaliserIncendieComplements = ({
   );
 
   const exutoiresTarifsFournisseur = exutoiresTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+    (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
   );
   const exutoiresParkingTarifsFournisseur = exutoiresParkingTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+    (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
   );
   const alarmesTarifsFournisseur = alarmesTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+    (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
   );
   const riaTarifFournisseur = riaTarifs?.find(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+    (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
   );
   const colonnesSechesTarifsFournisseur = colonnesSechesTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+    (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
   );
   const portesCoupeFeuTarifsFournisseur = portesCoupeFeuTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+    (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
   );
   const nbExutoires = incendie.quantites.nbExutoires || 1;
   const nbExutoiresParking = incendie.quantites.nbExutoiresParking || 1;

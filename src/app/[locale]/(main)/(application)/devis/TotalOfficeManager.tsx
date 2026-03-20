@@ -23,7 +23,7 @@ const TotalOfficeManager = () => {
     >
       <div className="flex flex-col gap-4">
         <div>
-          {t("office-manager")} ({officeManager.infos.nomFournisseur})
+          {t("office-manager")} ({officeManager.infos.nomPrestataire})
         </div>
         <div className={`ml-4 flex flex-col text-xs`}>
           <div

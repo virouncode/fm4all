@@ -11,10 +11,9 @@ import {
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 type HygieneFournisseurLogoProps = {
-  nomFournisseur: string | null;
-  logoUrl: string | null;
-  locationUrl: string | null;
-  sloganFournisseur: string | null;
+  nomPrestataire: string | null;
+  logoStorageKey: string | null;
+  sloganPrestataire: string | null;
   anneeCreation: number | null;
   ca: string | null;
   effectifFournisseur: string | null;
@@ -24,10 +23,9 @@ type HygieneFournisseurLogoProps = {
 };
 
 const HygieneFournisseurLogo = ({
-  nomFournisseur,
-  logoUrl,
-  locationUrl,
-  sloganFournisseur,
+  nomPrestataire,
+  logoStorageKey,
+  sloganPrestataire,
   anneeCreation,
   ca,
   effectifFournisseur,
@@ -44,18 +42,18 @@ const HygieneFournisseurLogo = ({
           title="Infos sur le fournisseur"
         >
           <div>
-            {logoUrl ? (
+            {logoStorageKey ? (
               <div className="relative h-full w-full">
                 <Image
-                  src={logoUrl}
-                  alt={`logo-de-${nomFournisseur}`}
+                  src={logoStorageKey}
+                  alt={`logo-de-${nomPrestataire}`}
                   fill
                   className="h-full w-full cursor-pointer object-contain"
                   sizes="(min-width:768px) 100vw"
                 />
               </div>
             ) : (
-              nomFournisseur
+              nomPrestataire
             )}
             <SquareArrowOutUpRight
               className="absolute top-0 right-0 cursor-pointer hover:opacity-70"
@@ -67,13 +65,13 @@ const HygieneFournisseurLogo = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{nomFournisseur}</DialogTitle>
+          <DialogTitle>{nomPrestataire}</DialogTitle>
         </DialogHeader>
         <FournisseurDialog
-          sloganFournisseur={sloganFournisseur}
-          logoUrl={logoUrl}
-          nomFournisseur={nomFournisseur}
-          locationUrl={locationUrl}
+          sloganPrestataire={sloganPrestataire}
+          logoStorageKey={logoStorageKey}
+          nomPrestataire={nomPrestataire}
+          locationUrl={null}
           anneeCreation={anneeCreation}
           ca={ca}
           effectif={effectifFournisseur}

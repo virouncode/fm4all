@@ -3,7 +3,6 @@
 import ContactButton from "@/components/buttons/contact-button";
 import LocaleButton from "@/components/buttons/locale-button";
 import { Link } from "@/i18n/navigation";
-import { PathnamesType } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import {
   Banana,
@@ -32,7 +31,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
-import { Suspense, useState } from "react";
+import { ComponentProps, Suspense, useState } from "react";
 import LinkedinButton from "../buttons/linkedin-button";
 import { ModeToggle } from "../theme/mode-toggle";
 import HeaderButtons from "./header-buttons";
@@ -52,10 +51,7 @@ const Header = () => {
 
   const services: {
     title: string;
-    href: {
-      pathname: PathnamesType;
-      params: { slug: string };
-    };
+    href: ComponentProps<typeof Link>["href"];
     linkText: string;
     icon: LucideIcon;
   }[] = [
@@ -201,10 +197,7 @@ const Header = () => {
 
   const secteurs: {
     title: string;
-    href: {
-      pathname: PathnamesType;
-      params: { slug: string };
-    };
+    href: ComponentProps<typeof Link>["href"];
     icon: LucideIcon;
   }[] = [
     {
@@ -311,9 +304,7 @@ const Header = () => {
 
   const decouvrir: {
     title: string;
-    href: {
-      pathname: PathnamesType;
-    };
+    href: ComponentProps<typeof Link>["href"];
     icon: LucideIcon;
   }[] = [
     {
@@ -341,9 +332,7 @@ const Header = () => {
 
   const rejoindre: {
     title: string;
-    href: {
-      pathname: PathnamesType;
-    };
+    href: ComponentProps<typeof Link>["href"];
     icon: LucideIcon;
   }[] = [
     {

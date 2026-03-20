@@ -1,10 +1,10 @@
-import { gammes } from "@/zod-schemas/gamme";
+import { gammes } from "@/zod-schemas/gamme.schema";
 import { HygieneType } from "@/zod-schemas/hygiene.schema";
-import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
-import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
-import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
-import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs.schema";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs.schema";
+import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs.schema";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation.schema";
 
 export const getFormattedHygienePropositions = (
   effectif: number,
@@ -61,25 +61,13 @@ export const getFormattedHygienePropositions = (
         (tarif) => tarif.type === "ph" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
-    const imageUrlEmp =
-      hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "emp" && tarif.gamme === gamme,
-      )?.imageUrl ?? null;
+    const imageUrlEmp = null;
+    const imageUrlSavon = null;
+    const imageUrlPh = null;
 
-    const imageUrlSavon =
-      hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "savon" && tarif.gamme === gamme,
-      )?.imageUrl ?? null;
-
-    const imageUrlPh =
-      hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "ph" && tarif.gamme === gamme,
-      )?.imageUrl ?? null;
-
-    const nomFournisseur = hygieneDistribTarifsFournisseur[0].nomFournisseur;
-    const sloganFournisseur = hygieneDistribTarifsFournisseur[0].slogan;
-    const logoUrl = hygieneDistribTarifsFournisseur[0].logoUrl;
-    const locationUrl = hygieneDistribTarifsFournisseur[0].locationUrl;
+    const nomPrestataire = hygieneDistribTarifsFournisseur[0].nomPrestataire;
+    const sloganPrestataire = hygieneDistribTarifsFournisseur[0].slogan;
+    const logoStorageKey = hygieneDistribTarifsFournisseur[0].logoStorageKey;
     const anneeCreation = hygieneDistribTarifsFournisseur[0].anneeCreation;
     const ca = hygieneDistribTarifsFournisseur[0].ca;
     const effectifFournisseur = hygieneDistribTarifsFournisseur[0].effectif;
@@ -125,10 +113,9 @@ export const getFormattedHygienePropositions = (
 
     return {
       gamme,
-      nomFournisseur,
-      sloganFournisseur,
-      logoUrl,
-      locationUrl,
+      nomPrestataire,
+      sloganPrestataire,
+      logoStorageKey,
       anneeCreation,
       ca,
       effectifFournisseur,
@@ -161,18 +148,18 @@ export const getHygieneFournisseurTarifs = (
   hygieneMinFacturation?: SelectHygieneMinFacturationType[],
 ) => {
   const hygieneDistribTarifsFournisseur = hygieneDistribTarifs.filter(
-    (item) => item.fournisseurId === hygiene.infos.fournisseurId,
+    (item) => item.entrepriseId === hygiene.infos.entrepriseId,
   );
   const ditribInstalTarifFournisseur =
     hygieneDistribInstalTarifs?.find(
-      (item) => item.fournisseurId === hygiene.infos.fournisseurId,
+      (item) => item.entrepriseId === hygiene.infos.entrepriseId,
     ) ?? null;
   const consosTarifFournisseur = hygieneConsosTarifs.find(
-    (item) => item.fournisseurId === hygiene.infos.fournisseurId,
+    (item) => item.entrepriseId === hygiene.infos.entrepriseId,
   );
   const hygieneMinFacturationFournisseur =
     hygieneMinFacturation?.find(
-      (item) => item.fournisseurId === hygiene.infos.fournisseurId,
+      (item) => item.entrepriseId === hygiene.infos.entrepriseId,
     ) ?? null;
   const prixInstalDistrib =
     ditribInstalTarifFournisseur?.prixInstallation ?? null;

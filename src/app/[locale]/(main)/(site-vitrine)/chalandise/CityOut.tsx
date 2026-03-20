@@ -9,7 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
 import { sendEmailFromClient } from "@/lib/email/sendEmail";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { CityOutType, createCityOutSchema } from "@/zod-schemas/cityout";
+import { CityOutType, createCityOutSchema } from "@/zod-schemas/cityout.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";

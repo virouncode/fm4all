@@ -1,6 +1,6 @@
 "use client";
 
-import { OfficeManagerType } from "@/zod-schemas/officeManager";
+import { OfficeManagerType } from "@/zod-schemas/officeManager.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -17,10 +17,10 @@ export const useOfficeManagerStore = create<OfficeManagerStore>()(
     (set) => ({
       officeManager: {
         infos: {
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           gammeSelected: null,
           remplace: false,
           commentaires: null,
@@ -43,10 +43,10 @@ export const useOfficeManagerStore = create<OfficeManagerStore>()(
         set({
           officeManager: {
             infos: {
-              fournisseurId: null,
-              nomFournisseur: null,
-              sloganFournisseur: null,
-              logoUrl: null,
+              entrepriseId: null,
+              nomPrestataire: null,
+              sloganPrestataire: null,
+              logoStorageKey: null,
               gammeSelected: null,
               remplace: false,
               commentaires: null,

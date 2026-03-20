@@ -1,3 +1,3 @@
 // Re-export everything from the new modular schema structure
 export * from "./schema/index";
-export * from "./schema/relations";
+// relations.ts géré par l'outil FM — non présent dans ce projet

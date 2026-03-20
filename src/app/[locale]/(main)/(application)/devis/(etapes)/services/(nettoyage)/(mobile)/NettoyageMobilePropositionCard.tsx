@@ -18,12 +18,11 @@ import Image from "next/image";
 
 type NettoyageMobilePropositionCardProps = {
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -37,12 +36,11 @@ type NettoyageMobilePropositionCardProps = {
     totalAnnuel: number | null;
   }) => void;
   proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -66,16 +64,15 @@ const NettoyageMobilePropositionCard = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const nettoyage = useNettoyageStore((s) => s.nettoyage);
   const {
-    fournisseurId,
+    entrepriseId,
     gamme,
     freqAnnuelle,
     hParPassage,
     totalAnnuel,
     ca,
-    sloganFournisseur,
-    logoUrl,
-    nomFournisseur,
-    locationUrl,
+    sloganPrestataire,
+    logoStorageKey,
+    nomPrestataire,
     anneeCreation,
     effectifFournisseur,
     nbClients,
@@ -178,7 +175,7 @@ const NettoyageMobilePropositionCard = ({
     <CarouselItem>
       <div
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
-          nettoyage.infos.fournisseurId === fournisseurId &&
+          nettoyage.infos.entrepriseId === entrepriseId &&
           nettoyage.infos.gammeSelected === gamme
             ? "ring-destructive ring-4 ring-inset"
             : ""
@@ -201,14 +198,14 @@ const NettoyageMobilePropositionCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             <Dialog>
               <DialogTrigger asChild>
-                {logoUrl ? (
+                {logoStorageKey ? (
                   <div className="relative h-10">
                     <Image
-                      src={logoUrl}
-                      alt={`logo-de-${nomFournisseur}`}
+                      src={logoStorageKey}
+                      alt={`logo-de-${nomPrestataire}`}
                       fill
                       className="cursor-pointer object-contain object-left"
                       sizes="(max-width:768px) 100vw"
@@ -218,13 +215,13 @@ const NettoyageMobilePropositionCard = ({
               </DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomFournisseur}</DialogTitle>
+                  <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={sloganFournisseur}
-                  logoUrl={logoUrl}
-                  nomFournisseur={nomFournisseur}
-                  locationUrl={locationUrl}
+                  sloganPrestataire={sloganPrestataire}
+                  logoStorageKey={logoStorageKey}
+                  nomPrestataire={nomPrestataire}
+                  locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
                   effectif={effectifFournisseur}
@@ -253,13 +250,13 @@ const NettoyageMobilePropositionCard = ({
             {totalAnnuel ? (
               <Switch
                 className={`${
-                  nettoyage.infos.fournisseurId === fournisseurId &&
+                  nettoyage.infos.entrepriseId === entrepriseId &&
                   nettoyage.infos.gammeSelected === gamme
                     ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={
-                  nettoyage.infos.fournisseurId === fournisseurId &&
+                  nettoyage.infos.entrepriseId === entrepriseId &&
                   nettoyage.infos.gammeSelected === gamme
                 }
                 onCheckedChange={() => handleClickProposition(proposition)}

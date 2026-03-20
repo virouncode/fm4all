@@ -17,12 +17,11 @@ import Image from "next/image";
 
 type NettoyageMobileOptionsSamediPropositionsProps = {
   samediProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -31,12 +30,11 @@ type NettoyageMobileOptionsSamediPropositionsProps = {
     nbAvis: number | null;
   };
   handleClickSamediProposition: (proposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -56,7 +54,7 @@ const NettoyageMobileOptionsSamediCard = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
   const nettoyage = useNettoyageStore((s) => s.nettoyage);
-  const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
+  const { gammeSelected: gamme, nomPrestataire } = nettoyage.infos;
   const samediPrixMensuelText = samediProposition.prixAnnuel ? (
     <p className="text-end text-sm font-bold">
       {formatNumber((samediProposition?.prixAnnuel * MARGE) / 12)}{" "}
@@ -149,16 +147,16 @@ const NettoyageMobileOptionsSamediCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             {samediProposition.prixAnnuel ? (
               <>
                 <Dialog>
                   <DialogTrigger asChild>
-                    {nettoyage.infos.logoUrl ? (
+                    {nettoyage.infos.logoStorageKey ? (
                       <div className="relative h-10">
                         <Image
-                          src={nettoyage.infos.logoUrl}
-                          alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
+                          src={nettoyage.infos.logoStorageKey}
+                          alt={`logo-de-${nettoyage.infos.nomPrestataire}`}
                           fill
                           className="cursor-pointer object-contain object-left"
                           sizes="(max-width:768px) 100vw"
@@ -168,13 +166,13 @@ const NettoyageMobileOptionsSamediCard = ({
                   </DialogTrigger>
                   <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                     <DialogHeader>
-                      <DialogTitle>{nomFournisseur}</DialogTitle>
+                      <DialogTitle>{nomPrestataire}</DialogTitle>
                     </DialogHeader>
                     <FournisseurDialog
-                      sloganFournisseur={samediProposition.slogan}
-                      logoUrl={samediProposition.logoUrl}
-                      nomFournisseur={samediProposition.nomFournisseur}
-                      locationUrl={samediProposition.locationUrl}
+                      sloganPrestataire={samediProposition.slogan}
+                      logoStorageKey={samediProposition.logoStorageKey}
+                      nomPrestataire={samediProposition.nomPrestataire}
+                      locationUrl={null}
                       anneeCreation={samediProposition.anneeCreation}
                       ca={samediProposition.ca}
                       effectif={samediProposition.effectif}
@@ -198,11 +196,11 @@ const NettoyageMobileOptionsSamediCard = ({
                   </div>
                 )}
               </>
-            ) : nettoyage.infos.logoUrl ? (
+            ) : nettoyage.infos.logoStorageKey ? (
               <div className="relative h-10">
                 <Image
-                  src={nettoyage.infos.logoUrl}
-                  alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
+                  src={nettoyage.infos.logoStorageKey}
+                  alt={`logo-de-${nettoyage.infos.nomPrestataire}`}
                   fill
                   className="cursor-pointer object-contain object-left"
                   sizes="(max-width:768px) 100vw"

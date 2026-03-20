@@ -1,3 +1,4 @@
+import { SnacksFruitsPropositionItem } from "@/app/[locale]/(main)/(application)/devis/(etapes)/food-beverage/(snacks)/(desktop)/SnacksFruitsPropositionCard";
 import CarouselGammesDots from "@/components/carousel/CarouselGammesDots";
 import {
   Carousel,
@@ -9,78 +10,8 @@ import { useEffect, useState } from "react";
 import SnacksFruitsMobilePropositionCard from "./SnacksFruitsMobilePropositionCard";
 
 type SnacksFruitsMobilePropositionsCarouselProps = {
-  propositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    isSameFournisseur: boolean;
-    gamme: "essentiel" | "confort" | "excellence";
-    fruitsKgParSemaine: number | null;
-    snacksPortionsParSemaine: number | null;
-    boissonsConsosParSemaine: number | null;
-    gFruitsParSemaineParPersonne: number | null;
-    portionsSnacksParSemaineParPersonne: number | null;
-    consosBoissonsParSemaineParPersonne: number | null;
-    prixKgFruits: number | null;
-    prixUnitaireSnacks: number | null;
-    prixUnitaireBoissons: number | null;
-    prixUnitaireLivraisonSiCafe: number | null;
-    prixUnitaireLivraison: number | null;
-    seuilFranco: number;
-    fraisLivraisonPanier: number | null;
-    panierMin: number | null;
-    total: number | null;
-    totalSansRemise: number | null;
-    totalFruits: number;
-    totalSnacks: number;
-    totalBoissons: number;
-    totalLivraison: number | null;
-  }[];
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    isSameFournisseur: boolean;
-    gamme: "essentiel" | "confort" | "excellence";
-    fruitsKgParSemaine: number | null;
-    snacksPortionsParSemaine: number | null;
-    boissonsConsosParSemaine: number | null;
-    gFruitsParSemaineParPersonne: number | null;
-    portionsSnacksParSemaineParPersonne: number | null;
-    consosBoissonsParSemaineParPersonne: number | null;
-    prixKgFruits: number | null;
-    prixUnitaireSnacks: number | null;
-    prixUnitaireBoissons: number | null;
-    prixUnitaireLivraisonSiCafe: number | null;
-    prixUnitaireLivraison: number | null;
-    seuilFranco: number;
-    fraisLivraisonPanier: number | null;
-    panierMin: number | null;
-    total: number | null;
-    totalSansRemise: number | null;
-    totalFruits: number;
-    totalSnacks: number;
-    totalBoissons: number;
-    totalLivraison: number | null;
-  }) => void;
+  propositions: SnacksFruitsPropositionItem[];
+  handleClickProposition: (proposition: SnacksFruitsPropositionItem) => void;
 };
 
 const SnacksFruitsMobilePropositionsCarousel = ({
@@ -100,11 +31,11 @@ const SnacksFruitsMobilePropositionsCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!snacksFruits.infos.fournisseurId || !api) {
+    if (!snacksFruits.infos.entrepriseId || !api) {
       return;
     }
     if (
-      propositions[0].fournisseurId === snacksFruits.infos.fournisseurId &&
+      propositions[0].entrepriseId === snacksFruits.infos.entrepriseId &&
       snacksFruits.infos.gammeSelected
     ) {
       api?.scrollTo(
@@ -118,7 +49,7 @@ const SnacksFruitsMobilePropositionsCarousel = ({
   }, [
     api,
     propositions,
-    snacksFruits.infos.fournisseurId,
+    snacksFruits.infos.entrepriseId,
     snacksFruits.infos.gammeSelected,
   ]);
 

@@ -2,8 +2,8 @@ import { toast } from "@/hooks/use-toast";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
-import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
-import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
+import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
+import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs.schema";
 import { useShallow } from "zustand/shallow";
 import PreviousEspaceButton from "../(cafe)/PreviousEspaceButton";
 import RetirerEspaceButton from "../(cafe)/RetirerEspaceButton";
@@ -50,10 +50,10 @@ const FontaineEspace = ({
       //TODO : Je reinitialise tout
       setFontaines({
         infos: {
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           currentEspaceId: 1,
           dureeLocation: "pa12M",
           commentaires: null,

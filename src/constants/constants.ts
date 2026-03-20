@@ -1,4 +1,4 @@
-import { ServicesFm4AllType } from "@/zod-schemas/servicesFm4All";
+import { ServicesFm4AllType } from "@/zod-schemas/servicesFm4All.schema";
 
 export const MARGE = 1.11111111;
 export const RATIO = 10000;

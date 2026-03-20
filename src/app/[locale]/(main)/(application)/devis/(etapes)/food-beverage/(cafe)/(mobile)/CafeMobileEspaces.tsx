@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { useCafeStore } from "@/stores/devis/cafeStore";
-import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
-import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
-import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
-import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs";
-import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
-import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
-import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
+import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
+import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine.schema";
+import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs.schema";
+import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs.schema";
+import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs.schema";
+import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs.schema";
+import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs.schema";
 import { useTranslations } from "next-intl";
 import CafeMobileEspace from "./CafeMobileEspace";
 

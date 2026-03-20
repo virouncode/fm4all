@@ -5,19 +5,18 @@ import SnacksFruitsPropositionLogo from "./SnacksFruitsPropositionLogo";
 
 type SnacksFruitsDesktopPropositionsProps = {
   formattedPropositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    isSameFournisseur: boolean;
+    isSamePrestataire: boolean;
     gamme: "essentiel" | "confort" | "excellence";
     fruitsKgParSemaine: number | null;
     snacksPortionsParSemaine: number | null;
@@ -41,19 +40,18 @@ type SnacksFruitsDesktopPropositionsProps = {
     totalLivraison: number | null;
   }[][];
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    isSameFournisseur: boolean;
+    isSamePrestataire: boolean;
     gamme: "essentiel" | "confort" | "excellence";
     fruitsKgParSemaine: number | null;
     snacksPortionsParSemaine: number | null;
@@ -104,7 +102,7 @@ const SnacksFruitsDesktopPropositions = ({
         ? formattedPropositions.map((propositions) => (
             <div
               className="flex flex-1 border-b"
-              key={propositions[0].fournisseurId}
+              key={propositions[0].entrepriseId}
             >
               <SnacksFruitsPropositionLogo {...propositions[0]} />
               {propositions.map((proposition) => (

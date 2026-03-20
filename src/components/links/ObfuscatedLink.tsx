@@ -3,41 +3,7 @@
 import { useRouter } from "@/i18n/navigation";
 
 type ObfuscatedLinkProps = {
-  href:
-    | "/"
-    | "/secteurs"
-    | { pathname: "/secteurs/[slug]"; params: { slug: string } }
-    | "/blog"
-    | { pathname: "/blog/[slug]"; params: { slug: string } }
-    | {
-        pathname: "/blog/[slug]/[subSlug]";
-        params: { slug: string; subSlug: string };
-      }
-    | "/gammes"
-    | "/engagements"
-    | "/partenaires"
-    | "/faq"
-    | "/prestataire"
-    | "/contact"
-    | "/mentions"
-    | "/confidentialite"
-    | "/cookies"
-    | "/cgv"
-    | "/cgu"
-    | { pathname: "/admin/[userId]"; params: { userId: string } }
-    | { pathname: "/client/[clientId]"; params: { clientId: string } }
-    | {
-        pathname: "/fournisseur/[fournisseurId]";
-        params: { fournisseurId: string };
-      }
-    | "/auth/login"
-    | {
-        pathname: "/services/[slug]";
-        params: { slug: string };
-      }
-    | "/app"
-    | "/auth/login"
-    | "/app/compte/mon-profil";
+  href: Parameters<ReturnType<typeof useRouter>["push"]>[0];
 
   children: React.ReactNode;
   className?: string;

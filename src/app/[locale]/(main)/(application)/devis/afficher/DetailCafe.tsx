@@ -50,7 +50,7 @@ const DetailCafe = () => {
           return (
             <TableRow key={espace.infos.espaceId}>
               <TableCell>{typeBoisson}</TableCell>
-              <TableCell>{cafe.infos.nomFournisseur}</TableCell>
+              <TableCell>{cafe.infos.nomPrestataire}</TableCell>
               <TableCell>{espace.infos.gammeCafeSelected}</TableCell>
               <TableCell>{espace.quantites.nbPersonnes} personne(s)</TableCell>
               <TableCell>

@@ -6,7 +6,7 @@ import {
   updatedAt,
   updatedById,
 } from "../schema-helper";
-import { user } from "./auth";
+import { user } from "./user";
 import { typeBatimentEnum, typeOccupationEnum } from "./enums";
 
 export const prospects = pgTable(

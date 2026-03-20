@@ -1,5 +1,5 @@
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
-import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs.schema";
 import { useTranslations } from "next-intl";
 import React from "react";
 import HygieneMobileDistribQuantitesInputs from "./HygieneMobileDistribQuantitesInputs";
@@ -21,10 +21,9 @@ type HygieneMobilePropositionsProps = {
   dureeLocation: "oneShot" | "pa12M" | "pa24M" | "pa36M";
   handleClickProposition: (proposition: {
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -48,10 +47,9 @@ type HygieneMobilePropositionsProps = {
   prixInstalDistrib: number | null;
   propositions: {
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;

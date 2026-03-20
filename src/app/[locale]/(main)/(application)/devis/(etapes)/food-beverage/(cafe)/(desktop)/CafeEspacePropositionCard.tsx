@@ -11,114 +11,49 @@ import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 
+export type CafePropositionItem = {
+  id: string;
+  entrepriseId: string;
+  nomPrestataire: string;
+  sloganPrestataire: string | null;
+  logoStorageKey: string | null;
+  anneeCreation: number | null;
+  ca: string | null;
+  effectifFournisseur: string | null;
+  nbClients: number | null;
+  noteGoogle: string | null;
+  nbAvis: number | null;
+  gamme: GammeType;
+  modele: string | null;
+  marque: string | null;
+  imageUrl: null;
+  infos: string | null;
+  reconditionne: boolean | null;
+  typeLait: "dosettes" | "frais" | "poudre" | null;
+  typeChocolat: "sachets" | "poudre" | null;
+  nbMachines: number | null;
+  nbTassesParJ: number;
+  nbPassagesParAn: number | null;
+  prixLoc: number | null;
+  prixInstal: number | null;
+  prixMaintenance: number | null;
+  prixUnitaireConsoCafe: number | null;
+  prixUnitaireConsoLait: number | null;
+  prixUnitaireConsoChocolat: number | null;
+  prixUnitaireConsoSucre: number | null;
+  totalAnnuel: number | null;
+  totalInstallation: number | null;
+};
+
 type CafeEspacePropositionCardProps = {
-  proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    gamme: GammeType;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "sachets" | "poudre" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  };
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    gamme: GammeType;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "sachets" | "poudre" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
-  handleClickFirstEspaceProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    gamme: GammeType;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "sachets" | "poudre" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
+  proposition: CafePropositionItem;
+  handleClickProposition: (proposition: CafePropositionItem) => void;
+  handleClickFirstEspaceProposition: (proposition: CafePropositionItem) => void;
   espace: CafeEspaceType;
   cafeEspacesIds: number[];
 };
@@ -293,7 +228,7 @@ const CafeEspacePropositionCard = ({
     <div
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         espace.infos.gammeCafeSelected === gamme &&
-        cafe.infos.fournisseurId === proposition.fournisseurId
+        cafe.infos.entrepriseId === proposition.entrepriseId
           ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
@@ -306,7 +241,7 @@ const CafeEspacePropositionCard = ({
       <Switch
         checked={
           espace.infos.gammeCafeSelected === gamme &&
-          cafe.infos.fournisseurId === proposition.fournisseurId
+          cafe.infos.entrepriseId === proposition.entrepriseId
         }
         onCheckedChange={() => () =>
           cafeEspacesIds[0] === espace.infos.espaceId

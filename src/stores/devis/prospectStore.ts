@@ -1,17 +1,17 @@
 "use client";
 
-import { InsertProspectType, SelectProspectType } from "@/zod-schemas/prospect";
+import { InsertProspectType, SelectProspectType } from "@/zod-schemas/prospect.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type ProspectStore = {
-  prospect: InsertProspectType & { id?: number };
+  prospect: InsertProspectType & { id?: string };
   setProspect: (
     value:
-      | (InsertProspectType & { id?: number })
+      | (InsertProspectType & { id?: string })
       | ((
-          prev: InsertProspectType & { id?: number },
-        ) => InsertProspectType & { id?: number }),
+          prev: InsertProspectType & { id?: string },
+        ) => InsertProspectType & { id?: string }),
   ) => void;
   reset: () => void;
 };

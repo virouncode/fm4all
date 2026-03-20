@@ -1,7 +1,7 @@
 "use client";
 
 import { SERVICES_FM4ALL_DEFAULT_VALUES } from "@/constants/constants";
-import { ServicesFm4AllType } from "@/zod-schemas/servicesFm4All";
+import { ServicesFm4AllType } from "@/zod-schemas/servicesFm4All.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

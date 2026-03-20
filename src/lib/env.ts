@@ -35,11 +35,15 @@ export const env = {
 
   // Optionnels serveur
   MAILGUN_BCC_EMAIL: optional("MAILGUN_BCC_EMAIL"),
+  MAILGUN_CONTACT_EMAIL: optional("MAILGUN_CONTACT_EMAIL"),
   S3_PRESIGN_READ_EXPIRES_SECONDS: Number(
     optionalWithDefault("S3_PRESIGN_READ_EXPIRES_SECONDS", "60"),
   ),
   S3_PRESIGN_UPLOAD_EXPIRES_SECONDS: Number(
     optionalWithDefault("S3_PRESIGN_UPLOAD_EXPIRES_SECONDS", "60"),
+  ),
+  S3_PRESIGN_DEVIS_READ_EXPIRES_SECONDS: Number(
+    optionalWithDefault("S3_PRESIGN_DEVIS_READ_EXPIRES_SECONDS", "86400"),
   ),
 
   NODE_ENV: (process.env.NODE_ENV ?? "development") as

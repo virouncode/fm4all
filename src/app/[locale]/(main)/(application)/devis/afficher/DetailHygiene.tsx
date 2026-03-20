@@ -42,7 +42,7 @@ const DetailHygiene = () => {
             <>
               <TableRow>
                 <TableCell>Essuies-mains papier</TableCell>
-                <TableCell>{hygiene.infos.nomFournisseur}</TableCell>
+                <TableCell>{hygiene.infos.nomPrestataire}</TableCell>
                 <TableCell>{hygiene.infos.trilogieGammeSelected}</TableCell>
                 <TableCell>{hygiene.quantites.nbDistribEmp}</TableCell>
                 <TableCell>distributeur(s) EMP</TableCell>
@@ -58,7 +58,7 @@ const DetailHygiene = () => {
               </TableRow>
               <TableRow>
                 <TableCell>Savon</TableCell>
-                <TableCell>{hygiene.infos.nomFournisseur}</TableCell>
+                <TableCell>{hygiene.infos.nomPrestataire}</TableCell>
                 <TableCell>{hygiene.infos.trilogieGammeSelected}</TableCell>
                 <TableCell>{hygiene.quantites.nbDistribEmp}</TableCell>
                 <TableCell>distributeur(s) Savon</TableCell>
@@ -74,7 +74,7 @@ const DetailHygiene = () => {
               </TableRow>
               <TableRow>
                 <TableCell>Papier hygiénique</TableCell>
-                <TableCell>{hygiene.infos.nomFournisseur}</TableCell>
+                <TableCell>{hygiene.infos.nomPrestataire}</TableCell>
                 <TableCell>{hygiene.infos.trilogieGammeSelected}</TableCell>
                 <TableCell>{hygiene.quantites.nbDistribEmp}</TableCell>
                 <TableCell>distributeur(s) PH</TableCell>
@@ -120,7 +120,7 @@ const DetailHygiene = () => {
           {totalHygiene.totalDesinfectant ? (
             <TableRow>
               <TableCell>Desinfectant cuvettes</TableCell>
-              <TableCell>{hygiene.infos.nomFournisseur}</TableCell>
+              <TableCell>{hygiene.infos.nomPrestataire}</TableCell>
               <TableCell>{hygiene.infos.desinfectantGammeSelected}</TableCell>
               <TableCell>{hygiene.quantites.nbDistribDesinfectant}</TableCell>
               <TableCell>distributeur(s) désinfectant</TableCell>
@@ -141,7 +141,7 @@ const DetailHygiene = () => {
           {totalHygiene.totalParfum ? (
             <TableRow>
               <TableCell>Parfum d&apos;ambiance</TableCell>
-              <TableCell>{hygiene.infos.nomFournisseur}</TableCell>
+              <TableCell>{hygiene.infos.nomPrestataire}</TableCell>
               <TableCell>{hygiene.infos.parfumGammeSelected}</TableCell>
               <TableCell>{hygiene.quantites.nbDistribEmp}</TableCell>
               <TableCell>distributeur(s) parfum</TableCell>
@@ -161,7 +161,7 @@ const DetailHygiene = () => {
           {totalHygiene.totalBalai ? (
             <TableRow>
               <TableCell>Balais WC</TableCell>
-              <TableCell>{hygiene.infos.nomFournisseur}</TableCell>
+              <TableCell>{hygiene.infos.nomPrestataire}</TableCell>
               <TableCell>{hygiene.infos.balaiGammeSelected}</TableCell>
               <TableCell>{hygiene.quantites.nbDistribBalai}</TableCell>
               <TableCell>bloc(s) </TableCell>
@@ -181,7 +181,7 @@ const DetailHygiene = () => {
           {totalHygiene.totalPoubelle ? (
             <TableRow>
               <TableCell>Poubelles hygiène féminine</TableCell>
-              <TableCell>{hygiene.infos.nomFournisseur}</TableCell>
+              <TableCell>{hygiene.infos.nomPrestataire}</TableCell>
               <TableCell>{hygiene.infos.balaiGammeSelected}</TableCell>
               <TableCell>{hygiene.quantites.nbDistribPoubelle}</TableCell>
               <TableCell>poubelle(s) </TableCell>

@@ -2,11 +2,11 @@
 import { usePersonnalisation } from "@/hooks/use-personnalisation";
 import useScrollIntoPersonnalisation from "@/hooks/use-scroll-into-personnalisation";
 import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
-import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs";
-import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs";
-import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
-import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs";
-import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
+import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs.schema";
+import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs.schema";
+import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs.schema";
+import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs.schema";
+import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs.schema";
 import PersonnaliserIncendieComplements from "./(incendie)/PersonnaliserIncendieComplements";
 import PersonnaliserNettoyageVitrerie from "./(nettoyage)/PersonnaliserNettoyageVitrerie";
 import PersonnaliserCommentaires from "./PersonnaliserCommentaires";

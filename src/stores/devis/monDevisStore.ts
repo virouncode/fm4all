@@ -1,6 +1,6 @@
 "use client";
 
-import { MonDevisType } from "@/zod-schemas/monDevis";
+import { MonDevisType } from "@/zod-schemas/monDevis.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

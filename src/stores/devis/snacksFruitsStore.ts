@@ -1,4 +1,4 @@
-import { SnacksFruitsType } from "@/zod-schemas/snacksFruits";
+import { SnacksFruitsType } from "@/zod-schemas/snacksFruits.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useProspectStore } from "./prospectStore";
@@ -16,10 +16,10 @@ const buildInitialSnacksFruits = (): SnacksFruitsType => {
 
   return {
     infos: {
-      fournisseurId: null,
-      nomFournisseur: null,
-      sloganFournisseur: null,
-      isSameFournisseur: false,
+      entrepriseId: null,
+      nomPrestataire: null,
+      sloganPrestataire: null,
+      isSamePrestataire: false,
       gammeSelected: null,
       choix: ["fruits"],
       commentaires: null,

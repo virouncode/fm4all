@@ -21,14 +21,14 @@ import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
-import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
-import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
-import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
-import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs";
-import { gammes, GammeType } from "@/zod-schemas/gamme";
-import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
-import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
-import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
+import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
+import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine.schema";
+import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs.schema";
+import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs.schema";
+import { gammes, GammeType } from "@/zod-schemas/gamme.schema";
+import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs.schema";
+import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs.schema";
+import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs.schema";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
@@ -98,12 +98,12 @@ const CafeEspacePropositions = ({
 
   const fournisseursCompatiblesIds = machinesTarifs
     ?.filter((tarif) => tarif[cafe.infos.dureeLocation] !== null)
-    .map(({ fournisseurId }) => fournisseurId);
+    .map(({ entrepriseId }) => entrepriseId);
 
   if (
-    cafe.infos.fournisseurId &&
+    cafe.infos.entrepriseId &&
     cafeEspacesIds[0] !== espace.infos.espaceId &&
-    !fournisseursCompatiblesIds.includes(cafe.infos.fournisseurId)
+    !fournisseursCompatiblesIds.includes(cafe.infos.entrepriseId)
   ) {
     return (
       <div className="flex flex-1 items-center justify-center rounded-xl border">
@@ -117,9 +117,9 @@ const CafeEspacePropositions = ({
   }
 
   const fournisseursIds =
-    cafe.infos.fournisseurId && cafeEspacesIds[0] !== espace.infos.espaceId
-      ? [cafe.infos.fournisseurId] //1 seul fournisseur
-      : machinesTarifs?.map(({ fournisseurId }) => fournisseurId); //tous les fournisseurs
+    cafe.infos.entrepriseId && cafeEspacesIds[0] !== espace.infos.espaceId
+      ? [cafe.infos.entrepriseId] //1 seul fournisseur
+      : machinesTarifs?.map(({ entrepriseId }) => entrepriseId); //tous les fournisseurs
 
   const nbTassesParAn = nbPersonnes * 400;
 
@@ -139,17 +139,16 @@ const CafeEspacePropositions = ({
     .filter(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-        fournisseursIds.includes(tarif.fournisseurId),
+        fournisseursIds.includes(tarif.entrepriseId),
     )
     .map((tarif) => {
       const {
         id,
         infos,
-        fournisseurId,
-        nomFournisseur,
-        slogan: sloganFournisseur,
-        logoUrl,
-        locationUrl,
+        entrepriseId,
+        nomPrestataire,
+        slogan: sloganPrestataire,
+        logoStorageKey,
         anneeCreation,
         ca,
         effectifFournisseur,
@@ -161,7 +160,7 @@ const CafeEspacePropositions = ({
       } = tarif;
       //MACHINES
       const machinesTarifFournisseur = machinesTarifs.find(
-        (item) => item.fournisseurId === fournisseurId,
+        (item) => item.entrepriseId === entrepriseId,
       );
 
       const nbMachines = machinesTarifFournisseur?.nbMachines ?? null;
@@ -182,7 +181,7 @@ const CafeEspacePropositions = ({
       const consoLaitTarifFournisseur = laitConsoTarifs.find(
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-          tarif.fournisseurId === fournisseurId,
+          tarif.entrepriseId === entrepriseId,
       );
       const typeLait =
         espace.infos.typeBoissons !== "cafe"
@@ -200,7 +199,7 @@ const CafeEspacePropositions = ({
       const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-          tarif.fournisseurId === fournisseurId,
+          tarif.entrepriseId === entrepriseId,
       );
       const typeChocolat =
         espace.infos.typeBoissons === "chocolat"
@@ -216,7 +215,7 @@ const CafeEspacePropositions = ({
       const consoSucreTarifFournisseur = sucreConsoTarifs.find(
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-          tarif.fournisseurId === fournisseurId,
+          tarif.entrepriseId === entrepriseId,
       );
       const prixUnitaireConsoSucre =
         consoSucreTarifFournisseur?.prixUnitaire ?? null;
@@ -244,21 +243,16 @@ const CafeEspacePropositions = ({
             ({ id }) => id === machinesTarifFournisseur?.cafeMachineId,
           )?.marque ?? null)
         : null;
-      const imageUrl = machinesTarifFournisseur
-        ? (cafeMachines?.find(
-            ({ id }) => id === machinesTarifFournisseur?.cafeMachineId,
-          )?.imageUrl ?? null)
-        : null;
+      const imageUrl = null;
       const reconditionne = machinesTarifFournisseur
         ? (machinesTarifFournisseur.reconditionne ?? null)
         : null;
       return {
         id,
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur,
-        logoUrl,
-        locationUrl,
+        entrepriseId,
+        nomPrestataire,
+        sloganPrestataire,
+        logoStorageKey,
         anneeCreation,
         ca,
         effectifFournisseur,
@@ -290,14 +284,13 @@ const CafeEspacePropositions = ({
 
   const propositionsByFournisseurId = propositions.reduce<
     Record<
-      number,
+      string,
       {
-        id: number;
-        fournisseurId: number;
-        nomFournisseur: string;
-        sloganFournisseur: string | null;
-        logoUrl: string | null;
-        locationUrl: string | null;
+        id: string;
+        entrepriseId: string;
+        nomPrestataire: string;
+        sloganPrestataire: string | null;
+        logoStorageKey: string | null;
         anneeCreation: number | null;
         ca: string | null;
         effectifFournisseur: string | null;
@@ -307,7 +300,7 @@ const CafeEspacePropositions = ({
         gamme: GammeType;
         modele: string | null;
         marque: string | null;
-        imageUrl: string | null;
+        imageUrl: null;
         infos: string | null;
         reconditionne: boolean | null;
         typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -327,13 +320,13 @@ const CafeEspacePropositions = ({
       }[]
     >
   >((acc, item) => {
-    const { fournisseurId } = item;
-    if (!acc[fournisseurId]) {
-      acc[fournisseurId] = [];
+    const { entrepriseId } = item;
+    if (!acc[entrepriseId]) {
+      acc[entrepriseId] = [];
     }
     // Add the item to the appropriate array
-    acc[fournisseurId].push(item);
-    acc[fournisseurId].sort(
+    acc[entrepriseId].push(item);
+    acc[entrepriseId].sort(
       (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme),
     );
     return acc;
@@ -342,12 +335,11 @@ const CafeEspacePropositions = ({
   const formattedPropositions = Object.values(propositionsByFournisseurId);
 
   const handleClickProposition = (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -357,7 +349,7 @@ const CafeEspacePropositions = ({
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
-    imageUrl: string | null;
+    imageUrl: null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -376,7 +368,7 @@ const CafeEspacePropositions = ({
     totalInstallation: number | null;
   }) => {
     const {
-      fournisseurId,
+      entrepriseId,
       gamme,
       modele,
       marque,
@@ -398,7 +390,7 @@ const CafeEspacePropositions = ({
     //Je décoche
     if (
       espace.infos.gammeCafeSelected === gamme &&
-      cafe.infos.fournisseurId === fournisseurId
+      cafe.infos.entrepriseId === entrepriseId
     ) {
       setCafe((prev) => ({
         ...prev,
@@ -494,12 +486,11 @@ const CafeEspacePropositions = ({
   };
 
   const handleClickFirstEspaceProposition = (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -509,7 +500,7 @@ const CafeEspacePropositions = ({
     gamme: "essentiel" | "confort" | "excellence";
     modele: string | null;
     marque: string | null;
-    imageUrl: string | null;
+    imageUrl: null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -528,10 +519,10 @@ const CafeEspacePropositions = ({
     totalInstallation: number | null;
   }) => {
     const {
-      fournisseurId,
-      nomFournisseur,
-      sloganFournisseur,
-      logoUrl,
+      entrepriseId,
+      nomPrestataire,
+      sloganPrestataire,
+      logoStorageKey,
       gamme,
       modele,
       marque,
@@ -553,16 +544,16 @@ const CafeEspacePropositions = ({
     //======================= JE DECOCHE ======================//
     if (
       espace.infos.gammeCafeSelected === gamme &&
-      cafe.infos.fournisseurId === fournisseurId
+      cafe.infos.entrepriseId === entrepriseId
     ) {
       setCafe((prev) => ({
         ...prev,
         infos: {
           ...prev.infos,
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
         },
         espaces: prev.espaces.map((item) => ({
           ...item,
@@ -651,21 +642,21 @@ const CafeEspacePropositions = ({
       //======================== JE COCHE ======================//
       //Pour chaque espace et le the si gammeCafeSelected je mets à jour les prix et le total
 
-      if (fournisseurId !== cafe.infos.fournisseurId) {
+      if (entrepriseId !== cafe.infos.entrepriseId) {
         toast({
           title: t("fournisseur-selectionne"),
           description: tCafe(
             "vous-avez-choisi-nomfournisseur-pour-le-cafe-ce-prestataire-assurera-la-prestation-thes-varies",
-            { nomFournisseur },
+            { nomPrestataire },
           ),
         });
       }
       const newCafeInfos = {
         ...cafe.infos,
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur,
-        logoUrl,
+        entrepriseId,
+        nomPrestataire,
+        sloganPrestataire,
+        logoStorageKey,
       };
       const newEspace: CafeEspaceType[] = [];
       const newTotalEspace: {
@@ -734,7 +725,7 @@ const CafeEspacePropositions = ({
               roundNbPersonnesCafeMachines(itemNbPersonnes) &&
             tarif.type === item.infos.typeBoissons &&
             tarif[cafe.infos.dureeLocation] !== null &&
-            tarif.fournisseurId === fournisseurId,
+            tarif.entrepriseId === entrepriseId,
         );
         if (!itemMachinesTarifFournisseur) {
           newEspace.push(item);
@@ -760,13 +751,13 @@ const CafeEspacePropositions = ({
           cafeConsoTarifs.find(
             (tarif) =>
               tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
-              tarif.fournisseurId === fournisseurId &&
+              tarif.entrepriseId === entrepriseId &&
               tarif.gamme === item.infos.gammeCafeSelected,
           )?.prixUnitaire ?? null;
         const itemConsoLaitTarifFournisseur = laitConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
-            tarif.fournisseurId === fournisseurId,
+            tarif.entrepriseId === entrepriseId,
         );
         const itemTypeLait =
           item.infos.typeBoissons !== "cafe"
@@ -784,7 +775,7 @@ const CafeEspacePropositions = ({
         const itemConsoChocolatTarifFournisseur = chocolatConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
-            tarif.fournisseurId === fournisseurId,
+            tarif.entrepriseId === entrepriseId,
         );
         const itemTypeChocolat =
           item.infos.typeBoissons === "chocolat"
@@ -799,7 +790,7 @@ const CafeEspacePropositions = ({
         const itemConsoSucreTarifFournisseur = sucreConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
-            tarif.fournisseurId === fournisseurId,
+            tarif.entrepriseId === entrepriseId,
         );
         const itemPrixUnitaireConsoSucre =
           itemConsoSucreTarifFournisseur?.prixUnitaire ?? null;
@@ -879,7 +870,7 @@ const CafeEspacePropositions = ({
         const theConsoTarifFournisseur = theConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundEffectif(nbPersonnesThe) &&
-            tarif.fournisseurId === fournisseurId &&
+            tarif.entrepriseId === entrepriseId &&
             tarif.gamme === the.infos.gammeSelected,
         );
         const prixUnitaireThe = theConsoTarifFournisseur?.prixUnitaire ?? null;
@@ -925,12 +916,12 @@ const CafeEspacePropositions = ({
           },
           0,
         );
-        const isSameFournisseur =
-          snacksFruits.infos.fournisseurId === fournisseurId;
+        const isSamePrestataire =
+          snacksFruits.infos.entrepriseId === entrepriseId;
         const prixLivraisonPanier =
           prixPanierSnacksFruits >= (snacksFruits.prix.seuilFranco ?? 0)
             ? 0
-            : isSameFournisseur
+            : isSamePrestataire
               ? snacksFruits.prix.prixUnitaireLivraisonSiCafe
               : snacksFruits.prix.prixUnitaireLivraison;
         const totalLivraison =

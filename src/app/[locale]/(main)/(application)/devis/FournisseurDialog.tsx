@@ -3,12 +3,12 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type FournisseurDialogProps = {
-  logoUrl: string | null;
+  logoStorageKey: string | null;
   darkLogoUrl?: string | null;
-  sloganFournisseur: string | null;
+  sloganPrestataire: string | null;
   presentation?: string | null;
   locationUrl: string | null;
-  nomFournisseur: string | null;
+  nomPrestataire: string | null;
   anneeCreation: number | null;
   ca: string | null;
   effectif: string | null;
@@ -18,12 +18,12 @@ type FournisseurDialogProps = {
 };
 
 const FournisseurDialog = ({
-  logoUrl,
+  logoStorageKey,
   darkLogoUrl,
   locationUrl,
-  sloganFournisseur,
+  sloganPrestataire,
   presentation,
-  nomFournisseur,
+  nomPrestataire,
   anneeCreation,
   ca,
   effectif,
@@ -64,29 +64,29 @@ const FournisseurDialog = ({
   // }, [locationUrl]);
   return (
     <div className="flex flex-col gap-2 text-sm">
-      <p className="italic">{sloganFournisseur}</p>
-      {nomFournisseur === "CASTALIE" && (
+      <p className="italic">{sloganPrestataire}</p>
+      {nomPrestataire === "CASTALIE" && (
         <p>
           {t(
             "entreprise-francaise-leader-sur-son-marche-souhaitant-travailler-en-marque-blanche",
           )}
         </p>
       )}
-      {logoUrl ? (
+      {logoStorageKey ? (
         <div className="relative h-[50px] w-full">
           <Image
-            src={logoUrl}
-            alt={`logo-de-${nomFournisseur}`}
+            src={logoStorageKey}
+            alt={`logo-de-${nomPrestataire}`}
             fill
-            className={`object-contain ${nomFournisseur === "CASTALIE" ? "blur-lg" : ""} ${darkLogoUrl ? "dark:hidden" : ""}`}
+            className={`object-contain ${nomPrestataire === "CASTALIE" ? "blur-lg" : ""} ${darkLogoUrl ? "dark:hidden" : ""}`}
             sizes="(max-width:768px) 25vw, 100vw"
           />
           {darkLogoUrl && (
             <Image
               src={darkLogoUrl}
-              alt={`logo-de-${nomFournisseur}`}
+              alt={`logo-de-${nomPrestataire}`}
               fill
-              className={`hidden object-contain dark:block ${nomFournisseur === "CASTALIE" ? "blur-lg" : ""}`}
+              className={`hidden object-contain dark:block ${nomPrestataire === "CASTALIE" ? "blur-lg" : ""}`}
               sizes="(max-width:768px) 25vw, 100vw"
             />
           )}

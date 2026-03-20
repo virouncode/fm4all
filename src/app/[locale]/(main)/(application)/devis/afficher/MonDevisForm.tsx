@@ -1,6 +1,6 @@
 "use client";
 
-import { finaliserDevisAction } from "@/actions/devisAction";
+import { finaliserDevisAction } from "@/server/actions/devisComparateurActions";
 import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import fillDevis from "@/lib/utils/fillDevis";
-import { postVercelBlob } from "@/server/queries_a_classer/vercel-blob/postVercelBlob";
+import { getPresignedDevisUploadUrlAction } from "@/server/actions/s3Actions";
 import { useCommentairesStore } from "@/stores/devis/commentairesStore";
 import { useMonDevisStore } from "@/stores/devis/monDevisStore";
 import {
@@ -27,7 +27,7 @@ import {
   createUpdateProspectFormSchema,
   UpdateProspectFormType,
   UpdateProspectType,
-} from "@/zod-schemas/prospect";
+} from "@/zod-schemas/prospect.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -124,8 +124,9 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           variant: "destructive",
           title: tSauver("erreur"),
           description:
-            error?.serverError ??
-            tSauver("impossible-de-generer-votre-devis-veuillez-reessayer"),
+            typeof error?.serverError === "string"
+              ? error.serverError
+              : tSauver("impossible-de-generer-votre-devis-veuillez-reessayer"),
         });
       },
     });
@@ -249,25 +250,46 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         setIsLoading(false);
         return;
       }
-      // 4) uploader le PDF vers Vercel Blob
+      // 4) obtenir une URL présignée S3 puis uploader le PDF
+      const presignResult = await getPresignedDevisUploadUrlAction({
+        originalName: nomDevis,
+      });
+
+      if (!presignResult?.data) {
+        toast({
+          variant: "destructive",
+          title: t("erreur"),
+          description: t("une-erreur-est-survenue"),
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const { uploadUrl, key: devisS3Key } = presignResult.data;
+
       const responseBlob = await fetch(urlTemp);
       const blob = await responseBlob.blob();
-      const file = new File([blob], nomDevis, {
-        type: "application/pdf",
+
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "PUT",
+        body: blob,
+        headers: { "Content-Type": "application/pdf" },
       });
 
-      const uploadResponse = await postVercelBlob({
-        file,
-        filename: nomDevis,
-        foldername: "devis",
-      });
+      if (!uploadResponse.ok) {
+        toast({
+          variant: "destructive",
+          title: t("erreur"),
+          description: t("une-erreur-est-survenue"),
+        });
+        setIsLoading(false);
+        return;
+      }
 
-      const finalDevisUrl = uploadResponse.url;
-
-      // 5) appeler la server action avec prospectToUpdate + finalDevisUrl
+      // 5) appeler la server action avec prospectToUpdate + devisS3Key
       executeFinaliserDevis({
         prospect: payload as UpdateProspectType,
-        devisUrl: finalDevisUrl,
+        devisS3Key,
         commentaires: commentaires ?? null,
         devisMontants: {
           totalMensuelHt: Math.round(((total.totalAnnuelHt ?? 0) / 12) * RATIO),

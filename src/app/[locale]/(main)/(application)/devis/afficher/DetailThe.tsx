@@ -37,7 +37,7 @@ const DetailThe = () => {
         {totalThe.totalService ? (
           <TableRow>
             <TableCell>The</TableCell>
-            <TableCell>{cafe.infos.nomFournisseur}</TableCell>
+            <TableCell>{cafe.infos.nomPrestataire}</TableCell>
             <TableCell>{the.infos.gammeSelected}</TableCell>
             <TableCell>{the.quantites.nbPersonnes} personne(s)</TableCell>
             <TableCell>N/A</TableCell>

@@ -18,13 +18,12 @@ import Image from "next/image";
 
 type MaintenanceMobilePropositionCardProps = {
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -41,13 +40,12 @@ type MaintenanceMobilePropositionCardProps = {
     totalAnnuel: number | null;
   }) => void;
   proposition: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -75,11 +73,10 @@ const MaintenanceMobilePropositionCard = ({
   const maintenance = useMaintenanceStore((s) => s.maintenance);
   const {
     gamme,
-    fournisseurId,
-    nomFournisseur,
-    sloganFournisseur,
-    logoUrl,
-    locationUrl,
+    entrepriseId,
+    nomPrestataire,
+    sloganPrestataire,
+    logoStorageKey,
     anneeCreation,
     ca,
     effectifFournisseur,
@@ -195,7 +192,7 @@ const MaintenanceMobilePropositionCard = ({
     <CarouselItem>
       <div
         className={`bg-${color} flex h-72 flex-col rounded-xl border border-slate-200 p-4 text-white ${
-          maintenance.infos.fournisseurId === fournisseurId &&
+          maintenance.infos.entrepriseId === entrepriseId &&
           maintenance.infos.gammeSelected === gamme
             ? "ring-destructive ring-4 ring-inset"
             : ""
@@ -218,14 +215,14 @@ const MaintenanceMobilePropositionCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             <Dialog>
               <DialogTrigger asChild>
-                {logoUrl ? (
+                {logoStorageKey ? (
                   <div className="relative h-10">
                     <Image
-                      src={logoUrl}
-                      alt={`logo-de-${nomFournisseur}`}
+                      src={logoStorageKey}
+                      alt={`logo-de-${nomPrestataire}`}
                       fill
                       className="cursor-pointer object-contain object-left"
                       sizes="(max-width:768px) 100vw"
@@ -235,13 +232,13 @@ const MaintenanceMobilePropositionCard = ({
               </DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomFournisseur}</DialogTitle>
+                  <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={sloganFournisseur}
-                  logoUrl={logoUrl}
-                  nomFournisseur={nomFournisseur}
-                  locationUrl={locationUrl}
+                  sloganPrestataire={sloganPrestataire}
+                  logoStorageKey={logoStorageKey}
+                  nomPrestataire={nomPrestataire}
+                  locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
                   effectif={effectifFournisseur}
@@ -274,13 +271,13 @@ const MaintenanceMobilePropositionCard = ({
             {totalMensuelText ? (
               <Switch
                 className={`${
-                  maintenance.infos.fournisseurId === fournisseurId &&
+                  maintenance.infos.entrepriseId === entrepriseId &&
                   maintenance.infos.gammeSelected === gamme
                     ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={
-                  maintenance.infos.fournisseurId === fournisseurId &&
+                  maintenance.infos.entrepriseId === entrepriseId &&
                   maintenance.infos.gammeSelected === gamme
                 }
                 onCheckedChange={() => handleClickProposition(proposition)}

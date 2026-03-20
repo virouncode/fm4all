@@ -17,10 +17,10 @@ export const useHygieneStore = create<HygieneStore>()(
     (set) => ({
       hygiene: {
         infos: {
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           dureeLocation: "pa12M",
           trilogieGammeSelected: "essentiel",
           desinfectantGammeSelected: null,
@@ -64,10 +64,10 @@ export const useHygieneStore = create<HygieneStore>()(
         set({
           hygiene: {
             infos: {
-              fournisseurId: null,
-              nomFournisseur: null,
-              sloganFournisseur: null,
-              logoUrl: null,
+              entrepriseId: null,
+              nomPrestataire: null,
+              sloganPrestataire: null,
+              logoStorageKey: null,
               dureeLocation: "pa12M",
               trilogieGammeSelected: "essentiel",
               desinfectantGammeSelected: null,

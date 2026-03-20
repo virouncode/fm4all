@@ -1,15 +1,14 @@
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 import NettoyageFournisseurLogo from "./NettoyageFournisseurLogo";
 import NettoyagePropositionCard from "./NettoyagePropositionCard";
 
 type NettoyageDesktopPropositionsProps = {
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -23,12 +22,11 @@ type NettoyageDesktopPropositionsProps = {
     totalAnnuel: number | null;
   }) => void;
   formattedPropositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -53,7 +51,7 @@ const NettoyageDesktopPropositions = ({
         ? formattedPropositions.map((propositions) => (
             <div
               className="flex flex-1 border-b"
-              key={propositions[0].fournisseurId}
+              key={propositions[0].entrepriseId}
             >
               <NettoyageFournisseurLogo {...propositions[0]} />
               {propositions.map((proposition) => (

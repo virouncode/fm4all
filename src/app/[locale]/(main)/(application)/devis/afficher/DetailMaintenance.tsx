@@ -37,7 +37,7 @@ const DetailMaintenance = () => {
         {totalMaintenance.totalService ? (
           <TableRow>
             <TableCell>Maintenance Multi-Tech</TableCell>
-            <TableCell>{maintenance.infos.nomFournisseur}</TableCell>
+            <TableCell>{maintenance.infos.nomPrestataire}</TableCell>
             <TableCell>{maintenance.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -54,7 +54,7 @@ const DetailMaintenance = () => {
         {totalMaintenance.totalQ18 ? (
           <TableRow>
             <TableCell>Contrôle Q18</TableCell>
-            <TableCell>{maintenance.infos.nomFournisseur}</TableCell>
+            <TableCell>{maintenance.infos.nomPrestataire}</TableCell>
             <TableCell>{maintenance.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -71,7 +71,7 @@ const DetailMaintenance = () => {
         {totalMaintenance.totalLegio ? (
           <TableRow>
             <TableCell>Contrôle Legio</TableCell>
-            <TableCell>{maintenance.infos.nomFournisseur}</TableCell>
+            <TableCell>{maintenance.infos.nomPrestataire}</TableCell>
             <TableCell>{maintenance.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -88,7 +88,7 @@ const DetailMaintenance = () => {
         {totalMaintenance.totalQualiteAir ? (
           <TableRow>
             <TableCell>Contrôle Qualité Air</TableCell>
-            <TableCell>{maintenance.infos.nomFournisseur}</TableCell>
+            <TableCell>{maintenance.infos.nomPrestataire}</TableCell>
             <TableCell>{maintenance.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>

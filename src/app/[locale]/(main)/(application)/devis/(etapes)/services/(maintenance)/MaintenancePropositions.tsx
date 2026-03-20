@@ -1,11 +1,11 @@
 import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
 import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
-import { gammes } from "@/zod-schemas/gamme";
-import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
-import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
-import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
-import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
-import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
+import { gammes } from "@/zod-schemas/gamme.schema";
+import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs.schema";
+import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites.schema";
+import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs.schema";
+import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs.schema";
+import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs.schema";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
 import MaintenanceDesktopPropositions from "./(desktop)/MaintenanceDesktopPropositions";
@@ -42,17 +42,16 @@ const MaintenancePropositions = ({
     const {
       id,
       gamme,
-      nomFournisseur,
-      slogan: sloganFournisseur,
-      logoUrl,
-      locationUrl,
+      nomPrestataire,
+      slogan: sloganPrestataire,
+      logoStorageKey,
       anneeCreation,
       ca,
       effectif: effectifFournisseur,
       nbClients,
       noteGoogle,
       nbAvis,
-      fournisseurId,
+      entrepriseId,
       hParPassage,
       tauxHoraire,
     } = tarif;
@@ -62,13 +61,13 @@ const MaintenancePropositions = ({
     const totalAnnuelService =
       freqAnnuelle !== null ? hParPassage * tauxHoraire * freqAnnuelle : null;
     const totalAnnuelQ18 =
-      q18Tarifs.find((item) => item.fournisseurId === fournisseurId)
+      q18Tarifs.find((item) => item.entrepriseId === entrepriseId)
         ?.prixAnnuel ?? null;
     const totalAnnuelLegio =
-      legioTarifs.find((item) => item.fournisseurId === fournisseurId)
+      legioTarifs.find((item) => item.entrepriseId === entrepriseId)
         ?.prixAnnuel ?? null;
     const totalAnnuelQualiteAir =
-      qualiteAirTarifs.find((item) => item.fournisseurId === fournisseurId)
+      qualiteAirTarifs.find((item) => item.entrepriseId === entrepriseId)
         ?.prixAnnuel ?? null;
 
     const totalAnnuelControlesSupplementaires =
@@ -85,11 +84,10 @@ const MaintenancePropositions = ({
     return {
       id,
       gamme,
-      nomFournisseur,
-      fournisseurId,
-      sloganFournisseur,
-      logoUrl,
-      locationUrl,
+      nomPrestataire,
+      entrepriseId,
+      sloganPrestataire,
+      logoStorageKey,
       anneeCreation,
       ca,
       effectifFournisseur,
@@ -109,15 +107,14 @@ const MaintenancePropositions = ({
 
   const propositionsByFournisseurId = propositions.reduce<
     Record<
-      number,
+      string,
       {
-        id: number;
+        id: string;
         gamme: "essentiel" | "confort" | "excellence";
-        nomFournisseur: string;
-        fournisseurId: number;
-        sloganFournisseur: string | null;
-        logoUrl: string | null;
-        locationUrl: string | null;
+        nomPrestataire: string;
+        entrepriseId: string;
+        sloganPrestataire: string | null;
+        logoStorageKey: string | null;
         anneeCreation: number | null;
         ca: string | null;
         effectifFournisseur: string | null;
@@ -135,29 +132,28 @@ const MaintenancePropositions = ({
       }[]
     >
   >((acc, item) => {
-    const { fournisseurId } = item;
-    if (!acc[fournisseurId]) {
-      acc[fournisseurId] = [];
+    const { entrepriseId } = item;
+    if (!acc[entrepriseId]) {
+      acc[entrepriseId] = [];
     }
     // Add the item to the appropriate array
-    acc[fournisseurId].push(item);
-    acc[fournisseurId].sort(
+    acc[entrepriseId].push(item);
+    acc[entrepriseId].sort(
       (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme),
     );
     return acc;
   }, {});
 
-  //An array of arrays of propositions by fournisseurId
+  //An array of arrays of propositions by entrepriseId
   const formattedPropositions = Object.values(propositionsByFournisseurId);
 
   const handleClickProposition = (proposition: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -175,10 +171,10 @@ const MaintenancePropositions = ({
   }) => {
     const {
       gamme,
-      nomFournisseur,
-      fournisseurId,
-      sloganFournisseur,
-      logoUrl,
+      nomPrestataire,
+      entrepriseId,
+      sloganPrestataire,
+      logoStorageKey,
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
@@ -194,7 +190,7 @@ const MaintenancePropositions = ({
       gammes.indexOf(gamme) > 1 ? totalAnnuelQualiteAir : null;
 
     if (
-      maintenance.infos.fournisseurId === fournisseurId &&
+      maintenance.infos.entrepriseId === entrepriseId &&
       maintenance.infos.gammeSelected === gamme
     ) {
       {
@@ -202,10 +198,10 @@ const MaintenancePropositions = ({
           ...prev,
           infos: {
             ...prev.infos,
-            fournisseurId: null,
-            nomFournisseur: null,
-            sloganFournisseur: null,
-            logoUrl: null,
+            entrepriseId: null,
+            nomPrestataire: null,
+            sloganPrestataire: null,
+            logoStorageKey: null,
             gammeSelected: null,
           },
           quantites: {
@@ -226,10 +222,10 @@ const MaintenancePropositions = ({
     setMaintenance((prev) => ({
       infos: {
         ...prev.infos,
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur,
-        logoUrl,
+        entrepriseId,
+        nomPrestataire,
+        sloganPrestataire,
+        logoStorageKey,
         gammeSelected: gamme,
       },
       quantites: {

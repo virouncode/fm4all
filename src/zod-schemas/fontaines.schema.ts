@@ -2,10 +2,10 @@ import { z } from "zod";
 
 export const fontainesSchema = z.object({
   infos: z.object({
-    fournisseurId: z.number().nullable(),
-    nomFournisseur: z.string().nullable(),
-    sloganFournisseur: z.string().nullable(),
-    logoUrl: z.string().nullable(),
+    entrepriseId: z.string().uuid().nullable(),
+    nomPrestataire: z.string().nullable(),
+    sloganPrestataire: z.string().nullable(),
+    logoStorageKey: z.string().nullable(),
     currentEspaceId: z.number().nullable(),
     dureeLocation: z
       .enum(["pa12M", "pa24M", "pa36M", "pa48M", "pa60M", "oneShot"])

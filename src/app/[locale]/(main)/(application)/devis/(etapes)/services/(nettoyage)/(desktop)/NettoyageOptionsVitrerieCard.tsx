@@ -17,17 +17,16 @@ import Image from "next/image";
 
 type NettoyageOptionsVitrerieCardProps = {
   vitrerieProposition: {
-    id: number;
+    id: string;
     tauxHoraire: number;
     cadenceCloisons: number;
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
     prixAnnuel: number | null;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -36,17 +35,16 @@ type NettoyageOptionsVitrerieCardProps = {
     nbAvis: number | null;
   };
   handleClickVitrerieProposition: (vitrerieProposition: {
-    id: number;
+    id: string;
     tauxHoraire: number;
     cadenceCloisons: number;
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
     prixAnnuel: number | null;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;

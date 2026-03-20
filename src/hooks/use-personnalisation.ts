@@ -26,7 +26,7 @@ export const usePersonnalisation = () => {
     // )
     //   ids.push(4);
     // if (maintenance?.infos?.gammeSelected) ids.push(5);
-    if (incendie?.infos?.fournisseurId) {
+    if (incendie?.infos?.entrepriseId) {
       ids.push(6);
       // ids.push(7);
     }
@@ -39,7 +39,7 @@ export const usePersonnalisation = () => {
     ids.push(14);
     return ids;
   }, [
-    incendie?.infos?.fournisseurId,
+    incendie?.infos?.entrepriseId,
     nettoyage?.infos?.gammeSelected,
     nettoyage?.infos?.vitrerieSelected,
   ]);

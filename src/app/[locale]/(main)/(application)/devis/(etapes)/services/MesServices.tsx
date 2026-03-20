@@ -5,24 +5,24 @@ import {
   getHygieneDistribTarifs,
   getHygieneInstalDistribTarifs,
   getHygieneMinFacturation,
-} from "@/server/queries_a_classer/hygiene/getHygiene";
+} from "@/server/queries/hygiene.query";
 import {
   getIncendieQuantite,
   getIncendieTarifs,
-} from "@/server/queries_a_classer/incendie/getIncendie";
+} from "@/server/queries/incendie.query";
 import {
   getLegioTarifs,
   getMaintenanceQuantites,
   getMaintenanceTarifs,
   getQ18Tarifs,
   getQualiteAirTarifs,
-} from "@/server/queries_a_classer/maintenance/getMaintenance";
+} from "@/server/queries/maintenance.query";
 import {
   getNettoyageQuantites,
   getNettoyageTarifs,
   getRepasseTarifs,
   getVitrerieTarifs,
-} from "@/server/queries_a_classer/nettoyage/getNettoyage";
+} from "@/server/queries/nettoyage.query";
 import { getTranslations } from "next-intl/server";
 import NextEtapeFoodButton from "../../NextEtapeFoodButton";
 import Hygiene from "./(hygiene)/Hygiene";

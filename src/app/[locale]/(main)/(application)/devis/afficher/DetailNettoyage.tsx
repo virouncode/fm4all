@@ -37,7 +37,7 @@ const DetailNettoyage = () => {
         {totalNettoyage.totalService ? (
           <TableRow>
             <TableCell>Nettoyage</TableCell>
-            <TableCell>{nettoyage.infos.nomFournisseur}</TableCell>
+            <TableCell>{nettoyage.infos.nomPrestataire}</TableCell>
             <TableCell>{nettoyage.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -56,7 +56,7 @@ const DetailNettoyage = () => {
         {totalNettoyage.totalRepasse ? (
           <TableRow>
             <TableCell>Repasse sanitaire</TableCell>
-            <TableCell>{nettoyage.infos.nomFournisseur}</TableCell>
+            <TableCell>{nettoyage.infos.nomPrestataire}</TableCell>
             <TableCell>{nettoyage.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -75,7 +75,7 @@ const DetailNettoyage = () => {
         {totalNettoyage.totalSamedi ? (
           <TableRow>
             <TableCell>Nettoyage sup. Samedi</TableCell>
-            <TableCell>{nettoyage.infos.nomFournisseur}</TableCell>
+            <TableCell>{nettoyage.infos.nomPrestataire}</TableCell>
             <TableCell>{nettoyage.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -91,7 +91,7 @@ const DetailNettoyage = () => {
         {totalNettoyage.totalDimanche ? (
           <TableRow>
             <TableCell>Nettoyage sup. Dimanche</TableCell>
-            <TableCell>{nettoyage.infos.nomFournisseur}</TableCell>
+            <TableCell>{nettoyage.infos.nomPrestataire}</TableCell>
             <TableCell>{nettoyage.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -107,7 +107,7 @@ const DetailNettoyage = () => {
         {totalNettoyage.totalVitrerie ? (
           <TableRow>
             <TableCell>Lavage vitrerie</TableCell>
-            <TableCell>{nettoyage.infos.nomFournisseur}</TableCell>
+            <TableCell>{nettoyage.infos.nomPrestataire}</TableCell>
             <TableCell>{nettoyage.infos.gammeSelected}</TableCell>
             <TableCell>
               {nettoyage.quantites.surfaceVitres},{" "}

@@ -15,22 +15,22 @@ import Image from "next/image";
 
 type OfficeManagerPropositionCardProps = {
   proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
   };
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
@@ -224,7 +224,7 @@ const OfficeManagerPropositionCard = ({
   return (
     <div
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
-        officeManager.infos.fournisseurId === proposition.fournisseurId &&
+        officeManager.infos.entrepriseId === proposition.entrepriseId &&
         officeManager.infos.gammeSelected !== null
           ? "ring-destructive ring-4 ring-inset"
           : ""
@@ -233,7 +233,7 @@ const OfficeManagerPropositionCard = ({
     >
       <Switch
         checked={
-          officeManager.infos.fournisseurId === proposition.fournisseurId &&
+          officeManager.infos.entrepriseId === proposition.entrepriseId &&
           officeManager.infos.gammeSelected !== null
         }
         onCheckedChange={() => handleClickProposition(proposition)}

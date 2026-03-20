@@ -1,6 +1,6 @@
 "use client";
 
-import { FoodBeverageType } from "@/zod-schemas/foodBeverage";
+import { FoodBeverageType } from "@/zod-schemas/foodBeverage.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

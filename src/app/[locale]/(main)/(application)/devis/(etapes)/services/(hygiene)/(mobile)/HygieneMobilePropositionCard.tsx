@@ -19,10 +19,9 @@ import Image from "next/image";
 type HygieneMobilePropositionCardProps = {
   proposition: {
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -45,10 +44,9 @@ type HygieneMobilePropositionCardProps = {
   };
   handleClickProposition: (proposition: {
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -84,10 +82,9 @@ const HygieneMobilePropositionCard = ({
   const hygiene = useHygieneStore((s) => s.hygiene);
   const {
     gamme,
-    nomFournisseur,
-    sloganFournisseur,
-    logoUrl,
-    locationUrl,
+    nomPrestataire,
+    sloganPrestataire,
+    logoStorageKey,
     anneeCreation,
     ca,
     effectifFournisseur,
@@ -271,14 +268,14 @@ const HygieneMobilePropositionCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             <Dialog>
               <DialogTrigger asChild>
-                {logoUrl ? (
+                {logoStorageKey ? (
                   <div className="relative h-10">
                     <Image
-                      src={logoUrl}
-                      alt={`logo-de-${nomFournisseur}`}
+                      src={logoStorageKey}
+                      alt={`logo-de-${nomPrestataire}`}
                       fill
                       className="cursor-pointer object-contain object-left"
                       sizes="(max-width:768px) 100vw"
@@ -288,13 +285,13 @@ const HygieneMobilePropositionCard = ({
               </DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomFournisseur}</DialogTitle>
+                  <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={sloganFournisseur}
-                  logoUrl={logoUrl}
-                  nomFournisseur={nomFournisseur}
-                  locationUrl={locationUrl}
+                  sloganPrestataire={sloganPrestataire}
+                  logoStorageKey={logoStorageKey}
+                  nomPrestataire={nomPrestataire}
+                  locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
                   effectif={effectifFournisseur}

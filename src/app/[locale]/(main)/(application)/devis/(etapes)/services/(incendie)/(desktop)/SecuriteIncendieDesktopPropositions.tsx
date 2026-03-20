@@ -1,4 +1,4 @@
-import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
+import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites.schema";
 import { useTranslations } from "next-intl";
 import SecuriteIncendieFournisseurLogo from "../SecuriteIncendieFournisseurLogo";
 import SecuriteIncendieInputs from "../SecuriteIncendieInputs";
@@ -6,12 +6,11 @@ import SecuriteIncendiePropostionCard from "../SecuriteIncendiePropostionCard";
 
 type SecuriteIncendieDesktopPropositionsProps = {
   propositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -36,12 +35,11 @@ type SecuriteIncendieDesktopPropositionsProps = {
   ) => void;
   incendieQuantite: SelectIncendieQuantitesType;
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;

@@ -24,7 +24,7 @@ describe("ServicePresentationCard", () => {
 
   it("renders correctly with href (link case)", () => {
     render(
-      <ServicePresentationCard title={title} icons={icons} href="/test" />,
+      <ServicePresentationCard title={title} icons={icons} href="/services" />,
     );
     expect(screen.getByRole("link", { name: title })).toBeInTheDocument();
     expect(screen.getByText(title)).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe("ServicePresentationCard", () => {
       <ServicePresentationCard
         title={title}
         icons={icons}
-        href="/with-link"
+        href="/gammes"
         onClick={onClick}
       />,
     );

@@ -15,12 +15,11 @@ import Image from "next/image";
 
 type NettoyageOptionsDimancheCardProps = {
   dimancheProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -29,12 +28,11 @@ type NettoyageOptionsDimancheCardProps = {
     nbAvis: number | null;
   };
   handleClickDimancheProposition: (dimancheProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;

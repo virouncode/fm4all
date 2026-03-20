@@ -24,7 +24,7 @@ import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createMesLocauxFormSchema,
   MesLocauxFormType,
-} from "@/zod-schemas/mesLocaux";
+} from "@/zod-schemas/mesLocaux.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useState } from "react";

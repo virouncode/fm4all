@@ -1,4 +1,4 @@
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { ChangeEvent } from "react";
 import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
 import HygieneMobileOptionsPoubelleCarousel from "./HygieneMobileOptionsPoubelleCarousel";
@@ -12,16 +12,16 @@ type HygieneMobileOptionsPoubelleProps = {
     type: HygieneOptionsType,
   ) => void;
   propositions: {
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
     anneeCreation: number | null;
-    logoUrl: string | null;
+    logoStorageKey: string | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    locationUrl: string | null;
+
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -40,16 +40,16 @@ type HygieneMobileOptionsPoubelleProps = {
   handleClickProposition: (
     type: HygieneOptionsType,
     proposition: {
-      nomFournisseur: string;
-      sloganFournisseur: string | null;
+      nomPrestataire: string;
+      sloganPrestataire: string | null;
       anneeCreation: number | null;
-      logoUrl: string | null;
+      logoStorageKey: string | null;
       ca: string | null;
       effectifFournisseur: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
-      locationUrl: string | null;
+  
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
@@ -67,7 +67,7 @@ type HygieneMobileOptionsPoubelleProps = {
     },
   ) => void;
   hygieneDistribTarifsFournisseur: {
-    id: number;
+    id: string;
     effectif: string | null;
     createdAt: Date;
     type:
@@ -79,22 +79,22 @@ type HygieneMobileOptionsPoubelleProps = {
       | "parfum"
       | "balai"
       | "poubelle";
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
+
     anneeCreation: number | null;
     ca: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    fournisseurId: number;
+    entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     oneShot: number | null;
     pa12M: number | null;
     pa24M: number | null;
     pa36M: number | null;
-    imageUrl: string | null;
+
   }[];
 };
 

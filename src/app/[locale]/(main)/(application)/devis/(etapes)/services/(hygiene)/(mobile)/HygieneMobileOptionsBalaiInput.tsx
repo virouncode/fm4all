@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
@@ -19,7 +19,7 @@ type HygieneMobileOptionsBalaiInputProps = {
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   hygieneDistribTarifsFournisseur: {
-    id: number;
+    id: string;
     effectif: string | null;
     createdAt: Date;
     type:
@@ -31,22 +31,22 @@ type HygieneMobileOptionsBalaiInputProps = {
       | "parfum"
       | "balai"
       | "poubelle";
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
+
     anneeCreation: number | null;
     ca: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    fournisseurId: number;
+    entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     oneShot: number | null;
     pa12M: number | null;
     pa24M: number | null;
     pa36M: number | null;
-    imageUrl: string | null;
+
   }[];
 };
 

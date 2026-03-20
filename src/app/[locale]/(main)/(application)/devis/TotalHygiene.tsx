@@ -40,7 +40,7 @@ const TotalHygiene = () => {
     <div className="total-section flex flex-col gap-4" id="total-hygiene">
       <div className="flex flex-col gap-4">
         <div>
-          {t("hygiene")} ({hygiene.infos.nomFournisseur})
+          {t("hygiene")} ({hygiene.infos.nomPrestataire})
         </div>
         <div className="ml-4 flex flex-col text-xs">
           {totalTrilogie ? (

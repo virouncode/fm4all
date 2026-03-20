@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 import React from "react";
 
 // Types for our data structure

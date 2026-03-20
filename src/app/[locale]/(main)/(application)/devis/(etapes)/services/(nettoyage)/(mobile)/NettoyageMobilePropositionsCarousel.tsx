@@ -5,18 +5,17 @@ import {
   CarouselContent,
 } from "@/components/ui/carousel";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 import { useEffect, useState } from "react";
 import NettoyageMobilePropositionCard from "./NettoyageMobilePropositionCard";
 
 type NettoyageMobilePropositionsCarouselProps = {
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -30,12 +29,11 @@ type NettoyageMobilePropositionsCarouselProps = {
     totalAnnuel: number | null;
   }) => void;
   propositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -68,11 +66,11 @@ const NettoyageMobilePropositionsCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!nettoyage.infos.fournisseurId || !api) {
+    if (!nettoyage.infos.entrepriseId || !api) {
       return;
     }
     if (
-      propositions[0].fournisseurId === nettoyage.infos.fournisseurId &&
+      propositions[0].entrepriseId === nettoyage.infos.entrepriseId &&
       nettoyage.infos.gammeSelected
     ) {
       api?.scrollTo(
@@ -85,7 +83,7 @@ const NettoyageMobilePropositionsCarousel = ({
     }
   }, [
     api,
-    nettoyage.infos.fournisseurId,
+    nettoyage.infos.entrepriseId,
     nettoyage.infos.gammeSelected,
     propositions,
   ]);

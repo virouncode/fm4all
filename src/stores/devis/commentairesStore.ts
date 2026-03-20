@@ -1,6 +1,6 @@
 "use client";
 
-import { CommentairesType } from "@/zod-schemas/commentaires";
+import { CommentairesType } from "@/zod-schemas/commentaires.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

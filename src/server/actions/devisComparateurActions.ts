@@ -3,19 +3,22 @@
 import { batiments } from "@/constants/batiments";
 import { occupation } from "@/constants/occupation";
 import { db } from "@/db";
-import { devis, devisTemporaires, prospects } from "@/db/schema";
+import { devisTemporaires, prospects } from "@/db/schema";
 import { actionClient } from "@/lib/action/safe-actions";
-import { sendEmailFromServer } from "@/lib/email/sendEmail";
+import { env } from "@/lib/env";
+import { sendEmailDirect } from "@/server/email/mailgunDirect";
 import {
-  insertDevisSchema,
-  saveProgressSchema,
-} from "@/zod-schemas/devisComparateur";
-import { finaliserDevisSchema } from "@/zod-schemas/finaliserDevis";
-import { SelectProspectType } from "@/zod-schemas/prospect";
+  s3,
+  S3_BUCKET,
+} from "@/server/s3/s3";
+import { saveProgressSchema } from "@/zod-schemas/devisComparateur.schema";
+import { finaliserDevisSchema } from "@/zod-schemas/finaliserDevis.schema";
+import { SelectProspectType } from "@/zod-schemas/prospect.schema";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { and, eq } from "drizzle-orm";
-import { DateTime } from "luxon";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
 
@@ -86,17 +89,18 @@ export const saveProgressAction = actionClient
       };
     });
 
-    // Ici TS sait exactement ce qu'il y a dans result
     const { prospect: upsertedProspect, devisTemporaire: insertedDevisTemp } =
       result;
 
-    try {
-      await sendEmailFromServer({
-        to: "contact@fm4all.com",
-        from: "contact@fm4all.com",
-        subject: "Un prospect a sauvegardé sa progression",
-        text: "placeholder",
-        html: `<p>Un prospect a sauvegardé sa progression dans le funnel.</p><br/>
+    const contactEmail = env.MAILGUN_CONTACT_EMAIL;
+
+    if (contactEmail) {
+      try {
+        await sendEmailDirect({
+          to: contactEmail,
+          subject: "Un prospect a sauvegardé sa progression",
+          text: "placeholder",
+          html: `<p>Un prospect a sauvegardé sa progression dans le funnel.</p><br/>
               <p>Voici ses coordonnées :</p><br/>
               <p>Entreprise : ${upsertedProspect.nomEntreprise}</p>
               <p>Code postal : ${upsertedProspect.codePostal}</p>
@@ -120,10 +124,11 @@ export const saveProgressAction = actionClient
               <p>Voici ses informations de chiffrage (avant personnalisation) :</p><br/>
               <pre>${insertedDevisTemp.texte}</pre>
               `,
-        useTemplate: false, //car trop long pour les templates Mailgun (limite de 10k caractères)
-      });
-    } catch (err) {
-      void err;
+          useTemplate: false,
+        });
+      } catch (err) {
+        void err;
+      }
     }
 
     return {
@@ -144,63 +149,44 @@ export const finaliserDevisAction = actionClient
   })
   .action(async ({ parsedInput }) => {
     const locale = await getLocale();
-    const { prospect, devisUrl, commentaires, devisMontants } = parsedInput;
+    const { prospect, devisS3Key, commentaires } = parsedInput;
 
     if (!prospect.id) {
       throw new Error("Prospect ID manquant pour la finalisation du devis.");
     }
 
-    // 1) Update prospect
+    // 1) Update prospect (exclure id du SET pour ne pas tenter de modifier la PK)
+    const { id: prospectId, ...prospectData } = prospect;
     const [updatedProspect] = await db
       .update(prospects)
-      .set(prospect)
-      .where(eq(prospects.id, prospect.id))
+      .set(prospectData)
+      .where(eq(prospects.id, prospectId))
       .returning();
 
     if (!updatedProspect) {
       throw new Error("Erreur lors de la mise à jour du prospect.");
     }
 
-    const finalDevisUrl = devisUrl;
-
-    const payload = insertDevisSchema.parse({
-      titre: "Devis en ligne fm4all",
-      description: "Devis généré via le comparateur en ligne fm4all",
-      typePrix: "forfait",
-      margeCoefficient: devisMontants.margeCoefficient,
-      status: "emis",
-      devisUrl: finalDevisUrl,
-      prospectId: updatedProspect.id,
-      fournisseurId: 16, // FM4ALL ID
-      totalMensuelHt: devisMontants.totalMensuelHt /*10000*/,
-      totalInstallationHt: devisMontants.totalInstallationHt ?? null /*10000*/,
-      dateDemarrage: updatedProspect.dateDeDemarrage
-        ? new Date(updatedProspect.dateDeDemarrage)
-        : null,
-      dateValidite: DateTime.now().startOf("day").plus({ days: 15 }).toJSDate(),
+    // 2) Générer une URL présignée de lecture (24h) pour le PDF
+    const readCmd = new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: devisS3Key,
+      ResponseContentDisposition: "inline",
+      ResponseContentType: "application/pdf",
     });
-
-    // 2) Transaction : insert devis
-    const result = await db.transaction(async (tx) => {
-      const [insertedDevis] = await tx
-        .insert(devis)
-        .values(payload)
-        .returning();
-
-      if (!insertedDevis) {
-        throw new Error("Erreur lors de l'enregistrement du devis.");
-      }
-
-      return { devis: insertedDevis, prospect: updatedProspect };
+    const devisUrl = await getSignedUrl(s3, readCmd, {
+      expiresIn: env.S3_PRESIGN_DEVIS_READ_EXPIRES_SECONDS,
     });
 
     // 3) Email admin (hors transaction)
-    try {
-      await sendEmailFromServer({
-        to: "contact@fm4all.com",
-        from: "devis@fm4all.com",
-        subject: "Un client a finalisé son devis",
-        text: `
+    const contactEmail = env.MAILGUN_CONTACT_EMAIL;
+
+    if (contactEmail) {
+      try {
+        await sendEmailDirect({
+          to: contactEmail,
+          subject: "Un client a finalisé son devis",
+          text: `
 <p>Un client a finalisé son devis.</p><br/>
 <p>Voici ses coordonnées :</p><br/>
 <p>Entreprise : ${updatedProspect.nomEntreprise}</p>
@@ -212,13 +198,13 @@ export const finaliserDevisAction = actionClient
 <p>Surface des locaux : ${updatedProspect.surface}</p>
 <p>Effectif : ${updatedProspect.effectif}</p>
 <p>Type de bâtiment : ${
-          batiments.find(({ id }) => id === updatedProspect.typeBatiment)
-            ?.description ?? ""
-        }</p>
+            batiments.find(({ id }) => id === updatedProspect.typeBatiment)
+              ?.description ?? ""
+          }</p>
 <p>Type d'occupation : ${
-          occupation.find(({ id }) => id === updatedProspect.typeOccupation)
-            ?.description ?? ""
-        }</p>
+            occupation.find(({ id }) => id === updatedProspect.typeOccupation)
+              ?.description ?? ""
+          }</p>
 <p>Nom du contact : ${updatedProspect.nomContact}</p>
 <p>Prénom du contact : ${updatedProspect.prenomContact}</p>
 <p>Poste du contact : ${updatedProspect.posteContact}</p>
@@ -229,22 +215,21 @@ export const finaliserDevisAction = actionClient
 <p>Poste du signataire : ${updatedProspect.posteSignataire ?? ""}</p>
 <p>Email du signataire : ${updatedProspect.emailSignataire ?? ""}</p>
 <p>Date de démarrage : ${
-          updatedProspect.dateDeDemarrage
-            ? format(new Date(updatedProspect.dateDeDemarrage), "dd/MM/yyyy", {
-                locale: fr,
-              })
-            : ""
-        }</p>
+            updatedProspect.dateDeDemarrage
+              ? format(new Date(updatedProspect.dateDeDemarrage), "dd/MM/yyyy", {
+                  locale: fr,
+                })
+              : ""
+          }</p>
 <br/>
 <p>Commentaires du client : ${commentaires ?? ""}</p><br/>
-<p>Lien vers le devis : <a href="${finalDevisUrl}">${finalDevisUrl}</a></p>
+<p>Lien vers le devis (valable 24h) : <a href="${devisUrl}">${devisUrl}</a></p>
 `,
-        attachment: finalDevisUrl,
-        filename: `Devis_fm4all_${updatedProspect.nomEntreprise}.pdf`,
-        useTemplate: true,
-      });
-    } catch (err) {
-      void err;
+          useTemplate: true,
+        });
+      } catch (err) {
+        void err;
+      }
     }
 
     return {
@@ -254,9 +239,8 @@ export const finaliserDevisAction = actionClient
           ? "Votre devis a bien été généré, merci !"
           : "Your quote has been generated, thank you!",
       data: {
-        devisUrl: finalDevisUrl,
-        prospect: result.prospect,
-        devis: result.devis,
+        devisUrl,
+        prospect: updatedProspect,
       },
     };
   });

@@ -23,10 +23,10 @@ const TotalFontaines = () => {
           {t("fontaines-a-eau")}{" "}
           <span
             className={`${
-              fontaines.infos.fournisseurId === 13 ? "inline-block blur-sm" : ""
+              false ? "inline-block blur-sm" : ""
             }`}
           >
-            ({fontaines.infos.nomFournisseur})
+            ({fontaines.infos.nomPrestataire})
           </span>
         </div>
         <div className="ml-4 flex flex-col text-xs">
@@ -44,7 +44,7 @@ const TotalFontaines = () => {
                     {t("1-x")}{" "}
                     <span
                       className={`${
-                        fontaines.infos.fournisseurId === 13
+                        false
                           ? "inline-block blur-sm"
                           : ""
                       }`}

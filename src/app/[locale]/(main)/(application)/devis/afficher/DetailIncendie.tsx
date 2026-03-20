@@ -47,7 +47,7 @@ const DetailIncendie = () => {
             <>
               <TableRow>
                 <TableCell>Contrôle Extincteurs</TableCell>
-                <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+                <TableCell>{incendie.infos.nomPrestataire}</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>{incendie.quantites.nbExtincteurs}</TableCell>
                 <TableCell>extincteurs</TableCell>
@@ -64,7 +64,7 @@ const DetailIncendie = () => {
               </TableRow>
               <TableRow>
                 <TableCell>Contrôle BAES</TableCell>
-                <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+                <TableCell>{incendie.infos.nomPrestataire}</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>{incendie.quantites.nbBaes}</TableCell>
                 <TableCell>baes</TableCell>
@@ -81,7 +81,7 @@ const DetailIncendie = () => {
               </TableRow>
               <TableRow>
                 <TableCell>Contrôle télécomandes BAES</TableCell>
-                <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+                <TableCell>{incendie.infos.nomPrestataire}</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>{incendie.quantites.nbTelBaes}</TableCell>
                 <TableCell>télécommande(s) baes</TableCell>
@@ -98,7 +98,7 @@ const DetailIncendie = () => {
               </TableRow>
               <TableRow>
                 <TableCell>Frais de déplacement</TableCell>
-                <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+                <TableCell>{incendie.infos.nomPrestataire}</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>N/A</TableCell>
@@ -148,7 +148,7 @@ const DetailIncendie = () => {
             <>
               <TableRow>
                 <TableCell>Exutoires de fumée</TableCell>
-                <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+                <TableCell>{incendie.infos.nomPrestataire}</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>{incendie.quantites.nbExutoires}</TableCell>
                 <TableCell>trappes</TableCell>
@@ -160,7 +160,7 @@ const DetailIncendie = () => {
               </TableRow>
               <TableRow>
                 <TableCell>Frais de déplacement</TableCell>
-                <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+                <TableCell>{incendie.infos.nomPrestataire}</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>N/A</TableCell>
@@ -179,7 +179,7 @@ const DetailIncendie = () => {
             <>
               <TableRow>
                 <TableCell>Exutoires de fumée (parking)</TableCell>
-                <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+                <TableCell>{incendie.infos.nomPrestataire}</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>{incendie.quantites.nbExutoiresParking}</TableCell>
                 <TableCell>trappes</TableCell>
@@ -193,7 +193,7 @@ const DetailIncendie = () => {
               </TableRow>
               <TableRow>
                 <TableCell>Frais de déplacement</TableCell>
-                <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+                <TableCell>{incendie.infos.nomPrestataire}</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell>N/A</TableCell>
@@ -213,7 +213,7 @@ const DetailIncendie = () => {
           {totalIncendie.totalAlarmes ? (
             <TableRow>
               <TableCell>Alarmes T4 SSI</TableCell>
-              <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+              <TableCell>{incendie.infos.nomPrestataire}</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell>{incendie.quantites.nbAlarmes}</TableCell>
               <TableCell>alarmes</TableCell>
@@ -227,7 +227,7 @@ const DetailIncendie = () => {
           {totalIncendie.totalPortesCoupeFeuBattantes ? (
             <TableRow>
               <TableCell>Portes Coupe-feu battantes</TableCell>
-              <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+              <TableCell>{incendie.infos.nomPrestataire}</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell>
                 {incendie.quantites.nbPortesCoupeFeuBattantes}
@@ -246,7 +246,7 @@ const DetailIncendie = () => {
           {totalIncendie.totalPortesCoupeFeuCoulissantes ? (
             <TableRow>
               <TableCell>Portes Coupe-feu battantes</TableCell>
-              <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+              <TableCell>{incendie.infos.nomPrestataire}</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell>
                 {incendie.quantites.nbPortesCoupeFeuCoulissantes}
@@ -266,7 +266,7 @@ const DetailIncendie = () => {
           {totalIncendie.totalColonnesSechesStatiques ? (
             <TableRow>
               <TableCell>Colonnes sèches statiques</TableCell>
-              <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+              <TableCell>{incendie.infos.nomPrestataire}</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell>
                 {incendie.quantites.nbColonnesSechesStatiques}
@@ -285,7 +285,7 @@ const DetailIncendie = () => {
           {totalIncendie.totalColonnesSechesDynamiques ? (
             <TableRow>
               <TableCell>Colonnes sèches dynamiques</TableCell>
-              <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+              <TableCell>{incendie.infos.nomPrestataire}</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell>
                 {incendie.quantites.nbColonnesSechesDynamiques}
@@ -304,7 +304,7 @@ const DetailIncendie = () => {
           {totalIncendie.totalRIA ? (
             <TableRow>
               <TableCell>Robinet(s) incendie armé(s)</TableCell>
-              <TableCell>{incendie.infos.nomFournisseur}</TableCell>
+              <TableCell>{incendie.infos.nomPrestataire}</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell>{incendie.quantites.nbRIA}</TableCell>
               <TableCell>robinet(s) </TableCell>

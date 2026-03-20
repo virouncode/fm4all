@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { MAX_NB_BAES, MAX_NB_EXTINCTEURS } from "@/constants/constants";
-import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
+import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites.schema";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 

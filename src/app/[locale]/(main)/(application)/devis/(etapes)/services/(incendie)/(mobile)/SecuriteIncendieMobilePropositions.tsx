@@ -5,12 +5,11 @@ import SecuriteIncendieMobileInputs from "./SecuriteIncendieMobileInputs";
 
 type SecuriteIncendieMobilePropositionsProps = {
   propositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -35,17 +34,16 @@ type SecuriteIncendieMobilePropositionsProps = {
   ) => void;
   incendieQuantite: {
     nbExtincteurs: number;
-    id: number;
+    id: string;
     surface: number;
     createdAt: Date;
   };
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;

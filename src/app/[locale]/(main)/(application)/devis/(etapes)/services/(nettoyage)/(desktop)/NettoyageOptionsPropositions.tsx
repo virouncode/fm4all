@@ -10,14 +10,13 @@ import NettoyageDesktopOptionsPropositions from "./NettoyageDesktopOptionsPropos
 
 type NettoyageOptionsPropositionsProps = {
   repasseProposition: {
-    id: number;
+    id: string;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -26,12 +25,11 @@ type NettoyageOptionsPropositionsProps = {
     nbAvis: number | null;
   } | null;
   samediProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -40,12 +38,11 @@ type NettoyageOptionsPropositionsProps = {
     nbAvis: number | null;
   };
   dimancheProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -54,17 +51,16 @@ type NettoyageOptionsPropositionsProps = {
     nbAvis: number | null;
   };
   vitrerieProposition: {
-    id: number;
+    id: string;
     tauxHoraire: number;
     cadenceCloisons: number;
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
     prixAnnuel: number | null;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -90,7 +86,7 @@ const NettoyageOptionsPropositions = ({
   const color = getFm4AllColor(nettoyage.infos.gammeSelected);
 
   const handleClickRepasseProposition = (proposition: {
-    id: number;
+    id: string;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
@@ -137,7 +133,7 @@ const NettoyageOptionsPropositions = ({
   };
 
   const handleClickSamediProposition = (proposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
   }) => {
     if (nettoyage.infos.samediSelected) {
@@ -168,7 +164,7 @@ const NettoyageOptionsPropositions = ({
   };
 
   const handleClickDimancheProposition = (proposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
   }) => {
     if (nettoyage.infos.dimancheSelected) {
@@ -199,7 +195,7 @@ const NettoyageOptionsPropositions = ({
   };
 
   const handleClickVitrerieProposition = (proposition: {
-    id: number;
+    id: string;
     tauxHoraire: number;
     cadenceCloisons: number;
     cadenceVitres: number;

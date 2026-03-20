@@ -11,16 +11,15 @@ import HygieneMobileOptionsBalaiCard from "./HygieneMobileOptionsBalaiCard";
 
 type HygieneMobileOptionsBalaiCarouselProps = {
   propositions: {
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
     anneeCreation: number | null;
-    logoUrl: string | null;
+    logoStorageKey: string | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -39,16 +38,15 @@ type HygieneMobileOptionsBalaiCarouselProps = {
   handleClickProposition: (
     type: HygieneOptionsType,
     proposition: {
-      nomFournisseur: string;
-      sloganFournisseur: string | null;
+      nomPrestataire: string;
+      sloganPrestataire: string | null;
       anneeCreation: number | null;
-      logoUrl: string | null;
+      logoStorageKey: string | null;
       ca: string | null;
       effectifFournisseur: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
-      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
@@ -85,7 +83,7 @@ const HygieneMobileOptionsBalaiCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!hygiene.infos.fournisseurId && !api) {
+    if (!hygiene.infos.entrepriseId && !api) {
       return;
     }
     if (hygiene.infos.balaiGammeSelected) {
@@ -97,7 +95,7 @@ const HygieneMobileOptionsBalaiCarousel = ({
             : 2,
       );
     }
-  }, [api, hygiene.infos.balaiGammeSelected, hygiene.infos.fournisseurId]);
+  }, [api, hygiene.infos.balaiGammeSelected, hygiene.infos.entrepriseId]);
 
   return (
     <Carousel

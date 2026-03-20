@@ -71,7 +71,7 @@ const DetailSnacksFruits = () => {
         {totalFruits ? (
           <TableRow>
             <TableCell>Fruits</TableCell>
-            <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
+            <TableCell>{snacksFruits.infos.nomPrestataire}</TableCell>
             <TableCell>{snacksFruits.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -85,7 +85,7 @@ const DetailSnacksFruits = () => {
         {totalSnacks ? (
           <TableRow>
             <TableCell>Snacks</TableCell>
-            <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
+            <TableCell>{snacksFruits.infos.nomPrestataire}</TableCell>
             <TableCell>{snacksFruits.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -99,7 +99,7 @@ const DetailSnacksFruits = () => {
         {totalBoissons ? (
           <TableRow>
             <TableCell>Boissons</TableCell>
-            <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
+            <TableCell>{snacksFruits.infos.nomPrestataire}</TableCell>
             <TableCell>{snacksFruits.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -112,7 +112,7 @@ const DetailSnacksFruits = () => {
         ) : null}
         <TableRow>
           <TableCell>Livraison</TableCell>
-          <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
+          <TableCell>{snacksFruits.infos.nomPrestataire}</TableCell>
           <TableCell>N/A</TableCell>
           <TableCell>N/A</TableCell>
           <TableCell>N/A</TableCell>
@@ -125,7 +125,7 @@ const DetailSnacksFruits = () => {
         {remiseSiCafe ? (
           <TableRow>
             <TableCell>Remise</TableCell>
-            <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
+            <TableCell>{snacksFruits.infos.nomPrestataire}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>

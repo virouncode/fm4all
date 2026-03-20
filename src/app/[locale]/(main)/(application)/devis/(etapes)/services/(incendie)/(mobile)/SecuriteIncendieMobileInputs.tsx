@@ -22,7 +22,7 @@ type SecuriteIncendieMobileInputsProps = {
   ) => void;
   incendieQuantite: {
     nbExtincteurs: number;
-    id: number;
+    id: string;
     surface: number;
     createdAt: Date;
   };

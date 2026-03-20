@@ -12,115 +12,19 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { CafePropositionItem } from "@/app/[locale]/(main)/(application)/devis/(etapes)/food-beverage/(cafe)/(desktop)/CafeEspacePropositionCard";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 
+export type CafeMobilePropositionItem = CafePropositionItem;
+
 type CafeMobileEspacePropositionCardProps = {
-  proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    gamme: "essentiel" | "confort" | "excellence";
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "poudre" | "sachets" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  };
+  proposition: CafeMobilePropositionItem;
   espace: CafeEspaceType;
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    gamme: "essentiel" | "confort" | "excellence";
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "poudre" | "sachets" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
-  handleClickFirstEspaceProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    gamme: "essentiel" | "confort" | "excellence";
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "poudre" | "sachets" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
+  handleClickProposition: (proposition: CafeMobilePropositionItem) => void;
+  handleClickFirstEspaceProposition: (proposition: CafeMobilePropositionItem) => void;
   cafeEspacesIds: number[];
 };
 
@@ -138,11 +42,10 @@ const CafeMobileEspacePropositionCard = ({
   const cafe = useCafeStore((s) => s.cafe);
   const {
     gamme,
-    fournisseurId,
-    nomFournisseur,
-    sloganFournisseur,
-    logoUrl,
-    locationUrl,
+    entrepriseId,
+    nomPrestataire,
+    sloganPrestataire,
+    logoStorageKey,
     anneeCreation,
     ca,
     effectifFournisseur,
@@ -313,7 +216,7 @@ const CafeMobileEspacePropositionCard = ({
     <CarouselItem>
       <div
         className={`bg-${color} flex h-96 flex-col rounded-xl border border-slate-200 p-4 text-white ${
-          cafe.infos.fournisseurId === fournisseurId &&
+          cafe.infos.entrepriseId === entrepriseId &&
           espace.infos.gammeCafeSelected === gamme &&
           totalAnnuel
             ? "ring-destructive ring-4 ring-inset"
@@ -335,14 +238,14 @@ const CafeMobileEspacePropositionCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             <Dialog>
               <DialogTrigger asChild>
-                {logoUrl ? (
+                {logoStorageKey ? (
                   <div className="relative h-10">
                     <Image
-                      src={logoUrl}
-                      alt={`logo-de-${nomFournisseur}`}
+                      src={logoStorageKey}
+                      alt={`logo-de-${nomPrestataire}`}
                       fill={true}
                       className="cursor-pointer object-contain object-left"
                       sizes="(max-width:768px) 100vw"
@@ -352,13 +255,13 @@ const CafeMobileEspacePropositionCard = ({
               </DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomFournisseur}</DialogTitle>
+                  <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={sloganFournisseur}
-                  logoUrl={logoUrl}
-                  nomFournisseur={nomFournisseur}
-                  locationUrl={locationUrl}
+                  sloganPrestataire={sloganPrestataire}
+                  logoStorageKey={logoStorageKey}
+                  nomPrestataire={nomPrestataire}
+                  locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
                   effectif={effectifFournisseur}
@@ -396,13 +299,13 @@ const CafeMobileEspacePropositionCard = ({
               <Switch
                 className={`${
                   espace.infos.gammeCafeSelected === gamme &&
-                  cafe.infos.fournisseurId === proposition.fournisseurId
+                  cafe.infos.entrepriseId === proposition.entrepriseId
                     ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={
                   espace.infos.gammeCafeSelected === gamme &&
-                  cafe.infos.fournisseurId === proposition.fournisseurId
+                  cafe.infos.entrepriseId === proposition.entrepriseId
                 }
                 onCheckedChange={() =>
                   cafeEspacesIds[0] === espace.infos.espaceId

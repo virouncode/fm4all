@@ -7,11 +7,11 @@ import {
   getLaitConsoTarifs,
   getSucreConsoTarifs,
   getTheConsoTarifs,
-} from "@/server/queries_a_classer/boissons-chaudes/getBoissonsChaudes";
+} from "@/server/queries/boissonsChaudes.query";
 import {
   getFontaines,
   getFontainesTarifs,
-} from "@/server/queries_a_classer/fontaines/getFontaines";
+} from "@/server/queries/fontaines.query";
 import {
   getBoissonsQuantites,
   getBoissonsTarifs,
@@ -20,7 +20,7 @@ import {
   getFruitsTarifs,
   getSnacksQuantites,
   getSnacksTarifs,
-} from "@/server/queries_a_classer/snacks-fruits/getSnacksFruits";
+} from "@/server/queries/snacksFruits.query";
 import { getTranslations } from "next-intl/server";
 import NextEtapePilotageButton from "../../NextEtapePilotageButton";
 import Cafe from "./(cafe)/Cafe";

@@ -4,11 +4,11 @@ import OfficeManagerPropositionCard from "../OfficeManagerPropositionCard";
 
 type OfficeManagerDesktopPropositionsProps = {
   propositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
@@ -24,11 +24,11 @@ type OfficeManagerDesktopPropositionsProps = {
   handleChangeRemplace: (value: string) => void;
   handleCheckPremium: (checked: boolean) => void;
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
@@ -52,7 +52,7 @@ const OfficeManagerDesktopPropositions = ({
         ? propositions.map((proposition) => (
             <div
               className="flex flex-1 border-b"
-              key={proposition.fournisseurId}
+              key={proposition.entrepriseId}
             >
               <div className="flex w-1/4 flex-col items-center justify-center gap-6 p-4">
                 <OfficeManagerFournisseurLogo {...proposition} />

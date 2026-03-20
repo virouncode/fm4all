@@ -5,16 +5,16 @@ import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
-import { gammes, GammeType } from "@/zod-schemas/gamme";
-import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
-import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
-import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
-import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
-import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
-import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
-import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
-import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
+import { gammes, GammeType } from "@/zod-schemas/gamme.schema";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs.schema";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs.schema";
+import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs.schema";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation.schema";
+import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites.schema";
+import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse.schema";
+import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs.schema";
+import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie.schema";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
@@ -66,11 +66,10 @@ const NettoyagePropositions = ({
   const propositions = nettoyageTarifs.map((item) => {
     const {
       id,
-      fournisseurId,
-      nomFournisseur,
-      slogan: sloganFournisseur,
-      logoUrl,
-      locationUrl,
+      entrepriseId,
+      nomPrestataire,
+      slogan: sloganPrestataire,
+      logoStorageKey,
       anneeCreation,
       ca,
       effectif: effectifFournisseur,
@@ -88,11 +87,10 @@ const NettoyagePropositions = ({
       freqAnnuelle !== null ? freqAnnuelle * hParPassage * tauxHoraire : null;
     return {
       id,
-      fournisseurId,
-      nomFournisseur,
-      sloganFournisseur,
-      logoUrl,
-      locationUrl,
+      entrepriseId,
+      nomPrestataire,
+      sloganPrestataire,
+      logoStorageKey,
       anneeCreation,
       ca,
       effectifFournisseur,
@@ -109,14 +107,13 @@ const NettoyagePropositions = ({
 
   const propositionsByFournisseurId = propositions.reduce<
     Record<
-      number,
+      string,
       {
-        id: number;
-        fournisseurId: number;
-        nomFournisseur: string;
-        sloganFournisseur: string | null;
-        logoUrl: string | null;
-        locationUrl: string | null;
+        id: string;
+        entrepriseId: string;
+        nomPrestataire: string;
+        sloganPrestataire: string | null;
+        logoStorageKey: string | null;
         anneeCreation: number | null;
         ca: string | null;
         effectifFournisseur: string | null;
@@ -131,13 +128,13 @@ const NettoyagePropositions = ({
       }[]
     >
   >((acc, item) => {
-    const { fournisseurId } = item;
-    if (!acc[fournisseurId]) {
-      acc[fournisseurId] = [];
+    const { entrepriseId } = item;
+    if (!acc[entrepriseId]) {
+      acc[entrepriseId] = [];
     }
     // Add the item to the appropriate array
-    acc[fournisseurId].push(item);
-    acc[fournisseurId].sort(
+    acc[entrepriseId].push(item);
+    acc[entrepriseId].sort(
       (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme),
     );
     return acc;
@@ -147,12 +144,11 @@ const NettoyagePropositions = ({
   const formattedPropositions = Object.values(propositionsByFournisseurId);
 
   const handleClickProposition = (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -167,17 +163,17 @@ const NettoyagePropositions = ({
   }) => {
     //Je décoche la proposition
     if (
-      nettoyage.infos.fournisseurId === proposition.fournisseurId &&
+      nettoyage.infos.entrepriseId === proposition.entrepriseId &&
       nettoyage.infos.gammeSelected === proposition.gamme
     ) {
       setNettoyage((prev) => ({
         infos: {
           ...prev.infos,
           tarifSelectedId: null,
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           gammeSelected: null,
         },
         quantites: {
@@ -201,10 +197,10 @@ const NettoyagePropositions = ({
         ...prev,
         infos: {
           ...prev.infos,
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
         },
         prix: {
           prixDistribEmp: null,
@@ -229,10 +225,10 @@ const NettoyagePropositions = ({
     //Je coche la proposition
     const {
       id,
-      fournisseurId,
-      nomFournisseur,
-      sloganFournisseur,
-      logoUrl,
+      entrepriseId,
+      nomPrestataire,
+      sloganPrestataire,
+      logoStorageKey,
       freqAnnuelle,
       gamme,
       hParPassage,
@@ -240,24 +236,24 @@ const NettoyagePropositions = ({
       totalAnnuel,
     } = proposition;
 
-    if (fournisseurId !== nettoyage.infos.fournisseurId) {
+    if (entrepriseId !== nettoyage.infos.entrepriseId) {
       toast({
         title: t("fournisseur-selectionne"),
         description: tNettoyage(
           "vous-avez-choisi-nomfournisseur-pour-le-nettoyage-ce-prestataire-ou-son-partenaire-assurera-la-prestation-hygiene-sanitaire",
-          { nomFournisseur },
+          { nomPrestataire },
         ),
       });
     }
 
     //NETTOYAGE
     const repasseTarif = repasseTarifs.find(
-      (tarif) => tarif.fournisseurId === fournisseurId && tarif.gamme === gamme,
+      (tarif) => tarif.entrepriseId === entrepriseId && tarif.gamme === gamme,
     );
     const hParPassageRepasse = repasseTarif?.hParPassage ?? null;
     const tauxHoraireRepasse = repasseTarif?.tauxHoraire ?? null;
     const vitrerieTarif = vitrerieTarifs.find(
-      (tarif) => tarif.fournisseurId === fournisseurId,
+      (tarif) => tarif.entrepriseId === entrepriseId,
     );
     const tauxHoraireVitrerie = vitrerieTarif?.tauxHoraire ?? null;
     const minFacturationVitrerie = vitrerieTarif?.minFacturation ?? null;
@@ -273,10 +269,10 @@ const NettoyagePropositions = ({
       infos: {
         ...prev.infos,
         tarifSelectedId: id,
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur,
-        logoUrl,
+        entrepriseId,
+        nomPrestataire,
+        sloganPrestataire,
+        logoStorageKey,
         gammeSelected: gamme,
       },
       quantites: {
@@ -330,16 +326,16 @@ const NettoyagePropositions = ({
       totalVitrerie,
     });
     //HYGIENE
-    const hygieneFournisseurId = fournisseurId === 9 ? 12 : fournisseurId;
-    const hygieneFournisseurNom = fournisseurId === 9 ? "EPCH" : nomFournisseur;
+    const hygieneFournisseurId = entrepriseId;
+    const hygieneFournisseurNom = nomPrestataire;
     const distribsTarifsFournisseur = hygieneDistribTarifs.filter(
-      (tarif) => tarif.fournisseurId === hygieneFournisseurId,
+      (tarif) => tarif.entrepriseId === hygieneFournisseurId,
     );
     const consosTarifFournisseur = hygieneConsosTarifs.find(
-      (tarif) => tarif.fournisseurId === hygieneFournisseurId,
+      (tarif) => tarif.entrepriseId === hygieneFournisseurId,
     );
     const minFacturationFournisseur = hygieneMinFacturation.find(
-      (tarif) => tarif.fournisseurId === hygieneFournisseurId,
+      (tarif) => tarif.entrepriseId === hygieneFournisseurId,
     );
     const prixDistribEmp =
       distribsTarifsFournisseur.find(
@@ -400,7 +396,7 @@ const NettoyagePropositions = ({
 
     const prixInstalDistrib =
       hygieneDistribInstalTarifs.find(
-        (tarif) => tarif.fournisseurId === hygieneFournisseurId,
+        (tarif) => tarif.entrepriseId === hygieneFournisseurId,
       )?.prixInstallation ?? null;
 
     const nbDistribEmp =
@@ -425,16 +421,16 @@ const NettoyagePropositions = ({
     setHygiene((prev) => ({
       infos: {
         ...prev.infos,
-        fournisseurId: hygieneFournisseurId,
-        nomFournisseur: hygieneFournisseurNom,
-        sloganFournisseur:
+        entrepriseId: hygieneFournisseurId,
+        nomPrestataire: hygieneFournisseurNom,
+        sloganPrestataire:
           hygieneFournisseurNom === "EPCH"
             ? "Le spécialiste de l'hygiène"
-            : sloganFournisseur,
-        logoUrl:
+            : sloganPrestataire,
+        logoStorageKey:
           hygieneFournisseurNom === "EPCH"
             ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_epch-Iy9QGTogt8KMcKbWGFrKzjQ6jqlEHS.webp"
-            : logoUrl,
+            : logoStorageKey,
       },
       quantites: {
         nbDistribEmp,

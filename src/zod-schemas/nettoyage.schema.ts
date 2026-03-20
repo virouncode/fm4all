@@ -2,10 +2,10 @@ import { z } from "zod";
 
 export const nettoyageSchema = z.object({
   infos: z.object({
-    fournisseurId: z.number().nullable(),
-    nomFournisseur: z.string().nullable(),
-    sloganFournisseur: z.string().nullable(),
-    logoUrl: z.string().nullable(),
+    entrepriseId: z.string().uuid().nullable(),
+    nomPrestataire: z.string().nullable(),
+    sloganPrestataire: z.string().nullable(),
+    logoStorageKey: z.string().nullable(),
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
     repasseSelected: z.boolean().default(false),
     samediSelected: z.boolean().default(false),

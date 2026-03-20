@@ -8,7 +8,7 @@ import {
   getExutoiresTarifs,
   getPortesCoupeFeuTarifs,
   getRiaTarifs,
-} from "@/server/queries_a_classer/incendie/getIncendie";
+} from "@/server/queries/incendie.query";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";

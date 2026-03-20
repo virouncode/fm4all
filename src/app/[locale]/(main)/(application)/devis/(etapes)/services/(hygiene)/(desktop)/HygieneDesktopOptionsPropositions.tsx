@@ -1,4 +1,4 @@
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { ChangeEvent } from "react";
 import HygieneOptionsBalaiCard from "./HygieneOptionsBalaiCard";
 import HygieneOptionsDesinfectantCard from "./HygieneOptionsDesinfectantCard";
@@ -17,16 +17,15 @@ type HygieneDesktopOptionsPropositionsProps = {
     type: HygieneOptionsType,
   ) => void;
   propositions: {
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
     anneeCreation: number | null;
-    logoUrl: string | null;
+    logoStorageKey: string | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -45,16 +44,15 @@ type HygieneDesktopOptionsPropositionsProps = {
   handleClickProposition: (
     type: HygieneOptionsType,
     proposition: {
-      nomFournisseur: string;
-      sloganFournisseur: string | null;
+      nomPrestataire: string;
+      sloganPrestataire: string | null;
       anneeCreation: number | null;
-      logoUrl: string | null;
+      logoStorageKey: string | null;
       ca: string | null;
       effectifFournisseur: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
-      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;

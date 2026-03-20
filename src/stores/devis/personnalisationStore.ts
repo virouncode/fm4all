@@ -1,6 +1,6 @@
 "use client";
 
-import { PersonnalisationType } from "@/zod-schemas/personnalisation";
+import { PersonnalisationType } from "@/zod-schemas/personnalisation.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

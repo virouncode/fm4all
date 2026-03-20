@@ -1,7 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SelectUserType } from "@/zod-schemas/user";
 import type { CellContext } from "@tanstack/react-table";
 import { Stethoscope } from "lucide-react";
+
+type SelectUserType = {
+  firstName?: string | null;
+  lastName?: string | null;
+  image?: string | null;
+};
 
 const LastNameCell = ({ row }: CellContext<SelectUserType, unknown>) => {
   const user = row.original as SelectUserType;

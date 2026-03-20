@@ -9,15 +9,15 @@ import { Switch } from "@/components/ui/switch";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
-import { GammeType } from "@/zod-schemas/gamme";
-import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
+import { GammeType } from "@/zod-schemas/gamme.schema";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All.schema";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type ServicesFm4AllPropositionCardProps = {
   proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
@@ -47,7 +47,7 @@ type ServicesFm4AllPropositionCardProps = {
     totalAnnuelSansRemise: number;
   };
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;

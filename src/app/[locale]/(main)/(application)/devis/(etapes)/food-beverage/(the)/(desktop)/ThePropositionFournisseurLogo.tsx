@@ -11,10 +11,9 @@ import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 
 type ThePropositionsProps = {
-  nomFournisseur: string | null;
+  nomPrestataire: string | null;
   slogan: string | null;
-  logoUrl: string | null;
-  locationUrl: string | null;
+  logoStorageKey: string | null;
   anneeCreation: number | null;
   ca: string | null;
   effectifFournisseur: string | null;
@@ -24,10 +23,9 @@ type ThePropositionsProps = {
 };
 
 const ThePropositionFournisseurLogo = ({
-  nomFournisseur,
+  nomPrestataire,
   slogan,
-  logoUrl,
-  locationUrl,
+  logoStorageKey,
   anneeCreation,
   ca,
   effectifFournisseur,
@@ -44,18 +42,18 @@ const ThePropositionFournisseurLogo = ({
           title="Infos sur le fournisseur"
         >
           <div>
-            {logoUrl ? (
+            {logoStorageKey ? (
               <div className="relative h-full w-full">
                 <Image
-                  src={logoUrl}
-                  alt={`logo-de-${nomFournisseur}`}
+                  src={logoStorageKey}
+                  alt={`logo-de-${nomPrestataire}`}
                   fill
                   className="h-full w-full cursor-pointer object-contain"
                   sizes="(min-width:768px) 100vw"
                 />
               </div>
             ) : (
-              nomFournisseur
+              nomPrestataire
             )}
             <SquareArrowOutUpRight
               className="absolute top-0 right-0 cursor-pointer hover:opacity-70"
@@ -67,13 +65,13 @@ const ThePropositionFournisseurLogo = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{nomFournisseur}</DialogTitle>
+          <DialogTitle>{nomPrestataire}</DialogTitle>
         </DialogHeader>
         <FournisseurDialog
-          sloganFournisseur={slogan}
-          logoUrl={logoUrl}
-          nomFournisseur={nomFournisseur}
-          locationUrl={locationUrl}
+          sloganPrestataire={slogan}
+          logoStorageKey={logoStorageKey}
+          nomPrestataire={nomPrestataire}
+          locationUrl={null}
           anneeCreation={anneeCreation}
           ca={ca}
           effectif={effectifFournisseur}

@@ -20,10 +20,10 @@ const buildInitialNettoyage = (): NettoyageType => {
 
   return {
     infos: {
-      fournisseurId: null,
-      nomFournisseur: null,
-      sloganFournisseur: null,
-      logoUrl: null,
+      entrepriseId: null,
+      nomPrestataire: null,
+      sloganPrestataire: null,
+      logoStorageKey: null,
       gammeSelected: null,
       repasseSelected: false,
       samediSelected: false,

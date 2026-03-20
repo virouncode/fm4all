@@ -18,11 +18,10 @@ type ThePropositionCardProps = {
   proposition: {
     totalAnnuel: number | null;
     infos: string | null;
-    id: number;
-    nomFournisseur: string;
+    id: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -30,7 +29,7 @@ type ThePropositionCardProps = {
     noteGoogle: string | null;
     nbAvis: number | null;
     createdAt: Date;
-    fournisseurId: number;
+    entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     effectif: number;
     prixUnitaire: number | null;
@@ -38,11 +37,10 @@ type ThePropositionCardProps = {
   handleClickProposition: (proposition: {
     totalAnnuel: number | null;
     infos: string | null;
-    id: number;
-    nomFournisseur: string;
+    id: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -50,7 +48,7 @@ type ThePropositionCardProps = {
     noteGoogle: string | null;
     nbAvis: number | null;
     createdAt: Date;
-    fournisseurId: number;
+    entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     effectif: number;
     prixUnitaire: number | null;

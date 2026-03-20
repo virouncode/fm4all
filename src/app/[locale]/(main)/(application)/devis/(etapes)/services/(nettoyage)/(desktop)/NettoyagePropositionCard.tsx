@@ -11,19 +11,18 @@ import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type NettoyagePropositionCardProps = {
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -37,12 +36,11 @@ type NettoyagePropositionCardProps = {
     totalAnnuel: number | null;
   }) => void;
   proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -149,7 +147,7 @@ const NettoyagePropositionCard = ({
   return (
     <div
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
-        nettoyage.infos.fournisseurId === proposition.fournisseurId &&
+        nettoyage.infos.entrepriseId === proposition.entrepriseId &&
         nettoyage.infos.gammeSelected === proposition.gamme
           ? "ring-destructive ring-4 ring-inset"
           : ""
@@ -158,7 +156,7 @@ const NettoyagePropositionCard = ({
     >
       <Switch
         checked={
-          nettoyage.infos.fournisseurId === proposition.fournisseurId &&
+          nettoyage.infos.entrepriseId === proposition.entrepriseId &&
           nettoyage.infos.gammeSelected === proposition.gamme
         }
         onCheckedChange={() => handleClickProposition(proposition)}

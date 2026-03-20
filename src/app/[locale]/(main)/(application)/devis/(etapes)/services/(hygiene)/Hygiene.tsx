@@ -3,11 +3,11 @@
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { useServicesStore } from "@/stores/devis/servicesStore";
-import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
-import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
-import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
-import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs.schema";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs.schema";
+import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs.schema";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation.schema";
 import { Toilet } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
@@ -83,7 +83,7 @@ const Hygiene = ({
         />
       )}
       <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
-        {!nettoyage.infos.fournisseurId || !nettoyage.infos.gammeSelected ? (
+        {!nettoyage.infos.entrepriseId || !nettoyage.infos.gammeSelected ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-destructive text-center">
               {tNettoyage(

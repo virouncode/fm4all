@@ -4,11 +4,11 @@ import OfficeManagerMobilePropositionCard from "./OfficeManagerMobileProposition
 
 type OfficeManagerMobilePropositionsProps = {
   propositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
@@ -24,11 +24,11 @@ type OfficeManagerMobilePropositionsProps = {
   handleChangeRemplace: (value: string) => void;
   handleCheckPremium: (checked: boolean) => void;
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
@@ -61,7 +61,7 @@ const OfficeManagerMobilePropositions = ({
       {propositions.map((proposition) => (
         <OfficeManagerMobilePropositionCard
           proposition={proposition}
-          key={proposition.fournisseurId}
+          key={proposition.entrepriseId}
           handleClickProposition={handleClickProposition}
           demiJParSemaineConfort={demiJParSemaineConfort}
           demiJParSemaineExcellence={demiJParSemaineExcellence}

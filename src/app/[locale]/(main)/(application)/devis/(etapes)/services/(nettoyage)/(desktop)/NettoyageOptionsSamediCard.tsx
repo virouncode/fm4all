@@ -15,12 +15,11 @@ import Image from "next/image";
 
 type NettoyageOptionsSamediCardProps = {
   samediProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -29,12 +28,11 @@ type NettoyageOptionsSamediCardProps = {
     nbAvis: number | null;
   };
   handleClickSamediProposition: (samediProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;

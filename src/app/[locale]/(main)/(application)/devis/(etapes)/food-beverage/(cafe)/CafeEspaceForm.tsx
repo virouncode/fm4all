@@ -16,13 +16,13 @@ import { useTheStore } from "@/stores/devis/theStore";
 import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
-import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
-import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
-import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
-import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs";
-import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
-import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
-import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
+import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
+import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine.schema";
+import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs.schema";
+import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs.schema";
+import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation.schema";
+import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs.schema";
+import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs.schema";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
@@ -87,7 +87,7 @@ const CafeEspaceForm = ({
 
   const handleChangeTypeBoissons = (value: string) => {
     //JE N'AI PAS DE FOURNISSEUR
-    if (!cafe.infos.fournisseurId) {
+    if (!cafe.infos.entrepriseId) {
       setCafe((prev) => ({
         ...prev,
         espaces: prev.espaces.map((item) =>
@@ -109,7 +109,7 @@ const CafeEspaceForm = ({
       (tarif) =>
         tarif.nbPersonnes === roundNbPersonnesCafeMachines(nbPersonnes) &&
         tarif.type === value &&
-        tarif.fournisseurId === cafe.infos.fournisseurId &&
+        tarif.entrepriseId === cafe.infos.entrepriseId &&
         tarif[cafe.infos.dureeLocation] !== null,
     ); //1 ligne par fournisseur
     //Il se peut que mon fournisseur n'ait pas de tarif pour ces critères
@@ -121,10 +121,10 @@ const CafeEspaceForm = ({
           ...prev,
           infos: {
             ...prev.infos,
-            fournisseurId: null,
-            nomFournisseur: null,
-            sloganFournisseur: null,
-            logoUrl: null,
+            entrepriseId: null,
+            nomPrestataire: null,
+            sloganPrestataire: null,
+            logoStorageKey: null,
           },
           espaces: prev.espaces.map((item) =>
             item.infos.espaceId === espace.infos.espaceId
@@ -253,13 +253,13 @@ const CafeEspaceForm = ({
       cafeConsoTarifs.find(
         (item) =>
           item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-          item.fournisseurId === cafe.infos.fournisseurId &&
+          item.entrepriseId === cafe.infos.entrepriseId &&
           item.gamme === espace.infos.gammeCafeSelected,
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
         item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-        item.fournisseurId === cafe.infos.fournisseurId,
+        item.entrepriseId === cafe.infos.entrepriseId,
     );
     const typeLait =
       value !== "cafe" ? machinesTarifFournisseur?.typeLait : null;
@@ -275,7 +275,7 @@ const CafeEspaceForm = ({
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-        tarif.fournisseurId === cafe.infos.fournisseurId,
+        tarif.entrepriseId === cafe.infos.entrepriseId,
     );
     const typeChocolat =
       value === "chocolat" ? machinesTarifFournisseur?.typeChocolat : null;
@@ -289,7 +289,7 @@ const CafeEspaceForm = ({
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-        tarif.fournisseurId === cafe.infos.fournisseurId,
+        tarif.entrepriseId === cafe.infos.entrepriseId,
     );
     const prixUnitaireConsoSucre =
       consoSucreTarifFournisseur?.prixUnitaire ?? null;
@@ -379,7 +379,7 @@ const CafeEspaceForm = ({
     // );
     const newNbTassesParAn = newNbPersonnes * 400;
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
-    if (!cafe.infos.fournisseurId) {
+    if (!cafe.infos.entrepriseId) {
       setCafe((prev) => ({
         ...prev,
         espaces: prev.espaces.map((item) =>
@@ -401,7 +401,7 @@ const CafeEspaceForm = ({
       (tarif) =>
         tarif.nbPersonnes === roundNbPersonnesCafeMachines(newNbPersonnes) &&
         tarif.type === espace.infos.typeBoissons &&
-        tarif.fournisseurId === cafe.infos.fournisseurId &&
+        tarif.entrepriseId === cafe.infos.entrepriseId &&
         tarif[cafe.infos.dureeLocation] !== null,
     );
 
@@ -414,10 +414,10 @@ const CafeEspaceForm = ({
           ...prev,
           infos: {
             ...prev.infos,
-            fournisseurId: null,
-            nomFournisseur: null,
-            sloganFournisseur: null,
-            logoUrl: null,
+            entrepriseId: null,
+            nomPrestataire: null,
+            sloganPrestataire: null,
+            logoStorageKey: null,
           },
           espaces: prev.espaces.map((item) =>
             item.infos.espaceId === espace.infos.espaceId
@@ -543,13 +543,13 @@ const CafeEspaceForm = ({
       cafeConsoTarifs.find(
         (item) =>
           item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
-          item.fournisseurId === cafe.infos.fournisseurId &&
+          item.entrepriseId === cafe.infos.entrepriseId &&
           item.gamme === espace.infos.gammeCafeSelected,
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
         item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
-        item.fournisseurId === cafe.infos.fournisseurId,
+        item.entrepriseId === cafe.infos.entrepriseId,
     );
     const typeLait =
       espace.infos.typeBoissons === "lait"
@@ -567,7 +567,7 @@ const CafeEspaceForm = ({
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
-        tarif.fournisseurId === cafe.infos.fournisseurId,
+        tarif.entrepriseId === cafe.infos.entrepriseId,
     );
     const typeChocolat =
       espace.infos.typeBoissons === "chocolat"
@@ -583,7 +583,7 @@ const CafeEspaceForm = ({
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
-        tarif.fournisseurId === cafe.infos.fournisseurId,
+        tarif.entrepriseId === cafe.infos.entrepriseId,
     );
     const prixUnitaireConsoSucre =
       consoSucreTarifFournisseur?.prixUnitaire ?? null;
@@ -702,7 +702,7 @@ const CafeEspaceForm = ({
 
   const handleSelectDureeLocation = (value: string) => {
     //Si j'ai pas de fournisseur encore, je change juste la duree de Location
-    if (!cafe.infos.fournisseurId) {
+    if (!cafe.infos.entrepriseId) {
       setCafe((prev) => ({
         ...prev,
         infos: {
@@ -718,7 +718,7 @@ const CafeEspaceForm = ({
         tarif.nbPersonnes === roundNbPersonnesCafeMachines(nbPersonnes) &&
         tarif.type === espace.infos.typeBoissons &&
         tarif[value as DureeLocationCafeType] !== null &&
-        tarif.fournisseurId === cafe.infos.fournisseurId,
+        tarif.entrepriseId === cafe.infos.entrepriseId,
     );
     //Il se peut que mon fournisseur n'ait pas de tarif ces critères
     if (!machinesTarifFournisseur) {
@@ -728,10 +728,10 @@ const CafeEspaceForm = ({
         ...prev,
         infos: {
           ...prev.infos,
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           dureeLocation: value as DureeLocationCafeType,
         },
         espaces: prev.espaces.map((item) =>
@@ -814,13 +814,13 @@ const CafeEspaceForm = ({
       cafeConsoTarifs.find(
         (item) =>
           item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-          item.fournisseurId === cafe.infos.fournisseurId &&
+          item.entrepriseId === cafe.infos.entrepriseId &&
           item.gamme === espace.infos.gammeCafeSelected,
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
         item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-        item.fournisseurId === cafe.infos.fournisseurId,
+        item.entrepriseId === cafe.infos.entrepriseId,
     );
     const typeLait =
       value !== "cafe" ? machinesTarifFournisseur?.typeLait : null;
@@ -836,7 +836,7 @@ const CafeEspaceForm = ({
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-        tarif.fournisseurId === cafe.infos.fournisseurId,
+        tarif.entrepriseId === cafe.infos.entrepriseId,
     );
     const typeChocolat =
       value === "chocolat" ? machinesTarifFournisseur?.typeChocolat : null;
@@ -850,7 +850,7 @@ const CafeEspaceForm = ({
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-        tarif.fournisseurId === cafe.infos.fournisseurId,
+        tarif.entrepriseId === cafe.infos.entrepriseId,
     );
     const prixUnitaireConsoSucre =
       consoSucreTarifFournisseur?.prixUnitaire ?? null;

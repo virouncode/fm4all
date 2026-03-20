@@ -21,7 +21,7 @@ const TotalThe = () => {
     <div className="total-section flex flex-col gap-4" id="total-the">
       <div className="flex flex-col gap-4">
         <div>
-          {t("thes")} ({cafe.infos.nomFournisseur})
+          {t("thes")} ({cafe.infos.nomPrestataire})
         </div>
         <div className="ml-4 flex flex-col text-xs">
           <div

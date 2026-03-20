@@ -79,6 +79,11 @@ function pluralizeCategorie(
     return "devis_demandes";
   }
 
+  // Cas spécial : devis_temporaire → devis_temporaires
+  if (categorie === "devis_temporaire") {
+    return "devis_temporaires";
+  }
+
   // Cas spécial : compte_rendu → comptes_rendus (double pluriel)
   if (categorie === "compte_rendu") {
     return "comptes_rendus";

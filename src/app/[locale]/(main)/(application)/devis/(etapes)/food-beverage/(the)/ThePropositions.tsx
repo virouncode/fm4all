@@ -5,8 +5,8 @@ import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTheStore } from "@/stores/devis/theStore";
 import { useTotalTheStore } from "@/stores/devis/totalTheStore";
-import { GammeType } from "@/zod-schemas/gamme";
-import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
+import { GammeType } from "@/zod-schemas/gamme.schema";
+import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs.schema";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
@@ -42,7 +42,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     ?.filter(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes / 0.15) &&
-        tarif.fournisseurId === cafe.infos.fournisseurId,
+        tarif.entrepriseId === cafe.infos.entrepriseId,
     )
     .map((tarif) => ({
       ...tarif,
@@ -64,7 +64,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       theConsoTarifs.find(
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes / 0.15) &&
-          tarif.fournisseurId === cafe.infos.fournisseurId &&
+          tarif.entrepriseId === cafe.infos.entrepriseId &&
           tarif.gamme === the.infos.gammeSelected,
       )?.prixUnitaire ?? null;
     const totalAnnuel =
@@ -112,11 +112,10 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   };
 
   const handleClickProposition = (proposition: {
-    id: number;
-    nomFournisseur: string;
+    id: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -124,7 +123,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     noteGoogle: string | null;
     nbAvis: number | null;
     createdAt: Date;
-    fournisseurId: number;
+    entrepriseId: string;
     gamme: GammeType;
     effectif: number;
     prixUnitaire: number | null;

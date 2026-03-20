@@ -10,10 +10,10 @@ export const reinitialisationCafeThe = () => {
   const setTotalCafe = useTotalCafeStore.getState().setTotalCafe;
   setCafe({
     infos: {
-      fournisseurId: null,
-      nomFournisseur: null,
-      sloganFournisseur: null,
-      logoUrl: null,
+      entrepriseId: null,
+      nomPrestataire: null,
+      sloganPrestataire: null,
+      logoStorageKey: null,
       currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,

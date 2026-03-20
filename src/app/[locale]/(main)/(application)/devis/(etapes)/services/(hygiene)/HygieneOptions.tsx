@@ -4,9 +4,9 @@ import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/P
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { useServicesStore } from "@/stores/devis/servicesStore";
-import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
-import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs.schema";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs.schema";
 import { Toilet } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
@@ -53,12 +53,12 @@ const HygieneOptions = ({
           icon={Toilet}
           title={t("hygiene-sanitaire-options")}
           description={
-            nettoyage.infos.fournisseurId &&
+            nettoyage.infos.entrepriseId &&
             nettoyage.infos.gammeSelected &&
             hygiene.infos.trilogieGammeSelected
               ? t("choisissez-vos-options-chez") +
                 " " +
-                (hygiene.infos.nomFournisseur ?? "")
+                (hygiene.infos.nomPrestataire ?? "")
               : ""
           }
           propositionsRef={propositionsRef}
@@ -68,12 +68,12 @@ const HygieneOptions = ({
           icon={Toilet}
           title={t("hygiene-sanitaire-options")}
           description={
-            nettoyage.infos.fournisseurId &&
+            nettoyage.infos.entrepriseId &&
             nettoyage.infos.gammeSelected &&
             hygiene.infos.trilogieGammeSelected
               ? t("choisissez-vos-options-chez") +
                 " " +
-                (hygiene.infos.nomFournisseur ?? "")
+                (hygiene.infos.nomPrestataire ?? "")
               : ""
           }
           handleClickPrevious={handleClickPrevious}
@@ -84,7 +84,7 @@ const HygieneOptions = ({
         ref={propositionsRef}
       >
         {!nettoyage.infos.gammeSelected ||
-        !nettoyage.infos.fournisseurId ||
+        !nettoyage.infos.entrepriseId ||
         !hygiene.infos.trilogieGammeSelected ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-destructive text-center">

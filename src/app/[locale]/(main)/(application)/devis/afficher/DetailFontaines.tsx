@@ -47,7 +47,7 @@ const DetailFontaines = () => {
           return (
             <TableRow key={espace.infos.espaceId}>
               <TableCell>{espace.infos.typeEau.join("/")}</TableCell>
-              <TableCell>{fontaines.infos.nomFournisseur}</TableCell>
+              <TableCell>{fontaines.infos.nomPrestataire}</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell>{espace.quantites.nbPersonnes} personne(s)</TableCell>
               <TableCell>

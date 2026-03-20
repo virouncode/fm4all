@@ -1,9 +1,5 @@
 import { formatSIRET } from "@/lib/utils/isValidSIRET";
 import {
-  InsertClientType,
-  UpdateClientType,
-} from "@/zod-schemas/client.schema";
-import {
   emptyToNull,
   normalizeCapitalized,
   normalizeEmail,
@@ -12,7 +8,7 @@ import {
 
 /*eslint-disable @typescript-eslint/no-explicit-any */
 
-type ClientInputType = InsertClientType | UpdateClientType;
+type ClientInputType = Record<string, unknown>;
 export function normalizeClient<T extends ClientInputType>(input: T): T {
   const clone: any = { ...input };
 

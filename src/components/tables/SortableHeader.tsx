@@ -67,7 +67,10 @@ export const SortableHeader = ({
       params.delete(cursorParamName);
     }
 
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    router.replace(
+      `${pathname}?${params.toString()}` as Parameters<typeof router.replace>[0],
+      { scroll: false },
+    );
   };
 
   return (

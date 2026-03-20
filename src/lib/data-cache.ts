@@ -27,7 +27,7 @@ export type CACHE_TAG =
 type GlobalTagResult<T extends CACHE_TAG> = `global:${T}`;
 type SurfaceTagResult<T extends CACHE_TAG> = `surface:${string}-${T}`;
 type EffectifTagResult<T extends CACHE_TAG> = `effectif:${string}-${T}`;
-type FournisseurTagResult<T extends CACHE_TAG> = `fournisseur:${number}-${T}`;
+type PrestataireTagResult<T extends CACHE_TAG> = `prestataire:${string}-${T}`;
 type IdTagResult<T extends CACHE_TAG> = `id:${number}-${T}`;
 
 // Union type of all possible tag formats
@@ -35,7 +35,7 @@ export type CACHE_TAG_RESULT =
   | GlobalTagResult<CACHE_TAG>
   | SurfaceTagResult<CACHE_TAG>
   | EffectifTagResult<CACHE_TAG>
-  | FournisseurTagResult<CACHE_TAG>
+  | PrestataireTagResult<CACHE_TAG>
   | IdTagResult<CACHE_TAG>;
 
 export const getGlobalTag = <T extends CACHE_TAG>(
@@ -58,11 +58,11 @@ export const getEffectifTag = <T extends CACHE_TAG>(
   return `effectif:${effectif}-${tag}`;
 };
 
-export const getFournisseurTag = <T extends CACHE_TAG>(
+export const getPrestataireTag = <T extends CACHE_TAG>(
   tag: T,
-  fournisseurId: number,
-): FournisseurTagResult<T> => {
-  return `fournisseur:${fournisseurId}-${tag}`;
+  entrepriseId: string,
+): PrestataireTagResult<T> => {
+  return `prestataire:${entrepriseId}-${tag}`;
 };
 
 export const getIdTag = <T extends CACHE_TAG>(

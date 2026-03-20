@@ -2,7 +2,7 @@
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
-import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
+import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs.schema";
 import { Leaf } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
@@ -60,7 +60,7 @@ const The = ({ theConsoTarifs }: TheProps) => {
         className="w-full flex-1 overflow-auto transition"
         ref={propositionsRef}
       >
-        {!cafe.infos.fournisseurId ? (
+        {!cafe.infos.entrepriseId ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-destructive text-center">
               {tThe(

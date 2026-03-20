@@ -15,14 +15,13 @@ import Image from "next/image";
 
 type NettoyageOptionsRepasseCardProps = {
   repasseProposition: {
-    id: number;
+    id: string;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -31,14 +30,13 @@ type NettoyageOptionsRepasseCardProps = {
     nbAvis: number | null;
   } | null;
   handleClickRepasseProposition: (repasseProposition: {
-    id: number;
+    id: string;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;

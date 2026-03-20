@@ -3,13 +3,12 @@ import MaintenanceMobilePropositionsCarousel from "./MaintenanceMobilePropositio
 
 type MaintenanceMobilePropositionsProps = {
   formattedPropositions: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -26,13 +25,12 @@ type MaintenanceMobilePropositionsProps = {
     totalAnnuel: number | null;
   }[][];
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -63,7 +61,7 @@ const MaintenanceMobilePropositions = ({
       {formattedPropositions.map((propositions) => (
         <MaintenanceMobilePropositionsCarousel
           propositions={propositions}
-          key={propositions[0].fournisseurId}
+          key={propositions[0].entrepriseId}
           handleClickProposition={handleClickProposition}
         />
       ))}

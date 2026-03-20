@@ -1,15 +1,14 @@
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 import NettoyageMobilePropositionsCarousel from "./NettoyageMobilePropositionsCarousel";
 import { useTranslations } from "next-intl";
 
 type NettoyageMobilePropositionsProps = {
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -23,12 +22,11 @@ type NettoyageMobilePropositionsProps = {
     totalAnnuel: number | null;
   }) => void;
   formattedPropositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -54,7 +52,7 @@ const NettoyageMobilePropositions = ({
       {formattedPropositions.map((propositions) => (
         <NettoyageMobilePropositionsCarousel
           propositions={propositions}
-          key={propositions[0].fournisseurId}
+          key={propositions[0].entrepriseId}
           handleClickProposition={handleClickProposition}
         />
       ))}

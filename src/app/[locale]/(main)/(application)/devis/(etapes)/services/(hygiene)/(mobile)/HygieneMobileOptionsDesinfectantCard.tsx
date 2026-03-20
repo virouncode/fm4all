@@ -19,16 +19,15 @@ import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
 
 type HygieneMobileOptionsDesinfectantCardProps = {
   proposition: {
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
     anneeCreation: number | null;
-    logoUrl: string | null;
+    logoStorageKey: string | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -47,16 +46,15 @@ type HygieneMobileOptionsDesinfectantCardProps = {
   handleClickProposition: (
     type: HygieneOptionsType,
     proposition: {
-      nomFournisseur: string;
-      sloganFournisseur: string | null;
+      nomPrestataire: string;
+      sloganPrestataire: string | null;
       anneeCreation: number | null;
-      logoUrl: string | null;
+      logoStorageKey: string | null;
       ca: string | null;
       effectifFournisseur: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
-      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
@@ -88,10 +86,9 @@ const HygieneMobileOptionsDesinfectantCard = ({
     gamme,
     imageUrlDesinfectant,
     totalDesinfectant,
-    nomFournisseur,
-    sloganFournisseur,
-    logoUrl,
-    locationUrl,
+    nomPrestataire,
+    sloganPrestataire,
+    logoStorageKey,
     anneeCreation,
     ca,
     effectifFournisseur,
@@ -241,14 +238,14 @@ const HygieneMobileOptionsDesinfectantCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             <Dialog>
               <DialogTrigger asChild>
-                {logoUrl ? (
+                {logoStorageKey ? (
                   <div className="relative h-10">
                     <Image
-                      src={logoUrl}
-                      alt={`logo-de-${nomFournisseur}`}
+                      src={logoStorageKey}
+                      alt={`logo-de-${nomPrestataire}`}
                       fill
                       className="cursor-pointer object-contain object-left"
                       sizes="(max-width:768px) 100vw"
@@ -258,13 +255,13 @@ const HygieneMobileOptionsDesinfectantCard = ({
               </DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomFournisseur}</DialogTitle>
+                  <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={sloganFournisseur}
-                  logoUrl={logoUrl}
-                  nomFournisseur={nomFournisseur}
-                  locationUrl={locationUrl}
+                  sloganPrestataire={sloganPrestataire}
+                  logoStorageKey={logoStorageKey}
+                  nomPrestataire={nomPrestataire}
+                  locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
                   effectif={effectifFournisseur}

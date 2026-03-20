@@ -2,7 +2,7 @@ import { batiments } from "@/constants/batiments";
 import { TVA } from "@/constants/constants";
 import { occupation } from "@/constants/occupation";
 import { toast } from "@/hooks/use-toast";
-import { UpdateProspectType } from "@/zod-schemas/prospect";
+import { UpdateProspectType } from "@/zod-schemas/prospect.schema";
 import html2canvas from "html2canvas-pro";
 import { PDFDocument, PDFTextField, RotationTypes } from "pdf-lib";
 import { formatNumber } from "./formatNumber";

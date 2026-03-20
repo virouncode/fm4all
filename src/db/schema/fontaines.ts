@@ -48,7 +48,9 @@ export const fontainesTarifs = pgTable(
     paConsoFiltres: integer("pa_conso_filtres"),
     paConsoCO2: integer("pa_conso_co2"),
     paConsoEauChaude: integer("pa_conso_eau_chaude"),
-    fontaineId: integer("fontaine_id"),
+    fontaineId: uuid("fontaine_id").references(() => fontaines.id, {
+      onDelete: "set null",
+    }),
     reconditionne: boolean().default(false),
     imageId: uuid("image_id").references(() => documents.id, {
       onDelete: "set null",

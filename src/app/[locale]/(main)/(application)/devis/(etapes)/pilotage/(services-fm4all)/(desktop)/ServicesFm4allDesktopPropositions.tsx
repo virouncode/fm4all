@@ -1,11 +1,11 @@
-import { GammeType } from "@/zod-schemas/gamme";
-import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
+import { GammeType } from "@/zod-schemas/gamme.schema";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All.schema";
 import ServicesFm4AllFournisseurLogo from "../ServicesFm4AllFournisseurLogo";
 import ServicesFm4AllPropositionCard from "../ServicesFm4AllPropositionCard";
 
 type ServicesFm4allDesktopPropositionsProps = {
   formattedPropositions: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
@@ -35,7 +35,7 @@ type ServicesFm4allDesktopPropositionsProps = {
     totalAnnuelSansRemise: number;
   }[];
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;

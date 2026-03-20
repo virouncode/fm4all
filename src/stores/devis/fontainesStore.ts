@@ -26,10 +26,10 @@ const buildInitialFontaines = (): FontainesType => {
 
   return {
     infos: {
-      fournisseurId: null,
-      nomFournisseur: null,
-      sloganFournisseur: null,
-      logoUrl: null,
+      entrepriseId: null,
+      nomPrestataire: null,
+      sloganPrestataire: null,
+      logoStorageKey: null,
       currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,

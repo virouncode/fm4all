@@ -3,13 +3,12 @@ import MaintenancePropositionCard from "./MaintenancePropositionCard";
 
 type MaintenanceDesktopPropositionsProps = {
   formattedPropositions: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -26,13 +25,12 @@ type MaintenanceDesktopPropositionsProps = {
     totalAnnuel: number | null;
   }[][];
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    nomPrestataire: string;
+    entrepriseId: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -60,7 +58,7 @@ const MaintenanceDesktopPropositions = ({
         ? formattedPropositions.map((propositions) => (
             <div
               className="flex flex-1 border-b"
-              key={propositions[0].fournisseurId}
+              key={propositions[0].entrepriseId}
             >
               <MaintenanceFournisseurLogo {...propositions[0]} />
               {propositions.map((proposition) => (

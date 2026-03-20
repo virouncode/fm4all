@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
-import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
-import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
+import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
+import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs.schema";
 import { useTranslations } from "next-intl";
 import FontaineMobileEspace from "./FontaineMobileEspace";
 

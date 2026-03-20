@@ -18,84 +18,38 @@ import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { getTypeFontaine } from "../getTypeFontaine";
 
+export type FontaineMobilePropositionItem = {
+  id: string;
+  entrepriseId: string;
+  nomPrestataire: string;
+  sloganPrestataire: string | null;
+  logoStorageKey: string | null;
+  anneeCreation: number | null;
+  ca: string | null;
+  effectifFournisseur: string | null;
+  nbClients: number | null;
+  noteGoogle: string | null;
+  nbAvis: number | null;
+  modele: string | null;
+  marque: string | null;
+  imageUrl: null;
+  infos: string | null;
+  typePose: "aposer" | "colonne" | "comptoir";
+  reconditionne: boolean | null;
+  prixLoc: number | null;
+  prixInstal: number | null;
+  prixMaintenance: number | null;
+  prixUnitaireConsoFiltres: number | null;
+  prixUnitaireConsoCO2: number | null;
+  prixUnitaireConsoEauChaude: number | null;
+  totalAnnuel: number | null;
+  totalInstallation: number | null;
+};
+
 type FontaineMobileEspacePropositionsCard = {
-  proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: "aposer" | "colonne" | "comptoir";
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  };
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: "aposer" | "colonne" | "comptoir";
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
-  handleClickFirstEspaceProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: "aposer" | "colonne" | "comptoir";
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
+  proposition: FontaineMobilePropositionItem;
+  handleClickProposition: (proposition: FontaineMobilePropositionItem) => void;
+  handleClickFirstEspaceProposition: (proposition: FontaineMobilePropositionItem) => void;
   espace: FontaineEspaceType;
   fontainesEspacesIds: number[];
 };
@@ -113,11 +67,10 @@ const FontaineMobileEspacePropositionCard = ({
   const fontaines = useFontainesStore((s) => s.fontaines);
   const {
     typePose,
-    fournisseurId,
-    nomFournisseur,
-    sloganFournisseur,
-    logoUrl,
-    locationUrl,
+    entrepriseId,
+    nomPrestataire,
+    sloganPrestataire,
+    logoStorageKey,
     anneeCreation,
     ca,
     effectifFournisseur,
@@ -197,7 +150,7 @@ const FontaineMobileEspacePropositionCard = ({
             1 {tFontaines("fontaine")}{" "}
             <span
               className={`${
-                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+                ""
               }`}
             >
               {proposition.marque}
@@ -210,7 +163,7 @@ const FontaineMobileEspacePropositionCard = ({
             1{" "}
             <span
               className={`${
-                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+                ""
               }`}
             >
               {proposition.marque}
@@ -244,7 +197,7 @@ const FontaineMobileEspacePropositionCard = ({
             1 {tFontaines("fontaine")}{" "}
             <span
               className={`${
-                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+                ""
               }`}
             >
               {proposition.marque}
@@ -257,7 +210,7 @@ const FontaineMobileEspacePropositionCard = ({
             1{" "}
             <span
               className={`${
-                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+                ""
               }`}
             >
               {proposition.marque}
@@ -325,7 +278,7 @@ const FontaineMobileEspacePropositionCard = ({
     <CarouselItem>
       <div
         className={`flex h-72 flex-col rounded-xl border border-slate-200 bg-slate-100 p-4 ${
-          fontaines.infos.fournisseurId === proposition.fournisseurId &&
+          fontaines.infos.entrepriseId === proposition.entrepriseId &&
           espace.infos.poseSelected === proposition.typePose
             ? "ring-destructive ring-4 ring-inset"
             : ""
@@ -348,22 +301,22 @@ const FontaineMobileEspacePropositionCard = ({
           <div className="flex h-full w-2/3 flex-col gap-1">
             <p
               className={`text-sm font-bold ${
-                fournisseurId === 13 ? "blur-lg" : ""
+                ""
               }`}
             >
-              {nomFournisseur}
+              {nomPrestataire}
             </p>
             <Dialog>
               <DialogTrigger asChild>
-                {logoUrl ? (
+                {logoStorageKey ? (
                   <div
                     className={`relative h-10 ${
-                      fournisseurId === 13 ? "blur-lg" : ""
+                      ""
                     }`}
                   >
                     <Image
-                      src={logoUrl}
-                      alt={`logo-de-${nomFournisseur}`}
+                      src={logoStorageKey}
+                      alt={`logo-de-${nomPrestataire}`}
                       fill={true}
                       className="cursor-pointer object-contain object-left"
                       sizes="(max-width:768px) 100vw"
@@ -374,16 +327,16 @@ const FontaineMobileEspacePropositionCard = ({
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
                   <DialogTitle
-                    className={`${fournisseurId === 13 ? "blur-lg" : ""} `}
+                    className={`${""} `}
                   >
-                    {nomFournisseur}
+                    {nomPrestataire}
                   </DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={sloganFournisseur}
-                  logoUrl={logoUrl}
-                  nomFournisseur={nomFournisseur}
-                  locationUrl={locationUrl}
+                  sloganPrestataire={sloganPrestataire}
+                  logoStorageKey={logoStorageKey}
+                  nomPrestataire={nomPrestataire}
+                  locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
                   effectif={effectifFournisseur}
@@ -421,13 +374,13 @@ const FontaineMobileEspacePropositionCard = ({
               <Switch
                 className={`${
                   espace.infos.poseSelected === typePose &&
-                  fontaines.infos.fournisseurId === fournisseurId
+                  fontaines.infos.entrepriseId === entrepriseId
                     ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={
                   espace.infos.poseSelected === typePose &&
-                  fontaines.infos.fournisseurId === fournisseurId
+                  fontaines.infos.entrepriseId === entrepriseId
                 }
                 onCheckedChange={() =>
                   fontainesEspacesIds[0] === espace.infos.espaceId

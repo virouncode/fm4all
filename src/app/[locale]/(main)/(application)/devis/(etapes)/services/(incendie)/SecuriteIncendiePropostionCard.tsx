@@ -15,12 +15,11 @@ import Image from "next/image";
 
 type SecuriteIncendiePropostionCardProps = {
   proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -37,12 +36,11 @@ type SecuriteIncendiePropostionCardProps = {
     fraisDeplacementTrilogie: number;
   };
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -154,14 +152,14 @@ const SecuriteIncendiePropostionCard = ({
   return (
     <div
       className={`flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-slate-100 p-4 text-xl ${
-        incendie.infos.fournisseurId === proposition.fournisseurId
+        incendie.infos.entrepriseId === proposition.entrepriseId
           ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}
     >
       <Switch
-        checked={incendie.infos.fournisseurId === proposition.fournisseurId}
+        checked={incendie.infos.entrepriseId === proposition.entrepriseId}
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-destructive"
         title={t("selectionnez-cette-proposition")}

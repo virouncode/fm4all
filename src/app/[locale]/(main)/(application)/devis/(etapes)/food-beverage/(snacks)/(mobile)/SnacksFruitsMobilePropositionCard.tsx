@@ -1,4 +1,5 @@
 import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import { SnacksFruitsPropositionItem } from "@/app/[locale]/(main)/(application)/devis/(etapes)/food-beverage/(snacks)/(desktop)/SnacksFruitsPropositionCard";
 import StarRating from "@/components/star/StarRating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
@@ -17,78 +18,8 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type SnacksFruitsMobilePropositionCardProps = {
-  proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    isSameFournisseur: boolean;
-    gamme: "essentiel" | "confort" | "excellence";
-    fruitsKgParSemaine: number | null;
-    snacksPortionsParSemaine: number | null;
-    boissonsConsosParSemaine: number | null;
-    gFruitsParSemaineParPersonne: number | null;
-    portionsSnacksParSemaineParPersonne: number | null;
-    consosBoissonsParSemaineParPersonne: number | null;
-    prixKgFruits: number | null;
-    prixUnitaireSnacks: number | null;
-    prixUnitaireBoissons: number | null;
-    prixUnitaireLivraisonSiCafe: number | null;
-    prixUnitaireLivraison: number | null;
-    seuilFranco: number;
-    fraisLivraisonPanier: number | null;
-    panierMin: number | null;
-    total: number | null;
-    totalSansRemise: number | null;
-    totalFruits: number;
-    totalSnacks: number;
-    totalBoissons: number;
-    totalLivraison: number | null;
-  };
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    isSameFournisseur: boolean;
-    gamme: "essentiel" | "confort" | "excellence";
-    fruitsKgParSemaine: number | null;
-    snacksPortionsParSemaine: number | null;
-    boissonsConsosParSemaine: number | null;
-    gFruitsParSemaineParPersonne: number | null;
-    portionsSnacksParSemaineParPersonne: number | null;
-    consosBoissonsParSemaineParPersonne: number | null;
-    prixKgFruits: number | null;
-    prixUnitaireSnacks: number | null;
-    prixUnitaireBoissons: number | null;
-    prixUnitaireLivraisonSiCafe: number | null;
-    prixUnitaireLivraison: number | null;
-    seuilFranco: number;
-    fraisLivraisonPanier: number | null;
-    panierMin: number | null;
-    total: number | null;
-    totalSansRemise: number | null;
-    totalFruits: number;
-    totalSnacks: number;
-    totalBoissons: number;
-    totalLivraison: number | null;
-  }) => void;
+  proposition: SnacksFruitsPropositionItem;
+  handleClickProposition: (proposition: SnacksFruitsPropositionItem) => void;
 };
 
 const SnacksFruitsMobilePropositionCard = ({
@@ -101,11 +32,10 @@ const SnacksFruitsMobilePropositionCard = ({
   const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   const {
     gamme,
-    fournisseurId,
-    nomFournisseur,
-    sloganFournisseur,
-    logoUrl,
-    locationUrl,
+    entrepriseId,
+    nomPrestataire,
+    sloganPrestataire,
+    logoStorageKey,
     anneeCreation,
     ca,
     effectifFournisseur,
@@ -266,7 +196,7 @@ const SnacksFruitsMobilePropositionCard = ({
     <CarouselItem>
       <div
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
-          snacksFruits.infos.fournisseurId === fournisseurId &&
+          snacksFruits.infos.entrepriseId === entrepriseId &&
           snacksFruits.infos.gammeSelected === gamme
             ? "ring-destructive ring-4 ring-inset"
             : ""
@@ -289,14 +219,14 @@ const SnacksFruitsMobilePropositionCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             <Dialog>
               <DialogTrigger asChild>
-                {logoUrl ? (
+                {logoStorageKey ? (
                   <div className="relative h-10">
                     <Image
-                      src={logoUrl}
-                      alt={`logo-de-${nomFournisseur}`}
+                      src={logoStorageKey}
+                      alt={`logo-de-${nomPrestataire}`}
                       fill={true}
                       className="cursor-pointer object-contain object-left"
                       sizes="(max-width:768px) 100vw"
@@ -306,13 +236,13 @@ const SnacksFruitsMobilePropositionCard = ({
               </DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomFournisseur}</DialogTitle>
+                  <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={sloganFournisseur}
-                  logoUrl={logoUrl}
-                  nomFournisseur={nomFournisseur}
-                  locationUrl={locationUrl}
+                  sloganPrestataire={sloganPrestataire}
+                  logoStorageKey={logoStorageKey}
+                  nomPrestataire={nomPrestataire}
+                  locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
                   effectif={effectifFournisseur}
@@ -343,13 +273,13 @@ const SnacksFruitsMobilePropositionCard = ({
             {isClickable ? (
               <Switch
                 className={`${
-                  snacksFruits.infos.fournisseurId === fournisseurId &&
+                  snacksFruits.infos.entrepriseId === entrepriseId &&
                   snacksFruits.infos.gammeSelected === gamme
                     ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={
-                  snacksFruits.infos.fournisseurId === fournisseurId &&
+                  snacksFruits.infos.entrepriseId === entrepriseId &&
                   snacksFruits.infos.gammeSelected === gamme
                 }
                 onCheckedChange={() => handleClickProposition(proposition)}

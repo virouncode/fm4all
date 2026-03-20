@@ -20,11 +20,10 @@ type TheMobilePropositionCardProps = {
   proposition: {
     totalAnnuel: number | null;
     infos: string | null;
-    id: number;
-    nomFournisseur: string;
+    id: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: number;
@@ -32,7 +31,7 @@ type TheMobilePropositionCardProps = {
     noteGoogle: string | null;
     nbAvis: number | null;
     createdAt: Date;
-    fournisseurId: number;
+    entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     prixUnitaire: number | null;
     effectifFournisseur: string | null;
@@ -40,11 +39,10 @@ type TheMobilePropositionCardProps = {
   handleClickProposition: (proposition: {
     totalAnnuel: number | null;
     infos: string | null;
-    id: number;
-    nomFournisseur: string;
+    id: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: number;
@@ -52,7 +50,7 @@ type TheMobilePropositionCardProps = {
     noteGoogle: string | null;
     nbAvis: number | null;
     createdAt: Date;
-    fournisseurId: number;
+    entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     prixUnitaire: number | null;
     effectifFournisseur: string | null;
@@ -72,10 +70,9 @@ const TheMobilePropositionCard = ({
   const the = useTheStore((s) => s.the);
   const {
     gamme,
-    nomFournisseur,
+    nomPrestataire,
     slogan,
-    logoUrl,
-    locationUrl,
+    logoStorageKey,
     anneeCreation,
     ca,
     nbClients,
@@ -215,14 +212,14 @@ const TheMobilePropositionCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             <Dialog>
               <DialogTrigger asChild>
-                {logoUrl ? (
+                {logoStorageKey ? (
                   <div className="relative h-10">
                     <Image
-                      src={logoUrl}
-                      alt={`logo-de-${nomFournisseur}`}
+                      src={logoStorageKey}
+                      alt={`logo-de-${nomPrestataire}`}
                       fill
                       className="cursor-pointer object-contain object-left"
                       sizes="(max-width:768px) 100vw"
@@ -232,13 +229,13 @@ const TheMobilePropositionCard = ({
               </DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomFournisseur}</DialogTitle>
+                  <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={slogan}
-                  logoUrl={logoUrl}
-                  nomFournisseur={nomFournisseur}
-                  locationUrl={locationUrl}
+                  sloganPrestataire={slogan}
+                  logoStorageKey={logoStorageKey}
+                  nomPrestataire={nomPrestataire}
+                  locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
                   effectif={effectifFournisseur}

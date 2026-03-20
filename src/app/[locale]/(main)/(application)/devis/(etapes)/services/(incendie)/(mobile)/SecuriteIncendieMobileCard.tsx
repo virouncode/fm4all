@@ -17,12 +17,11 @@ import Image from "next/image";
 
 type SecuriteIncendieMobileCardProps = {
   proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -39,12 +38,11 @@ type SecuriteIncendieMobileCardProps = {
     fraisDeplacementTrilogie: number;
   };
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -70,11 +68,10 @@ const SecuriteIncendieMobileCard = ({
   const tIncendie = useTranslations("DevisPage.services.incendie");
   const incendie = useIncendieStore((s) => s.incendie);
   const {
-    fournisseurId,
-    nomFournisseur,
-    sloganFournisseur,
-    logoUrl,
-    locationUrl,
+    entrepriseId,
+    nomPrestataire,
+    sloganPrestataire,
+    logoStorageKey,
     anneeCreation,
     ca,
     effectifFournisseur,
@@ -176,7 +173,7 @@ const SecuriteIncendieMobileCard = ({
   return (
     <div
       className={`flex h-72 flex-col rounded-xl border border-slate-200 bg-slate-100 p-4 ${
-        incendie.infos.fournisseurId === proposition.fournisseurId
+        incendie.infos.entrepriseId === proposition.entrepriseId
           ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
@@ -198,14 +195,14 @@ const SecuriteIncendieMobileCard = ({
           </DialogContent>
         </Dialog>
         <div className="flex h-full w-2/3 flex-col gap-1">
-          <p className="text-sm font-bold">{nomFournisseur}</p>
+          <p className="text-sm font-bold">{nomPrestataire}</p>
           <Dialog>
             <DialogTrigger asChild>
-              {logoUrl ? (
+              {logoStorageKey ? (
                 <div className="relative h-10">
                   <Image
-                    src={logoUrl}
-                    alt={`logo-de-${nomFournisseur}`}
+                    src={logoStorageKey}
+                    alt={`logo-de-${nomPrestataire}`}
                     fill
                     className="cursor-pointer object-contain object-left"
                     sizes="(max-width:768px) 100vw"
@@ -215,13 +212,13 @@ const SecuriteIncendieMobileCard = ({
             </DialogTrigger>
             <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
-                <DialogTitle>{nomFournisseur}</DialogTitle>
+                <DialogTitle>{nomPrestataire}</DialogTitle>
               </DialogHeader>
               <FournisseurDialog
-                sloganFournisseur={sloganFournisseur}
-                logoUrl={logoUrl}
-                nomFournisseur={nomFournisseur}
-                locationUrl={locationUrl}
+                sloganPrestataire={sloganPrestataire}
+                logoStorageKey={logoStorageKey}
+                nomPrestataire={nomPrestataire}
+                locationUrl={null}
                 anneeCreation={anneeCreation}
                 ca={ca}
                 effectif={effectifFournisseur}
@@ -254,11 +251,11 @@ const SecuriteIncendieMobileCard = ({
           {totalAnnuelTrilogie ? (
             <Switch
               className={`${
-                incendie.infos.fournisseurId === fournisseurId
+                incendie.infos.entrepriseId === entrepriseId
                   ? "data-[state=checked]:bg-destructive"
                   : ""
               }`}
-              checked={incendie.infos.fournisseurId === fournisseurId}
+              checked={incendie.infos.entrepriseId === entrepriseId}
               onCheckedChange={() => handleClickProposition(proposition)}
               title={t("selectionnez-cette-proposition")}
               onClick={(e) => e.stopPropagation()}

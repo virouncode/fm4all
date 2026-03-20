@@ -6,8 +6,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useIncendieStore } from "@/stores/devis/incendieStore";
 import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
-import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
-import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
+import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites.schema";
+import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs.schema";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
@@ -50,11 +50,10 @@ const SecuriteIncendiePropositions = ({
 
   const propositions = incendieTarifs.map((tarif) => ({
     id: tarif.id,
-    fournisseurId: tarif.fournisseurId,
-    nomFournisseur: tarif.nomFournisseur,
-    sloganFournisseur: tarif.slogan,
-    logoUrl: tarif.logoUrl,
-    locationUrl: tarif.locationUrl,
+    entrepriseId: tarif.entrepriseId,
+    nomPrestataire: tarif.nomPrestataire,
+    sloganPrestataire: tarif.slogan,
+    logoStorageKey: tarif.logoStorageKey,
     anneeCreation: tarif.anneeCreation,
     ca: tarif.ca,
     effectifFournisseur: tarif.effectif,
@@ -75,12 +74,11 @@ const SecuriteIncendiePropositions = ({
   }));
 
   const handleClickProposition = (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -97,10 +95,10 @@ const SecuriteIncendiePropositions = ({
     fraisDeplacementTrilogie: number;
   }) => {
     const {
-      fournisseurId,
-      nomFournisseur,
-      sloganFournisseur,
-      logoUrl,
+      entrepriseId,
+      nomPrestataire,
+      sloganPrestataire,
+      logoStorageKey,
       nbExtincteurs,
       nbBaes,
       nbTelBaes,
@@ -110,15 +108,15 @@ const SecuriteIncendiePropositions = ({
       totalAnnuelTrilogie,
       fraisDeplacementTrilogie,
     } = proposition;
-    if (incendie.infos.fournisseurId === fournisseurId) {
+    if (incendie.infos.entrepriseId === entrepriseId) {
       setIncendie((prev) => ({
         ...prev,
         infos: {
           ...prev.infos,
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
         },
         prix: {
           prixParExtincteur: null,
@@ -144,10 +142,10 @@ const SecuriteIncendiePropositions = ({
       ...prev,
       infos: {
         ...prev.infos,
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur,
-        logoUrl,
+        entrepriseId,
+        nomPrestataire,
+        sloganPrestataire,
+        logoStorageKey,
       },
       quantites: {
         ...prev.quantites,
@@ -193,9 +191,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -227,9 +225,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbBaes: newNbBaes },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -258,9 +256,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -294,9 +292,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -324,9 +322,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbBaes: newNbBaes },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -353,9 +351,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -388,9 +386,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -418,9 +416,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbBaes: newNbBaes },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -447,9 +445,9 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
         }));
-        if (incendie.infos.fournisseurId) {
+        if (incendie.infos.entrepriseId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
+            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;

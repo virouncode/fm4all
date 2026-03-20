@@ -2,12 +2,11 @@ import SecuriteIncendieMobileCard from "./SecuriteIncendieMobileCard";
 
 type SecuriteIncendieMobileCardsProps = {
   propositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -24,12 +23,11 @@ type SecuriteIncendieMobileCardsProps = {
     fraisDeplacementTrilogie: number;
   }[];
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectifFournisseur: string | null;
@@ -55,7 +53,7 @@ const SecuriteIncendieMobileCards = ({
     <div className="flex w-full flex-col gap-6">
       {propositions.map((proposition) => (
         <SecuriteIncendieMobileCard
-          key={proposition.fournisseurId}
+          key={proposition.entrepriseId}
           proposition={proposition}
           handleClickProposition={handleClickProposition}
         />

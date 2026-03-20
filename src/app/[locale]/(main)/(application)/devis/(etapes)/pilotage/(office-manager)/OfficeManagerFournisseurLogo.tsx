@@ -7,39 +7,39 @@ import {
 import Image from "next/image";
 
 type OfficeManagerFournisseurLogoProps = {
-  nomFournisseur: string | null;
-  sloganFournisseur: string | null;
-  logoUrl: string | null;
+  nomPrestataire: string | null;
+  sloganPrestataire: string | null;
+  logoStorageKey: string | null;
 };
 
 const OfficeManagerFournisseurLogo = ({
-  nomFournisseur,
-  sloganFournisseur,
-  logoUrl,
+  nomPrestataire,
+  sloganPrestataire,
+  logoStorageKey,
 }: OfficeManagerFournisseurLogoProps) => {
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex h-1/2 w-full items-center justify-center p-4">
-            {logoUrl ? (
+            {logoStorageKey ? (
               <div className="relative h-full w-full">
                 <Image
-                  src={logoUrl}
-                  alt={`logo-de-${nomFournisseur}`}
+                  src={logoStorageKey}
+                  alt={`logo-de-${nomPrestataire}`}
                   fill={true}
                   className="h-full w-full object-contain"
                   sizes="(min-width:768px) 100vw"
                 />
               </div>
             ) : (
-              nomFournisseur
+              nomPrestataire
             )}
           </div>
         </TooltipTrigger>
-        {sloganFournisseur && (
+        {sloganPrestataire && (
           <TooltipContent className="max-w-60">
-            <p className="text-sm italic">{sloganFournisseur}</p>
+            <p className="text-sm italic">{sloganPrestataire}</p>
           </TooltipContent>
         )}
       </Tooltip>

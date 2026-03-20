@@ -16,14 +16,13 @@ import Image from "next/image";
 
 type NettoyageMobileOptionsRepasseCardProps = {
   repasseProposition: {
-    id: number;
+    id: string;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -32,14 +31,13 @@ type NettoyageMobileOptionsRepasseCardProps = {
     nbAvis: number | null;
   } | null;
   handleClickRepasseProposition: (proposition: {
-    id: number;
+    id: string;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -59,7 +57,7 @@ const NettoyageMobileOptionsRepasseCard = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
   const nettoyage = useNettoyageStore((s) => s.nettoyage);
-  const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
+  const { gammeSelected: gamme, nomPrestataire } = nettoyage.infos;
   const totalMensuelText = repasseProposition?.prixAnnuel ? (
     <p className="text-end text-sm font-bold">
       {formatNumber((repasseProposition.prixAnnuel * MARGE) / 12)}{" "}
@@ -174,16 +172,16 @@ const NettoyageMobileOptionsRepasseCard = ({
             </DialogContent>
           </Dialog>
           <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomFournisseur}</p>
+            <p className="text-sm font-bold">{nomPrestataire}</p>
             {repasseProposition ? (
               <>
                 <Dialog>
                   <DialogTrigger asChild>
-                    {nettoyage.infos.logoUrl ? (
+                    {nettoyage.infos.logoStorageKey ? (
                       <div className="relative h-10">
                         <Image
-                          src={nettoyage.infos.logoUrl}
-                          alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
+                          src={nettoyage.infos.logoStorageKey}
+                          alt={`logo-de-${nettoyage.infos.nomPrestataire}`}
                           fill
                           className="cursor-pointer object-contain object-left"
                           sizes="(max-width:768px) 100vw"
@@ -193,13 +191,13 @@ const NettoyageMobileOptionsRepasseCard = ({
                   </DialogTrigger>
                   <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                     <DialogHeader>
-                      <DialogTitle>{nomFournisseur}</DialogTitle>
+                      <DialogTitle>{nomPrestataire}</DialogTitle>
                     </DialogHeader>
                     <FournisseurDialog
-                      sloganFournisseur={repasseProposition.slogan}
-                      logoUrl={repasseProposition.logoUrl}
-                      nomFournisseur={repasseProposition.nomFournisseur}
-                      locationUrl={repasseProposition.locationUrl}
+                      sloganPrestataire={repasseProposition.slogan}
+                      logoStorageKey={repasseProposition.logoStorageKey}
+                      nomPrestataire={repasseProposition.nomPrestataire}
+                      locationUrl={null}
                       anneeCreation={repasseProposition.anneeCreation}
                       ca={repasseProposition.ca}
                       effectif={repasseProposition.effectif}
@@ -223,11 +221,11 @@ const NettoyageMobileOptionsRepasseCard = ({
                   </div>
                 )}
               </>
-            ) : nettoyage.infos.logoUrl ? (
+            ) : nettoyage.infos.logoStorageKey ? (
               <div className="relative h-10">
                 <Image
-                  src={nettoyage.infos.logoUrl}
-                  alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
+                  src={nettoyage.infos.logoStorageKey}
+                  alt={`logo-de-${nettoyage.infos.nomPrestataire}`}
                   fill
                   className="cursor-pointer object-contain object-left"
                   sizes="(max-width:768px) 100vw"

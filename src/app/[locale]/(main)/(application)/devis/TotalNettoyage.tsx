@@ -29,7 +29,7 @@ const TotalNettoyage = () => {
     <div className="total-section flex flex-col gap-4" id="total-nettoyage">
       <div className="flex flex-col gap-4">
         <div>
-          {t("nettoyage")} ({nettoyage.infos.nomFournisseur})
+          {t("nettoyage")} ({nettoyage.infos.nomPrestataire})
         </div>
         <div className="ml-4 flex flex-col text-xs">
           {totalService ? (

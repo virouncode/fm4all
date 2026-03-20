@@ -15,22 +15,22 @@ import Image from "next/image";
 
 type OfficeManagerMobilePropositionCardProps = {
   proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
   };
   handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
+    id: string;
+    entrepriseId: string;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
+    logoStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
@@ -50,7 +50,7 @@ const OfficeManagerMobilePropositionCard = ({
   const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
   const tGlobal = useTranslations("Global");
   const officeManager = useOfficeManagerStore((s) => s.officeManager);
-  const { fournisseurId, totalAnnuel } = proposition;
+  const { entrepriseId, totalAnnuel } = proposition;
   const color =
     proposition.demiJParSemaine !== null &&
     demiJParSemaineConfort !== null &&
@@ -250,7 +250,7 @@ const OfficeManagerMobilePropositionCard = ({
   return (
     <div
       className={`bg-${color} flex h-[570px] flex-col rounded-xl border border-slate-200 p-4 text-white ${
-        officeManager.infos.fournisseurId === fournisseurId &&
+        officeManager.infos.entrepriseId === entrepriseId &&
         officeManager.infos.gammeSelected !== null
           ? "ring-destructive ring-4 ring-inset"
           : ""
@@ -298,12 +298,12 @@ const OfficeManagerMobilePropositionCard = ({
                 <DialogTitle>fm4all</DialogTitle>
               </DialogHeader>
               <FournisseurDialog
-                sloganFournisseur={tOfficeManager(
+                sloganPrestataire={tOfficeManager(
                   "le-facility-management-pour-tous",
                 )}
-                logoUrl={"/img/logo_full.webp"}
+                logoStorageKey={"/img/logo_full.webp"}
                 darkLogoUrl={"/img/logo_full_dark_mode.webp"}
-                nomFournisseur={"fm4all"}
+                nomPrestataire={"fm4all"}
                 locationUrl={null}
                 anneeCreation={2025}
                 ca={null}
@@ -335,13 +335,13 @@ const OfficeManagerMobilePropositionCard = ({
           {totalAnnuel ? (
             <Switch
               className={`${
-                officeManager.infos.fournisseurId === fournisseurId &&
+                officeManager.infos.entrepriseId === entrepriseId &&
                 officeManager.infos.gammeSelected !== null
                   ? "data-[state=checked]:bg-destructive"
                   : ""
               }`}
               checked={
-                officeManager.infos.fournisseurId === fournisseurId &&
+                officeManager.infos.entrepriseId === entrepriseId &&
                 officeManager.infos.gammeSelected !== null
               }
               onCheckedChange={() => handleClickProposition(proposition)}

@@ -7,10 +7,10 @@ import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
-import { DureeLocationFontaineType } from "@/zod-schemas/dureeLocation";
+import { DureeLocationFontaineType } from "@/zod-schemas/dureeLocation.schema";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
-import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
-import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
+import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
+import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs.schema";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
@@ -81,7 +81,7 @@ const FontaineEspaceForm = ({
         tarif.nbPersonnes === roundNbPersonnesFontaine(nbPersonnes) &&
         tarif.type === typeFontaine &&
         tarif.typePose === espace.infos.poseSelected &&
-        tarif.fournisseurId === fontaines.infos.fournisseurId &&
+        tarif.entrepriseId === fontaines.infos.entrepriseId &&
         tarif[fontaines.infos.dureeLocation] !== null,
     ); //1 ligne par fournisseur
     //Il se peut que mon fournisseur n'ait pas de tarif pour ces critères
@@ -93,10 +93,10 @@ const FontaineEspaceForm = ({
           ...prev,
           infos: {
             ...prev.infos,
-            fournisseurId: null,
-            nomFournisseur: null,
-            sloganFournisseur: null,
-            logoUrl: null,
+            entrepriseId: null,
+            nomPrestataire: null,
+            sloganPrestataire: null,
+            logoStorageKey: null,
           },
           espaces: prev.espaces.map((item) =>
             item.infos.espaceId === espace.infos.espaceId
@@ -267,7 +267,7 @@ const FontaineEspaceForm = ({
 
   const updateFontaineEspace = (newNbPersonnes: number) => {
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
-    if (!fontaines.infos.fournisseurId) {
+    if (!fontaines.infos.entrepriseId) {
       setFontaines((prev) => ({
         ...prev,
         espaces: prev.espaces.map((item) =>
@@ -291,7 +291,7 @@ const FontaineEspaceForm = ({
         tarif.nbPersonnes === roundNbPersonnesFontaine(newNbPersonnes) &&
         tarif.type === typeFontaine &&
         tarif.typePose === espace.infos.poseSelected &&
-        tarif.fournisseurId === fontaines.infos.fournisseurId &&
+        tarif.entrepriseId === fontaines.infos.entrepriseId &&
         tarif[fontaines.infos.dureeLocation] !== null,
     );
 
@@ -304,10 +304,10 @@ const FontaineEspaceForm = ({
           ...prev,
           infos: {
             ...prev.infos,
-            fournisseurId: null,
-            nomFournisseur: null,
-            sloganFournisseur: null,
-            logoUrl: null,
+            entrepriseId: null,
+            nomPrestataire: null,
+            sloganPrestataire: null,
+            logoStorageKey: null,
           },
           espaces: prev.espaces.map((item) =>
             item.infos.espaceId === espace.infos.espaceId
@@ -527,7 +527,7 @@ const FontaineEspaceForm = ({
 
   const handleSelectDureeLocation = (value: string) => {
     //Si j'ai pas de fournisseur encore, je change juste la duree de Location
-    if (!fontaines.infos.fournisseurId) {
+    if (!fontaines.infos.entrepriseId) {
       setFontaines((prev) => ({
         ...prev,
         infos: {
@@ -545,7 +545,7 @@ const FontaineEspaceForm = ({
         tarif.type === typeFontaine &&
         tarif.typePose === espace.infos.poseSelected &&
         tarif[value as DureeLocationFontaineType] !== null &&
-        tarif.fournisseurId === fontaines.infos.fournisseurId,
+        tarif.entrepriseId === fontaines.infos.entrepriseId,
     );
     //Il se peut que mon fournisseur n'ait pas de tarif ces critères
     if (!fontainesTarifFournisseur) {
@@ -555,10 +555,10 @@ const FontaineEspaceForm = ({
         ...prev,
         infos: {
           ...prev.infos,
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           dureeLocation: value as DureeLocationFontaineType,
         },
         espaces: prev.espaces.map((item) =>

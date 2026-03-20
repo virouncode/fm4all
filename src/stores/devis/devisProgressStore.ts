@@ -1,6 +1,6 @@
 "use client";
 
-import { DevisProgressType } from "@/zod-schemas/devisProgress";
+import { DevisProgressType } from "@/zod-schemas/devisProgress.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

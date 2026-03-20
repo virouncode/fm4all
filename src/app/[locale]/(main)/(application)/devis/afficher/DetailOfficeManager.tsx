@@ -36,7 +36,7 @@ const DetailOfficeManager = () => {
         {totalOfficeManager.totalService ? (
           <TableRow>
             <TableCell>Office/Hospitality Manager</TableCell>
-            <TableCell>{officeManager.infos.nomFournisseur}</TableCell>
+            <TableCell>{officeManager.infos.nomPrestataire}</TableCell>
             <TableCell>{officeManager.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>

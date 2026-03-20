@@ -11,14 +11,14 @@ import { Switch } from "@/components/ui/switch";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
-import { GammeType } from "@/zod-schemas/gamme";
-import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
+import { GammeType } from "@/zod-schemas/gamme.schema";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All.schema";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type ServicesFm4AllMobilePropositionCardProps = {
   proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
@@ -48,7 +48,7 @@ type ServicesFm4AllMobilePropositionCardProps = {
     totalAnnuelSansRemise: number;
   };
   handleClickProposition: (proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
@@ -309,12 +309,12 @@ const ServicesFm4AllMobilePropositionCard = ({
                   <DialogTitle>{"fm4all"}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={tGlobal(
+                  sloganPrestataire={tGlobal(
                     "le-facility-management-pour-tous",
                   )}
-                  logoUrl={"/img/logo_full.webp"}
+                  logoStorageKey={"/img/logo_full.webp"}
                   darkLogoUrl={"/img/logo_full_dark_mode.webp"}
-                  nomFournisseur={"fm4all"}
+                  nomPrestataire={"fm4all"}
                   locationUrl={null}
                   anneeCreation={2025}
                   ca={null}

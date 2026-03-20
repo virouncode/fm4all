@@ -11,10 +11,10 @@ import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerSto
 import { useTotalServicesFm4AllStore } from "@/stores/devis/totalServicesFm4AllStore";
 import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { useTotalTheStore } from "@/stores/devis/totalTheStore";
-import { GammeType } from "@/zod-schemas/gamme";
-import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
-import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
-import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
+import { GammeType } from "@/zod-schemas/gamme.schema";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All.schema";
+import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType.schema";
+import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux.schema";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
 import ServicesFm4allDesktopPropositions from "./(desktop)/ServicesFm4allDesktopPropositions";
@@ -198,7 +198,7 @@ const ServicesFm4AllPropositions = ({
   });
 
   const handleClickProposition = (proposition: {
-    id: number;
+    id: string;
     gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;

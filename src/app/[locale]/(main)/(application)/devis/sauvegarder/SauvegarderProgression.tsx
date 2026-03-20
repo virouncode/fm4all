@@ -1,5 +1,5 @@
 "use client";
-import { saveProgressAction } from "@/actions/devisAction";
+import { saveProgressAction } from "@/server/actions/devisComparateurActions";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,7 +19,7 @@ import {
   createInsertProspectFormSchema,
   InsertProspectFormType,
   InsertProspectType,
-} from "@/zod-schemas/prospect";
+} from "@/zod-schemas/prospect.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";

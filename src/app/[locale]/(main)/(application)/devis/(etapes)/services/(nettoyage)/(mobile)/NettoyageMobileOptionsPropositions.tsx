@@ -6,14 +6,13 @@ import NettoyageMobileOptionsVitrerieCard from "./NettoyageMobileOptionsVitrerie
 
 type NettoyageMobileOptionsPropositionsProps = {
   repasseProposition: {
-    id: number;
+    id: string;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -22,14 +21,13 @@ type NettoyageMobileOptionsPropositionsProps = {
     nbAvis: number | null;
   } | null;
   handleClickRepasseProposition: (proposition: {
-    id: number;
+    id: string;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -38,12 +36,11 @@ type NettoyageMobileOptionsPropositionsProps = {
     nbAvis: number | null;
   }) => void;
   samediProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -52,12 +49,11 @@ type NettoyageMobileOptionsPropositionsProps = {
     nbAvis: number | null;
   };
   handleClickSamediProposition: (proposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -66,12 +62,11 @@ type NettoyageMobileOptionsPropositionsProps = {
     nbAvis: number | null;
   }) => void;
   dimancheProposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -80,12 +75,11 @@ type NettoyageMobileOptionsPropositionsProps = {
     nbAvis: number | null;
   };
   handleClickDimancheProposition: (proposition: {
-    id: number;
+    id: string;
     prixAnnuel: number;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -94,17 +88,16 @@ type NettoyageMobileOptionsPropositionsProps = {
     nbAvis: number | null;
   }) => void;
   vitrerieProposition: {
-    id: number;
+    id: string;
     tauxHoraire: number;
     cadenceCloisons: number;
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
     prixAnnuel: number | null;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;
@@ -113,17 +106,16 @@ type NettoyageMobileOptionsPropositionsProps = {
     nbAvis: number | null;
   };
   handleClickVitrerieProposition: (proposition: {
-    id: number;
+    id: string;
     tauxHoraire: number;
     cadenceCloisons: number;
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
     prixAnnuel: number | null;
-    nomFournisseur: string;
+    nomPrestataire: string;
     slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
+    logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
     effectif: string | null;

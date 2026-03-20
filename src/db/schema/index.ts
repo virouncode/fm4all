@@ -1,5 +1,7 @@
 export * from "./cafe";
 export * from "./devis";
+export * from "./documents";
+export * from "./entreprises";
 export * from "./enums";
 export * from "./fontaines";
 export * from "./food";
@@ -11,3 +13,4 @@ export * from "./office-manager";
 export * from "./prospects";
 export * from "./services";
 export * from "./services-fm4all";
+export * from "./user";

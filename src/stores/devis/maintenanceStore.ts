@@ -17,10 +17,10 @@ export const useMaintenanceStore = create<MaintenanceStore>()(
     (set) => ({
       maintenance: {
         infos: {
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           gammeSelected: null,
           commentaires: null,
         },
@@ -44,10 +44,10 @@ export const useMaintenanceStore = create<MaintenanceStore>()(
         set({
           maintenance: {
             infos: {
-              fournisseurId: null,
-              nomFournisseur: null,
-              sloganFournisseur: null,
-              logoUrl: null,
+              entrepriseId: null,
+              nomPrestataire: null,
+              sloganPrestataire: null,
+              logoStorageKey: null,
               gammeSelected: null,
               commentaires: null,
             },

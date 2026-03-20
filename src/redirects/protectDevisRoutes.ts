@@ -1,3 +1,4 @@
+import { LocaleType } from "@/i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 
 export const protectDevisRoutes = ({

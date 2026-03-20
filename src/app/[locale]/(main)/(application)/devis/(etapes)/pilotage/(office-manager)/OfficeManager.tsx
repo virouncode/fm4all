@@ -3,8 +3,8 @@
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import useScrollIntoManagement from "@/hooks/use-scroll-into-management";
 import { useManagementStore } from "@/stores/devis/managementStore";
-import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
-import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
+import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites.schema";
+import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs.schema";
 import { UserRoundCog } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";

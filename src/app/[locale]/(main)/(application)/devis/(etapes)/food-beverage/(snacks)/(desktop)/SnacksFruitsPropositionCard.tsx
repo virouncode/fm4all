@@ -10,84 +10,50 @@ import { MARGE, S_PAR_MOIS } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
+export type SnacksFruitsPropositionItem = {
+  id: string;
+  entrepriseId: string;
+  nomPrestataire: string;
+  sloganPrestataire: string | null;
+  logoStorageKey: string | null;
+  anneeCreation: number | null;
+  ca: string | null;
+  effectifFournisseur: string | null;
+  nbClients: number | null;
+  noteGoogle: string | null;
+  nbAvis: number | null;
+  isSamePrestataire: boolean;
+  gamme: GammeType;
+  fruitsKgParSemaine: number | null;
+  snacksPortionsParSemaine: number | null;
+  boissonsConsosParSemaine: number | null;
+  gFruitsParSemaineParPersonne: number | null;
+  portionsSnacksParSemaineParPersonne: number | null;
+  consosBoissonsParSemaineParPersonne: number | null;
+  prixKgFruits: number | null;
+  prixUnitaireSnacks: number | null;
+  prixUnitaireBoissons: number | null;
+  prixUnitaireLivraisonSiCafe: number | null;
+  prixUnitaireLivraison: number | null;
+  seuilFranco: number;
+  fraisLivraisonPanier: number | null;
+  panierMin: number | null;
+  total: number | null;
+  totalSansRemise: number | null;
+  totalFruits: number;
+  totalSnacks: number;
+  totalBoissons: number;
+  totalLivraison: number | null;
+};
+
 type SnacksFruitsPropositionCardProps = {
-  proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    isSameFournisseur: boolean;
-    gamme: GammeType;
-    fruitsKgParSemaine: number | null;
-    snacksPortionsParSemaine: number | null;
-    boissonsConsosParSemaine: number | null;
-    gFruitsParSemaineParPersonne: number | null;
-    portionsSnacksParSemaineParPersonne: number | null;
-    consosBoissonsParSemaineParPersonne: number | null;
-    prixKgFruits: number | null;
-    prixUnitaireSnacks: number | null;
-    prixUnitaireBoissons: number | null;
-    prixUnitaireLivraisonSiCafe: number | null;
-    prixUnitaireLivraison: number | null;
-    seuilFranco: number;
-    fraisLivraisonPanier: number | null;
-    panierMin: number | null;
-    total: number | null;
-    totalSansRemise: number | null;
-    totalFruits: number;
-    totalSnacks: number;
-    totalBoissons: number;
-    totalLivraison: number | null;
-  };
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    isSameFournisseur: boolean;
-    gamme: GammeType;
-    fruitsKgParSemaine: number | null;
-    snacksPortionsParSemaine: number | null;
-    boissonsConsosParSemaine: number | null;
-    gFruitsParSemaineParPersonne: number | null;
-    portionsSnacksParSemaineParPersonne: number | null;
-    consosBoissonsParSemaineParPersonne: number | null;
-    prixKgFruits: number | null;
-    prixUnitaireSnacks: number | null;
-    prixUnitaireBoissons: number | null;
-    prixUnitaireLivraisonSiCafe: number | null;
-    prixUnitaireLivraison: number | null;
-    seuilFranco: number;
-    fraisLivraisonPanier: number | null;
-    panierMin: number | null;
-    total: number | null;
-    totalSansRemise: number | null;
-    totalFruits: number;
-    totalSnacks: number;
-    totalBoissons: number;
-    totalLivraison: number | null;
-  }) => void;
+  proposition: SnacksFruitsPropositionItem;
+  handleClickProposition: (proposition: SnacksFruitsPropositionItem) => void;
 };
 
 const SnacksFruitsPropositionCard = ({
@@ -251,7 +217,7 @@ const SnacksFruitsPropositionCard = ({
   return (
     <div
       className={`flex flex-1 bg-${color} min-h-36 cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
-        snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
+        snacksFruits.infos.entrepriseId === proposition.entrepriseId &&
         snacksFruits.infos.gammeSelected === gamme
           ? "ring-destructive ring-4 ring-inset"
           : ""
@@ -260,7 +226,7 @@ const SnacksFruitsPropositionCard = ({
     >
       <Switch
         checked={
-          snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
+          snacksFruits.infos.entrepriseId === proposition.entrepriseId &&
           snacksFruits.infos.gammeSelected === gamme
         }
         onCheckedChange={() => handleClickProposition(proposition)}

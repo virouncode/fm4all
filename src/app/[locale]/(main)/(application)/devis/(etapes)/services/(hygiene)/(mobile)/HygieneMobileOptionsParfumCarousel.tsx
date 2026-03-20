@@ -11,16 +11,15 @@ import HygieneMobileOptionsParfumCard from "./HygieneMobileOptionsParfumCard";
 
 type HygieneMobileOptionsParfumCarouselProps = {
   propositions: {
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
+    nomPrestataire: string;
+    sloganPrestataire: string | null;
     anneeCreation: number | null;
-    logoUrl: string | null;
+    logoStorageKey: string | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -39,16 +38,15 @@ type HygieneMobileOptionsParfumCarouselProps = {
   handleClickProposition: (
     type: HygieneOptionsType,
     proposition: {
-      nomFournisseur: string;
-      sloganFournisseur: string | null;
+      nomPrestataire: string;
+      sloganPrestataire: string | null;
       anneeCreation: number | null;
-      logoUrl: string | null;
+      logoStorageKey: string | null;
       ca: string | null;
       effectifFournisseur: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
-      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
@@ -85,7 +83,7 @@ const HygieneMobileOptionsParfumCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!hygiene.infos.fournisseurId && !api) {
+    if (!hygiene.infos.entrepriseId && !api) {
       return;
     }
     if (hygiene.infos.parfumGammeSelected) {
@@ -97,7 +95,7 @@ const HygieneMobileOptionsParfumCarousel = ({
             : 2,
       );
     }
-  }, [api, hygiene.infos.parfumGammeSelected, hygiene.infos.fournisseurId]);
+  }, [api, hygiene.infos.parfumGammeSelected, hygiene.infos.entrepriseId]);
 
   return (
     <Carousel

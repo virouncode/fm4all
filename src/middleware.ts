@@ -1,6 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
-import { routing } from "./i18n/routing";
+import { LocaleType, routing } from "./i18n/routing";
 
 import {
   getLocaleFromPathname,
@@ -64,14 +64,15 @@ export async function middleware(req: NextRequest) {
   // 2. Redirections SEO articles/services/secteurs
   // ============================================================================
   const parts = pathnameWithoutLocale.split("/").filter(Boolean);
+  const typedLocale = locale as LocaleType;
 
-  const r1 = handleArticleRedirects(req, parts, locale);
+  const r1 = handleArticleRedirects(req, parts, typedLocale);
   if (r1) return r1;
 
-  const r2 = handleServiceRedirects(req, parts, locale);
+  const r2 = handleServiceRedirects(req, parts, typedLocale);
   if (r2) return r2;
 
-  const r3 = handleSecteurRedirects(req, parts, locale);
+  const r3 = handleSecteurRedirects(req, parts, typedLocale);
   if (r3) return r3;
 
   return intlMiddleware(req);

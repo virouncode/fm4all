@@ -4,16 +4,17 @@ import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
-import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
-import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
-import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
-import { SelectFruitsQuantitesType } from "@/zod-schemas/fruitsQuantites";
-import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
-import { gammes, GammeType } from "@/zod-schemas/gamme";
-import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
-import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
+import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites.schema";
+import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs.schema";
+import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs.schema";
+import { SelectFruitsQuantitesType } from "@/zod-schemas/fruitsQuantites.schema";
+import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs.schema";
+import { gammes } from "@/zod-schemas/gamme.schema";
+import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites.schema";
+import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs.schema";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
+import { SnacksFruitsPropositionItem } from "./(desktop)/SnacksFruitsPropositionCard";
 import SnacksFruitsDesktopPropositions from "./(desktop)/SnacksFruitsDesktopPropositions";
 import SnacksFruitsMobilePropositions from "./(mobile)/SnacksFruitsMobilePropositions";
 
@@ -67,17 +68,16 @@ const SnacksFruitsPropositions = ({
     const {
       id,
       gamme,
-      nomFournisseur,
-      slogan: sloganFournisseur,
-      logoUrl,
-      locationUrl,
+      nomPrestataire,
+      slogan: sloganPrestataire,
+      logoStorageKey,
       anneeCreation,
       ca,
       effectifFournisseur,
       nbClients,
       noteGoogle,
       nbAvis,
-      fournisseurId,
+      entrepriseId,
       prixKg,
     } = item;
     //Quantites /  semaine / personne
@@ -124,19 +124,19 @@ const SnacksFruitsPropositions = ({
             minConsosBoissonsParSemaine,
           )
         : null;
-    const isSameFournisseur = fournisseurId === cafe.infos.fournisseurId;
+    const isSamePrestataire = entrepriseId === cafe.infos.entrepriseId;
 
     //Tarifs / portion
     const prixKgFruits = prixKg;
     const prixUnitaireSnacks =
       snacksTarifsPourNbPersonnes.find(
         (tarif) =>
-          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId,
+          tarif.gamme === gamme && tarif.entrepriseId === entrepriseId,
       )?.prixUnitaire ?? null;
     const prixUnitaireBoissons =
       boissonsTarifsPourNbPersonnes.find(
         (tarif) =>
-          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId,
+          tarif.gamme === gamme && tarif.entrepriseId === entrepriseId,
       )?.prixUnitaire ?? null;
 
     //Prix panier
@@ -164,9 +164,9 @@ const SnacksFruitsPropositions = ({
 
     //Prix livraison / panier
     const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
-      (tarif) => tarif.fournisseurId === fournisseurId,
+      (tarif) => tarif.entrepriseId === entrepriseId,
     );
-    const remiseSiCafe = isSameFournisseur
+    const remiseSiCafe = isSamePrestataire
       ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
       : 0;
     const prixPanierSansRemise = panierFruits + panierSnacks + panierBoissons;
@@ -190,7 +190,7 @@ const SnacksFruitsPropositions = ({
       ? (fraisLivraisonsFournisseur?.prixUnitaire ?? null)
       : null;
 
-    let fraisLivraisonPanier = isSameFournisseur
+    let fraisLivraisonPanier = isSamePrestataire
       ? prixUnitaireLivraisonSiCafe
       : prixUnitaireLivraison;
 
@@ -215,18 +215,17 @@ const SnacksFruitsPropositions = ({
     return {
       //infos
       id,
-      fournisseurId,
-      nomFournisseur,
-      sloganFournisseur,
-      logoUrl,
-      locationUrl,
+      entrepriseId,
+      nomPrestataire,
+      sloganPrestataire,
+      logoStorageKey,
       anneeCreation,
       ca,
       effectifFournisseur,
       nbClients,
       noteGoogle,
       nbAvis,
-      isSameFournisseur,
+      isSamePrestataire,
       gamme,
       //quantites
       fruitsKgParSemaine,
@@ -255,53 +254,15 @@ const SnacksFruitsPropositions = ({
   });
 
   const propositionsByFournisseurId = propositions.reduce<
-    Record<
-      number,
-      {
-        id: number;
-        fournisseurId: number;
-        nomFournisseur: string;
-        sloganFournisseur: string | null;
-        logoUrl: string | null;
-        locationUrl: string | null;
-        anneeCreation: number | null;
-        ca: string | null;
-        effectifFournisseur: string | null;
-        nbClients: number | null;
-        noteGoogle: string | null;
-        nbAvis: number | null;
-        isSameFournisseur: boolean;
-        gamme: GammeType;
-        fruitsKgParSemaine: number | null;
-        snacksPortionsParSemaine: number | null;
-        boissonsConsosParSemaine: number | null;
-        gFruitsParSemaineParPersonne: number | null;
-        portionsSnacksParSemaineParPersonne: number | null;
-        consosBoissonsParSemaineParPersonne: number | null;
-        prixKgFruits: number | null;
-        prixUnitaireSnacks: number | null;
-        prixUnitaireBoissons: number | null;
-        prixUnitaireLivraisonSiCafe: number | null;
-        prixUnitaireLivraison: number | null;
-        seuilFranco: number;
-        fraisLivraisonPanier: number | null;
-        panierMin: number | null;
-        total: number | null;
-        totalSansRemise: number | null;
-        totalFruits: number;
-        totalSnacks: number;
-        totalBoissons: number;
-        totalLivraison: number | null;
-      }[]
-    >
+    Record<string, SnacksFruitsPropositionItem[]>
   >((acc, item) => {
-    const { fournisseurId } = item;
-    if (!acc[fournisseurId]) {
-      acc[fournisseurId] = [];
+    const { entrepriseId } = item;
+    if (!acc[entrepriseId]) {
+      acc[entrepriseId] = [];
     }
     // Add the item to the appropriate array
-    acc[fournisseurId].push(item);
-    acc[fournisseurId].sort(
+    acc[entrepriseId].push(item);
+    acc[entrepriseId].sort(
       (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme),
     );
     return acc;
@@ -309,47 +270,12 @@ const SnacksFruitsPropositions = ({
 
   const formattedPropositions = Object.values(propositionsByFournisseurId);
 
-  const handleClickProposition = (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    isSameFournisseur: boolean;
-    gamme: GammeType;
-    fruitsKgParSemaine: number | null;
-    snacksPortionsParSemaine: number | null;
-    boissonsConsosParSemaine: number | null;
-    gFruitsParSemaineParPersonne: number | null;
-    portionsSnacksParSemaineParPersonne: number | null;
-    consosBoissonsParSemaineParPersonne: number | null;
-    prixKgFruits: number | null;
-    prixUnitaireSnacks: number | null;
-    prixUnitaireBoissons: number | null;
-    prixUnitaireLivraisonSiCafe: number | null;
-    prixUnitaireLivraison: number | null;
-    seuilFranco: number;
-    fraisLivraisonPanier: number | null;
-    panierMin: number | null;
-    total: number | null;
-    totalSansRemise: number | null;
-    totalFruits: number;
-    totalSnacks: number;
-    totalBoissons: number;
-    totalLivraison: number | null;
-  }) => {
+  const handleClickProposition = (proposition: SnacksFruitsPropositionItem) => {
     const {
-      fournisseurId,
-      nomFournisseur,
-      sloganFournisseur,
-      isSameFournisseur,
+      entrepriseId,
+      nomPrestataire,
+      sloganPrestataire,
+      isSamePrestataire,
       gamme,
       fruitsKgParSemaine,
       snacksPortionsParSemaine,
@@ -370,16 +296,16 @@ const SnacksFruitsPropositions = ({
     } = proposition;
 
     if (
-      snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
+      snacksFruits.infos.entrepriseId === proposition.entrepriseId &&
       snacksFruits.infos.gammeSelected === proposition.gamme
     ) {
       setSnacksFruits((prev) => ({
         infos: {
           ...prev.infos,
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          isSameFournisseur: false,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          isSamePrestataire: false,
           gammeSelected: null,
         },
         quantites: {
@@ -404,10 +330,10 @@ const SnacksFruitsPropositions = ({
     setSnacksFruits((prev) => ({
       infos: {
         ...prev.infos,
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur,
-        isSameFournisseur,
+        entrepriseId,
+        nomPrestataire,
+        sloganPrestataire,
+        isSamePrestataire,
         gammeSelected: gamme,
       },
       quantites: {

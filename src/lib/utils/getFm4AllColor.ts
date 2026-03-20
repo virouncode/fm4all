@@ -1,4 +1,4 @@
-import { GammeType } from "@/zod-schemas/gamme";
+import { GammeType } from "@/zod-schemas/gamme.schema";
 
 export const getFm4AllColor = (gamme: GammeType | null) => {
   if (!gamme) return "";

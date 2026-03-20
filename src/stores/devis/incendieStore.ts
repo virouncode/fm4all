@@ -17,10 +17,10 @@ export const useIncendieStore = create<IncendieStore>()(
     (set) => ({
       incendie: {
         infos: {
-          fournisseurId: null,
-          nomFournisseur: null,
-          sloganFournisseur: null,
-          logoUrl: null,
+          entrepriseId: null,
+          nomPrestataire: null,
+          sloganPrestataire: null,
+          logoStorageKey: null,
           commentaires: null,
         },
         quantites: {
@@ -61,10 +61,10 @@ export const useIncendieStore = create<IncendieStore>()(
         set(() => ({
           incendie: {
             infos: {
-              fournisseurId: null,
-              nomFournisseur: null,
-              sloganFournisseur: null,
-              logoUrl: null,
+              entrepriseId: null,
+              nomPrestataire: null,
+              sloganPrestataire: null,
+              logoStorageKey: null,
               commentaires: null,
             },
             quantites: {

@@ -8,13 +8,13 @@ import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
-import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
-import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
-import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
-import { SelectFruitsQuantitesType } from "@/zod-schemas/fruitsQuantites";
-import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
-import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
-import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
+import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites.schema";
+import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs.schema";
+import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs.schema";
+import { SelectFruitsQuantitesType } from "@/zod-schemas/fruitsQuantites.schema";
+import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs.schema";
+import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites.schema";
+import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs.schema";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
@@ -58,7 +58,7 @@ const SnacksFruitsForm = ({
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   const updateSnacksFruits = (newNbPersonnes: number) => {
-    if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
+    if (snacksFruits.infos.gammeSelected && snacksFruits.infos.entrepriseId) {
       const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
         (item) => item.effectif === roundEffectif(newNbPersonnes),
       );
@@ -116,28 +116,28 @@ const SnacksFruitsForm = ({
               minConsosBoissonsParSemaine,
             )
           : null;
-      const isSameFournisseur =
-        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
+      const isSamePrestataire =
+        snacksFruits.infos.entrepriseId === cafe.infos.entrepriseId;
 
       //Tarifs / portion
       const prixKgFruits =
         fruitsTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
-            tarif.fournisseurId === snacksFruits.infos.fournisseurId,
+            tarif.entrepriseId === snacksFruits.infos.entrepriseId,
         )?.prixKg ?? null;
 
       const prixUnitaireSnacks =
         snacksTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
-            tarif.fournisseurId === snacksFruits.infos.fournisseurId,
+            tarif.entrepriseId === snacksFruits.infos.entrepriseId,
         )?.prixUnitaire ?? null;
       const prixUnitaireBoissons =
         boissonsTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
-            tarif.fournisseurId === snacksFruits.infos.fournisseurId,
+            tarif.entrepriseId === snacksFruits.infos.entrepriseId,
         )?.prixUnitaire ?? null;
       const panierFruits =
         snacksFruits.infos.choix.includes("fruits") &&
@@ -163,10 +163,10 @@ const SnacksFruitsForm = ({
 
       //Prix livraison / panier
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
-        ({ fournisseurId }) =>
-          fournisseurId === snacksFruits.infos.fournisseurId,
+        ({ entrepriseId }) =>
+          entrepriseId === snacksFruits.infos.entrepriseId,
       );
-      const remiseSiCafe = isSameFournisseur
+      const remiseSiCafe = isSamePrestataire
         ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
         : 0;
       const prixPanierSansRemise = panierFruits + panierSnacks + panierBoissons;
@@ -192,7 +192,7 @@ const SnacksFruitsForm = ({
         ? (fraisLivraisonsFournisseur?.prixUnitaire ?? null)
         : null;
 
-      let fraisLivraisonPanier = isSameFournisseur
+      let fraisLivraisonPanier = isSamePrestataire
         ? prixUnitaireLivraisonSiCafe
         : prixUnitaireLivraison;
 
@@ -304,7 +304,7 @@ const SnacksFruitsForm = ({
       }));
       return;
     }
-    if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
+    if (snacksFruits.infos.gammeSelected && snacksFruits.infos.entrepriseId) {
       const panierFruits =
         newChoix.includes("fruits") &&
         snacksFruits.quantites.fruitsKgParSemaine !== null
@@ -328,11 +328,11 @@ const SnacksFruitsForm = ({
       const totalBoissons = 52 * panierBoissons;
 
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
-        (tarif) => tarif.fournisseurId === snacksFruits.infos.fournisseurId,
+        (tarif) => tarif.entrepriseId === snacksFruits.infos.entrepriseId,
       );
-      const isSameFournisseur =
-        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
-      const remiseSiCafe = isSameFournisseur
+      const isSamePrestataire =
+        snacksFruits.infos.entrepriseId === cafe.infos.entrepriseId;
+      const remiseSiCafe = isSamePrestataire
         ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
         : 0;
       const prixPanierSansRemise = panierFruits + panierSnacks + panierBoissons;
@@ -342,7 +342,7 @@ const SnacksFruitsForm = ({
       const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
       const isPanierMin = panierMin === null || prixPanier >= panierMin;
 
-      let fraisLivraisonPanier = snacksFruits.infos.isSameFournisseur
+      let fraisLivraisonPanier = snacksFruits.infos.isSamePrestataire
         ? snacksFruits.prix.prixUnitaireLivraisonSiCafe
         : snacksFruits.prix.prixUnitaireLivraison;
 

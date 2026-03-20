@@ -4,9 +4,9 @@ import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/P
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { useServicesStore } from "@/stores/devis/servicesStore";
-import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
-import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
-import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
+import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse.schema";
+import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs.schema";
+import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie.schema";
 import { SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
@@ -57,7 +57,7 @@ const NettoyageOptions = ({
         : repasseTarifs
             .filter(
               (tarif) =>
-                tarif.fournisseurId === nettoyage.infos.fournisseurId &&
+                tarif.entrepriseId === nettoyage.infos.entrepriseId &&
                 tarif.gamme === nettoyage.infos.gammeSelected,
             )
             .map((tarif) => {
@@ -65,11 +65,10 @@ const NettoyageOptions = ({
                 id,
                 hParPassage,
                 tauxHoraire,
-                nomFournisseur,
+                nomPrestataire,
                 gamme,
                 slogan,
-                logoUrl,
-                locationUrl,
+                logoStorageKey,
                 anneeCreation,
                 ca,
                 effectif,
@@ -84,11 +83,10 @@ const NettoyageOptions = ({
                 hParPassage,
                 tauxHoraire,
                 prixAnnuel,
-                nomFournisseur,
+                nomPrestataire,
                 gamme,
                 slogan,
-                logoUrl,
-                locationUrl,
+                logoStorageKey,
                 anneeCreation,
                 ca,
                 effectif,
@@ -100,7 +98,7 @@ const NettoyageOptions = ({
   const samediProposition = nettoyageTarifs
     .filter(
       (tarif) =>
-        tarif.fournisseurId === nettoyage.infos.fournisseurId &&
+        tarif.entrepriseId === nettoyage.infos.entrepriseId &&
         tarif.gamme === nettoyage.infos.gammeSelected,
     )
     .map((tarif) => {
@@ -109,10 +107,9 @@ const NettoyageOptions = ({
         gamme,
         hParPassage,
         tauxHoraire,
-        nomFournisseur,
+        nomPrestataire,
         slogan,
-        logoUrl,
-        locationUrl,
+        logoStorageKey,
         anneeCreation,
         ca,
         effectif,
@@ -125,10 +122,9 @@ const NettoyageOptions = ({
         id,
         gamme,
         prixAnnuel,
-        nomFournisseur,
+        nomPrestataire,
         slogan,
-        logoUrl,
-        locationUrl,
+        logoStorageKey,
         anneeCreation,
         ca,
         effectif,
@@ -140,7 +136,7 @@ const NettoyageOptions = ({
   const dimancheProposition = nettoyageTarifs
     .filter(
       (tarif) =>
-        tarif.fournisseurId === nettoyage.infos.fournisseurId &&
+        tarif.entrepriseId === nettoyage.infos.entrepriseId &&
         tarif.gamme === nettoyage.infos.gammeSelected,
     )
     .map((tarif) => {
@@ -148,10 +144,9 @@ const NettoyageOptions = ({
         id,
         hParPassage,
         tauxHoraire,
-        nomFournisseur,
+        nomPrestataire,
         slogan,
-        logoUrl,
-        locationUrl,
+        logoStorageKey,
         anneeCreation,
         ca,
         effectif,
@@ -163,10 +158,9 @@ const NettoyageOptions = ({
       return {
         id,
         prixAnnuel,
-        nomFournisseur,
+        nomPrestataire,
         slogan,
-        logoUrl,
-        locationUrl,
+        logoStorageKey,
         anneeCreation,
         ca,
         effectif,
@@ -176,7 +170,7 @@ const NettoyageOptions = ({
       };
     })[0];
   const vitrerieProposition = vitrerieTarifs
-    .filter((tarif) => tarif.fournisseurId === nettoyage.infos.fournisseurId)
+    .filter((tarif) => tarif.entrepriseId === nettoyage.infos.entrepriseId)
     .map((tarif) => {
       const {
         id,
@@ -185,10 +179,9 @@ const NettoyageOptions = ({
         cadenceVitres,
         minFacturation,
         fraisDeplacement,
-        nomFournisseur,
+        nomPrestataire,
         slogan,
-        logoUrl,
-        locationUrl,
+        logoStorageKey,
         anneeCreation,
         ca,
         effectif,
@@ -216,10 +209,9 @@ const NettoyageOptions = ({
         minFacturation,
         fraisDeplacement,
         prixAnnuel,
-        nomFournisseur,
+        nomPrestataire,
         slogan,
-        logoUrl,
-        locationUrl,
+        logoStorageKey,
         anneeCreation,
         ca,
         effectif,
@@ -235,12 +227,12 @@ const NettoyageOptions = ({
         <PropositionsTitleMobile
           title={tNettoyage("nettoyage-et-proprete-options")}
           description={
-            nettoyage.infos.fournisseurId && nettoyage.infos.gammeSelected
+            nettoyage.infos.entrepriseId && nettoyage.infos.gammeSelected
               ? t(
                   "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur",
                   {
                     gamme: capitalize(nettoyage.infos.gammeSelected),
-                    nomFournisseur: nettoyage.infos.nomFournisseur ?? "",
+                    nomPrestataire: nettoyage.infos.nomPrestataire ?? "",
                   },
                 )
               : ""
@@ -252,12 +244,12 @@ const NettoyageOptions = ({
         <PropositionsTitle
           title={tNettoyage("nettoyage-et-proprete-options")}
           description={
-            nettoyage.infos.fournisseurId && nettoyage.infos.gammeSelected
+            nettoyage.infos.entrepriseId && nettoyage.infos.gammeSelected
               ? t(
                   "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur",
                   {
                     gamme: capitalize(nettoyage.infos.gammeSelected),
-                    nomFournisseur: nettoyage.infos.nomFournisseur ?? "",
+                    nomPrestataire: nettoyage.infos.nomPrestataire ?? "",
                   },
                 )
               : ""
@@ -267,7 +259,7 @@ const NettoyageOptions = ({
         />
       )}
       <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
-        {!nettoyage.infos.fournisseurId || !nettoyage.infos.gammeSelected ? (
+        {!nettoyage.infos.entrepriseId || !nettoyage.infos.gammeSelected ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-destructive text-center">
               {tNettoyage(

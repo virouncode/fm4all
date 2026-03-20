@@ -8,86 +8,13 @@ import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { useEffect, useState } from "react";
 import FontaineMobileEspacePropositionCard from "./FontaineMobileEspacePropositionCard";
+import { FontaineMobilePropositionItem } from "./FontaineMobileEspacePropositionCard";
 
 type FontaineMobileEspacePropositionsCarouselProps = {
-  propositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: "aposer" | "colonne" | "comptoir";
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }[];
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: "aposer" | "colonne" | "comptoir";
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
+  propositions: FontaineMobilePropositionItem[];
+  handleClickProposition: (proposition: FontaineMobilePropositionItem) => void;
   espace: FontaineEspaceType;
-  handleClickFirstEspaceProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    modele: string | null;
-    marque: string | null;
-    imageUrl: string | null;
-    infos: string | null;
-    typePose: "aposer" | "colonne" | "comptoir";
-    reconditionne: boolean | null;
-    prixLoc: number | null;
-    prixInstal: number | null;
-    prixMaintenance: number | null;
-    prixUnitaireConsoFiltres: number | null;
-    prixUnitaireConsoCO2: number | null;
-    prixUnitaireConsoEauChaude: number | null;
-    totalAnnuel: number | null;
-    totalInstallation: number | null;
-  }) => void;
+  handleClickFirstEspaceProposition: (proposition: FontaineMobilePropositionItem) => void;
   fontainesEspacesIds: number[];
 };
 
@@ -112,11 +39,11 @@ const FontaineMobileEspacePropositionsCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!fontaines.infos.fournisseurId && !api) {
+    if (!fontaines.infos.entrepriseId && !api) {
       return;
     }
     if (
-      propositions[0].fournisseurId === fontaines.infos.fournisseurId &&
+      propositions[0].entrepriseId === fontaines.infos.entrepriseId &&
       espace.infos.poseSelected
     ) {
       api?.scrollTo(
@@ -130,7 +57,7 @@ const FontaineMobileEspacePropositionsCarousel = ({
   }, [
     api,
     espace.infos.poseSelected,
-    fontaines.infos.fournisseurId,
+    fontaines.infos.entrepriseId,
     propositions,
   ]);
 

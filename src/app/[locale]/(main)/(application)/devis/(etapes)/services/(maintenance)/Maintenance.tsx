@@ -1,11 +1,11 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { useServicesStore } from "@/stores/devis/servicesStore";
-import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
-import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
-import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
-import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
-import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
+import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs.schema";
+import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites.schema";
+import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs.schema";
+import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs.schema";
+import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs.schema";
 import { Wrench } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
