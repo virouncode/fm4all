@@ -1,6 +1,7 @@
 "use client";
 
 import { finaliserDevisAction } from "@/server/actions/devisComparateurActions";
+import { verifierCoherenceDevisAction } from "@/server/actions/verifierCoherenceDevisAction";
 import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
@@ -16,11 +17,17 @@ import { Link, useRouter } from "@/i18n/navigation";
 import fillDevis from "@/lib/utils/fillDevis";
 import { getPresignedDevisUploadUrlAction } from "@/server/actions/s3Actions";
 import { useCommentairesStore } from "@/stores/devis/commentairesStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
+import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
 import { useMonDevisStore } from "@/stores/devis/monDevisStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
 import {
   toStoreProspect,
   useProspectStore,
 } from "@/stores/devis/prospectStore";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useTotalStore } from "@/stores/devis/totalStore";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
@@ -56,6 +63,18 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const total = useTotalStore((s) => s.total);
   const commentaires = useCommentairesStore((s) => s.commentaires);
   const setMonDevis = useMonDevisStore((s) => s.setMonDevis);
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  const setNettoyage = useNettoyageStore((s) => s.setNettoyage);
+  const maintenance = useMaintenanceStore((s) => s.maintenance);
+  const setMaintenance = useMaintenanceStore((s) => s.setMaintenance);
+  const hygiene = useHygieneStore((s) => s.hygiene);
+  const setHygiene = useHygieneStore((s) => s.setHygiene);
+  const incendie = useIncendieStore((s) => s.incendie);
+  const setIncendie = useIncendieStore((s) => s.setIncendie);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
+  const setSnacksFruits = useSnacksFruitsStore((s) => s.setSnacksFruits);
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
+  const setOfficeManager = useOfficeManagerStore((s) => s.setOfficeManager);
   const [accepte, setAccepte] = useState(false);
   const router = useRouter();
   useScrollIntoMonDevis();
@@ -219,6 +238,54 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     });
 
     try {
+      // 0) vérifier la cohérence des tarifs avant émission
+      const coherenceResult = await verifierCoherenceDevisAction({
+        surface: prospect.surface ?? 0,
+        effectif: prospect.effectif ?? 0,
+        nettoyage,
+        maintenance,
+        hygiene,
+        incendie,
+        snacksFruits,
+        officeManager,
+      });
+
+      if (coherenceResult?.data && !coherenceResult.data.coherent) {
+        const { corrections } = coherenceResult.data;
+        if (corrections.nettoyage) {
+          const c = corrections.nettoyage;
+          setNettoyage((prev) => ({ ...prev, prix: { ...prev.prix, ...c } }));
+        }
+        if (corrections.maintenance) {
+          const c = corrections.maintenance;
+          setMaintenance((prev) => ({ ...prev, prix: { ...prev.prix, ...c } }));
+        }
+        if (corrections.hygiene) {
+          const c = corrections.hygiene;
+          setHygiene((prev) => ({ ...prev, prix: { ...prev.prix, ...c } }));
+        }
+        if (corrections.incendie) {
+          const c = corrections.incendie;
+          setIncendie((prev) => ({ ...prev, prix: { ...prev.prix, ...c } }));
+        }
+        if (corrections.snacksFruits) {
+          const c = corrections.snacksFruits;
+          setSnacksFruits((prev) => ({ ...prev, prix: { ...prev.prix, ...c } }));
+        }
+        if (corrections.officeManager) {
+          const c = corrections.officeManager;
+          setOfficeManager((prev) => ({ ...prev, prix: { ...prev.prix, ...c } }));
+        }
+        toast({
+          variant: "destructive",
+          title: "Tarifs mis à jour",
+          description:
+            "Certains prix ont changé depuis votre dernière visite. Votre devis a été recalculé avec les tarifs à jour. Veuillez vérifier les montants et soumettre à nouveau.",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // 3) générer le PDF côté client avec ce prospect normalisé
       const numeroDevis = `${payload.nomEntreprise}_${DateTime.local().toFormat(
         "dd-MM-yyyy'T'HH:mm",
