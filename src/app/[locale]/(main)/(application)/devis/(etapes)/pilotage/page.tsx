@@ -5,6 +5,7 @@ import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import DevisGuard from "../../DevisGuard";
 import ServicesLoader from "../locaux/ServicesLoader";
 import PilotagePrestations from "./PilotagePrestations";
 
@@ -79,9 +80,11 @@ const page = async ({
           {tPilotage("4-pilotage-prestations")}
         </h1>
       </div>
-      <Suspense fallback={<ServicesLoader />}>
-        <PilotagePrestations surface={surface} effectif={effectif} />
-      </Suspense>
+      <DevisGuard>
+        <Suspense fallback={<ServicesLoader />}>
+          <PilotagePrestations surface={surface} effectif={effectif} />
+        </Suspense>
+      </DevisGuard>
     </>
   );
 };

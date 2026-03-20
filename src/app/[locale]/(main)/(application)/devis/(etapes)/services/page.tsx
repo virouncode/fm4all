@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Metadata } from "next/types";
 import { Suspense } from "react";
+import DevisGuard from "../../DevisGuard";
 import ServicesLoader from "../locaux/ServicesLoader";
 import MesServices from "./MesServices";
 
@@ -69,9 +70,11 @@ const page = async ({
       <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl">{tServices("2-mes-services")}</h1>
       </div>
-      <Suspense fallback={<ServicesLoader />}>
-        <MesServices surface={surface} effectif={effectif} />
-      </Suspense>
+      <DevisGuard>
+        <Suspense fallback={<ServicesLoader />}>
+          <MesServices surface={surface} effectif={effectif} />
+        </Suspense>
+      </DevisGuard>
     </>
   );
 };

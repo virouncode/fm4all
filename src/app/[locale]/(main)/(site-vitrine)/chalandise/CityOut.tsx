@@ -1,6 +1,6 @@
 "use client";
 
-import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
+import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { batiments } from "@/constants/batiments";
@@ -132,31 +132,37 @@ const CityOut = ({
         >
           <div className="flex flex-col gap-4 md:flex-row md:gap-8">
             <div className="flex flex-1 flex-col gap-4">
-              <InputWithLabel<CityOutType>
-                fieldTitle={t("nom-de-lentreprise")}
-                nameInSchema="nomEntreprise"
+              <RhfInput<CityOutType>
+                label={t("nom-de-lentreprise")}
+                name="nomEntreprise"
+                inputClassName="w-full max-w-xs"
               />
-              <InputWithLabel<CityOutType>
-                fieldTitle={t("email-du-contact")}
-                nameInSchema="emailContact"
+              <RhfInput<CityOutType>
+                label={t("email-du-contact")}
+                name="emailContact"
+                inputClassName="w-full max-w-xs"
               />
-              <InputWithLabel<CityOutType>
-                fieldTitle={t("n-de-telephone")}
-                nameInSchema="phoneContact"
+              <RhfInput<CityOutType>
+                label={t("n-de-telephone")}
+                name="phoneContact"
+                inputClassName="w-full max-w-xs"
               />
             </div>
             <div className="flex flex-1 flex-col gap-4">
-              <InputWithLabel<CityOutType>
-                fieldTitle={t("prenom-du-contact")}
-                nameInSchema="prenomContact"
+              <RhfInput<CityOutType>
+                label={t("prenom-du-contact")}
+                name="prenomContact"
+                inputClassName="w-full max-w-xs"
               />
-              <InputWithLabel<CityOutType>
-                fieldTitle={t("nom-du-contact")}
-                nameInSchema="nomContact"
+              <RhfInput<CityOutType>
+                label={t("nom-du-contact")}
+                name="nomContact"
+                inputClassName="w-full max-w-xs"
               />
-              <InputWithLabel<CityOutType>
-                fieldTitle={t("poste-du-contact")}
-                nameInSchema="posteContact"
+              <RhfInput<CityOutType>
+                label={t("poste-du-contact")}
+                name="posteContact"
+                inputClassName="w-full max-w-xs"
               />
             </div>
           </div>

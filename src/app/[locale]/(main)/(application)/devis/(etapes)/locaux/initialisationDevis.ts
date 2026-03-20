@@ -12,6 +12,7 @@ import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
 import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useTheStore } from "@/stores/devis/theStore";
 import { useTotalServicesFm4AllStore } from "@/stores/devis/totalServicesFm4AllStore";
@@ -35,7 +36,7 @@ export const initialisationDevis = () => {
   useOfficeManagerStore.getState().reset();
   useServicesFm4AllStore.getState().reset();
   useCommentairesStore.getState().reset();
-  useServicesFm4AllStore.getState().reset();
+  useServicesStore.getState().reset();
   useFoodBeverageStore.getState().reset();
   useManagementStore.getState().reset();
   usePersonnalisationStore.getState().reset();

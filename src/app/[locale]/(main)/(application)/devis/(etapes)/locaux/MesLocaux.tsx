@@ -80,46 +80,14 @@ const MesLocaux = () => {
       | "/personnaliser"
       | "/afficher";
     searchParams?: URLSearchParams;
-    name: string;
   }[] = [
-    {
-      id: 1,
-      pathname: "/locaux",
-      name: "Mes locaux",
-    },
-    {
-      id: 2,
-      pathname: "/services",
-      searchParams: serviceSearchParams,
-      name: "Mes services",
-    },
-    {
-      id: 3,
-      pathname: "/food-beverage",
-      name: "Food & Beverage",
-    },
-    {
-      id: 4,
-      pathname: "/pilotage",
-      searchParams: serviceSearchParams,
-      name: "Office Management",
-    },
-    {
-      id: 5,
-      pathname: "/sauvegarder",
-      searchParams: sauvegarderSearchParams,
-      name: "Sauvegarder",
-    },
-    {
-      id: 6,
-      pathname: "/personnaliser",
-      name: "Personnaliser",
-    },
-    {
-      id: 7,
-      pathname: "/afficher",
-      name: "Afficher mon devis",
-    },
+    { id: 1, pathname: "/locaux" },
+    { id: 2, pathname: "/services", searchParams: serviceSearchParams },
+    { id: 3, pathname: "/food-beverage" },
+    { id: 4, pathname: "/pilotage", searchParams: serviceSearchParams },
+    { id: 5, pathname: "/sauvegarder", searchParams: sauvegarderSearchParams },
+    { id: 6, pathname: "/personnaliser" },
+    { id: 7, pathname: "/afficher" },
   ];
 
   const defaultValues: MesLocauxFormType = {
@@ -164,7 +132,7 @@ const MesLocaux = () => {
       const cityData = await response.json();
 
       if (cityData.length === 0) {
-        setDevisProgress({ ...devisProgress, completedSteps: [] });
+        setDevisProgress((prev) => ({ ...prev, completedSteps: [] }));
         toast({
           variant: "destructive",
           title: t("code-postal-invalide"),
@@ -202,7 +170,7 @@ const MesLocaux = () => {
     if (
       !departements.find(({ id }) => id === payload.codePostal.substring(0, 2))
     ) {
-      setDevisProgress({ ...devisProgress, completedSteps: [] });
+      setDevisProgress((prev) => ({ ...prev, completedSteps: [] }));
       router.push({
         pathname: "/chalandise",
         query: {

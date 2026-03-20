@@ -4,6 +4,7 @@ import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import DevisGuard from "../../DevisGuard";
 import ServicesLoader from "../locaux/ServicesLoader";
 import FoodBeverage from "./FoodBeverage";
 
@@ -40,9 +41,11 @@ const page = async ({
       <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl">3. Food & Beverage</h1>
       </div>
-      <Suspense fallback={<ServicesLoader />}>
-        <FoodBeverage />
-      </Suspense>
+      <DevisGuard>
+        <Suspense fallback={<ServicesLoader />}>
+          <FoodBeverage />
+        </Suspense>
+      </DevisGuard>
     </>
   );
 };

@@ -22,6 +22,7 @@ const lastMod = new Date().toISOString();
 // Fonction pour générer les URLs des pages statiques
 const generateStaticUrls = () => {
   const urls: MetadataRoute.Sitemap = [];
+  // Pages légales (peu de valeur SEO)
   const pathsSecondaires = [
     "/mentions",
     "/confidentialite",
@@ -30,6 +31,20 @@ const generateStaticUrls = () => {
     "/cgu",
   ];
 
+  // Pages importantes mais pas de contenu Sanity dynamique
+  const priorityMap: Record<string, number> = {
+    "/services": 0.9,
+    "/blog": 0.9,
+    "/secteurs": 0.9,
+    "/gammes": 0.9,
+    "/engagements": 0.8,
+    "/partenaires": 0.8,
+    "/faq": 0.8,
+    "/prestataire": 0.7,
+    "/contact": 0.7,
+    "/travail": 0.6,
+  };
+
   // Pour chaque locale et chaque route définie dans routing.ts
   for (const locale of routing.locales) {
     // Parcourir toutes les routes définies dans routing.pathnames
@@ -37,10 +52,6 @@ const generateStaticUrls = () => {
       // Ignorer les routes dynamiques avec paramètres et les routes protégées
       if (
         (path.includes("[") && path.includes("]")) ||
-        path.includes("/admin") ||
-        path.includes("/client") ||
-        path.includes("/fournisseur") ||
-        path.includes("/auth") ||
         path.includes("/devis") ||
         path.includes("/chalandise") ||
         path.includes("/tag")
@@ -57,16 +68,19 @@ const generateStaticUrls = () => {
         localizedPath = path;
       }
 
+      // Calculer la priorité
+      const priority = localizedPath
+        ? pathsSecondaires.includes(path)
+          ? 0.5
+          : (priorityMap[path] ?? 0.8)
+        : 1;
+
       // Ajouter l'URL au sitemap
       urls.push({
         url: `${APP_URL}/${locale}${localizedPath}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
-        priority: localizedPath
-          ? pathsSecondaires.includes(path)
-            ? 0.5
-            : 0.8
-          : 1,
+        priority,
       });
     }
   }

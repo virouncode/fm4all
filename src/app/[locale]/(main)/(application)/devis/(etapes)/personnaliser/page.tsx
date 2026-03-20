@@ -12,6 +12,7 @@ import {
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import DevisGuard from "../../DevisGuard";
 import ServicesLoader from "../locaux/ServicesLoader";
 import PersonnaliserDevis from "./PersonnaliserDevis";
 
@@ -65,16 +66,18 @@ const page = async ({
           {tPersonnaliser("6-personnaliser-mon-devis")}
         </h1>
       </div>
-      <Suspense fallback={<ServicesLoader />}>
-        <PersonnaliserDevis
-          exutoiresTarifs={exutoiresTarifs}
-          exutoiresParkingTarifs={exutoiresParkingTarifs}
-          alarmesTarifs={alarmesTarifs}
-          riaTarifs={riaTarifs}
-          colonnesSechesTarifs={colonnesSechesTarifs}
-          portesCoupeFeuTarifs={portesCoupeFeuTarifs}
-        />
-      </Suspense>
+      <DevisGuard>
+        <Suspense fallback={<ServicesLoader />}>
+          <PersonnaliserDevis
+            exutoiresTarifs={exutoiresTarifs}
+            exutoiresParkingTarifs={exutoiresParkingTarifs}
+            alarmesTarifs={alarmesTarifs}
+            riaTarifs={riaTarifs}
+            colonnesSechesTarifs={colonnesSechesTarifs}
+            portesCoupeFeuTarifs={portesCoupeFeuTarifs}
+          />
+        </Suspense>
+      </DevisGuard>
     </>
   );
 };

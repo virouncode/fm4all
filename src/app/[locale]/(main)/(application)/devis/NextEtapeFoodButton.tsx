@@ -22,6 +22,8 @@ const NextEtapeFoodButton = () => {
     const searchParams = new URLSearchParams();
     if (prospect.effectif)
       searchParams.set("effectif", prospect.effectif.toString());
+    if (prospect.surface)
+      searchParams.set("surface", prospect.surface.toString());
     const newCompletedSteps = [
       ...new Set([...devisProgress.completedSteps, 1, 2]),
     ].sort((a, b) => a - b);

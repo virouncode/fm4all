@@ -87,6 +87,10 @@ export default function GoogleTags({
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+
             gtag('js', new Date());
 
             // On gère les page_view nous-mêmes (SPA)

@@ -3,6 +3,7 @@ import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import DevisGuard from "../DevisGuard";
 import MonDevis from "./MonDevis";
 
 export const generateStaticParams = () => {
@@ -38,7 +39,9 @@ const page = async ({
       <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl">{tAfficher("7-mon-devis")}</h1>
       </div>
-      <MonDevis />
+      <DevisGuard>
+        <MonDevis />
+      </DevisGuard>
     </>
   );
 };

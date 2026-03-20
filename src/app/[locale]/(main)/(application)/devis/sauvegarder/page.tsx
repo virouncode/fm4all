@@ -5,6 +5,7 @@ import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import DevisGuard from "../DevisGuard";
 import SauvegarderProgression from "./SauvegarderProgression";
 
 export const generateStaticParams = () => {
@@ -74,7 +75,9 @@ const page = async ({
           {tSauver("5-sauvegarder-ma-progression")}
         </h1>
       </div>
-      <SauvegarderProgression />
+      <DevisGuard>
+        <SauvegarderProgression />
+      </DevisGuard>
     </>
   );
 };

@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
-import { roundEffectif } from "@/lib/utils/roundEffectif";
-import { roundSurface } from "@/lib/utils/roundSurface";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
 import { useManagementStore } from "@/stores/devis/managementStore";
@@ -44,24 +42,12 @@ const DevisBreadcrumb = () => {
   const sauvegarderSearchParams = new URLSearchParams();
 
   if (propect.effectif) {
-    serviceSearchParams.set(
-      "effectif",
-      roundEffectif(propect.effectif).toString(),
-    );
-    sauvegarderSearchParams.set(
-      "effectif",
-      roundEffectif(propect.effectif).toString(),
-    );
+    serviceSearchParams.set("effectif", propect.effectif.toString());
+    sauvegarderSearchParams.set("effectif", propect.effectif.toString());
   }
   if (propect.surface) {
-    serviceSearchParams.set(
-      "surface",
-      roundSurface(propect.surface).toString(),
-    );
-    sauvegarderSearchParams.set(
-      "surface",
-      roundSurface(propect.surface).toString(),
-    );
+    serviceSearchParams.set("surface", propect.surface.toString());
+    sauvegarderSearchParams.set("surface", propect.surface.toString());
   }
   if (propect.typeBatiment) {
     sauvegarderSearchParams.set("typeBatiment", propect.typeBatiment);
@@ -148,11 +134,10 @@ const DevisBreadcrumb = () => {
       en: string;
     };
   }) => {
-    if (route.id !== 1)
-      setDevisProgress((prev) => ({
-        ...prev,
-        currentStep: route.id,
-      }));
+    setDevisProgress((prev) => ({
+      ...prev,
+      currentStep: route.id,
+    }));
     if (route.id === 2)
       setServices((prev) => ({ ...prev, currentServiceId: 1 }));
     if (route.id === 3)

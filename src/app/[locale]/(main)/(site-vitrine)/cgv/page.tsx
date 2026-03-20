@@ -3,7 +3,6 @@ import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import Link from "next/link";
 
 export const generateMetadata = async ({
   params,
@@ -42,17 +41,18 @@ const page = async ({
         <div className="mx-auto flex w-full max-w-prose flex-col items-center gap-4">
           <p>
             {t("si-le-document-ne-s-affiche-pas-correctement")}{" "}
-            <Link
+            <a
               href={
                 locale === "fr"
                   ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250416-3cWd57xG84FTKBYBot6WEpJQrZjE1J.pdf"
                   : "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/Terms%20and%20conditions%20%28CGV%20EN%29%2020250416-7v7RF6gJkp9PazUE7xhTunF93J1sea.pdf"
               }
               target="_blank"
+              rel="noopener noreferrer"
               className="underline"
             >
               {t("cliquez-ici")}
-            </Link>
+            </a>
           </p>
         </div>
         <div className="mt-6 mb-6 w-full">
