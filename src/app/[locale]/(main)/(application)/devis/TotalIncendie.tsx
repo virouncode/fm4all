@@ -1,14 +1,18 @@
 import { MARGE } from "@/constants/constants";
+import { calcIncendieTotaux } from "@/lib/devis/calc-incendie";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useIncendieStore } from "@/stores/devis/incendieStore";
-import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 const TotalIncendie = () => {
   const t = useTranslations("Total");
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const incendie = useIncendieStore((s) => s.incendie);
-  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
+  const totalIncendie = useMemo(
+    () => calcIncendieTotaux(incendie),
+    [incendie],
+  );
   const totalTrilogie = totalIncendie.totalTrilogie;
   const totalExutoires = totalIncendie.totalExutoires;
   const totalExutoiresParking = totalIncendie.totalExutoiresParking;

@@ -9,13 +9,19 @@ import {
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
+import { calcHygieneTotaux } from "@/lib/devis/calc-hygiene";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useMemo } from "react";
 
 const DetailHygiene = () => {
   const hygiene = useHygieneStore((s) => s.hygiene);
-  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
+  const effectif = useProspectStore((s) => s.prospect.effectif ?? 0);
+  const totalHygiene = useMemo(
+    () => calcHygieneTotaux(hygiene, effectif),
+    [hygiene, effectif],
+  );
   const totalOptions =
     (totalHygiene.totalDesinfectant ?? 0) +
     (totalHygiene.totalParfum ?? 0) +

@@ -271,6 +271,8 @@ export function generateAlternates(
       },
     },
     openGraph: {
+      type: routeKey === "blogArticle" ? "article" : "website",
+      url: canonicalUrl,
       images: [
         {
           url: imageUrl ?? DEFAULT_OG_IMAGE,

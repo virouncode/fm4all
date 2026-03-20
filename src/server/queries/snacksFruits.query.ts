@@ -13,6 +13,7 @@ import {
   snacksQuantites,
   snacksTarifs,
 } from "@/db/schema";
+import { getGlobalTag } from "@/lib/data-cache";
 import { selectBoissonsQuantitesSchema } from "@/zod-schemas/boissonsQuantites.schema";
 import { selectBoissonsTarifsSchema } from "@/zod-schemas/boissonsTarifs.schema";
 import { selectFoodLivraisonTarifsSchema } from "@/zod-schemas/foodLivraisonTarifs.schema";
@@ -21,8 +22,11 @@ import { selectFruitsTarifsSchema } from "@/zod-schemas/fruitsTarifs.schema";
 import { selectSnacksQuantitesSchema } from "@/zod-schemas/snacksQuantites.schema";
 import { selectSnacksTarifsSchema } from "@/zod-schemas/snacksTarifs.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getFruitsQuantites = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("fruitsQuantites"));
   try {
     const results = await db.select().from(fruitsQuantites);
     if (results.length === 0) return [];
@@ -34,6 +38,8 @@ export const getFruitsQuantites = async () => {
 };
 
 export const getFruitsTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("fruitsTarifs"));
   try {
     const results = await db
       .select({
@@ -43,7 +49,7 @@ export const getFruitsTarifs = async () => {
         logoStorageKey: documents.storageKey,
         anneeCreation: entrepriseInfos.anneeCreation,
         ca: entrepriseInfos.ca,
-        effectifFournisseur: entrepriseInfos.effectif,
+        effectif: entrepriseInfos.effectif,
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
@@ -70,6 +76,8 @@ export const getFruitsTarifs = async () => {
 };
 
 export const getSnacksQuantites = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("snacksQuantites"));
   try {
     const results = await db.select().from(snacksQuantites);
     if (results.length === 0) return [];
@@ -81,6 +89,8 @@ export const getSnacksQuantites = async () => {
 };
 
 export const getSnacksTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("snacksTarifs"));
   try {
     const results = await db
       .select({
@@ -90,7 +100,7 @@ export const getSnacksTarifs = async () => {
         logoStorageKey: documents.storageKey,
         anneeCreation: entrepriseInfos.anneeCreation,
         ca: entrepriseInfos.ca,
-        effectifFournisseur: entrepriseInfos.effectif,
+        effectif: entrepriseInfos.effectif,
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
@@ -117,6 +127,8 @@ export const getSnacksTarifs = async () => {
 };
 
 export const getBoissonsQuantites = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("boissonsQuantites"));
   try {
     const results = await db.select().from(boissonsQuantites);
     if (results.length === 0) return [];
@@ -130,6 +142,8 @@ export const getBoissonsQuantites = async () => {
 };
 
 export const getBoissonsTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("boissonsTarifs"));
   try {
     const results = await db
       .select({
@@ -139,7 +153,7 @@ export const getBoissonsTarifs = async () => {
         logoStorageKey: documents.storageKey,
         anneeCreation: entrepriseInfos.anneeCreation,
         ca: entrepriseInfos.ca,
-        effectifFournisseur: entrepriseInfos.effectif,
+        effectif: entrepriseInfos.effectif,
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
@@ -166,6 +180,8 @@ export const getBoissonsTarifs = async () => {
 };
 
 export const getFoodLivraisonTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("foodLivraisonTarifs"));
   try {
     const results = await db
       .select({

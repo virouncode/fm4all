@@ -8,14 +8,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
+import { calcCafeTotaux } from "@/lib/devis/calc-cafe";
+import { calcSnacksFruitsTotaux } from "@/lib/devis/calc-snacks-fruits";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
-import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
+import { useMemo } from "react";
 
 const DetailSnacksFruits = () => {
+  const cafe = useCafeStore((s) => s.cafe);
   const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
-  const totalSnacksFruits = useTotalSnacksFruitsStore(
-    (s) => s.totalSnacksFruits,
+  const totalCafeAnnuel = useMemo(() => {
+    const totalCafe = calcCafeTotaux(cafe);
+    return totalCafe.totalEspaces
+      .map(({ total }) => total ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+  }, [cafe]);
+  const totalSnacksFruits = useMemo(
+    () => calcSnacksFruitsTotaux(snacksFruits, totalCafeAnnuel),
+    [snacksFruits, totalCafeAnnuel],
   );
   const totalFruits = totalSnacksFruits.totalFruits;
   const totalSnacks = totalSnacksFruits.totalSnacks;

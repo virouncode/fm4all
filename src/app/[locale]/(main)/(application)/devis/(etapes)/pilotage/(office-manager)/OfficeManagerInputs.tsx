@@ -13,12 +13,7 @@ import { useTranslations } from "next-intl";
 
 type OfficeManagerInputsProps = {
   demiJParSemaineEssentiel: number | null;
-  handleChangeDemiJParSemaine: (
-    value: number[],
-    demiTauxJournalier: number | null,
-  ) => void;
-  demiTjm: number | null;
-  demiTjmPremium: number | null;
+  handleChangeDemiJParSemaine: (value: number[]) => void;
   handleChangeRemplace: (value: string) => void;
   handleCheckPremium: (checked: boolean) => void;
 };
@@ -28,8 +23,6 @@ const OfficeManagerInputs = ({
   handleChangeDemiJParSemaine,
   handleChangeRemplace,
   handleCheckPremium,
-  demiTjm,
-  demiTjmPremium,
 }: OfficeManagerInputsProps) => {
   const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
   const officeManager = useOfficeManagerStore((s) => s.officeManager);
@@ -49,10 +42,7 @@ const OfficeManagerInputs = ({
                     1,
                 ]}
                 onValueChange={(value: number[]) =>
-                  handleChangeDemiJParSemaine(
-                    value,
-                    officeManager.infos.premium ? demiTjmPremium : demiTjm,
-                  )
+                  handleChangeDemiJParSemaine(value)
                 }
                 min={1}
                 max={20}

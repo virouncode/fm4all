@@ -1,16 +1,24 @@
 import { MARGE } from "@/constants/constants";
+import { calcCafeTotaux } from "@/lib/devis/calc-cafe";
+import { calcFontainesTotaux } from "@/lib/devis/calc-fontaines";
+import { calcHygieneTotaux } from "@/lib/devis/calc-hygiene";
+import { calcIncendieTotaux } from "@/lib/devis/calc-incendie";
+import { calcMaintenanceTotaux } from "@/lib/devis/calc-maintenance";
+import { calcNettoyageTotaux } from "@/lib/devis/calc-nettoyage";
+import { calcOfficeManagerTotaux } from "@/lib/devis/calc-office-manager";
+import { calcSnacksFruitsTotaux } from "@/lib/devis/calc-snacks-fruits";
+import { calcTheTotaux } from "@/lib/devis/calc-the";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
+import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
 import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
-import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
-import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
-import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
-import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
-import { useTotalServicesFm4AllStore } from "@/stores/devis/totalServicesFm4AllStore";
-import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTheStore } from "@/stores/devis/theStore";
 import { GammeType } from "@/zod-schemas/gamme.schema";
 import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All.schema";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType.schema";
@@ -35,23 +43,16 @@ const ServicesFm4AllPropositions = ({
       setServicesFm4All: s.setServicesFm4All,
     })),
   );
-  const setTotalServicesFm4All = useTotalServicesFm4AllStore(
-    (s) => s.setTotalServicesFm4All,
-  );
-  const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
-  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
-  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
-  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
-  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
-  const totalThe = useTotalTheStore((s) => s.totalThe);
-  const totalSnacksFruits = useTotalSnacksFruitsStore(
-    (s) => s.totalSnacksFruits,
-  );
-  const totalFontaines = useTotalFontainesStore((s) => s.totalFontaines);
-  const totalOfficeManager = useTotalOfficeManagerStore(
-    (s) => s.totalOfficeManager,
-  );
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  const hygiene = useHygieneStore((s) => s.hygiene);
+  const maintenance = useMaintenanceStore((s) => s.maintenance);
+  const incendie = useIncendieStore((s) => s.incendie);
+  const cafe = useCafeStore((s) => s.cafe);
+  const the = useTheStore((s) => s.the);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
+  const fontaines = useFontainesStore((s) => s.fontaines);
   const officeManager = useOfficeManagerStore((s) => s.officeManager);
+  const effectif = useProspectStore((s) => s.prospect.effectif ?? 0);
   const {
     assurance: tauxAssurance,
     plateforme: tauxPlateforme,
@@ -67,28 +68,29 @@ const ServicesFm4AllPropositions = ({
   } = servicesFm4AllTaux[0];
 
   //Calcul des propositions
-  const totalFinalNettoyage = Object.values(totalNettoyage)
+  const totalFinalNettoyage = Object.values(calcNettoyageTotaux(nettoyage))
     .filter((item) => item !== null)
     .reduce((sum, value) => sum + value, 0);
-  const totalFinalHygiene = Object.values(totalHygiene)
+  const totalFinalHygiene = Object.values(calcHygieneTotaux(hygiene, effectif))
     .filter((item) => item !== null)
     .reduce((sum, value) => sum + value, 0);
-  const totalFinalMaintenance = Object.values(totalMaintenance)
+  const totalFinalMaintenance = Object.values(calcMaintenanceTotaux(maintenance))
     .filter((item) => item !== null)
     .reduce((sum, value) => sum + value, 0);
-  const totalFinalIncendie = Object.values(totalIncendie)
+  const totalFinalIncendie = Object.values(calcIncendieTotaux(incendie))
     .filter((item) => item !== null)
     .reduce((sum, value) => sum + value, 0);
   //TODO voir pour les prix one shot d'installation
-  const totalFinalCafe = totalCafe.totalEspaces
+  const totalFinalCafe = calcCafeTotaux(cafe).totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
-  const totalFinalThe = totalThe.totalService ?? 0;
-  const totalFinalSnacksFruits = totalSnacksFruits.total ?? 0;
-  const totalFinalFontaines = totalFontaines.totalEspaces
+  const totalFinalThe = calcTheTotaux(the).totalService ?? 0;
+  const totalFinalSnacksFruits = calcSnacksFruitsTotaux(snacksFruits, totalFinalCafe).total ?? 0;
+  const totalFinalFontaines = calcFontainesTotaux(fontaines).totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
-  const totalFinalOfficeManager = totalOfficeManager.totalService ?? 0;
+  const totalFinalOfficeManager =
+    calcOfficeManagerTotaux(officeManager).totalService ?? 0;
   const total =
     totalFinalNettoyage +
     totalFinalHygiene +

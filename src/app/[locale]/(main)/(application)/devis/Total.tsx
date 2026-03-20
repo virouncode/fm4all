@@ -11,23 +11,32 @@ import {
 } from "@/components/ui/sheet";
 import { MARGE } from "@/constants/constants";
 import { useUpddateServicesFm4AllTotal } from "@/hooks/use-upddate-services-fm4All-total";
+import { calcCafeTotaux } from "@/lib/devis/calc-cafe";
+import { calcFontainesTotaux } from "@/lib/devis/calc-fontaines";
+import { calcHygieneTotaux } from "@/lib/devis/calc-hygiene";
+import { calcIncendieTotaux } from "@/lib/devis/calc-incendie";
+import { calcMaintenanceTotaux } from "@/lib/devis/calc-maintenance";
+import { calcNettoyageTotaux } from "@/lib/devis/calc-nettoyage";
+import { calcOfficeManagerTotaux } from "@/lib/devis/calc-office-manager";
+import { calcSnacksFruitsTotaux } from "@/lib/devis/calc-snacks-fruits";
+import { calcTheTotaux } from "@/lib/devis/calc-the";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
+import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
-import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
-import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
-import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
-import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
+import { useTheStore } from "@/stores/devis/theStore";
 import { useTotalServicesFm4AllStore } from "@/stores/devis/totalServicesFm4AllStore";
-import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { useTotalStore } from "@/stores/devis/totalStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { Calculator } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useShallow } from "zustand/shallow";
 import TotalCafe from "./TotalCafe";
 import TotalFontaines from "./TotalFontaines";
@@ -44,19 +53,15 @@ const Total = () => {
   const t = useTranslations("Total");
   const prospect = useProspectStore((s) => s.prospect);
   const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
-  const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
-  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
-  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
-  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
-  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
-  const totalThe = useTotalTheStore((s) => s.totalThe);
-  const totalSnacksFruits = useTotalSnacksFruitsStore(
-    (s) => s.totalSnacksFruits,
-  );
-  const totalFontaines = useTotalFontainesStore((s) => s.totalFontaines);
-  const totalOfficeManager = useTotalOfficeManagerStore(
-    (s) => s.totalOfficeManager,
-  );
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  const hygiene = useHygieneStore((s) => s.hygiene);
+  const maintenance = useMaintenanceStore((s) => s.maintenance);
+  const incendie = useIncendieStore((s) => s.incendie);
+  const cafe = useCafeStore((s) => s.cafe);
+  const the = useTheStore((s) => s.the);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
+  const fontaines = useFontainesStore((s) => s.fontaines);
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
   const totalServicesFm4All = useTotalServicesFm4AllStore(
     (s) => s.totalServicesFm4All,
   );
@@ -67,6 +72,46 @@ const Total = () => {
     })),
   );
   useUpddateServicesFm4AllTotal();
+
+  const effectif = prospect.effectif ?? 0;
+
+  const totalNettoyage = useMemo(
+    () => calcNettoyageTotaux(nettoyage),
+    [nettoyage],
+  );
+  const totalHygiene = useMemo(
+    () => calcHygieneTotaux(hygiene, effectif),
+    [hygiene, effectif],
+  );
+  const totalMaintenance = useMemo(
+    () => calcMaintenanceTotaux(maintenance),
+    [maintenance],
+  );
+  const totalIncendie = useMemo(
+    () => calcIncendieTotaux(incendie),
+    [incendie],
+  );
+  const totalCafe = useMemo(() => calcCafeTotaux(cafe), [cafe]);
+  const totalThe = useMemo(() => calcTheTotaux(the), [the]);
+  const totalCafeAnnuel = useMemo(
+    () =>
+      totalCafe.totalEspaces
+        .map(({ total }) => total ?? 0)
+        .reduce((acc, curr) => acc + curr, 0),
+    [totalCafe.totalEspaces],
+  );
+  const totalSnacksFruits = useMemo(
+    () => calcSnacksFruitsTotaux(snacksFruits, totalCafeAnnuel),
+    [snacksFruits, totalCafeAnnuel],
+  );
+  const totalFontaines = useMemo(
+    () => calcFontainesTotaux(fontaines),
+    [fontaines],
+  );
+  const totalOfficeManager = useMemo(
+    () => calcOfficeManagerTotaux(officeManager),
+    [officeManager],
+  );
 
   useEffect(() => {
     const totalFinalNettoyage = Object.values(totalNettoyage)

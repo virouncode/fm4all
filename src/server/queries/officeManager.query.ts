@@ -8,27 +8,33 @@ import {
   officeManagerQuantites,
   officeManagerTarifs,
 } from "@/db/schema";
+import { getGlobalTag } from "@/lib/data-cache";
 import { roundEffectifOfficeManager } from "@/lib/utils/roundEffectifOfficeManager";
 import { roundSurface } from "@/lib/utils/roundSurface";
 import { selectOfficeManagerQuantitesSchema } from "@/zod-schemas/officeManagerQuantites.schema";
 import { selectOfficeManagerTarifsSchema } from "@/zod-schemas/officeManagerTarifs.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getOfficeManagerQuantites = async (
   surface: string,
   effectif: string,
 ) => {
+  "use cache";
+  cacheTag(getGlobalTag("officeManagerQuantites"));
   const roundedSurface = roundSurface(parseInt(surface));
   const roundedEffectif = roundEffectifOfficeManager(parseInt(effectif));
   try {
-    const resultsSurface = await db
-      .select()
-      .from(officeManagerQuantites)
-      .where(eq(officeManagerQuantites.surface, roundedSurface));
-    const resultsEffectif = await db
-      .select()
-      .from(officeManagerQuantites)
-      .where(eq(officeManagerQuantites.effectif, roundedEffectif));
+    const [resultsSurface, resultsEffectif] = await Promise.all([
+      db
+        .select()
+        .from(officeManagerQuantites)
+        .where(eq(officeManagerQuantites.surface, roundedSurface)),
+      db
+        .select()
+        .from(officeManagerQuantites)
+        .where(eq(officeManagerQuantites.effectif, roundedEffectif)),
+    ]);
     if (resultsSurface.length === 0 || resultsEffectif.length === 0) return [];
     const results =
       (resultsSurface.find((result) => result.gamme === "essentiel")
@@ -47,6 +53,8 @@ export const getOfficeManagerQuantites = async (
 };
 
 export const getOfficeManagerTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("officeManagerTarifs"));
   try {
     const results = await db
       .select({

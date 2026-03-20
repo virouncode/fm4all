@@ -1,9 +1,8 @@
+import { calcCafeTotaux } from "@/lib/devis/calc-cafe";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
-import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites.schema";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs.schema";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs.schema";
@@ -43,13 +42,8 @@ const SnacksFruitsPropositions = ({
       setSnacksFruits: s.setSnacksFruits,
     })),
   );
-  const setTotalSnacksFruits = useTotalSnacksFruitsStore(
-    (s) => s.setTotalSnacksFruits,
-  );
-  const resetTotalSnakcFruits = useTotalSnacksFruitsStore((s) => s.reset);
   const prospect = useProspectStore((s) => s.prospect);
   const cafe = useCafeStore((s) => s.cafe);
-  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
   const effectif = prospect.effectif ?? 0;
   const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
 
@@ -174,9 +168,10 @@ const SnacksFruitsPropositions = ({
       (1 - remiseSiCafe / 100) * (panierFruits + panierSnacks + panierBoissons);
 
     const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
+    const totalCafeEspaces = calcCafeTotaux(cafe).totalEspaces;
     const totalCafeAnnuel =
-      totalCafe.totalEspaces.length > 0
-        ? totalCafe.totalEspaces
+      totalCafeEspaces.length > 0
+        ? totalCafeEspaces
             .map(({ total }) => total ?? 0)
             .reduce((acc, curr) => acc + curr, 0)
         : 0;
@@ -287,12 +282,6 @@ const SnacksFruitsPropositions = ({
       prixUnitaireLivraison,
       seuilFranco,
       panierMin,
-      total,
-      totalSansRemise,
-      totalFruits,
-      totalSnacks,
-      totalBoissons,
-      totalLivraison,
     } = proposition;
 
     if (
@@ -324,7 +313,6 @@ const SnacksFruitsPropositions = ({
           panierMin: null,
         },
       }));
-      resetTotalSnakcFruits();
       return;
     }
     setSnacksFruits((prev) => ({
@@ -352,14 +340,6 @@ const SnacksFruitsPropositions = ({
         panierMin,
       },
     }));
-    setTotalSnacksFruits({
-      totalFruits,
-      totalSnacks,
-      totalBoissons,
-      totalLivraison,
-      total,
-      totalSansRemise,
-    });
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

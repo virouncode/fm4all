@@ -7,7 +7,6 @@ import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs.schema";
@@ -39,7 +38,6 @@ const FontaineEspacePropositions = ({
       setFontaines: s.setFontaines,
     })),
   );
-  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   const router = useRouter();
@@ -232,8 +230,6 @@ const FontaineEspacePropositions = ({
       prixUnitaireConsoFiltres,
       prixUnitaireConsoCO2,
       prixUnitaireConsoEauChaude,
-      totalAnnuel,
-      totalInstallation,
     } = proposition;
     //Je décoche
     if (
@@ -265,17 +261,6 @@ const FontaineEspacePropositions = ({
             : item,
         ),
       }));
-      setTotalFontaines((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: null,
-                totalInstallation: null,
-              }
-            : item,
-        ),
-      }));
     } else {
       //Je coche
       setFontaines((prev) => ({
@@ -299,17 +284,6 @@ const FontaineEspacePropositions = ({
                   prixUnitaireConsoCO2,
                   prixUnitaireConsoEauChaude,
                 },
-              }
-            : item,
-        ),
-      }));
-      setTotalFontaines((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation,
               }
             : item,
         ),
@@ -353,8 +327,6 @@ const FontaineEspacePropositions = ({
       prixUnitaireConsoFiltres,
       prixUnitaireConsoCO2,
       prixUnitaireConsoEauChaude,
-      totalAnnuel,
-      totalInstallation,
     } = proposition;
     //======================= JE DECOCHE ======================//
     if (
@@ -392,13 +364,6 @@ const FontaineEspacePropositions = ({
           },
         })),
       }));
-      setTotalFontaines((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) => ({
-          ...item,
-          total: null,
-          totalInstallation: null,
-        })),
-      }));
     } else {
       //======================== JE COCHE ======================//
       //Pour chaque espace et le the si gammeCafeSelected je mets à jour les prix et le total
@@ -410,11 +375,6 @@ const FontaineEspacePropositions = ({
         logoStorageKey,
       };
       const newEspace: FontaineEspaceType[] = [];
-      const newTotalEspace: {
-        espaceId: number;
-        total: number | null;
-        totalInstallation: number | null;
-      }[] = [];
       fontaines.espaces.forEach((item) => {
         if (item.infos.espaceId === espace.infos.espaceId) {
           //1ER LOT
@@ -436,22 +396,12 @@ const FontaineEspacePropositions = ({
               prixUnitaireConsoEauChaude,
             },
           });
-          newTotalEspace.push({
-            espaceId: item.infos.espaceId,
-            total: totalAnnuel,
-            totalInstallation: totalInstallation,
-          });
           return;
         }
         //AUTRES LOTS
         if (!item.infos.poseSelected) {
           //pas de selection
           newEspace.push(item);
-          newTotalEspace.push({
-            espaceId: item.infos.espaceId,
-            total: null,
-            totalInstallation: null,
-          });
           return;
         }
         //selection existante je recalcule tout
@@ -470,11 +420,6 @@ const FontaineEspacePropositions = ({
         );
         if (!itemMachinesTarifFournisseur) {
           newEspace.push(item);
-          newTotalEspace.push({
-            espaceId: item.infos.espaceId,
-            total: null,
-            totalInstallation: null,
-          });
           return;
         }
 
@@ -482,8 +427,6 @@ const FontaineEspacePropositions = ({
           itemMachinesTarifFournisseur?.[fontaines.infos.dureeLocation] ?? null;
         const itemPrixInstal =
           itemMachinesTarifFournisseur?.fraisInstallation ?? null;
-        const itemTotalInstallation =
-          itemPrixInstal !== null ? itemPrixInstal : null;
         const itemPrixMaintenance =
           itemMachinesTarifFournisseur?.paMaintenance ?? null;
 
@@ -494,18 +437,6 @@ const FontaineEspacePropositions = ({
         const itemPrixUnitaireConsoEauChaude =
           itemMachinesTarifFournisseur?.paConsoEauChaude ?? null;
 
-        const itemTotalLoc =
-          itemPrixLoc !== null && itemPrixMaintenance !== null
-            ? itemPrixLoc + itemPrixMaintenance
-            : null;
-        const itemTotalConso =
-          ((itemPrixUnitaireConsoFiltres ?? 0) +
-            (itemPrixUnitaireConsoCO2 ?? 0) +
-            (itemPrixUnitaireConsoEauChaude ?? 0)) *
-          itemNbPersonnes;
-
-        const itemTotalAnnuel =
-          itemTotalLoc !== null ? itemTotalLoc + itemTotalConso : null;
         const itemModele = itemMachinesTarifFournisseur
           ? (fontainesModeles?.find(
               ({ id }) => id === itemMachinesTarifFournisseur?.fontaineId,
@@ -536,20 +467,12 @@ const FontaineEspacePropositions = ({
             prixUnitaireConsoEauChaude: itemPrixUnitaireConsoEauChaude,
           },
         });
-        newTotalEspace.push({
-          espaceId: item.infos.espaceId,
-          total: itemTotalAnnuel,
-          totalInstallation: itemTotalInstallation,
-        });
       });
       setFontaines((prev) => ({
         ...prev,
         infos: newFontainesInfos,
         espaces: newEspace,
       }));
-      setTotalFontaines({
-        totalEspaces: newTotalEspace,
-      });
     }
   };
 
@@ -588,17 +511,6 @@ const FontaineEspacePropositions = ({
           },
         },
       ].sort((a, b) => a.infos.espaceId - b.infos.espaceId),
-    }));
-    setTotalFontaines((prev) => ({
-      totalEspaces: [
-        ...prev.totalEspaces,
-        {
-          espaceId:
-            prev.totalEspaces[prev.totalEspaces.length - 1].espaceId + 1,
-          total: 0,
-          totalInstallation: 0,
-        },
-      ],
     }));
   };
 

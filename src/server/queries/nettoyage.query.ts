@@ -26,7 +26,7 @@ import {
   selectVitrerieTarifsFournisseurSchema,
   selectVitrerieTarifsSchema,
 } from "@/zod-schemas/nettoyageVitrerie.schema";
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { eq, getTableColumns } from "drizzle-orm";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 const prestataireColumns = {
@@ -160,7 +160,7 @@ export const getRepasseTarifs = async (surface: string) => {
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
       .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId))
-      .where(and(eq(nettoyageRepasseTarifs.surface, roundedSurface)));
+      .where(eq(nettoyageRepasseTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectRepasseTarifsSchema.parse(result),

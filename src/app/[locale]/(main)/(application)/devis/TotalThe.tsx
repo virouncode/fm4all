@@ -1,16 +1,17 @@
 import { MARGE } from "@/constants/constants";
+import { calcTheTotaux } from "@/lib/devis/calc-the";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useTheStore } from "@/stores/devis/theStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 const TotalThe = () => {
   const t = useTranslations("Total");
   const cafe = useCafeStore((s) => s.cafe);
   const the = useTheStore((s) => s.the);
-  const totalThe = useTotalTheStore((s) => s.totalThe);
+  const totalThe = useMemo(() => calcTheTotaux(the), [the]);
 
   const total = totalThe.totalService;
   if (!total) return null;

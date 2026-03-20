@@ -7,10 +7,7 @@ import { useTranslations } from "next-intl";
 
 type OfficeManagerMobileInputsProps = {
   demiJParSemaineEssentiel: number | null;
-  handleChangeDemiJParSemaine: (
-    value: number[],
-    demiTauxJournalier: number | null,
-  ) => void;
+  handleChangeDemiJParSemaine: (value: number[]) => void;
   handleChangeRemplace: (value: string) => void;
   handleCheckPremium: (checked: boolean) => void;
 };
@@ -100,12 +97,7 @@ const OfficeManagerMobileInputs = ({
                 1,
             ]}
             onValueChange={(value: number[]) =>
-              handleChangeDemiJParSemaine(
-                value,
-                officeManager.infos.premium
-                  ? officeManager.prix.demiTjmPremium
-                  : officeManager.prix.demiTjm,
-              )
+              handleChangeDemiJParSemaine(value)
             }
             min={1}
             max={20}

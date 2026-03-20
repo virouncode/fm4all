@@ -7,7 +7,6 @@ import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine.schema";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs.schema";
@@ -53,7 +52,6 @@ const Cafe = ({
       setCafe: s.setCafe,
     })),
   );
-  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
   const devisProgress = useDevisProgressStore((s) => s.devisProgress);
   const effectif = prospect.effectif ?? 0;
   useScrollIntoFood();
@@ -104,9 +102,6 @@ const Cafe = ({
         },
       ],
     }));
-    setTotalCafe({
-      totalEspaces: [{ espaceId: 1, total: 0, totalInstallation: 0 }],
-    });
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

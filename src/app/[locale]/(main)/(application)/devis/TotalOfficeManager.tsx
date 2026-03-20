@@ -1,15 +1,17 @@
 import { MARGE } from "@/constants/constants";
+import { calcOfficeManagerTotaux } from "@/lib/devis/calc-office-manager";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
-import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 const TotalOfficeManager = () => {
   const t = useTranslations("Total");
   const officeManager = useOfficeManagerStore((s) => s.officeManager);
-  const totalOfficeManager = useTotalOfficeManagerStore(
-    (s) => s.totalOfficeManager,
+  const totalOfficeManager = useMemo(
+    () => calcOfficeManagerTotaux(officeManager),
+    [officeManager],
   );
   const total = totalOfficeManager.totalService;
   const color = getFm4AllColor(officeManager.infos.gammeSelected);

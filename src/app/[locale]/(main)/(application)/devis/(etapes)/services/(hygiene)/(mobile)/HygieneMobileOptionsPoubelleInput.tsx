@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -18,43 +17,12 @@ type HygieneMobileOptionsPoubelleInputProps = {
     type: HygieneOptionsType,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
-  hygieneDistribTarifsFournisseur: {
-    id: string;
-    effectif: string | null;
-    createdAt: Date;
-    type:
-      | "emp"
-      | "poubelleEmp"
-      | "savon"
-      | "ph"
-      | "desinfectant"
-      | "parfum"
-      | "balai"
-      | "poubelle";
-    nomPrestataire: string;
-    slogan: string | null;
-    logoStorageKey: string | null;
-
-    anneeCreation: number | null;
-    ca: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    entrepriseId: string;
-    gamme: "essentiel" | "confort" | "excellence";
-    oneShot: number | null;
-    pa12M: number | null;
-    pa24M: number | null;
-    pa36M: number | null;
-
-  }[];
 };
 
 const HygieneMobileOptionsPoubelleInput = ({
   nbDistribPoubelle,
   handleChangeDistribNbr,
   hygieneDistribQuantite,
-  hygieneDistribTarifsFournisseur,
 }: HygieneMobileOptionsPoubelleInputProps) => {
   const t = useTranslations("DevisPage");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
@@ -64,8 +32,6 @@ const HygieneMobileOptionsPoubelleInput = ({
       setHygiene: s.setHygiene,
     })),
   );
-  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
-
   const handleIncrement = () => {
     let newNbDistribPoubelle = nbDistribPoubelle + 1;
     if (newNbDistribPoubelle > MAX_NB_DISTRIB)
@@ -77,23 +43,6 @@ const HygieneMobileOptionsPoubelleInput = ({
         nbDistribPoubelle: newNbDistribPoubelle,
       },
     }));
-    if (hygiene.infos.poubelleGammeSelected) {
-      const prixDistribPoubelle =
-        hygieneDistribTarifsFournisseur.find(
-          (tarif) =>
-            tarif.type === "poubelle" &&
-            tarif.gamme === hygiene.infos.poubelleGammeSelected,
-        )?.[hygiene.infos.dureeLocation] ?? null;
-
-      const totalPoubelle =
-        newNbDistribPoubelle && prixDistribPoubelle !== null
-          ? newNbDistribPoubelle * prixDistribPoubelle
-          : null;
-      setTotalHygiene((prev) => ({
-        ...prev,
-        totalPoubelle,
-      }));
-    }
   };
   const handleDecrement = () => {
     let newNbDistribPoubelle = nbDistribPoubelle - 1;
@@ -105,23 +54,6 @@ const HygieneMobileOptionsPoubelleInput = ({
         nbDistribPoubelle: newNbDistribPoubelle,
       },
     }));
-    if (hygiene.infos.poubelleGammeSelected) {
-      const prixDistribPoubelle =
-        hygieneDistribTarifsFournisseur.find(
-          (tarif) =>
-            tarif.type === "poubelle" &&
-            tarif.gamme === hygiene.infos.poubelleGammeSelected,
-        )?.[hygiene.infos.dureeLocation] ?? null;
-
-      const totalPoubelle =
-        newNbDistribPoubelle && prixDistribPoubelle !== null
-          ? newNbDistribPoubelle * prixDistribPoubelle
-          : null;
-      setTotalHygiene((prev) => ({
-        ...prev,
-        totalPoubelle,
-      }));
-    }
   };
 
   return (

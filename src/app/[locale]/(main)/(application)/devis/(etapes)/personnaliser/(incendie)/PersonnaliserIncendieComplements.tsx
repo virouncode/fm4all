@@ -10,7 +10,6 @@ import { roundNbAlarmes } from "@/lib/utils/roundAlarmes";
 import { roundNbExutoires } from "@/lib/utils/roundNbExutoires";
 import { useIncendieStore } from "@/stores/devis/incendieStore";
 import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
-import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
 import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs.schema";
 import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs.schema";
 import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs.schema";
@@ -51,12 +50,6 @@ const PersonnaliserIncendieComplements = ({
       setIncendie: s.setIncendie,
     })),
   );
-  const { totalIncendie, setTotalIncendie } = useTotalIncendieStore(
-    useShallow((s) => ({
-      totalIncendie: s.totalIncendie,
-      setTotalIncendie: s.setTotalIncendie,
-    })),
-  );
   const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
     useShallow((s) => ({
       personnalisation: s.personnalisation,
@@ -64,27 +57,25 @@ const PersonnaliserIncendieComplements = ({
     })),
   );
   const [exutoires, setExutoires] = useState(
-    totalIncendie.totalExutoires ? true : false,
+    incendie.quantites.nbExutoires !== null,
   );
   const [exutoiresParking, setExutoiresParking] = useState(
-    totalIncendie.totalExutoiresParking ? true : false,
+    incendie.quantites.nbExutoiresParking !== null,
   );
   const [portesCoupeFeuBattantes, setPortesCoupeFeuBattantes] = useState(
-    totalIncendie.totalPortesCoupeFeuBattantes ? true : false,
+    incendie.quantites.nbPortesCoupeFeuBattantes !== null,
   );
   const [portesCoupeFeuCoulissantes, setPortesCoupeFeuCoulissantes] = useState(
-    totalIncendie.totalPortesCoupeFeuCoulissantes ? true : false,
+    incendie.quantites.nbPortesCoupeFeuCoulissantes !== null,
   );
   const [colonnesSechesStatiques, setColonnesStatiques] = useState(
-    totalIncendie.totalColonnesSechesStatiques ? true : false,
+    incendie.quantites.nbColonnesSechesStatiques !== null,
   );
   const [colonnesSechesDynamiques, setColonnesDynamiques] = useState(
-    totalIncendie.totalColonnesSechesDynamiques ? true : false,
+    incendie.quantites.nbColonnesSechesDynamiques !== null,
   );
-  const [ria, setRia] = useState(totalIncendie.totalRIA ? true : false);
-  const [alarmes, setAlarmes] = useState(
-    totalIncendie.totalAlarmes ? true : false,
-  );
+  const [ria, setRia] = useState(incendie.quantites.nbRIA !== null);
+  const [alarmes, setAlarmes] = useState(incendie.quantites.nbAlarmes !== null);
 
   const exutoiresTarifsFournisseur = exutoiresTarifs?.filter(
     (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
@@ -152,8 +143,6 @@ const PersonnaliserIncendieComplements = ({
           exutoiresTarifsFournisseur?.find(
             (tarif) => tarif.nbExutoires === roundNbExutoires(newNbrExutoires),
           )?.prixParExutoire ?? null;
-        const totalExutoires =
-          prixParExutoire !== null ? prixParExutoire * newNbrExutoires : null;
         const fraisDeplacementExutoires =
           exutoiresTarifsFournisseur?.find(
             (tarif) => tarif.nbExutoires === roundNbExutoires(newNbrExutoires),
@@ -166,11 +155,6 @@ const PersonnaliserIncendieComplements = ({
           },
           prix: { ...prev.prix, prixParExutoire, fraisDeplacementExutoires },
         }));
-        setTotalIncendie((prev) => ({
-          ...prev,
-          totalExutoires,
-          totalDeplacementExutoires: fraisDeplacementExutoires,
-        }));
 
         break;
       case "exutoiresParking":
@@ -181,10 +165,6 @@ const PersonnaliserIncendieComplements = ({
             (tarif) =>
               tarif.nbExutoires === roundNbExutoires(newNbrExutoiresParking),
           )?.prixParExutoire ?? null;
-        const totalExutoiresParking =
-          prixParExutoireParking !== null
-            ? prixParExutoireParking * newNbrExutoiresParking
-            : null;
         const fraisDeplacementExutoiresParking =
           exutoiresParkingTarifsFournisseur?.find(
             (tarif) =>
@@ -201,11 +181,6 @@ const PersonnaliserIncendieComplements = ({
             prixParExutoireParking,
             fraisDeplacementExutoiresParking,
           },
-        }));
-        setTotalIncendie((prev) => ({
-          ...prev,
-          totalExutoiresParking,
-          totalDeplacementExutoiresParking: fraisDeplacementExutoiresParking,
         }));
         break;
       case "alarmes":
@@ -226,7 +201,6 @@ const PersonnaliserIncendieComplements = ({
           },
           prix: { ...prev.prix, prixParAlarme },
         }));
-        setTotalIncendie((prev) => ({ ...prev, totalAlarmes }));
         break;
       case "portesCoupeFeuBattantes":
         const newNbrPortesCoupeFeuBattantes =
@@ -235,10 +209,6 @@ const PersonnaliserIncendieComplements = ({
           portesCoupeFeuTarifsFournisseur?.find(
             (tarif) => tarif.type === "vantaux",
           )?.prixParPorte ?? null;
-        const totalPortesCoupeFeuBattantes =
-          prixParPorteCoupeFeuBattante !== null
-            ? prixParPorteCoupeFeuBattante * newNbrPortesCoupeFeuBattantes
-            : null;
         setIncendie((prev) => ({
           ...prev,
           quantites: {
@@ -246,10 +216,6 @@ const PersonnaliserIncendieComplements = ({
             nbPortesCoupeFeuBattantes: newNbrPortesCoupeFeuBattantes,
           },
           prix: { ...prev.prix, prixParPorteCoupeFeuBattante },
-        }));
-        setTotalIncendie((prev) => ({
-          ...prev,
-          totalPortesCoupeFeuBattantes: totalPortesCoupeFeuBattantes,
         }));
 
         break;
@@ -260,10 +226,6 @@ const PersonnaliserIncendieComplements = ({
           portesCoupeFeuTarifsFournisseur?.find(
             (tarif) => tarif.type === "coulissante",
           )?.prixParPorte ?? null;
-        const totalPortesCoupeFeuCoulissantes =
-          prixParProteCoupeFeuCoulissante !== null
-            ? prixParProteCoupeFeuCoulissante * newNbrPortesCoupeFeuCoulissantes
-            : null;
         setIncendie((prev) => ({
           ...prev,
           quantites: {
@@ -271,10 +233,6 @@ const PersonnaliserIncendieComplements = ({
             nbPortesCoupeFeuCoulissantes: newNbrPortesCoupeFeuCoulissantes,
           },
           prix: { ...prev.prix, prixParProteCoupeFeuCoulissante },
-        }));
-        setTotalIncendie((prev) => ({
-          ...prev,
-          totalPortesCoupeFeuCoulissantes: totalPortesCoupeFeuCoulissantes,
         }));
         break;
       case "colonnesSechesStatiques":
@@ -284,10 +242,6 @@ const PersonnaliserIncendieComplements = ({
           colonnesSechesTarifsFournisseur?.find(
             (tarif) => tarif.type === "statique",
           )?.prixParColonne ?? null;
-        const totalColonnesSechesStatiques =
-          prixParColonneSecheStatique !== null
-            ? prixParColonneSecheStatique * newNbColonnesSechesStatiques
-            : null;
         setIncendie((prev) => ({
           ...prev,
           quantites: {
@@ -295,10 +249,6 @@ const PersonnaliserIncendieComplements = ({
             nbColonnesSechesStatiques: newNbColonnesSechesStatiques,
           },
           prix: { ...prev.prix, prixParColonneSecheStatique },
-        }));
-        setTotalIncendie((prev) => ({
-          ...prev,
-          totalColonnesSechesStatiques,
         }));
         break;
       case "colonnesSechesDynamiques":
@@ -308,10 +258,6 @@ const PersonnaliserIncendieComplements = ({
           colonnesSechesTarifsFournisseur?.find(
             (tarif) => tarif.type === "dynamique",
           )?.prixParColonne ?? null;
-        const totalColonnesSechesDynamiques =
-          prixParColonneSecheDynamique !== null
-            ? prixParColonneSecheDynamique * newNbColonnesSechesDynamiques
-            : null;
         setIncendie((prev) => ({
           ...prev,
           quantites: {
@@ -320,15 +266,10 @@ const PersonnaliserIncendieComplements = ({
           },
           prix: { ...prev.prix, prixParColonneSecheDynamique },
         }));
-        setTotalIncendie((prev) => ({
-          ...prev,
-          totalColonnesSechesDynamiques,
-        }));
         break;
       case "ria":
         const newNbRia = newNb > MAX_NB_RIA ? MAX_NB_RIA : newNb;
         const prixParRIA = riaTarifFournisseur?.prixParRIA ?? null;
-        const totalRIA = prixParRIA !== null ? prixParRIA * newNbRia : null;
         setIncendie((prev) => ({
           ...prev,
           quantites: {
@@ -337,7 +278,6 @@ const PersonnaliserIncendieComplements = ({
           },
           prix: { ...prev.prix, prixParRIA },
         }));
-        setTotalIncendie((prev) => ({ ...prev, totalRIA }));
         break;
     }
   };
@@ -431,18 +371,11 @@ const PersonnaliserIncendieComplements = ({
               fraisDeplacementExutoires: null,
             },
           }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalExutoires: null,
-            totalDeplacementExutoires: null,
-          }));
         } else {
           const prixParExutoire =
             exutoiresTarifsFournisseur?.find(
               (tarif) => tarif.nbExutoires === roundNbExutoires(nbExutoires),
             )?.prixParExutoire ?? null;
-          const totalExutoires =
-            prixParExutoire !== null ? prixParExutoire * nbExutoires : null;
           const fraisDeplacementExutoires =
             exutoiresTarifsFournisseur?.find(
               (tarif) => tarif.nbExutoires === roundNbExutoires(nbExutoires),
@@ -451,11 +384,6 @@ const PersonnaliserIncendieComplements = ({
             ...prev,
             quantites: { ...prev.quantites, nbExutoires },
             prix: { ...prev.prix, prixParExutoire, fraisDeplacementExutoires },
-          }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalExutoires,
-            totalDeplacementExutoires: fraisDeplacementExutoires,
           }));
         }
         break;
@@ -470,21 +398,12 @@ const PersonnaliserIncendieComplements = ({
             },
             prix: { ...prev.prix, prixParExutoireParking: null },
           }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalExutoiresParking: null,
-            totalDeplacementExutoiresParking: null,
-          }));
         } else {
           const prixParExutoireParking =
             exutoiresTarifsFournisseur?.find(
               (tarif) =>
                 tarif.nbExutoires === roundNbExutoires(nbExutoiresParking),
             )?.prixParExutoire ?? null;
-          const totalExutoiresParking =
-            prixParExutoireParking !== null
-              ? prixParExutoireParking * nbExutoiresParking
-              : null;
           const fraisDeplacementExutoiresParking =
             exutoiresParkingTarifsFournisseur?.find(
               (tarif) =>
@@ -499,11 +418,6 @@ const PersonnaliserIncendieComplements = ({
               fraisDeplacementExutoiresParking,
             },
           }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalExutoiresParking,
-            totalDeplacementExutoiresParking: fraisDeplacementExutoiresParking,
-          }));
         }
         break;
       case "alarmes":
@@ -517,7 +431,6 @@ const PersonnaliserIncendieComplements = ({
             },
             prix: { ...prev.prix, prixParAlarme: null },
           }));
-          setTotalIncendie((prev) => ({ ...prev, totalAlarmes: null }));
         } else {
           const totalAlarmes =
             alarmesTarifsFournisseur?.find(
@@ -532,7 +445,6 @@ const PersonnaliserIncendieComplements = ({
             quantites: { ...prev.quantites, nbAlarmes },
             prix: { ...prev.prix, prixParAlarme },
           }));
-          setTotalIncendie((prev) => ({ ...prev, totalAlarmes }));
         }
         break;
       case "portesCoupeFeuBattantes":
@@ -546,27 +458,15 @@ const PersonnaliserIncendieComplements = ({
             },
             prix: { ...prev.prix, prixParPorteCoupeFeuBattante: null },
           }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalPortesCoupeFeuBattantes: null,
-          }));
         } else {
           const prixParPorteCoupeFeuBattante =
             portesCoupeFeuTarifsFournisseur?.find(
               (tarif) => tarif.type === "vantaux",
             )?.prixParPorte ?? null;
-          const totalPortesCoupeFeuBattantes =
-            prixParPorteCoupeFeuBattante !== null
-              ? prixParPorteCoupeFeuBattante * nbPortesCoupeFeuBattantes
-              : null;
           setIncendie((prev) => ({
             ...prev,
             quantites: { ...prev.quantites, nbPortesCoupeFeuBattantes },
             prix: { ...prev.prix, prixParPorteCoupeFeuBattante },
-          }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalPortesCoupeFeuBattantes,
           }));
         }
         break;
@@ -581,27 +481,15 @@ const PersonnaliserIncendieComplements = ({
             },
             prix: { ...prev.prix, prixParProteCoupeFeuCoulissante: null },
           }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalPortesCoupeFeuCoulissantes: null,
-          }));
         } else {
           const prixParProteCoupeFeuCoulissante =
             portesCoupeFeuTarifsFournisseur?.find(
               (tarif) => tarif.type === "coulissante",
             )?.prixParPorte ?? null;
-          const totalPortesCoupeFeuCoulissantes =
-            prixParProteCoupeFeuCoulissante !== null
-              ? prixParProteCoupeFeuCoulissante * nbPortesCoupeFeuCoulissantes
-              : null;
           setIncendie((prev) => ({
             ...prev,
             quantites: { ...prev.quantites, nbPortesCoupeFeuCoulissantes },
             prix: { ...prev.prix, prixParProteCoupeFeuCoulissante },
-          }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalPortesCoupeFeuCoulissantes,
           }));
         }
         break;
@@ -616,27 +504,15 @@ const PersonnaliserIncendieComplements = ({
             },
             prix: { ...prev.prix, prixParColonneSecheStatique: null },
           }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalColonnesSechesStatiques: null,
-          }));
         } else {
           const prixParColonneSecheStatique =
             colonnesSechesTarifsFournisseur?.find(
               (tarif) => tarif.type === "statique",
             )?.prixParColonne ?? null;
-          const totalColonnesSechesStatiques =
-            prixParColonneSecheStatique !== null
-              ? prixParColonneSecheStatique * nbColonnesSechesStatiques
-              : null;
           setIncendie((prev) => ({
             ...prev,
             quantites: { ...prev.quantites, nbColonnesSechesStatiques },
             prix: { ...prev.prix, prixParColonneSecheStatique },
-          }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalColonnesSechesStatiques,
           }));
         }
         break;
@@ -651,27 +527,15 @@ const PersonnaliserIncendieComplements = ({
             },
             prix: { ...prev.prix, prixParColonneSecheDynamique: null },
           }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalColonnesSechesDynamiques: null,
-          }));
         } else {
           const prixParColonneSecheDynamique =
             colonnesSechesTarifsFournisseur?.find(
               (tarif) => tarif.type === "dynamique",
             )?.prixParColonne ?? null;
-          const totalColonnesSechesDynamiques =
-            prixParColonneSecheDynamique !== null
-              ? prixParColonneSecheDynamique * nbColonnesSechesDynamiques
-              : null;
           setIncendie((prev) => ({
             ...prev,
             quantites: { ...prev.quantites, nbColonnesSechesDynamiques },
             prix: { ...prev.prix, prixParColonneSecheDynamique },
-          }));
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalColonnesSechesDynamiques,
           }));
         }
 
@@ -687,16 +551,13 @@ const PersonnaliserIncendieComplements = ({
             },
             prix: { ...prev.prix, prixParRIA: null },
           }));
-          setTotalIncendie((prev) => ({ ...prev, totalRIA: null }));
         } else {
           const prixParRIA = riaTarifFournisseur?.prixParRIA ?? null;
-          const totalRIA = prixParRIA !== null ? prixParRIA * nbRIA : null;
           setIncendie((prev) => ({
             ...prev,
             quantites: { ...prev.quantites, nbRIA: nbRIA },
             prix: { ...prev.prix, prixParRIA },
           }));
-          setTotalIncendie((prev) => ({ ...prev, totalRIA }));
         }
 
         break;

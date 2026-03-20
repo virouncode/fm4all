@@ -14,17 +14,8 @@ import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useTheStore } from "@/stores/devis/theStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
-import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
-import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
-import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
-import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
 import { useTotalServicesFm4AllStore } from "@/stores/devis/totalServicesFm4AllStore";
-import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { useTotalStore } from "@/stores/devis/totalStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 
 export const initialisationDevis = () => {
   //Devis
@@ -49,15 +40,6 @@ export const initialisationDevis = () => {
   useManagementStore.getState().reset();
   usePersonnalisationStore.getState().reset();
   useMonDevisStore.getState().reset();
-  useTotalNettoyageStore.getState().reset();
-  useTotalHygieneStore.getState().reset();
-  useTotalMaintenanceStore.getState().reset();
-  useTotalIncendieStore.getState().reset();
-  useTotalCafeStore.getState().reset();
-  useTotalTheStore.getState().reset();
-  useTotalSnacksFruitsStore.getState().reset();
-  useTotalFontainesStore.getState().reset();
-  useTotalOfficeManagerStore.getState().reset();
   useTotalServicesFm4AllStore.getState().reset();
   useTotalStore.getState().reset();
 };

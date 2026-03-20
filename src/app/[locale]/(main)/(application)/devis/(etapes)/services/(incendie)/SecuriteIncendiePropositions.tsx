@@ -5,7 +5,6 @@ import {
 } from "@/constants/constants";
 import { toast } from "@/hooks/use-toast";
 import { useIncendieStore } from "@/stores/devis/incendieStore";
-import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites.schema";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs.schema";
 import { useTranslations } from "next-intl";
@@ -31,9 +30,6 @@ const SecuriteIncendiePropositions = ({
       setIncendie: s.setIncendie,
     })),
   );
-  const setTotalIncendie = useTotalIncendieStore((s) => s.setTotalIncendie);
-  const resetTotalIncendie = useTotalIncendieStore((s) => s.reset);
-
   //Calcul des propositions
   const nbExtincteurs =
     incendie.quantites.nbExtincteurs !== null
@@ -135,7 +131,6 @@ const SecuriteIncendiePropositions = ({
           fraisDeplacementExutoiresParking: null,
         },
       }));
-      resetTotalIncendie();
       return;
     }
     setIncendie((prev) => ({
@@ -160,11 +155,6 @@ const SecuriteIncendiePropositions = ({
         prixParTelBaes,
         fraisDeplacementTrilogie,
       },
-    }));
-    setTotalIncendie((prev) => ({
-      ...prev,
-      totalTrilogie: totalAnnuelTrilogie,
-      totalDeplacementTrilogie: fraisDeplacementTrilogie,
     }));
     toast({
       description: t(
@@ -191,28 +181,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? newNbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
       case "baes":
         // let newNbBaes = value
@@ -225,27 +193,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbBaes: newNbBaes },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                newNbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
       case "telBaes":
         // let newNbTelBaes = value ? parseInt(value) : 1;
@@ -256,27 +203,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                newNbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
     }
   };
@@ -292,28 +218,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? newNbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
       case "baes":
         let newNbBaes = nbBaes + 1;
@@ -322,27 +226,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbBaes: newNbBaes },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                newNbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
       case "telBaes":
         let newNbTelBaes = nbTelBaes + 1;
@@ -351,27 +234,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                newNbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
     }
   };
@@ -386,28 +248,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? newNbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
       case "baes":
         let newNbBaes = nbBaes - 1;
@@ -416,27 +256,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbBaes: newNbBaes },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                newNbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
       case "telBaes":
         let newNbTelBaes = nbTelBaes - 1;
@@ -445,27 +264,6 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
         }));
-        if (incendie.infos.entrepriseId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.entrepriseId === incendie.infos.entrepriseId,
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                newNbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
         return;
     }
   };

@@ -1,14 +1,20 @@
 import { MARGE } from "@/constants/constants";
+import { calcHygieneTotaux } from "@/lib/devis/calc-hygiene";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 const TotalHygiene = () => {
   const t = useTranslations("Total");
   const hygiene = useHygieneStore((s) => s.hygiene);
-  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
+  const effectif = useProspectStore((s) => s.prospect.effectif ?? 0);
+  const totalHygiene = useMemo(
+    () => calcHygieneTotaux(hygiene, effectif),
+    [hygiene, effectif],
+  );
   const {
     totalTrilogie,
     totalDesinfectant,

@@ -1,5 +1,4 @@
 import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
-import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
 import { gammes } from "@/zod-schemas/gamme.schema";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs.schema";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites.schema";
@@ -32,11 +31,6 @@ const MaintenancePropositions = ({
       setMaintenance: s.setMaintenance,
     })),
   );
-  const setTotalMaintenance = useTotalMaintenanceStore(
-    (s) => s.setTotalMaintenance,
-  );
-  const resetTotalMaintenance = useTotalMaintenanceStore((s) => s.reset);
-
   //Calcul des propositions
   const propositions = maintenanceTarifs.map((tarif) => {
     const {
@@ -184,11 +178,6 @@ const MaintenancePropositions = ({
       totalAnnuelQualiteAir,
     } = proposition;
 
-    const totalQ18 = totalAnnuelQ18;
-    const totalLegio = gammes.indexOf(gamme) > 0 ? totalAnnuelLegio : null;
-    const totalQualiteAir =
-      gammes.indexOf(gamme) > 1 ? totalAnnuelQualiteAir : null;
-
     if (
       maintenance.infos.entrepriseId === entrepriseId &&
       maintenance.infos.gammeSelected === gamme
@@ -215,7 +204,6 @@ const MaintenancePropositions = ({
             prixQualiteAir: null,
           },
         }));
-        resetTotalMaintenance();
         return;
       }
     }
@@ -239,12 +227,6 @@ const MaintenancePropositions = ({
         prixQualiteAir: totalAnnuelQualiteAir,
       },
     }));
-    setTotalMaintenance({
-      totalService: totalAnnuelService,
-      totalQ18,
-      totalLegio,
-      totalQualiteAir,
-    });
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

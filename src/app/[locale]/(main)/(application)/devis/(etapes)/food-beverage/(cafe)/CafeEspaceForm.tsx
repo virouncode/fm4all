@@ -13,8 +13,6 @@ import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMa
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTheStore } from "@/stores/devis/theStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine.schema";
@@ -59,8 +57,6 @@ const CafeEspaceForm = ({
     })),
   );
   const setThe = useTheStore((s) => s.setThe);
-  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
-  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
   const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
   const effectif = prospect.effectif ?? 0;
@@ -179,16 +175,6 @@ const CafeEspaceForm = ({
             prixUnitaire: null,
           },
         }));
-        setTotalCafe((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) => ({
-            ...item,
-            total: null,
-            totalInstallation: null,
-          })),
-        }));
-        setTotalThe({
-          totalService: null,
-        });
       } else {
         //Si c'est pas la première machine on retire juste les choix pour la machine en cours
         setCafe((prev) => ({
@@ -223,17 +209,6 @@ const CafeEspaceForm = ({
               : item,
           ),
         }));
-        setTotalCafe((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) =>
-            item.espaceId === espace.infos.espaceId
-              ? {
-                  ...item,
-                  total: null,
-                  totalInstallation: null,
-                }
-              : item,
-          ),
-        }));
       }
       return;
     }
@@ -243,11 +218,6 @@ const CafeEspaceForm = ({
     const prixInstal = machinesTarifFournisseur.fraisInstallation;
     const prixMaintenance = machinesTarifFournisseur.paMaintenance;
     const nbPassagesParAn = machinesTarifFournisseur?.nbPassages ?? null;
-    const totalLoc =
-      prixLoc !== null && prixMaintenance !== null
-        ? prixLoc + prixMaintenance
-        : null;
-    const totalInstallation = prixInstal !== null ? prixInstal : null;
 
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
@@ -294,16 +264,6 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoSucre =
       consoSucreTarifFournisseur?.prixUnitaire ?? null;
 
-    const totalConso =
-      (prixUnitaireConsoCafe ?? 0) * nbTassesParAn +
-      (prixUnitaireConsoSucre ?? 0) * nbTassesParAn * RATIO_SUCRE +
-      (value !== "cafe"
-        ? (prixUnitaireConsoLait ?? 0) * nbTassesParAn * RATIO_LAIT
-        : 0) +
-      (value === "chocolat"
-        ? (prixUnitaireConsoChocolat ?? 0) * nbTassesParAn * RATIO_CHOCO
-        : 0);
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = machinesTarifFournisseur
       ? (cafeMachines?.find(
@@ -350,20 +310,6 @@ const CafeEspaceForm = ({
           : item,
       ),
     }));
-    //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.gammeCafeSelected) {
-      setTotalCafe((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation: totalInstallation,
-              }
-            : item,
-        ),
-      }));
-    }
   };
 
   const updateCafeEspace = (newNbPersonnes: number) => {
@@ -377,7 +323,6 @@ const CafeEspaceForm = ({
     //           : effectif),
     //   0
     // );
-    const newNbTassesParAn = newNbPersonnes * 400;
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.entrepriseId) {
       setCafe((prev) => ({
@@ -471,16 +416,6 @@ const CafeEspaceForm = ({
             prixUnitaire: null,
           },
         }));
-        setTotalCafe((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) => ({
-            ...item,
-            total: null,
-            totalInstallation: null,
-          })),
-        }));
-        setTotalThe({
-          totalService: null,
-        });
       } else {
         //Si c'est pas la première machine on retire juste les choix pour la machine en cours
         setCafe((prev) => ({
@@ -514,17 +449,6 @@ const CafeEspaceForm = ({
               : item,
           ),
         }));
-        setTotalCafe((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) =>
-            item.espaceId === espace.infos.espaceId
-              ? {
-                  ...item,
-                  total: null,
-                  totalInstallation: null,
-                }
-              : item,
-          ),
-        }));
       }
       return;
     }
@@ -534,11 +458,6 @@ const CafeEspaceForm = ({
     const prixInstal = machinesTarifFournisseur.fraisInstallation;
     const prixMaintenance = machinesTarifFournisseur.paMaintenance;
     const nbPassagesParAn = machinesTarifFournisseur?.nbPassages ?? null;
-    const totalLoc =
-      prixLoc !== null && prixMaintenance !== null
-        ? prixLoc + prixMaintenance
-        : null;
-    const totalInstallation = prixInstal !== null ? prixInstal : null;
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
@@ -588,17 +507,6 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoSucre =
       consoSucreTarifFournisseur?.prixUnitaire ?? null;
 
-    const totalConso =
-      (prixUnitaireConsoCafe ?? 0) * newNbTassesParAn +
-      (prixUnitaireConsoSucre ?? 0) * newNbTassesParAn * RATIO_SUCRE +
-      (espace.infos.typeBoissons !== "cafe"
-        ? (prixUnitaireConsoLait ?? 0) * newNbTassesParAn * RATIO_LAIT
-        : 0) +
-      (espace.infos.typeBoissons === "chocolat"
-        ? (prixUnitaireConsoChocolat ?? 0) * newNbTassesParAn * RATIO_CHOCO
-        : 0);
-    const totalAnnuel =
-      newNbPersonnes && totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = machinesTarifFournisseur
       ? (cafeMachines?.find(
@@ -646,20 +554,6 @@ const CafeEspaceForm = ({
           : item,
       ),
     }));
-    //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.gammeCafeSelected) {
-      setTotalCafe((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation,
-              }
-            : item,
-        ),
-      }));
-    }
   };
 
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
@@ -786,16 +680,6 @@ const CafeEspaceForm = ({
           prixUnitaire: null,
         },
       }));
-      setTotalCafe((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) => ({
-          ...item,
-          total: null,
-          totalInstallation: null,
-        })),
-      }));
-      setTotalThe({
-        totalService: null,
-      });
       return;
     }
     //Le fournisseur a des tarifs pour ces critères ! On reprend le calcul
@@ -804,11 +688,6 @@ const CafeEspaceForm = ({
     const prixInstal = machinesTarifFournisseur.fraisInstallation;
     const prixMaintenance = machinesTarifFournisseur.paMaintenance;
     const nbPassagesParAn = machinesTarifFournisseur?.nbPassages ?? null;
-    const totalLoc =
-      prixLoc !== null && prixMaintenance !== null
-        ? prixLoc + prixMaintenance
-        : null;
-    const totalInstallation = prixInstal !== null ? prixInstal : null;
 
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
@@ -855,16 +734,6 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoSucre =
       consoSucreTarifFournisseur?.prixUnitaire ?? null;
 
-    const totalConso =
-      (prixUnitaireConsoCafe ?? 0) * nbTassesParAn +
-      (prixUnitaireConsoSucre ?? 0) * nbTassesParAn * RATIO_SUCRE +
-      (value !== "cafe"
-        ? (prixUnitaireConsoLait ?? 0) * nbTassesParAn * RATIO_LAIT
-        : 0) +
-      (value === "chocolat"
-        ? (prixUnitaireConsoChocolat ?? 0) * nbTassesParAn * RATIO_CHOCO
-        : 0);
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = machinesTarifFournisseur
       ? (cafeMachines?.find(
@@ -914,20 +783,6 @@ const CafeEspaceForm = ({
           : item,
       ),
     }));
-    //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.gammeCafeSelected) {
-      setTotalCafe((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation: totalInstallation,
-              }
-            : item,
-        ),
-      }));
-    }
   };
 
   return isTabletOrMobile ? (

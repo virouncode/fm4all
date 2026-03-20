@@ -1,15 +1,24 @@
 import { MARGE } from "@/constants/constants";
+import { calcCafeTotaux } from "@/lib/devis/calc-cafe";
+import { calcSnacksFruitsTotaux } from "@/lib/devis/calc-snacks-fruits";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
-import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 const TotalSnacksFruits = () => {
   const t = useTranslations("Total");
   const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
-  const totalSnacksFruits = useTotalSnacksFruitsStore(
-    (s) => s.totalSnacksFruits,
+  const cafe = useCafeStore((s) => s.cafe);
+  const totalCafe = useMemo(() => calcCafeTotaux(cafe), [cafe]);
+  const totalCafeAnnuel = totalCafe.totalEspaces
+    .map(({ total }) => total ?? 0)
+    .reduce((acc, curr) => acc + curr, 0);
+  const totalSnacksFruits = useMemo(
+    () => calcSnacksFruitsTotaux(snacksFruits, totalCafeAnnuel),
+    [snacksFruits, totalCafeAnnuel],
   );
   const totalFruits = totalSnacksFruits.totalFruits;
   const totalSnacks = totalSnacksFruits.totalSnacks;
@@ -21,10 +30,6 @@ const TotalSnacksFruits = () => {
     totalSansRemise && total && totalSansRemise !== total
       ? totalSansRemise - total
       : null;
-
-  if (remiseSiCafe && totalSansRemise) {
-    total = totalSansRemise - remiseSiCafe;
-  }
 
   const color = getFm4AllColor(snacksFruits.infos.gammeSelected);
 
@@ -61,7 +66,7 @@ const TotalSnacksFruits = () => {
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
-              <p>{t("fruits")}</p>
+              <p>{t("boissons")}</p>
               <p className="text-end">
                 {formatNumber(Math.round(totalBoissons * MARGE))}{" "}
                 {t("eur-ht-an")}

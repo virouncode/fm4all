@@ -8,21 +8,25 @@ import {
   fontaines,
   fontainesTarifs,
 } from "@/db/schema";
+import { getGlobalTag } from "@/lib/data-cache";
 import { selectFontainesModelesSchema } from "@/zod-schemas/fontainesModeles.schema";
 import { selectFontainesTarifsSchema } from "@/zod-schemas/fontainesTarifs.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getFontainesTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("fontainesTarifs"));
   try {
     const results = await db
       .select({
         ...getTableColumns(fontainesTarifs),
         nomPrestataire: entreprises.nom,
-        sloganPrestataire: entrepriseInfos.slogan,
+        slogan: entrepriseInfos.slogan,
         logoStorageKey: documents.storageKey,
         anneeCreation: entrepriseInfos.anneeCreation,
         ca: entrepriseInfos.ca,
-        effectifFournisseur: entrepriseInfos.effectif,
+        effectif: entrepriseInfos.effectif,
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
@@ -72,6 +76,8 @@ export const getFontainesTarifs = async () => {
 };
 
 export const getFontaines = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("fontaines"));
   try {
     const results = await db.select().from(fontaines);
     if (results.length === 0) return [];

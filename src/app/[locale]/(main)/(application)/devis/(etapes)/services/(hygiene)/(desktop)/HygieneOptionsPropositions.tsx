@@ -1,7 +1,6 @@
 import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 import { gammes } from "@/zod-schemas/gamme.schema";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs.schema";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
@@ -37,7 +36,6 @@ const HygieneOptionsPropositions = ({
     })),
   );
   const prospect = useProspectStore((s) => s.prospect);
-  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
   //Formatter les propositions d'options en hygiene
   const nbDistribDesinfectant =
     hygiene.quantites.nbDistribDesinfectant ??
@@ -189,10 +187,6 @@ const HygieneOptionsPropositions = ({
               paParPersonneDesinfectant: null,
             },
           }));
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalDesinfectant: null,
-          }));
           return;
         }
         setHygiene((prev) => ({
@@ -207,10 +201,6 @@ const HygieneOptionsPropositions = ({
             paParPersonneDesinfectant,
           },
         }));
-        setTotalHygiene((prev) => ({
-          ...prev,
-          totalDesinfectant,
-        }));
         return;
       case "parfum":
         if (hygiene.infos.parfumGammeSelected === gamme) {
@@ -221,10 +211,6 @@ const HygieneOptionsPropositions = ({
               ...prev.prix,
               prixDistribParfum: null,
             },
-          }));
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalParfum: null,
           }));
           return;
         }
@@ -239,10 +225,6 @@ const HygieneOptionsPropositions = ({
             prixDistribParfum,
           },
         }));
-        setTotalHygiene((prev) => ({
-          ...prev,
-          totalParfum,
-        }));
         return;
       case "balai":
         if (hygiene.infos.balaiGammeSelected === gamme) {
@@ -254,10 +236,6 @@ const HygieneOptionsPropositions = ({
               prixDistribBalai: null,
             },
           }));
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalBalai: null,
-          }));
           return;
         }
         setHygiene((prev) => ({
@@ -267,10 +245,6 @@ const HygieneOptionsPropositions = ({
             ...prev.prix,
             prixDistribBalai,
           },
-        }));
-        setTotalHygiene((prev) => ({
-          ...prev,
-          totalBalai,
         }));
         return;
       case "poubelle":
@@ -283,10 +257,6 @@ const HygieneOptionsPropositions = ({
               prixDistribPoubelle: null,
             },
           }));
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalPoubelle: null,
-          }));
           return;
         }
         setHygiene((prev) => ({
@@ -296,10 +266,6 @@ const HygieneOptionsPropositions = ({
             ...prev.prix,
             prixDistribPoubelle,
           },
-        }));
-        setTotalHygiene((prev) => ({
-          ...prev,
-          totalPoubelle,
         }));
         return;
     }
@@ -322,27 +288,6 @@ const HygieneOptionsPropositions = ({
             nbDistribDesinfectant: newNbDistribDesinfectant,
           },
         }));
-        if (hygiene.infos.desinfectantGammeSelected) {
-          const prixDistribDesinfectant =
-            hygieneDistribTarifsFournisseur.find(
-              (tarif) =>
-                tarif.type === "desinfectant" &&
-                tarif.gamme === hygiene.infos.desinfectantGammeSelected,
-            )?.[dureeLocation] ?? null;
-
-          const totalDesinfectant =
-            newNbDistribDesinfectant &&
-            prixDistribDesinfectant !== null &&
-            paParPersonneDesinfectant !== null &&
-            newNbDistribDesinfectant
-              ? newNbDistribDesinfectant * prixDistribDesinfectant +
-                paParPersonneDesinfectant * (prospect.effectif ?? 0)
-              : null;
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalDesinfectant,
-          }));
-        }
         return;
       case "parfum":
         let newNbDistribParfum = value ? parseInt(value) : 0;
@@ -355,23 +300,6 @@ const HygieneOptionsPropositions = ({
             nbDistribParfum: newNbDistribParfum,
           },
         }));
-        if (hygiene.infos.parfumGammeSelected) {
-          const prixDistribParfum =
-            hygieneDistribTarifsFournisseur.find(
-              (tarif) =>
-                tarif.type === "parfum" &&
-                tarif.gamme === hygiene.infos.parfumGammeSelected,
-            )?.[dureeLocation] ?? null;
-
-          const totalParfum =
-            newNbDistribParfum && prixDistribParfum !== null
-              ? newNbDistribParfum * prixDistribParfum
-              : null;
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalParfum,
-          }));
-        }
         return;
 
       case "balai":
@@ -385,23 +313,6 @@ const HygieneOptionsPropositions = ({
             nbDistribBalai: newNbDistribBalai,
           },
         }));
-        if (hygiene.infos.balaiGammeSelected) {
-          const prixDistribBalai =
-            hygieneDistribTarifsFournisseur.find(
-              (tarif) =>
-                tarif.type === "balai" &&
-                tarif.gamme === hygiene.infos.balaiGammeSelected,
-            )?.[dureeLocation] ?? null;
-
-          const totalBalai =
-            newNbDistribBalai && prixDistribBalai !== null
-              ? newNbDistribBalai * prixDistribBalai
-              : null;
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalBalai,
-          }));
-        }
         return;
 
       case "poubelle":
@@ -415,23 +326,6 @@ const HygieneOptionsPropositions = ({
             nbDistribPoubelle: newNbDistribPoubelle,
           },
         }));
-        if (hygiene.infos.poubelleGammeSelected) {
-          const prixDistribPoubelle =
-            hygieneDistribTarifsFournisseur.find(
-              (tarif) =>
-                tarif.type === "poubelle" &&
-                tarif.gamme === hygiene.infos.poubelleGammeSelected,
-            )?.[dureeLocation] ?? null;
-
-          const totalPoubelle =
-            newNbDistribPoubelle && prixDistribPoubelle !== null
-              ? newNbDistribPoubelle * prixDistribPoubelle
-              : null;
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalPoubelle,
-          }));
-        }
         return;
     }
   };
@@ -448,7 +342,6 @@ const HygieneOptionsPropositions = ({
       handleChangeDistribNbr={handleChangeDistribNbr}
       propositions={propositions}
       handleClickProposition={handleClickProposition}
-      hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
     />
   ) : (
     <HygieneDesktopOptionsPropositions

@@ -5,7 +5,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useRef } from "react";
@@ -24,7 +23,6 @@ const PersonnaliserNettoyageVitrerie = () => {
       setNettoyage: s.setNettoyage,
     })),
   );
-  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
   const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
     useShallow((s) => ({
       personnalisation: s.personnalisation,
@@ -41,31 +39,8 @@ const PersonnaliserNettoyageVitrerie = () => {
   };
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
-    const tauxHoraireVitrerie = nettoyage.prix.tauxHoraireVitrerie;
-    const cadenceVitres = nettoyage.quantites.cadenceVitres;
-    const cadenceCloisons = nettoyage.quantites.cadenceCloisons;
-    const nbPassagesVitrerie = nettoyage.quantites.nbPassagesVitrerie;
-    const minFacturationVitrerie = nettoyage.prix.minFacturationVitrerie;
     const newSurface = value ? parseInt(value) : (prospect.surface ?? 0) * 0.15;
     if (name === "vitres") {
-      const surfaceCloisons = nettoyage.quantites.surfaceCloisons;
-      const totalVitrerieParPassage =
-        cadenceVitres !== null &&
-        surfaceCloisons !== null &&
-        cadenceCloisons !== null &&
-        tauxHoraireVitrerie !== null
-          ? Math.max(
-              (newSurface / cadenceVitres + surfaceCloisons / cadenceCloisons) *
-                tauxHoraireVitrerie,
-              minFacturationVitrerie ?? 0,
-            )
-          : null;
-
-      const totalVitrerie =
-        totalVitrerieParPassage !== null
-          ? nbPassagesVitrerie * totalVitrerieParPassage
-          : null;
-
       setNettoyage((prev) => ({
         ...prev,
         quantites: {
@@ -73,24 +48,7 @@ const PersonnaliserNettoyageVitrerie = () => {
           surfaceVitres: newSurface,
         },
       }));
-      setTotalNettoyage((prev) => ({ ...prev, totalVitrerie }));
     } else if (name === "cloisons") {
-      const surfaceVitres = nettoyage.quantites.surfaceVitres;
-      const totalVitrerieParPassage =
-        cadenceVitres !== null &&
-        surfaceVitres !== null &&
-        cadenceCloisons !== null &&
-        tauxHoraireVitrerie !== null
-          ? Math.max(
-              (surfaceVitres / cadenceVitres + newSurface / cadenceCloisons) *
-                tauxHoraireVitrerie,
-              minFacturationVitrerie ?? 0,
-            )
-          : null;
-      const totalVitrerie =
-        totalVitrerieParPassage !== null
-          ? nbPassagesVitrerie * totalVitrerieParPassage
-          : null;
       setNettoyage((prev) => ({
         ...prev,
         quantites: {
@@ -98,7 +56,6 @@ const PersonnaliserNettoyageVitrerie = () => {
           surfaceCloisons: newSurface,
         },
       }));
-      setTotalNettoyage((prev) => ({ ...prev, totalVitrerie }));
     }
   };
   const handleChangePleinPied = (value: string) => {

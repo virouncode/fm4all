@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -18,43 +17,12 @@ type HygieneMobileOptionsParfumInputProps = {
     type: HygieneOptionsType,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
-  hygieneDistribTarifsFournisseur: {
-    id: string;
-    effectif: string | null;
-    createdAt: Date;
-    type:
-      | "emp"
-      | "poubelleEmp"
-      | "savon"
-      | "ph"
-      | "desinfectant"
-      | "parfum"
-      | "balai"
-      | "poubelle";
-    nomPrestataire: string;
-    slogan: string | null;
-    logoStorageKey: string | null;
-
-    anneeCreation: number | null;
-    ca: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    entrepriseId: string;
-    gamme: "essentiel" | "confort" | "excellence";
-    oneShot: number | null;
-    pa12M: number | null;
-    pa24M: number | null;
-    pa36M: number | null;
-
-  }[];
 };
 
 const HygieneMobileOptionsParfumInput = ({
   nbDistribParfum,
   handleChangeDistribNbr,
   hygieneDistribQuantite,
-  hygieneDistribTarifsFournisseur,
 }: HygieneMobileOptionsParfumInputProps) => {
   const t = useTranslations("DevisPage");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
@@ -64,8 +32,6 @@ const HygieneMobileOptionsParfumInput = ({
       setHygiene: s.setHygiene,
     })),
   );
-  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
-
   const handleIncrement = () => {
     let newNbDistribParfum = nbDistribParfum + 1;
     if (newNbDistribParfum > MAX_NB_DISTRIB)
@@ -77,23 +43,6 @@ const HygieneMobileOptionsParfumInput = ({
         nbDistribParfum: newNbDistribParfum,
       },
     }));
-    if (hygiene.infos.parfumGammeSelected) {
-      const prixDistribParfum =
-        hygieneDistribTarifsFournisseur.find(
-          (tarif) =>
-            tarif.type === "parfum" &&
-            tarif.gamme === hygiene.infos.parfumGammeSelected,
-        )?.[hygiene.infos.dureeLocation] ?? null;
-
-      const totalParfum =
-        newNbDistribParfum && prixDistribParfum !== null
-          ? newNbDistribParfum * prixDistribParfum
-          : null;
-      setTotalHygiene((prev) => ({
-        ...prev,
-        totalParfum,
-      }));
-    }
   };
   const handleDecrement = () => {
     let newNbDistribParfum = nbDistribParfum - 1;
@@ -105,23 +54,6 @@ const HygieneMobileOptionsParfumInput = ({
         nbDistribParfum: newNbDistribParfum,
       },
     }));
-    if (hygiene.infos.parfumGammeSelected) {
-      const prixDistribParfum =
-        hygieneDistribTarifsFournisseur.find(
-          (tarif) =>
-            tarif.type === "parfum" &&
-            tarif.gamme === hygiene.infos.parfumGammeSelected,
-        )?.[hygiene.infos.dureeLocation] ?? null;
-
-      const totalParfum =
-        newNbDistribParfum && prixDistribParfum !== null
-          ? newNbDistribParfum * prixDistribParfum
-          : null;
-      setTotalHygiene((prev) => ({
-        ...prev,
-        totalParfum,
-      }));
-    }
   };
 
   return (

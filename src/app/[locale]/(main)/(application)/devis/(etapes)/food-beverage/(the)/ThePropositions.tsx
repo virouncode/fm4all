@@ -4,7 +4,6 @@ import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTheStore } from "@/stores/devis/theStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { GammeType } from "@/zod-schemas/gamme.schema";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs.schema";
 import { useTranslations } from "next-intl";
@@ -29,8 +28,6 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       setThe: s.setThe,
     })),
   );
-  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
-  const resetTotalThe = useTotalTheStore((s) => s.reset);
   const effectif = prospect.effectif ?? 0;
 
   //Calcul des propositions
@@ -59,7 +56,6 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   };
 
   const updateThe = (newNbPersonnes: number) => {
-    const nbThesParAn = newNbPersonnes * 400;
     const prixUnitaire =
       theConsoTarifs.find(
         (tarif) =>
@@ -67,11 +63,6 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           tarif.entrepriseId === cafe.infos.entrepriseId &&
           tarif.gamme === the.infos.gammeSelected,
       )?.prixUnitaire ?? null;
-    const totalAnnuel =
-      newNbPersonnes && prixUnitaire !== null
-        ? nbThesParAn * prixUnitaire
-        : null;
-
     setThe((prev) => ({
       ...prev,
       quantites: {
@@ -84,11 +75,6 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           : prev.prix.prixUnitaire,
       },
     }));
-    if (the.infos.gammeSelected) {
-      setTotalThe({
-        totalService: totalAnnuel,
-      });
-    }
   };
 
   const handleIncrement = () => {
@@ -130,7 +116,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     totalAnnuel: number | null;
     infos: string | null;
   }) => {
-    const { gamme, totalAnnuel, prixUnitaire } = proposition;
+    const { gamme, prixUnitaire } = proposition;
     if (the.infos.gammeSelected === gamme) {
       setThe((prev) => ({
         ...prev,
@@ -142,7 +128,6 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           prixUnitaire: null,
         },
       }));
-      resetTotalThe();
       return;
     }
     setThe((prev) => ({
@@ -155,9 +140,6 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
         prixUnitaire: prixUnitaire,
       },
     }));
-    setTotalThe({
-      totalService: totalAnnuel,
-    });
   };
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 

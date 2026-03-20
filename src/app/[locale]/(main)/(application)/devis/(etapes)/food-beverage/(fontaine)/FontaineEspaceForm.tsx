@@ -6,7 +6,6 @@ import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
 import { DureeLocationFontaineType } from "@/zod-schemas/dureeLocation.schema";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
@@ -38,7 +37,6 @@ const FontaineEspaceForm = ({
       setFontaines: s.setFontaines,
     })),
   );
-  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId,
   );
@@ -138,13 +136,6 @@ const FontaineEspaceForm = ({
                 },
           ),
         }));
-        setTotalFontaines((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) => ({
-            ...item,
-            total: null,
-            totalInstallation: null,
-          })),
-        }));
       } else {
         //Si c'est pas la première machine on retire juste les choix pour la machine en cours
         setFontaines((prev) => ({
@@ -173,17 +164,6 @@ const FontaineEspaceForm = ({
               : item,
           ),
         }));
-        setTotalFontaines((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) =>
-            item.espaceId === espace.infos.espaceId
-              ? {
-                  ...item,
-                  total: null,
-                  totalInstallation: null,
-                }
-              : item,
-          ),
-        }));
       }
       return;
     }
@@ -191,24 +171,12 @@ const FontaineEspaceForm = ({
     const prixLoc = fontainesTarifFournisseur[fontaines.infos.dureeLocation];
     const prixInstal = fontainesTarifFournisseur.fraisInstallation;
     const prixMaintenance = fontainesTarifFournisseur.paMaintenance;
-    const totalLoc =
-      prixLoc !== null && prixMaintenance !== null
-        ? prixLoc + prixMaintenance
-        : null;
-    const totalInstallation = prixInstal !== null ? prixInstal : null;
 
     const prixUnitaireConsoFiltres =
       fontainesTarifFournisseur.paConsoFiltres ?? null;
     const prixUnitaireConsoCO2 = fontainesTarifFournisseur.paConsoCO2 ?? null;
     const prixUnitaireConsoEauChaude =
       fontainesTarifFournisseur.paConsoEauChaude ?? null;
-
-    const totalConso =
-      ((prixUnitaireConsoFiltres ?? 0) +
-        (prixUnitaireConsoCO2 ?? 0) +
-        (prixUnitaireConsoEauChaude ?? 0)) *
-      nbPersonnes;
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
@@ -249,20 +217,6 @@ const FontaineEspaceForm = ({
           : item,
       ),
     }));
-    //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.poseSelected) {
-      setTotalFontaines((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation: totalInstallation,
-              }
-            : item,
-        ),
-      }));
-    }
   };
 
   const updateFontaineEspace = (newNbPersonnes: number) => {
@@ -351,13 +305,6 @@ const FontaineEspaceForm = ({
                 },
           ),
         }));
-        setTotalFontaines((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) => ({
-            ...item,
-            total: null,
-            totalInstallation: null,
-          })),
-        }));
       } else {
         //Si c'est pas la première machine on retire juste les choix pour la machine en cours
         setFontaines((prev) => ({
@@ -388,17 +335,6 @@ const FontaineEspaceForm = ({
               : item,
           ),
         }));
-        setTotalFontaines((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) =>
-            item.espaceId === espace.infos.espaceId
-              ? {
-                  ...item,
-                  total: null,
-                  totalInstallation: null,
-                }
-              : item,
-          ),
-        }));
       }
       return;
     }
@@ -406,24 +342,11 @@ const FontaineEspaceForm = ({
     const prixLoc = fontainesTarifFournisseur[fontaines.infos.dureeLocation];
     const prixInstal = fontainesTarifFournisseur.fraisInstallation;
     const prixMaintenance = fontainesTarifFournisseur.paMaintenance;
-    const totalLoc =
-      prixLoc !== null && prixMaintenance !== null
-        ? prixLoc + prixMaintenance
-        : null;
-    const totalInstallation = prixInstal !== null ? prixInstal : null;
     const prixUnitaireConsoFiltres =
       fontainesTarifFournisseur.paConsoFiltres ?? null;
     const prixUnitaireConsoCO2 = fontainesTarifFournisseur.paConsoCO2 ?? null;
     const prixUnitaireConsoEauChaude =
       fontainesTarifFournisseur.paConsoEauChaude ?? null;
-
-    const totalConso =
-      ((prixUnitaireConsoFiltres ?? 0) +
-        (prixUnitaireConsoCO2 ?? 0) +
-        (prixUnitaireConsoEauChaude ?? 0)) *
-      newNbPersonnes;
-
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
@@ -468,20 +391,6 @@ const FontaineEspaceForm = ({
           : item,
       ),
     }));
-    //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.poseSelected) {
-      setTotalFontaines((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation,
-              }
-            : item,
-        ),
-      }));
-    }
   };
 
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
@@ -600,13 +509,6 @@ const FontaineEspaceForm = ({
               },
         ),
       }));
-      setTotalFontaines((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) => ({
-          ...item,
-          total: null,
-          totalInstallation: null,
-        })),
-      }));
       return;
     }
     //Le fournisseur a des tarifs pour ces critères ! On reprend le calcul
@@ -614,24 +516,12 @@ const FontaineEspaceForm = ({
       fontainesTarifFournisseur[value as DureeLocationFontaineType];
     const prixInstal = fontainesTarifFournisseur.fraisInstallation;
     const prixMaintenance = fontainesTarifFournisseur.paMaintenance;
-    const totalLoc =
-      prixLoc !== null && prixMaintenance !== null
-        ? prixLoc + prixMaintenance
-        : null;
-    const totalInstallation = prixInstal !== null ? prixInstal : null;
 
     const prixUnitaireConsoFiltres =
       fontainesTarifFournisseur.paConsoFiltres ?? null;
     const prixUnitaireConsoCO2 = fontainesTarifFournisseur.paConsoCO2 ?? null;
     const prixUnitaireConsoEauChaude =
       fontainesTarifFournisseur.paConsoEauChaude ?? null;
-    const totalConso =
-      ((prixUnitaireConsoFiltres ?? 0) +
-        (prixUnitaireConsoCO2 ?? 0) +
-        (prixUnitaireConsoEauChaude ?? 0)) *
-      nbPersonnes;
-
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
@@ -675,20 +565,6 @@ const FontaineEspaceForm = ({
           : item,
       ),
     }));
-    //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.poseSelected) {
-      setTotalFontaines((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation: totalInstallation,
-              }
-            : item,
-        ),
-      }));
-    }
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

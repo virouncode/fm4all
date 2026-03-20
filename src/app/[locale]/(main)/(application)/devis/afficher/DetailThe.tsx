@@ -8,15 +8,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
+import { calcTheTotaux } from "@/lib/devis/calc-the";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useTheStore } from "@/stores/devis/theStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
+import { useMemo } from "react";
 
 const DetailThe = () => {
   const cafe = useCafeStore((s) => s.cafe);
   const the = useTheStore((s) => s.the);
-  const totalThe = useTotalTheStore((s) => s.totalThe);
+  const totalThe = useMemo(() => calcTheTotaux(the), [the]);
   if (!totalThe.totalService) return null;
 
   return (

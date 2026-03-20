@@ -3,11 +3,10 @@ import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
+import { calcCafeTotaux } from "@/lib/devis/calc-cafe";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
-import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites.schema";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs.schema";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs.schema";
@@ -43,15 +42,11 @@ const SnacksFruitsForm = ({
   const t = useTranslations("DevisPage");
   const prospect = useProspectStore((s) => s.prospect);
   const cafe = useCafeStore((s) => s.cafe);
-  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
   const { snacksFruits, setSnacksFruits } = useSnacksFruitsStore(
     useShallow((s) => ({
       snacksFruits: s.snacksFruits,
       setSnacksFruits: s.setSnacksFruits,
     })),
-  );
-  const setTotalSnacksFruits = useTotalSnacksFruitsStore(
-    (s) => s.setTotalSnacksFruits,
   );
   const effectif = prospect.effectif ?? 0;
   const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
@@ -157,10 +152,6 @@ const SnacksFruitsForm = ({
         boissonsConsosParSemaine !== null
           ? prixUnitaireBoissons * boissonsConsosParSemaine
           : 0;
-      const totalFruits = 52 * panierFruits;
-      const totalSnacks = 52 * panierSnacks;
-      const totalBoissons = 52 * panierBoissons;
-
       //Prix livraison / panier
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
         ({ entrepriseId }) =>
@@ -169,20 +160,20 @@ const SnacksFruitsForm = ({
       const remiseSiCafe = isSamePrestataire
         ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
         : 0;
-      const prixPanierSansRemise = panierFruits + panierSnacks + panierBoissons;
       const prixPanier =
         (1 - remiseSiCafe / 100) *
         (panierFruits + panierSnacks + panierBoissons);
 
       const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
+      const totalCafeEspaces = calcCafeTotaux(cafe).totalEspaces;
+      const totalCafeAnnuel =
+        totalCafeEspaces.length > 0
+          ? totalCafeEspaces
+              .map(({ total }) => total ?? 0)
+              .reduce((acc, curr) => acc + curr, 0)
+          : 0;
       const isPanierMin =
-        panierMin === null ||
-        prixPanier +
-          totalCafe.totalEspaces
-            .map(({ total }) => total ?? 0)
-            .reduce((acc, curr) => acc + curr, 0) /
-            12 >=
-          panierMin;
+        panierMin === null || prixPanier + totalCafeAnnuel / 12 >= panierMin;
 
       const prixUnitaireLivraisonSiCafe = isPanierMin
         ? (fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null)
@@ -203,17 +194,6 @@ const SnacksFruitsForm = ({
           ? fraisLivraisonPanier
           : 0
         : null;
-      const totalLivraison =
-        fraisLivraisonPanier !== null ? fraisLivraisonPanier * 52 : null;
-      const total =
-        fraisLivraisonPanier !== null && newNbPersonnes
-          ? 52 * (prixPanier + fraisLivraisonPanier)
-          : null;
-      const totalSansRemise =
-        fraisLivraisonPanier !== null && newNbPersonnes
-          ? 52 * (prixPanierSansRemise + fraisLivraisonPanier)
-          : null;
-
       setSnacksFruits((prev) => ({
         ...prev,
         quantites: {
@@ -233,14 +213,6 @@ const SnacksFruitsForm = ({
           panierMin,
         },
       }));
-      setTotalSnacksFruits({
-        totalFruits,
-        totalSnacks,
-        totalBoissons,
-        totalLivraison,
-        total,
-        totalSansRemise,
-      });
     } else {
       setSnacksFruits((prev) => ({
         ...prev,
@@ -294,85 +266,7 @@ const SnacksFruitsForm = ({
     }));
 
     if (newChoix.length === 0) {
-      setTotalSnacksFruits((prev) => ({
-        ...prev,
-        totalFruits: null,
-        totalSnacks: null,
-        totalBoissons: null,
-        totalLivraison: null,
-        total: null,
-      }));
       return;
-    }
-    if (snacksFruits.infos.gammeSelected && snacksFruits.infos.entrepriseId) {
-      const panierFruits =
-        newChoix.includes("fruits") &&
-        snacksFruits.quantites.fruitsKgParSemaine !== null
-          ? (snacksFruits.prix.prixKgFruits ?? 0) *
-            snacksFruits.quantites.fruitsKgParSemaine
-          : 0;
-      const panierSnacks =
-        newChoix.includes("snacks") &&
-        snacksFruits.quantites.snacksPortionsParSemaine !== null
-          ? (snacksFruits.prix.prixUnitaireSnacks ?? 0) *
-            snacksFruits.quantites.snacksPortionsParSemaine
-          : 0;
-      const panierBoissons =
-        newChoix.includes("boissons") &&
-        snacksFruits.quantites.boissonsConsosParSemaine !== null
-          ? (snacksFruits.prix.prixUnitaireBoissons ?? 0) *
-            snacksFruits.quantites.boissonsConsosParSemaine
-          : 0;
-      const totalFruits = 52 * panierFruits;
-      const totalSnacks = 52 * panierSnacks;
-      const totalBoissons = 52 * panierBoissons;
-
-      const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
-        (tarif) => tarif.entrepriseId === snacksFruits.infos.entrepriseId,
-      );
-      const isSamePrestataire =
-        snacksFruits.infos.entrepriseId === cafe.infos.entrepriseId;
-      const remiseSiCafe = isSamePrestataire
-        ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
-        : 0;
-      const prixPanierSansRemise = panierFruits + panierSnacks + panierBoissons;
-      const prixPanier =
-        (1 - remiseSiCafe / 100) *
-        (panierFruits + panierSnacks + panierBoissons);
-      const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
-      const isPanierMin = panierMin === null || prixPanier >= panierMin;
-
-      let fraisLivraisonPanier = snacksFruits.infos.isSamePrestataire
-        ? snacksFruits.prix.prixUnitaireLivraisonSiCafe
-        : snacksFruits.prix.prixUnitaireLivraison;
-
-      const seuilFranco = snacksFruits.prix.seuilFranco ?? 0;
-
-      fraisLivraisonPanier = isPanierMin
-        ? prixPanier < seuilFranco
-          ? fraisLivraisonPanier
-          : 0
-        : null;
-      const totalLivraison =
-        fraisLivraisonPanier !== null ? fraisLivraisonPanier * 52 : null;
-      const total =
-        fraisLivraisonPanier !== null && nbPersonnes
-          ? 52 * (prixPanier + fraisLivraisonPanier)
-          : null;
-      const totalSansRemise =
-        fraisLivraisonPanier !== null && nbPersonnes
-          ? 52 * (prixPanierSansRemise + fraisLivraisonPanier)
-          : null;
-
-      setTotalSnacksFruits((prev) => ({
-        ...prev,
-        totalFruits,
-        totalSnacks,
-        totalBoissons,
-        totalLivraison,
-        total,
-        totalSansRemise,
-      }));
     }
   };
   return isTabletOrMobile ? (

@@ -66,36 +66,6 @@ type HygieneMobileOptionsPoubelleProps = {
       imageUrlPoubelle: string | null;
     },
   ) => void;
-  hygieneDistribTarifsFournisseur: {
-    id: string;
-    effectif: string | null;
-    createdAt: Date;
-    type:
-      | "emp"
-      | "poubelleEmp"
-      | "savon"
-      | "ph"
-      | "desinfectant"
-      | "parfum"
-      | "balai"
-      | "poubelle";
-    nomPrestataire: string;
-    slogan: string | null;
-    logoStorageKey: string | null;
-
-    anneeCreation: number | null;
-    ca: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    entrepriseId: string;
-    gamme: "essentiel" | "confort" | "excellence";
-    oneShot: number | null;
-    pa12M: number | null;
-    pa24M: number | null;
-    pa36M: number | null;
-
-  }[];
 };
 
 const HygieneMobileOptionsPoubelle = ({
@@ -104,7 +74,6 @@ const HygieneMobileOptionsPoubelle = ({
   handleChangeDistribNbr,
   propositions,
   handleClickProposition,
-  hygieneDistribTarifsFournisseur,
 }: HygieneMobileOptionsPoubelleProps) => {
   return (
     <>
@@ -112,7 +81,6 @@ const HygieneMobileOptionsPoubelle = ({
         nbDistribPoubelle={nbDistribPoubelle}
         handleChangeDistribNbr={handleChangeDistribNbr}
         hygieneDistribQuantite={hygieneDistribQuantite}
-        hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
       />
       <HygieneMobileOptionsPoubelleCarousel
         propositions={propositions}

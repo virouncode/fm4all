@@ -1,10 +1,6 @@
-import { MAJORATION_DIMANCHE } from "@/constants/constants";
 import { toast } from "@/hooks/use-toast";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
-import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { gammes, GammeType } from "@/zod-schemas/gamme.schema";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs.schema";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
@@ -46,7 +42,6 @@ const NettoyagePropositions = ({
 }: NettoyagePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const prospect = useProspectStore((s) => s.prospect);
   const hygiene = useHygieneStore((s) => s.hygiene);
   const { nettoyage, setNettoyage } = useNettoyageStore(
     useShallow((s) => ({
@@ -55,13 +50,6 @@ const NettoyagePropositions = ({
     })),
   );
   const setHygiene = useHygieneStore((s) => s.setHygiene);
-  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
-  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
-  const resetTotalNettoyage = useTotalNettoyageStore((s) => s.reset);
-  const resetTotalHygiene = useTotalHygieneStore((s) => s.reset);
-  const effectif = prospect.effectif ?? 0;
-  const surface = prospect.surface ?? 0;
-
   //Calcul des propositions
   const propositions = nettoyageTarifs.map((item) => {
     const {
@@ -192,7 +180,6 @@ const NettoyagePropositions = ({
           fraisDeplacementVitrerie: null,
         },
       }));
-      resetTotalNettoyage();
       setHygiene((prev) => ({
         ...prev,
         infos: {
@@ -219,7 +206,6 @@ const NettoyagePropositions = ({
           minFacturation: null,
         },
       }));
-      resetTotalHygiene();
       return;
     }
     //Je coche la proposition
@@ -233,7 +219,6 @@ const NettoyagePropositions = ({
       gamme,
       hParPassage,
       tauxHoraire,
-      totalAnnuel,
     } = proposition;
 
     if (entrepriseId !== nettoyage.infos.entrepriseId) {
@@ -260,10 +245,6 @@ const NettoyagePropositions = ({
     const fraisDeplacementVitrerie = vitrerieTarif?.fraisDeplacement ?? null;
     const cadenceVitres = vitrerieTarif?.cadenceVitres ?? null;
     const cadenceCloisons = vitrerieTarif?.cadenceCloisons ?? null;
-
-    const surfaceCloisons =
-      nettoyage.quantites.surfaceCloisons ?? surface * 0.15;
-    const surfaceVitres = nettoyage.quantites.surfaceVitres ?? surface * 0.15;
 
     setNettoyage((prev) => ({
       infos: {
@@ -292,39 +273,6 @@ const NettoyagePropositions = ({
       },
     }));
 
-    const totalRepasse =
-      nettoyage.infos.repasseSelected &&
-      freqAnnuelle !== null &&
-      hParPassageRepasse !== null &&
-      tauxHoraireRepasse !== null
-        ? freqAnnuelle * hParPassageRepasse * tauxHoraireRepasse
-        : null;
-    const totalSamedi = nettoyage.infos.samediSelected
-      ? 52 * tauxHoraire * hParPassage
-      : null;
-    const totalDimanche = nettoyage.infos.dimancheSelected
-      ? 52 * tauxHoraire * hParPassage * MAJORATION_DIMANCHE
-      : null;
-    const totalVitrerie =
-      nettoyage.infos.vitrerieSelected &&
-      cadenceVitres !== null &&
-      cadenceCloisons !== null &&
-      tauxHoraireVitrerie !== null
-        ? nettoyage.quantites.nbPassagesVitrerie *
-          Math.max(
-            (surfaceVitres / cadenceVitres) * tauxHoraireVitrerie +
-              (surfaceCloisons / cadenceCloisons) * tauxHoraireVitrerie,
-            minFacturationVitrerie ?? 0,
-          )
-        : null;
-    const totalService = totalAnnuel;
-    setTotalNettoyage({
-      totalService,
-      totalRepasse,
-      totalSamedi,
-      totalDimanche,
-      totalVitrerie,
-    });
     //HYGIENE
     const hygieneFournisseurId = entrepriseId;
     const hygieneFournisseurNom = nomPrestataire;
@@ -460,67 +408,6 @@ const NettoyagePropositions = ({
       },
     }));
 
-    const totalEmp =
-      nbDistribEmp && prixDistribEmp !== null && paParPersonneEmp !== null
-        ? nbDistribEmp * prixDistribEmp + paParPersonneEmp * effectif
-        : 0;
-
-    const totalPoubellEmp =
-      nbDistribEmpPoubelle && prixDistribEmpPoubelle !== null
-        ? nbDistribEmpPoubelle * prixDistribEmpPoubelle
-        : 0;
-
-    const totalSavon =
-      nbDistribSavon && prixDistribSavon !== null && paParPersonneSavon !== null
-        ? nbDistribSavon * prixDistribSavon + paParPersonneSavon * effectif
-        : 0;
-
-    const totalPh =
-      nbDistribPh && prixDistribPh !== null && paParPersonnePh !== null
-        ? nbDistribPh * prixDistribPh + paParPersonnePh * effectif
-        : 0;
-
-    const totalTrilogie = hygiene.infos.trilogieGammeSelected
-      ? totalEmp + totalPoubellEmp + totalSavon + totalPh || null
-      : null;
-    const totalInstallation = hygiene.infos.trilogieGammeSelected
-      ? prixInstalDistrib
-      : null;
-
-    const totalDesinfectant =
-      hygiene.infos.desinfectantGammeSelected &&
-      prixDistribDesinfectant !== null &&
-      paParPersonneDesinfectant !== null &&
-      nbDistribDesinfectant
-        ? nbDistribDesinfectant * prixDistribDesinfectant +
-          paParPersonneDesinfectant * effectif
-        : null;
-    const totalParfum =
-      hygiene.infos.parfumGammeSelected &&
-      prixDistribParfum !== null &&
-      nbDistribParfum
-        ? nbDistribParfum * prixDistribParfum
-        : null;
-    const totalBalai =
-      hygiene.infos.balaiGammeSelected &&
-      prixDistribBalai !== null &&
-      nbDistribBalai
-        ? nbDistribBalai * prixDistribBalai
-        : null;
-    const totalPoubelle =
-      hygiene.infos.poubelleGammeSelected &&
-      prixDistribPoubelle !== null &&
-      nbDistribPoubelle
-        ? nbDistribPoubelle * prixDistribPoubelle
-        : null;
-    setTotalHygiene({
-      totalTrilogie,
-      totalDesinfectant,
-      totalParfum,
-      totalBalai,
-      totalPoubelle,
-      totalInstallation,
-    });
   };
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 

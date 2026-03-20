@@ -70,34 +70,6 @@ type HygieneMobielOptionsPropositionsProps = {
       imageUrlPoubelle: string | null;
     },
   ) => void;
-  hygieneDistribTarifsFournisseur: {
-    id: string;
-    effectif: string | null;
-    createdAt: Date;
-    type:
-      | "emp"
-      | "poubelleEmp"
-      | "savon"
-      | "ph"
-      | "desinfectant"
-      | "parfum"
-      | "balai"
-      | "poubelle";
-    nomPrestataire: string;
-    slogan: string | null;
-    logoStorageKey: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    entrepriseId: string;
-    gamme: "essentiel" | "confort" | "excellence";
-    oneShot: number | null;
-    pa12M: number | null;
-    pa24M: number | null;
-    pa36M: number | null;
-  }[];
 };
 
 const HygieneMobileOptionsPropositions = ({
@@ -109,7 +81,6 @@ const HygieneMobileOptionsPropositions = ({
   handleChangeDistribNbr,
   handleClickProposition,
   propositions,
-  hygieneDistribTarifsFournisseur,
 }: HygieneMobielOptionsPropositionsProps) => {
   return (
     <div className="flex w-full flex-col gap-6">
@@ -119,7 +90,6 @@ const HygieneMobileOptionsPropositions = ({
         propositions={propositions}
         hygieneDistribQuantite={hygieneDistribQuantite}
         handleClickProposition={handleClickProposition}
-        hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
       />
       <HygieneMobileOptionsParfum
         nbDistribParfum={nbDistribParfum}
@@ -127,7 +97,6 @@ const HygieneMobileOptionsPropositions = ({
         propositions={propositions}
         hygieneDistribQuantite={hygieneDistribQuantite}
         handleClickProposition={handleClickProposition}
-        hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
       />
 
       <HygieneMobileOptionsBalai
@@ -136,7 +105,6 @@ const HygieneMobileOptionsPropositions = ({
         propositions={propositions}
         hygieneDistribQuantite={hygieneDistribQuantite}
         handleClickProposition={handleClickProposition}
-        hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
       />
 
       <HygieneMobileOptionsPoubelle
@@ -145,7 +113,6 @@ const HygieneMobileOptionsPropositions = ({
         propositions={propositions}
         hygieneDistribQuantite={hygieneDistribQuantite}
         handleClickProposition={handleClickProposition}
-        hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
       />
     </div>
   );

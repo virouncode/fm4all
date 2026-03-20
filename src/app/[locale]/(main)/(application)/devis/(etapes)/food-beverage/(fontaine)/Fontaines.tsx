@@ -5,7 +5,6 @@ import useScrollIntoFontainesEspace from "@/hooks/use-scroll-into-fontaines-espa
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs.schema";
 import { Droplets } from "lucide-react";
@@ -25,7 +24,6 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const prospect = useProspectStore((s) => s.prospect);
   const setFontaines = useFontainesStore((s) => s.setFontaines);
-  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
   const effectif = prospect.effectif ?? 0;
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
@@ -69,9 +67,6 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
         },
       ],
     }));
-    setTotalFontaines({
-      totalEspaces: [{ espaceId: 1, total: 0, totalInstallation: 0 }],
-    });
   };
 
   const propositionsRef = useRef<HTMLDivElement>(null);

@@ -17,10 +17,7 @@ type OfficeManagerMobilePropositionsProps = {
   demiJParSemaineEssentiel: number | null;
   demiJParSemaineConfort: number | null;
   demiJParSemaineExcellence: number | null;
-  handleChangeDemiJParSemaine: (
-    value: number[],
-    demiTauxJournalier: number | null,
-  ) => void;
+  handleChangeDemiJParSemaine: (value: number[]) => void;
   handleChangeRemplace: (value: string) => void;
   handleCheckPremium: (checked: boolean) => void;
   handleClickProposition: (proposition: {

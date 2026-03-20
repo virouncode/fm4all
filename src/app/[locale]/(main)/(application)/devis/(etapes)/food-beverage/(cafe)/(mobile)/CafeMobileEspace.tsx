@@ -1,9 +1,6 @@
 import { toast } from "@/hooks/use-toast";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTheStore } from "@/stores/devis/theStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine.schema";
@@ -48,9 +45,6 @@ const CafeMobileEspace = ({
       setCafe: s.setCafe,
     })),
   );
-  const setThe = useTheStore((s) => s.setThe);
-  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
-  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
 
   const handleClickRemove = () => {
@@ -68,11 +62,6 @@ const CafeMobileEspace = ({
       },
       espaces: prev.espaces.filter(
         (item) => item.infos.espaceId !== espace.infos.espaceId,
-      ),
-    }));
-    setTotalCafe((prev) => ({
-      totalEspaces: prev.totalEspaces.filter(
-        (item) => item.espaceId !== espace.infos.espaceId,
       ),
     }));
   };

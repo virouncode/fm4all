@@ -1,14 +1,15 @@
 import { MARGE } from "@/constants/constants";
+import { calcCafeTotaux } from "@/lib/devis/calc-cafe";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useCafeStore } from "@/stores/devis/cafeStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 const TotalCafe = () => {
   const t = useTranslations("Total");
   const cafe = useCafeStore((s) => s.cafe);
-  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
+  const totalCafe = useMemo(() => calcCafeTotaux(cafe), [cafe]);
   const total = totalCafe.totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);

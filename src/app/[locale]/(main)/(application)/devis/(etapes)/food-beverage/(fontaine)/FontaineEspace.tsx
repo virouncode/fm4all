@@ -1,6 +1,5 @@
 import { toast } from "@/hooks/use-toast";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
-import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs.schema";
@@ -27,7 +26,6 @@ const FontaineEspace = ({
       setFontaines: s.setFontaines,
     })),
   );
-  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId,
   );
@@ -61,9 +59,6 @@ const FontaineEspace = ({
         nbEspaces: null,
         espaces: [],
       });
-      setTotalFontaines({
-        totalEspaces: [],
-      });
       return;
     }
     const indexOfCurrentEspace = fontainesEspacesIds.indexOf(
@@ -77,11 +72,6 @@ const FontaineEspace = ({
       },
       espaces: prev.espaces.filter(
         (item) => item.infos.espaceId !== espace.infos.espaceId,
-      ),
-    }));
-    setTotalFontaines((prev) => ({
-      totalEspaces: prev.totalEspaces.filter(
-        (item) => item.espaceId !== espace.infos.espaceId,
       ),
     }));
   };

@@ -2,10 +2,14 @@ import "server-only";
 import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import { servicesFm4AllOffres, servicesFm4AllTaux } from "@/db/schema";
+import { getGlobalTag } from "@/lib/data-cache";
 import { selectServicesFm4AllOffresSchema } from "@/zod-schemas/servicesFm4AllOffresType.schema";
 import { selectServicesFm4AllTauxSchema } from "@/zod-schemas/servicesFm4AllTaux.schema";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getServicesFm4AllTaux = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("servicesFm4AllTaux"));
   try {
     const results = await db.select().from(servicesFm4AllTaux);
     if (results.length === 0) return [];
@@ -33,6 +37,8 @@ export const getServicesFm4AllTaux = async () => {
 };
 
 export const getServicesFm4AllOffres = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("servicesFm4AllOffres"));
   try {
     const results = await db.select().from(servicesFm4AllOffres);
     if (results.length === 0) return [];

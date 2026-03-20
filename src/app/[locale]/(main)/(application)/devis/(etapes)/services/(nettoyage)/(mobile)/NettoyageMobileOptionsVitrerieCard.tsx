@@ -14,7 +14,6 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE, MAX_PASSAGES_VITRERIE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -79,7 +78,6 @@ const NettoyageMobileOptionsVitrerieCard = ({
       setNettoyage: s.setNettoyage,
     })),
   );
-  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
   const { gammeSelected: gamme, nomPrestataire } = nettoyage.infos;
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
     <p className="text-end text-sm font-bold">
@@ -155,28 +153,6 @@ const NettoyageMobileOptionsVitrerieCard = ({
         nbPassagesVitrerie: newNbPassageVitrerie,
       },
     }));
-    const totalVitrerie =
-      nettoyage.infos.vitrerieSelected &&
-      nettoyage.quantites.surfaceCloisons !== null &&
-      nettoyage.quantites.cadenceCloisons !== null &&
-      nettoyage.quantites.surfaceVitres !== null &&
-      nettoyage.quantites.cadenceVitres !== null &&
-      nettoyage.prix.tauxHoraireVitrerie !== null &&
-      nettoyage.prix.minFacturationVitrerie !== null
-        ? newNbPassageVitrerie *
-          Math.max(
-            (nettoyage.quantites.surfaceCloisons /
-              nettoyage.quantites.cadenceCloisons +
-              nettoyage.quantites.surfaceVitres /
-                nettoyage.quantites.cadenceVitres) *
-              nettoyage.prix.tauxHoraireVitrerie,
-            nettoyage.prix.minFacturationVitrerie,
-          )
-        : null;
-    setTotalNettoyage((prev) => ({
-      ...prev,
-      totalVitrerie,
-    }));
   };
   const handleIncrement = () => {
     let newNbPassageVitrerie = nettoyage.quantites.nbPassagesVitrerie + 1;
@@ -188,28 +164,6 @@ const NettoyageMobileOptionsVitrerieCard = ({
         ...prev.quantites,
         nbPassagesVitrerie: newNbPassageVitrerie,
       },
-    }));
-    const totalVitrerie =
-      nettoyage.infos.vitrerieSelected &&
-      nettoyage.quantites.surfaceCloisons !== null &&
-      nettoyage.quantites.cadenceCloisons !== null &&
-      nettoyage.quantites.surfaceVitres !== null &&
-      nettoyage.quantites.cadenceVitres !== null &&
-      nettoyage.prix.tauxHoraireVitrerie !== null &&
-      nettoyage.prix.minFacturationVitrerie !== null
-        ? newNbPassageVitrerie *
-          Math.max(
-            (nettoyage.quantites.surfaceCloisons /
-              nettoyage.quantites.cadenceCloisons +
-              nettoyage.quantites.surfaceVitres /
-                nettoyage.quantites.cadenceVitres) *
-              nettoyage.prix.tauxHoraireVitrerie,
-            nettoyage.prix.minFacturationVitrerie,
-          )
-        : null;
-    setTotalNettoyage((prev) => ({
-      ...prev,
-      totalVitrerie,
     }));
   };
   return (

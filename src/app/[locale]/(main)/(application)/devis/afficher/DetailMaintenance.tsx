@@ -8,13 +8,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
+import { calcMaintenanceTotaux } from "@/lib/devis/calc-maintenance";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
-import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
+import { useMemo } from "react";
 
 const DetailMaintenance = () => {
   const maintenance = useMaintenanceStore((s) => s.maintenance);
-  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
+  const totalMaintenance = useMemo(
+    () => calcMaintenanceTotaux(maintenance),
+    [maintenance],
+  );
   const total = Object.values(totalMaintenance)
     .filter((item) => item !== null)
     .reduce((sum, value) => sum + value, 0);

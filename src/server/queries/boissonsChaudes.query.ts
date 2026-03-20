@@ -20,9 +20,13 @@ import { selectChocolatConsoTarifsSchema } from "@/zod-schemas/chocolatConsoTari
 import { selectLaitConsoTarifsSchema } from "@/zod-schemas/laitConsoTarifs.schema";
 import { selectSucreConsoTarifsSchema } from "@/zod-schemas/sucreConsoTarifs.schema";
 import { selectTheConsoTarifsSchema } from "@/zod-schemas/theConsoTarifs.schema";
+import { getGlobalTag } from "@/lib/data-cache";
 import { eq, getTableColumns } from "drizzle-orm";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getCafeMachinesTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("cafeMachinesTarifs"));
   try {
     const results = await db
       .select({
@@ -74,6 +78,8 @@ export const getCafeMachinesTarifs = async () => {
 };
 
 export const getCafeConsoTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("cafeConsoTarifs"));
   try {
     const results = await db
       .select({
@@ -83,7 +89,7 @@ export const getCafeConsoTarifs = async () => {
         logoStorageKey: documents.storageKey,
         anneeCreation: entrepriseInfos.anneeCreation,
         ca: entrepriseInfos.ca,
-        effectifFournisseur: entrepriseInfos.effectif,
+        effectif: entrepriseInfos.effectif,
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
@@ -113,6 +119,8 @@ export const getCafeConsoTarifs = async () => {
 };
 
 export const getLaitConsoTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("laitConsoTarifs"));
   try {
     const results = await db
       .select({
@@ -157,6 +165,8 @@ export const getLaitConsoTarifs = async () => {
 };
 
 export const getChocolatConsoTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("chocolatConsoTarifs"));
   try {
     const results = await db
       .select({
@@ -197,6 +207,8 @@ export const getChocolatConsoTarifs = async () => {
 };
 
 export const getTheConsoTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("theConsoTarifs"));
   try {
     const results = await db
       .select({
@@ -206,7 +218,7 @@ export const getTheConsoTarifs = async () => {
         logoStorageKey: documents.storageKey,
         anneeCreation: entrepriseInfos.anneeCreation,
         ca: entrepriseInfos.ca,
-        effectifFournisseur: entrepriseInfos.effectif,
+        effectif: entrepriseInfos.effectif,
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
@@ -237,6 +249,8 @@ export const getTheConsoTarifs = async () => {
 };
 
 export const getSucreConsoTarifs = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("sucreConsoTarifs"));
   try {
     const results = await db
       .select({
@@ -271,6 +285,8 @@ export const getSucreConsoTarifs = async () => {
 };
 
 export const getCafeMachines = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("cafeMachines"));
   try {
     const results = await db.select().from(cafeMachines);
     if (results.length === 0) return [];

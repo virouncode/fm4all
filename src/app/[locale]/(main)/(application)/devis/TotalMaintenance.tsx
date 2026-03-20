@@ -1,15 +1,19 @@
 import { MARGE } from "@/constants/constants";
+import { calcMaintenanceTotaux } from "@/lib/devis/calc-maintenance";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
-import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 const TotalMaintenance = () => {
   const t = useTranslations("Total");
   const tMaintenance = useTranslations("DevisPage.services.maintenance");
   const maintenance = useMaintenanceStore((s) => s.maintenance);
-  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
+  const totalMaintenance = useMemo(
+    () => calcMaintenanceTotaux(maintenance),
+    [maintenance],
+  );
 
   const { totalService, totalQ18, totalLegio, totalQualiteAir } =
     totalMaintenance;

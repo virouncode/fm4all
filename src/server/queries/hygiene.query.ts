@@ -31,7 +31,7 @@ import {
   selectHygieneInstalDistribTarifsSchema,
 } from "@/zod-schemas/hygieneInstalDistribTarifs.schema";
 import { selectHygieneMinFacturationSchema } from "@/zod-schemas/hygieneMinFacturation.schema";
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { eq, getTableColumns } from "drizzle-orm";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getHygieneDistribQuantite = async (effectif: string) => {
@@ -182,7 +182,7 @@ export const getHygieneInstalDistribTarifs = async (effectif: string) => {
     const results = await db
       .select()
       .from(hygieneInstalDistribTarifs)
-      .where(and(eq(hygieneInstalDistribTarifs.effectif, roundedEffectif)));
+      .where(eq(hygieneInstalDistribTarifs.effectif, roundedEffectif));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectHygieneInstalDistribTarifsSchema.parse(result),
@@ -249,7 +249,7 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
       .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId))
-      .where(and(eq(hygieneConsoTarifs.effectif, roundedEffectif)));
+      .where(eq(hygieneConsoTarifs.effectif, roundedEffectif));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectHygieneConsoTarifsSchema.parse(result),

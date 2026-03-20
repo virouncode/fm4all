@@ -1,7 +1,6 @@
 import { MAX_PASSAGES_VITRERIE } from "@/constants/constants";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
@@ -82,7 +81,6 @@ const NettoyageOptionsPropositions = ({
       setNettoyage: s.setNettoyage,
     })),
   );
-  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
   const color = getFm4AllColor(nettoyage.infos.gammeSelected);
 
   const handleClickRepasseProposition = (proposition: {
@@ -106,10 +104,6 @@ const NettoyageOptionsPropositions = ({
           tauxHoraireRepasse: null,
         },
       }));
-      setTotalNettoyage((prev) => ({
-        ...prev,
-        totalRepasse: null,
-      }));
     } else {
       setNettoyage((prev) => ({
         infos: {
@@ -125,14 +119,10 @@ const NettoyageOptionsPropositions = ({
           tauxHoraireRepasse: proposition.tauxHoraire,
         },
       }));
-      setTotalNettoyage((prev) => ({
-        ...prev,
-        totalRepasse: proposition.prixAnnuel,
-      }));
     }
   };
 
-  const handleClickSamediProposition = (proposition: {
+  const handleClickSamediProposition = (_proposition: {
     id: string;
     prixAnnuel: number;
   }) => {
@@ -144,10 +134,6 @@ const NettoyageOptionsPropositions = ({
           samediSelected: false,
         },
       }));
-      setTotalNettoyage((prev) => ({
-        ...prev,
-        totalSamedi: null,
-      }));
     } else {
       setNettoyage((prev) => ({
         ...prev,
@@ -156,14 +142,10 @@ const NettoyageOptionsPropositions = ({
           samediSelected: true,
         },
       }));
-      setTotalNettoyage((prev) => ({
-        ...prev,
-        totalSamedi: proposition.prixAnnuel,
-      }));
     }
   };
 
-  const handleClickDimancheProposition = (proposition: {
+  const handleClickDimancheProposition = (_proposition: {
     id: string;
     prixAnnuel: number;
   }) => {
@@ -175,10 +157,6 @@ const NettoyageOptionsPropositions = ({
           dimancheSelected: false,
         },
       }));
-      setTotalNettoyage((prev) => ({
-        ...prev,
-        totalDimanche: null,
-      }));
     } else {
       setNettoyage((prev) => ({
         ...prev,
@@ -186,10 +164,6 @@ const NettoyageOptionsPropositions = ({
           ...prev.infos,
           dimancheSelected: true,
         },
-      }));
-      setTotalNettoyage((prev) => ({
-        ...prev,
-        totalDimanche: proposition.prixAnnuel,
       }));
     }
   };
@@ -217,10 +191,6 @@ const NettoyageOptionsPropositions = ({
           fraisDeplacementVitrerie: null,
         },
       }));
-      setTotalNettoyage((prev) => ({
-        ...prev,
-        totalVitrerie: null,
-      }));
     } else {
       setNettoyage((prev) => ({
         ...prev,
@@ -234,10 +204,6 @@ const NettoyageOptionsPropositions = ({
           minFacturationVitrerie: proposition.minFacturation,
           fraisDeplacementVitrerie: proposition.fraisDeplacement,
         },
-      }));
-      setTotalNettoyage((prev) => ({
-        ...prev,
-        totalVitrerie: proposition.prixAnnuel,
       }));
     }
   };
@@ -253,29 +219,6 @@ const NettoyageOptionsPropositions = ({
         ...prev.quantites,
         nbPassagesVitrerie: newNbPassageVitrerie,
       },
-    }));
-
-    const totalVitrerie =
-      nettoyage.infos.vitrerieSelected &&
-      nettoyage.quantites.surfaceCloisons !== null &&
-      nettoyage.quantites.cadenceCloisons !== null &&
-      nettoyage.quantites.surfaceVitres !== null &&
-      nettoyage.quantites.cadenceVitres !== null &&
-      nettoyage.prix.tauxHoraireVitrerie !== null &&
-      nettoyage.prix.minFacturationVitrerie !== null
-        ? newNbPassageVitrerie *
-          Math.max(
-            (nettoyage.quantites.surfaceCloisons /
-              nettoyage.quantites.cadenceCloisons +
-              nettoyage.quantites.surfaceVitres /
-                nettoyage.quantites.cadenceVitres) *
-              nettoyage.prix.tauxHoraireVitrerie,
-            nettoyage.prix.minFacturationVitrerie,
-          )
-        : null;
-    setTotalNettoyage((prev) => ({
-      ...prev,
-      totalVitrerie,
     }));
   };
 

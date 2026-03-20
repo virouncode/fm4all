@@ -1,15 +1,19 @@
 "use client";
 import { MARGE } from "@/constants/constants";
+import { calcNettoyageTotaux } from "@/lib/devis/calc-nettoyage";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 const TotalNettoyage = () => {
   const t = useTranslations("Total");
   const nettoyage = useNettoyageStore((s) => s.nettoyage);
-  const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
+  const totalNettoyage = useMemo(
+    () => calcNettoyageTotaux(nettoyage),
+    [nettoyage],
+  );
   const {
     totalService,
     totalRepasse,

@@ -1,7 +1,6 @@
 "use client";
 
 import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
-import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites.schema";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs.schema";
 import { useTranslations } from "next-intl";
@@ -26,10 +25,6 @@ const OfficeManagerPropositions = ({
       setOfficeManager: s.setOfficeManager,
     })),
   );
-  const setTotalOfficeManager = useTotalOfficeManagerStore(
-    (s) => s.setTotalOfficeManager,
-  );
-
   //Calcul des propositions
   const demiJParSemaineEssentiel =
     officeManagerQuantites.find((q) => q.gamme === "essentiel")
@@ -104,7 +99,6 @@ const OfficeManagerPropositions = ({
       nomPrestataire,
       sloganPrestataire,
       logoStorageKey,
-      totalAnnuel,
       demiJParSemaine,
       demiTjm,
       demiTjmPremium,
@@ -132,9 +126,6 @@ const OfficeManagerPropositions = ({
           demiTjmPremium: null,
         },
       }));
-      setTotalOfficeManager({
-        totalService: null,
-      });
       return;
     }
     setOfficeManager((prev) => ({
@@ -163,15 +154,9 @@ const OfficeManagerPropositions = ({
         demiTjmPremium,
       },
     }));
-    setTotalOfficeManager({
-      totalService: totalAnnuel,
-    });
   };
 
-  const handleChangeDemiJParSemaine = (
-    value: number[],
-    demiTauxJournalier: number | null,
-  ) => {
+  const handleChangeDemiJParSemaine = (value: number[]) => {
     const newDemiJ = value[0];
     setOfficeManager((prev) => ({
       ...prev,
@@ -190,27 +175,6 @@ const OfficeManagerPropositions = ({
         demiJParSemaine: newDemiJ,
       },
     }));
-    if (officeManager.infos.gammeSelected) {
-      const newMajoration =
-        newDemiJ <= 1
-          ? 20
-          : newDemiJ <= 2
-            ? 15
-            : newDemiJ <= 3
-              ? 10
-              : newDemiJ <= 4
-                ? 5
-                : 0;
-      const totalAnnuel =
-        demiTauxJournalier !== null
-          ? officeManager.infos.remplace
-            ? newDemiJ * demiTauxJournalier * 52 * (1 + newMajoration / 100)
-            : newDemiJ * demiTauxJournalier * 47 * (1 + newMajoration / 100)
-          : null;
-      setTotalOfficeManager({
-        totalService: totalAnnuel,
-      });
-    }
   };
 
   const handleChangeRemplace = (value: string) => {
@@ -221,42 +185,6 @@ const OfficeManagerPropositions = ({
         remplace: value === "remplace",
       },
     }));
-    if (officeManager.infos.gammeSelected) {
-      const demiJParSemaine =
-        officeManager.quantites.demiJParSemaine ?? demiJParSemaineEssentiel;
-      const newMajoration =
-        demiJParSemaine !== null
-          ? demiJParSemaine <= 1
-            ? 20
-            : demiJParSemaine <= 2
-              ? 15
-              : demiJParSemaine <= 3
-                ? 10
-                : demiJParSemaine <= 4
-                  ? 5
-                  : 0
-          : null;
-      const demiTauxJournalier = officeManager.infos.premium
-        ? officeManager.prix.demiTjmPremium
-        : officeManager.prix.demiTjm;
-      const totalAnnuel =
-        demiJParSemaine !== null &&
-        demiTauxJournalier !== null &&
-        newMajoration !== null
-          ? value === "remplace"
-            ? demiJParSemaine *
-              demiTauxJournalier *
-              52 *
-              (1 + newMajoration / 100)
-            : demiJParSemaine *
-              demiTauxJournalier *
-              47 *
-              (1 + newMajoration / 100)
-          : null;
-      setTotalOfficeManager({
-        totalService: totalAnnuel,
-      });
-    }
   };
 
   const handleCheckPremium = (checked: boolean) => {
@@ -267,43 +195,6 @@ const OfficeManagerPropositions = ({
         premium: checked,
       },
     }));
-    if (officeManager.infos.gammeSelected) {
-      const demiJParSemaine =
-        officeManager.quantites.demiJParSemaine ?? demiJParSemaineEssentiel;
-      const newMajoration =
-        demiJParSemaine !== null
-          ? demiJParSemaine <= 1
-            ? 20
-            : demiJParSemaine <= 2
-              ? 15
-              : demiJParSemaine <= 3
-                ? 10
-                : demiJParSemaine <= 4
-                  ? 5
-                  : 0
-          : null;
-      const demiTauxJournalier = checked
-        ? officeManager.prix.demiTjmPremium
-        : officeManager.prix.demiTjm;
-
-      const totalAnnuel =
-        demiJParSemaine !== null &&
-        demiTauxJournalier !== null &&
-        newMajoration !== null
-          ? officeManager.infos.remplace === true
-            ? demiJParSemaine *
-              demiTauxJournalier *
-              52 *
-              (1 + newMajoration / 100)
-            : demiJParSemaine *
-              demiTauxJournalier *
-              47 *
-              (1 + newMajoration / 100)
-          : null;
-      setTotalOfficeManager({
-        totalService: totalAnnuel,
-      });
-    }
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

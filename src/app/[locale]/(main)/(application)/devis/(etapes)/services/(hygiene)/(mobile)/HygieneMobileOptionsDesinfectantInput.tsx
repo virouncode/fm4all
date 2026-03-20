@@ -3,8 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
-import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -18,43 +16,12 @@ type HygieneMobileOptionsDesinfectantInputProps = {
     type: HygieneOptionsType,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
-  hygieneDistribTarifsFournisseur: {
-    type:
-      | "emp"
-      | "poubelleEmp"
-      | "savon"
-      | "ph"
-      | "desinfectant"
-      | "parfum"
-      | "balai"
-      | "poubelle";
-    entrepriseId: string;
-    nomPrestataire: string;
-    logoStorageKey: string | null;
-    pa12M: number | null;
-    pa24M: number | null;
-    pa36M: number | null;
-    oneShot: number | null;
-    id: string;
-    slogan: string | null;
-
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    createdAt: Date;
-    gamme: "essentiel" | "confort" | "excellence";
-
-  }[];
 };
 
 const HygieneMobileOptionsDesinfectantInput = ({
   nbDistribDesinfectant,
   handleChangeDistribNbr,
   hygieneDistribQuantite,
-  hygieneDistribTarifsFournisseur,
 }: HygieneMobileOptionsDesinfectantInputProps) => {
   const t = useTranslations("DevisPage");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
@@ -64,9 +31,6 @@ const HygieneMobileOptionsDesinfectantInput = ({
       setHygiene: s.setHygiene,
     })),
   );
-  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
-  const prospect = useProspectStore((s) => s.prospect);
-
   const handleIncrement = () => {
     let newNbDistribDesinfectant = nbDistribDesinfectant + 1;
     if (newNbDistribDesinfectant > MAX_NB_DISTRIB)
@@ -78,27 +42,6 @@ const HygieneMobileOptionsDesinfectantInput = ({
         nbDistribDesinfectant: newNbDistribDesinfectant,
       },
     }));
-    if (hygiene.infos.desinfectantGammeSelected) {
-      const prixDistribDesinfectant =
-        hygieneDistribTarifsFournisseur.find(
-          (tarif) =>
-            tarif.type === "desinfectant" &&
-            tarif.gamme === hygiene.infos.desinfectantGammeSelected,
-        )?.[hygiene.infos.dureeLocation] ?? null;
-
-      const totalDesinfectant =
-        newNbDistribDesinfectant &&
-        prixDistribDesinfectant !== null &&
-        hygiene.prix.paParPersonneDesinfectant !== null &&
-        newNbDistribDesinfectant
-          ? newNbDistribDesinfectant * prixDistribDesinfectant +
-            hygiene.prix.paParPersonneDesinfectant * (prospect.effectif ?? 0)
-          : null;
-      setTotalHygiene((prev) => ({
-        ...prev,
-        totalDesinfectant,
-      }));
-    }
   };
   const handleDecrement = () => {
     let newNbDistribDesinfectant = nbDistribDesinfectant - 1;
@@ -110,27 +53,6 @@ const HygieneMobileOptionsDesinfectantInput = ({
         nbDistribDesinfectant: newNbDistribDesinfectant,
       },
     }));
-    if (hygiene.infos.desinfectantGammeSelected) {
-      const prixDistribDesinfectant =
-        hygieneDistribTarifsFournisseur.find(
-          (tarif) =>
-            tarif.type === "desinfectant" &&
-            tarif.gamme === hygiene.infos.desinfectantGammeSelected,
-        )?.[hygiene.infos.dureeLocation] ?? null;
-
-      const totalDesinfectant =
-        newNbDistribDesinfectant &&
-        prixDistribDesinfectant !== null &&
-        hygiene.prix.paParPersonneDesinfectant !== null &&
-        newNbDistribDesinfectant
-          ? newNbDistribDesinfectant * prixDistribDesinfectant +
-            hygiene.prix.paParPersonneDesinfectant * (prospect.effectif ?? 0)
-          : null;
-      setTotalHygiene((prev) => ({
-        ...prev,
-        totalDesinfectant,
-      }));
-    }
   };
 
   return (

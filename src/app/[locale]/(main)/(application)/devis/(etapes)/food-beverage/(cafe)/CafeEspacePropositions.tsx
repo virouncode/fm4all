@@ -7,7 +7,6 @@ import {
   RATIO_SUCRE,
 } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
-import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
@@ -15,11 +14,7 @@ import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMa
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
-import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useTheStore } from "@/stores/devis/theStore";
-import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
-import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
-import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine.schema";
@@ -59,7 +54,6 @@ const CafeEspacePropositions = ({
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const t = useTranslations("DevisPage");
   const prospect = useProspectStore((s) => s.prospect);
-  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
   const { cafe, setCafe } = useCafeStore(
     useShallow((s) => ({
@@ -72,11 +66,6 @@ const CafeEspacePropositions = ({
       the: s.the,
       setThe: s.setThe,
     })),
-  );
-  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
-  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
-  const setTotalSnacksFruits = useTotalSnacksFruitsStore(
-    (s) => s.setTotalSnacksFruits,
   );
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
@@ -425,17 +414,6 @@ const CafeEspacePropositions = ({
             : item,
         ),
       }));
-      setTotalCafe((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: null,
-                totalInstallation: null,
-              }
-            : item,
-        ),
-      }));
     } else {
       //Je coche
       setCafe((prev) => ({
@@ -467,17 +445,6 @@ const CafeEspacePropositions = ({
                   prixUnitaireConsoChocolat,
                   prixUnitaireConsoSucre,
                 },
-              }
-            : item,
-        ),
-      }));
-      setTotalCafe((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation,
               }
             : item,
         ),
@@ -591,53 +558,6 @@ const CafeEspacePropositions = ({
           prixUnitaire: null,
         },
       }));
-      setTotalCafe((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) => ({
-          ...item,
-          total: null,
-          totalInstallation: null,
-        })),
-      }));
-      setTotalThe({
-        totalService: null,
-      });
-      //Voir si snacks fruits a des frais de livraison
-      if (snacksFruits.infos.gammeSelected) {
-        const prixPanierSnacksFruits = snacksFruits.infos.choix.reduce(
-          (acc, cur: TypesSnacksFruitsType) => {
-            if (cur === "fruits")
-              return (
-                acc +
-                (snacksFruits.quantites.fruitsKgParSemaine ?? 0) *
-                  (snacksFruits.prix.prixKgFruits ?? 0)
-              );
-            else if (cur === "snacks")
-              return (
-                acc +
-                (snacksFruits.quantites.snacksPortionsParSemaine ?? 0) *
-                  (snacksFruits.prix.prixUnitaireSnacks ?? 0)
-              );
-            else if (cur === "boissons")
-              return (
-                acc +
-                (snacksFruits.quantites.boissonsConsosParSemaine ?? 0) *
-                  (snacksFruits.prix.prixUnitaireBoissons ?? 0)
-              );
-            return acc;
-          },
-          0,
-        );
-        const prixLivraisonPanier =
-          prixPanierSnacksFruits >= (snacksFruits.prix.seuilFranco ?? 0)
-            ? 0
-            : snacksFruits.prix.prixUnitaireLivraison;
-        const totalLivraison =
-          prixLivraisonPanier !== null ? 52 * prixLivraisonPanier : null;
-        setTotalSnacksFruits((prev) => ({
-          ...prev,
-          totalLivraison,
-        }));
-      }
     } else {
       //======================== JE COCHE ======================//
       //Pour chaque espace et le the si gammeCafeSelected je mets à jour les prix et le total
@@ -659,11 +579,6 @@ const CafeEspacePropositions = ({
         logoStorageKey,
       };
       const newEspace: CafeEspaceType[] = [];
-      const newTotalEspace: {
-        espaceId: number;
-        total: number | null;
-        totalInstallation: number | null;
-      }[] = [];
       cafe.espaces.forEach((item) => {
         if (item.infos.espaceId === espace.infos.espaceId) {
           //1ER LOT
@@ -693,22 +608,12 @@ const CafeEspacePropositions = ({
               prixUnitaireConsoSucre,
             },
           });
-          newTotalEspace.push({
-            espaceId: item.infos.espaceId,
-            total: totalAnnuel,
-            totalInstallation: totalInstallation,
-          });
           return;
         }
         //AUTRES LOTS
         if (!item.infos.gammeCafeSelected) {
           //pas de selection
           newEspace.push(item);
-          newTotalEspace.push({
-            espaceId: item.infos.espaceId,
-            total: null,
-            totalInstallation: null,
-          });
           return;
         }
         //selection existante je recalcule tout
@@ -717,8 +622,6 @@ const CafeEspacePropositions = ({
           (effectif > MAX_NB_PERSONNES_PAR_ESPACE
             ? MAX_NB_PERSONNES_PAR_ESPACE
             : effectif);
-        const itemNbTassesParAn = itemNbPersonnes * 400;
-
         const itemMachinesTarifFournisseur = cafeMachinesTarifs.find(
           (tarif) =>
             tarif.nbPersonnes ===
@@ -729,11 +632,6 @@ const CafeEspacePropositions = ({
         );
         if (!itemMachinesTarifFournisseur) {
           newEspace.push(item);
-          newTotalEspace.push({
-            espaceId: item.infos.espaceId,
-            total: null,
-            totalInstallation: null,
-          });
           return;
         }
         const itemNbMachines = itemMachinesTarifFournisseur?.nbMachines ?? null;
@@ -741,8 +639,6 @@ const CafeEspacePropositions = ({
           itemMachinesTarifFournisseur?.[cafe.infos.dureeLocation] ?? null;
         const itemPrixInstal =
           itemMachinesTarifFournisseur?.fraisInstallation ?? null;
-        const itemTotalInstallation =
-          itemPrixInstal !== null ? itemPrixInstal : null;
         const itemPrixMaintenance =
           itemMachinesTarifFournisseur?.paMaintenance ?? null;
         const itemNbPassagesParAn =
@@ -795,23 +691,6 @@ const CafeEspacePropositions = ({
         const itemPrixUnitaireConsoSucre =
           itemConsoSucreTarifFournisseur?.prixUnitaire ?? null;
 
-        const itemTotalLoc =
-          itemPrixLoc !== null && itemPrixMaintenance !== null
-            ? itemPrixLoc + itemPrixMaintenance
-            : null;
-        const itemTotalConso =
-          (itemPrixUnitaireConsoCafe ?? 0) * itemNbTassesParAn +
-          (itemPrixUnitaireConsoSucre ?? 0) * itemNbTassesParAn * RATIO_SUCRE +
-          (item.infos.typeBoissons !== "cafe"
-            ? (itemPrixUnitaireConsoLait ?? 0) * itemNbTassesParAn * RATIO_LAIT
-            : 0) +
-          (item.infos.typeBoissons === "chocolat"
-            ? (itemPrixUnitaireConsoChocolat ?? 0) *
-              itemNbTassesParAn *
-              RATIO_CHOCO
-            : 0);
-        const itemTotalAnnuel =
-          itemTotalLoc !== null ? itemTotalLoc + itemTotalConso : null;
         const itemModele = itemMachinesTarifFournisseur
           ? (cafeMachines?.find(
               ({ id }) => id === itemMachinesTarifFournisseur?.cafeMachineId,
@@ -849,24 +728,15 @@ const CafeEspacePropositions = ({
             prixUnitaireConsoSucre: itemPrixUnitaireConsoSucre,
           },
         });
-        newTotalEspace.push({
-          espaceId: item.infos.espaceId,
-          total: itemTotalAnnuel,
-          totalInstallation: itemTotalInstallation,
-        });
       });
       setCafe((prev) => ({
         ...prev,
         infos: newCafeInfos,
         espaces: newEspace,
       }));
-      setTotalCafe({
-        totalEspaces: newTotalEspace,
-      });
       if (the.infos.gammeSelected) {
         const nbPersonnesThe =
           the.quantites.nbPersonnes || Math.round(effectif * 0.15);
-        const nbTassesThesParAn = nbPersonnesThe * 400;
         const theConsoTarifFournisseur = theConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundEffectif(nbPersonnesThe) &&
@@ -874,61 +744,11 @@ const CafeEspacePropositions = ({
             tarif.gamme === the.infos.gammeSelected,
         );
         const prixUnitaireThe = theConsoTarifFournisseur?.prixUnitaire ?? null;
-        const totalThe =
-          prixUnitaireThe !== null ? nbTassesThesParAn * prixUnitaireThe : null;
         setThe((prev) => ({
           ...prev,
           prix: {
             prixUnitaire: prixUnitaireThe,
           },
-        }));
-        setTotalThe({
-          totalService: totalThe,
-        });
-      } else {
-        setTotalThe({
-          totalService: null,
-        });
-      }
-      //Voir si snacks fruits a des frais de livraison
-      if (snacksFruits.infos.gammeSelected) {
-        const prixPanierSnacksFruits = snacksFruits.infos.choix.reduce(
-          (acc, cur: TypesSnacksFruitsType) => {
-            if (cur === "fruits")
-              return (
-                acc +
-                (snacksFruits.quantites.fruitsKgParSemaine ?? 0) *
-                  (snacksFruits.prix.prixKgFruits ?? 0)
-              );
-            else if (cur === "snacks")
-              return (
-                acc +
-                (snacksFruits.quantites.snacksPortionsParSemaine ?? 0) *
-                  (snacksFruits.prix.prixUnitaireSnacks ?? 0)
-              );
-            else if (cur === "boissons")
-              return (
-                acc +
-                (snacksFruits.quantites.boissonsConsosParSemaine ?? 0) *
-                  (snacksFruits.prix.prixUnitaireBoissons ?? 0)
-              );
-            return acc;
-          },
-          0,
-        );
-        const isSamePrestataire =
-          snacksFruits.infos.entrepriseId === entrepriseId;
-        const prixLivraisonPanier =
-          prixPanierSnacksFruits >= (snacksFruits.prix.seuilFranco ?? 0)
-            ? 0
-            : isSamePrestataire
-              ? snacksFruits.prix.prixUnitaireLivraisonSiCafe
-              : snacksFruits.prix.prixUnitaireLivraison;
-        const totalLivraison =
-          prixLivraisonPanier !== null ? 52 * prixLivraisonPanier : null;
-        setTotalSnacksFruits((prev) => ({
-          ...prev,
-          totalLivraison,
         }));
       }
     }
@@ -974,17 +794,6 @@ const CafeEspacePropositions = ({
           },
         },
       ].sort((a, b) => a.infos.espaceId - b.infos.espaceId),
-    }));
-    setTotalCafe((prev) => ({
-      totalEspaces: [
-        ...prev.totalEspaces,
-        {
-          espaceId:
-            prev.totalEspaces[prev.totalEspaces.length - 1].espaceId + 1,
-          total: null,
-          totalInstallation: null,
-        },
-      ],
     }));
   };
   const handleClickNext = () => {

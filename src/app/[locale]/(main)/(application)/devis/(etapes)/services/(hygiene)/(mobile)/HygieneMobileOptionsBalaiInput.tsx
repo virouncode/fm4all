@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
-import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -18,43 +17,12 @@ type HygieneMobileOptionsBalaiInputProps = {
     type: HygieneOptionsType,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
-  hygieneDistribTarifsFournisseur: {
-    id: string;
-    effectif: string | null;
-    createdAt: Date;
-    type:
-      | "emp"
-      | "poubelleEmp"
-      | "savon"
-      | "ph"
-      | "desinfectant"
-      | "parfum"
-      | "balai"
-      | "poubelle";
-    nomPrestataire: string;
-    slogan: string | null;
-    logoStorageKey: string | null;
-
-    anneeCreation: number | null;
-    ca: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    entrepriseId: string;
-    gamme: "essentiel" | "confort" | "excellence";
-    oneShot: number | null;
-    pa12M: number | null;
-    pa24M: number | null;
-    pa36M: number | null;
-
-  }[];
 };
 
 const HygieneMobileOptionsBalaiInput = ({
   nbDistribBalai,
   handleChangeDistribNbr,
   hygieneDistribQuantite,
-  hygieneDistribTarifsFournisseur,
 }: HygieneMobileOptionsBalaiInputProps) => {
   const t = useTranslations("DevisPage");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
@@ -65,8 +33,6 @@ const HygieneMobileOptionsBalaiInput = ({
       setHygiene: s.setHygiene,
     })),
   );
-  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
-
   const handleIncrement = () => {
     let newNbDistribBalai = nbDistribBalai + 1;
     if (newNbDistribBalai > MAX_NB_DISTRIB) newNbDistribBalai = MAX_NB_DISTRIB;
@@ -77,23 +43,6 @@ const HygieneMobileOptionsBalaiInput = ({
         nbDistribBalai: newNbDistribBalai,
       },
     }));
-    if (hygiene.infos.balaiGammeSelected) {
-      const prixDistribBalai =
-        hygieneDistribTarifsFournisseur.find(
-          (tarif) =>
-            tarif.type === "balai" &&
-            tarif.gamme === hygiene.infos.balaiGammeSelected,
-        )?.[hygiene.infos.dureeLocation] ?? null;
-
-      const totalBalai =
-        newNbDistribBalai && prixDistribBalai !== null
-          ? newNbDistribBalai * prixDistribBalai
-          : null;
-      setTotalHygiene((prev) => ({
-        ...prev,
-        totalBalai,
-      }));
-    }
   };
   const handleDecrement = () => {
     let newNbDistribBalai = nbDistribBalai - 1;
@@ -105,23 +54,6 @@ const HygieneMobileOptionsBalaiInput = ({
         nbDistribBalai: newNbDistribBalai,
       },
     }));
-    if (hygiene.infos.balaiGammeSelected) {
-      const prixDistribBalai =
-        hygieneDistribTarifsFournisseur.find(
-          (tarif) =>
-            tarif.type === "balai" &&
-            tarif.gamme === hygiene.infos.balaiGammeSelected,
-        )?.[hygiene.infos.dureeLocation] ?? null;
-
-      const totalBalai =
-        newNbDistribBalai && prixDistribBalai !== null
-          ? newNbDistribBalai * prixDistribBalai
-          : null;
-      setTotalHygiene((prev) => ({
-        ...prev,
-        totalBalai,
-      }));
-    }
   };
   return (
     <div className="flex flex-col gap-4">

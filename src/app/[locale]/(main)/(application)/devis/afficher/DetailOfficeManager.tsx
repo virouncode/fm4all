@@ -8,14 +8,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
+import { calcOfficeManagerTotaux } from "@/lib/devis/calc-office-manager";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
-import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
+import { useMemo } from "react";
 
 const DetailOfficeManager = () => {
   const officeManager = useOfficeManagerStore((s) => s.officeManager);
-  const totalOfficeManager = useTotalOfficeManagerStore(
-    (s) => s.totalOfficeManager,
+  const totalOfficeManager = useMemo(
+    () => calcOfficeManagerTotaux(officeManager),
+    [officeManager],
   );
   if (!totalOfficeManager.totalService) return null;
   return (

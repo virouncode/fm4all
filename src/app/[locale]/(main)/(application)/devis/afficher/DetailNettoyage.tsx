@@ -8,13 +8,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
+import { calcNettoyageTotaux } from "@/lib/devis/calc-nettoyage";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
-import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
+import { useMemo } from "react";
 
 const DetailNettoyage = () => {
   const nettoyage = useNettoyageStore((s) => s.nettoyage);
-  const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
+  const totalNettoyage = useMemo(
+    () => calcNettoyageTotaux(nettoyage),
+    [nettoyage],
+  );
   const total = Object.values(totalNettoyage)
     .filter((item) => item !== null)
     .reduce((sum, value) => sum + value, 0);

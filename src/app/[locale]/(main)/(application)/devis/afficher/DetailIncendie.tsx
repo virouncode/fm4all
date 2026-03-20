@@ -8,13 +8,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
+import { calcIncendieTotaux } from "@/lib/devis/calc-incendie";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useIncendieStore } from "@/stores/devis/incendieStore";
-import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
+import { useMemo } from "react";
 
 const DetailIncendie = () => {
   const incendie = useIncendieStore((s) => s.incendie);
-  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
+  const totalIncendie = useMemo(
+    () => calcIncendieTotaux(incendie),
+    [incendie],
+  );
   const totalOptions =
     (totalIncendie.totalExutoires ?? 0) +
     (totalIncendie.totalExutoiresParking ?? 0) +
