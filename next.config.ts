@@ -37,6 +37,17 @@ const nextConfig: NextConfig = {
   headers: async () => [
     {
       source: "/:path*",
+      headers: [
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        {
+          key: "Referrer-Policy",
+          value: "strict-origin-when-cross-origin",
+        },
+      ],
+    },
+    {
+      source: "/:path*",
       has: [{ type: "host", value: "fm4all.vercel.app" }],
       headers: [{ key: "X-Robots-Tag", value: "noindex" }],
     },

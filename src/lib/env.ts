@@ -28,16 +28,13 @@ function optionalWithDefault(key: string, defaultValue: string): string {
 // ---------------------------------------------------------------------------
 export const env = {
   APP_URL: required("APP_URL"),
-  BETTER_AUTH_URL: required("BETTER_AUTH_URL"),
   DATABASE_URL: required("DATABASE_URL"),
   MAILGUN_API_KEY: required("MAILGUN_API_KEY"),
   AWS_REGION: required("AWS_REGION"),
   AWS_S3_BUCKET: required("AWS_S3_BUCKET"),
-  INSEE_API_TOKEN: optional("INSEE_API_TOKEN"),
 
   // Optionnels serveur
   MAILGUN_BCC_EMAIL: optional("MAILGUN_BCC_EMAIL"),
-  CRON_SECRET: required("CRON_SECRET"),
   S3_PRESIGN_READ_EXPIRES_SECONDS: Number(
     optionalWithDefault("S3_PRESIGN_READ_EXPIRES_SECONDS", "60"),
   ),
@@ -53,10 +50,6 @@ export const env = {
   // ---------------------------------------------------------------------------
   // Client — variables publiques (accessibles côté client et serveur)
   // ---------------------------------------------------------------------------
-  NEXT_PUBLIC_PUSHER_APP_ID: optional("NEXT_PUBLIC_PUSHER_APP_ID"),
-  NEXT_PUBLIC_PUSHER_KEY: optional("NEXT_PUBLIC_PUSHER_KEY"),
-  PUSHER_SECRET: required("PUSHER_SECRET"),
-  NEXT_PUBLIC_PUSHER_CLUSTER: optional("NEXT_PUBLIC_PUSHER_CLUSTER"),
   NEXT_PUBLIC_GA_MEASUREMENT_ID: optional("NEXT_PUBLIC_GA_MEASUREMENT_ID"),
   NEXT_PUBLIC_SANITY_PROJECT_ID: optional("NEXT_PUBLIC_SANITY_PROJECT_ID"),
   NEXT_PUBLIC_SANITY_DATASET: optional("NEXT_PUBLIC_SANITY_DATASET"),

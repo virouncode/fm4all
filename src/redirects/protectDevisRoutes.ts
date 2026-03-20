@@ -8,7 +8,7 @@ export const protectDevisRoutes = ({
 }: {
   req: NextRequest;
   pathnameWithoutLocale: string;
-  locale: string;
+  locale: LocaleType;
   intlMiddleware: (req: NextRequest) => NextResponse;
 }) => {
   const segments = pathnameWithoutLocale.split("/").filter(Boolean);

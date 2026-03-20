@@ -1,11 +1,9 @@
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import { env } from "@/lib/env";
 import * as schema from "./schema";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("Missing DATABASE_URL environment variable");
-}
+const connectionString = env.DATABASE_URL;
 
 // Singleton global pour éviter de recréer un Pool en dev / sur Vercel
 const globalForDb = globalThis as unknown as {

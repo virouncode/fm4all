@@ -26,9 +26,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import FAQService from "./FAQService";
 
-// export const dynamic = "force-static";
-// export const revalidate = 60;
-// export const dynamicParams = false; //permet de retourner 404 si le slug n'existe pas, mais on préfère appeler nous-memes notFound() pour personnaliser la page 404
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
@@ -65,7 +62,7 @@ const ptComponents = {
             alt={value.alt || "illustration du service"}
             fill
             className="m-0 object-contain"
-            sizes="(min-width:768px) 100vw"
+            sizes="(min-width:768px) 100vw, 100vw"
           />
         </div>
       );
@@ -110,7 +107,7 @@ export const generateStaticParams = async () => {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: string }>;
+  params: Promise<{ slug: string; locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { slug, locale } = await params;
   const service = await getService(slug);
@@ -136,7 +133,7 @@ export default async function page({
 }) {
   const { slug, locale } = await params;
   setRequestLocale(locale);
-  const tGlobal = await getTranslations({ locale, namespace: "Global" }); //car force-static
+  const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const t = await getTranslations({ locale, namespace: "ServicesPage" });
 
   const service = await getService(slug);
@@ -151,142 +148,24 @@ export default async function page({
   const serviceImageAlt = service.imagePrincipale?.alt
     ? service.imagePrincipale.alt
     : tGlobal("illustration-du-service");
-  const serviceImageBloc1Url = service.imageBloc1
-    ? urlFor(service.imageBloc1)
-    : null;
-  const serviceImageBloc1Alt = service.imageBloc1?.alt
-    ? service.imageBloc1.alt
-    : tGlobal("illustration-du-service");
-  const serviceImageBloc2Url = service.imageBloc2
-    ? urlFor(service.imageBloc2)
-    : null;
-  const serviceImageBloc2Alt = service.imageBloc2?.alt
-    ? service.imageBloc2.alt
-    : tGlobal("illustration-du-service");
-  const serviceImageBloc3Url = service.imageBloc3
-    ? urlFor(service.imageBloc3)
-    : null;
-  const serviceImageBloc3Alt = service.imageBloc3?.alt
-    ? service.imageBloc3.alt
-    : tGlobal("illustration-du-service");
-  const serviceImageBloc4Url = service.imageBloc4
-    ? urlFor(service.imageBloc4)
-    : null;
-  const serviceImageBloc4Alt = service.imageBloc4?.alt
-    ? service.imageBloc4.alt
-    : tGlobal("illustration-du-service");
-  const serviceImageBloc5Url = service.imageBloc5
-    ? urlFor(service.imageBloc5)
-    : null;
-  const serviceImageBloc5Alt = service.imageBloc5?.alt
-    ? service.imageBloc5.alt
-    : tGlobal("illustration-du-service");
-  const serviceImageBloc6Url = service.imageBloc6
-    ? urlFor(service.imageBloc6)
-    : null;
-  const serviceImageBloc6Alt = service.imageBloc6?.alt
-    ? service.imageBloc6.alt
-    : tGlobal("illustration-du-service");
-  const serviceImageBloc7Url = service.imageBloc7
-    ? urlFor(service.imageBloc7)
-    : null;
-  const serviceImageBloc7Alt = service.imageBloc7?.alt
-    ? service.imageBloc7.alt
-    : tGlobal("illustration-du-service");
-
-  const serviceImageBloc8Url = service.imageBloc8
-    ? urlFor(service.imageBloc8)
-    : null;
-  const serviceImageBloc8Alt = service.imageBloc8?.alt
-    ? service.imageBloc8.alt
-    : tGlobal("illustration-du-service");
-
-  const serviceImageBloc9Url = service.imageBloc9
-    ? urlFor(service.imageBloc9)
-    : null;
-  const serviceImageBloc9Alt = service.imageBloc9?.alt
-    ? service.imageBloc9.alt
-    : tGlobal("illustration-du-service");
-
-  const serviceImageBloc10Url = service.imageBloc10
-    ? urlFor(service.imageBloc10)
-    : null;
-  const serviceImageBloc10Alt = service.imageBloc10?.alt
-    ? service.imageBloc10.alt
-    : tGlobal("illustration-du-service");
-
   const serviceBlocs = [
-    {
-      id: 1,
-      imageUrl: serviceImageBloc1Url,
-      imageAlt: serviceImageBloc1Alt,
-      bloc: service.bloc1,
-      side: "left" as const,
-    },
-    {
-      id: 2,
-      imageUrl: serviceImageBloc2Url,
-      imageAlt: serviceImageBloc2Alt,
-      bloc: service.bloc2,
-      side: "right" as const,
-    },
-    {
-      id: 3,
-      imageUrl: serviceImageBloc3Url,
-      imageAlt: serviceImageBloc3Alt,
-      bloc: service.bloc3,
-      side: "left" as const,
-    },
-    {
-      id: 4,
-      imageUrl: serviceImageBloc4Url,
-      imageAlt: serviceImageBloc4Alt,
-      bloc: service.bloc4,
-      side: "right" as const,
-    },
-    {
-      id: 5,
-      imageUrl: serviceImageBloc5Url,
-      imageAlt: serviceImageBloc5Alt,
-      bloc: service.bloc5,
-      side: "left" as const,
-    },
-    {
-      id: 6,
-      imageUrl: serviceImageBloc6Url,
-      imageAlt: serviceImageBloc6Alt,
-      bloc: service.bloc6,
-      side: "right" as const,
-    },
-    {
-      id: 7,
-      imageUrl: serviceImageBloc7Url,
-      imageAlt: serviceImageBloc7Alt,
-      bloc: service.bloc7,
-      side: "left" as const,
-    },
-    {
-      id: 8,
-      imageUrl: serviceImageBloc8Url,
-      imageAlt: serviceImageBloc8Alt,
-      bloc: service.bloc8,
-      side: "right" as const,
-    },
-    {
-      id: 9,
-      imageUrl: serviceImageBloc9Url,
-      imageAlt: serviceImageBloc9Alt,
-      bloc: service.bloc9,
-      side: "left" as const,
-    },
-    {
-      id: 10,
-      imageUrl: serviceImageBloc10Url,
-      imageAlt: serviceImageBloc10Alt,
-      bloc: service.bloc10,
-      side: "right" as const,
-    },
-  ];
+    { image: service.imageBloc1, bloc: service.bloc1 },
+    { image: service.imageBloc2, bloc: service.bloc2 },
+    { image: service.imageBloc3, bloc: service.bloc3 },
+    { image: service.imageBloc4, bloc: service.bloc4 },
+    { image: service.imageBloc5, bloc: service.bloc5 },
+    { image: service.imageBloc6, bloc: service.bloc6 },
+    { image: service.imageBloc7, bloc: service.bloc7 },
+    { image: service.imageBloc8, bloc: service.bloc8 },
+    { image: service.imageBloc9, bloc: service.bloc9 },
+    { image: service.imageBloc10, bloc: service.bloc10 },
+  ].map(({ image, bloc }, index) => ({
+    id: index + 1,
+    imageUrl: image ? urlFor(image) : null,
+    imageAlt: image?.alt ?? tGlobal("illustration-du-service"),
+    bloc,
+    side: (index % 2 === 0 ? "left" : "right") as "left" | "right",
+  }));
 
   return (
     <main className="mx-auto mb-24 max-w-7xl px-6 py-4 hyphens-auto md:px-20">

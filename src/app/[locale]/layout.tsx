@@ -1,12 +1,12 @@
 import GoogleTags from "@/components/analytics/GoogleTags";
 import { Toaster } from "@/components/ui/sonner";
 import { ConfirmProvider } from "@/context/ConfirmContextProvider";
-import { ThemeProvider } from "next-themes";
-import { routing } from "@/i18n/routing";
+import { LocaleType, routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import { ThemeProvider } from "next-themes";
 import { Didact_Gothic, Geist, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import "./globals.css";
@@ -39,7 +39,7 @@ export default async function LocalizedLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }>) {
   const { locale } = await params;
 

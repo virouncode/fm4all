@@ -31,19 +31,19 @@ export function generateLocalizedDynamicRouteParams<T extends string>(
   slugsFr: (string | undefined)[],
   slugsEn: (string | undefined)[],
   paramName: T,
-): Array<{ locale: string } & Record<T, string>> {
+): Array<{ locale: LocaleType } & Record<T, string>> {
   return [
     ...slugsFr.filter(Boolean).map((slug) => {
       return {
         locale: "fr",
         [paramName]: slug,
-      } as { locale: string } & Record<T, string>;
+      } as { locale: LocaleType } & Record<T, string>;
     }),
     ...slugsEn.filter(Boolean).map((slug) => {
       return {
         locale: "en",
         [paramName]: slug,
-      } as { locale: string } & Record<T, string>;
+      } as { locale: LocaleType } & Record<T, string>;
     }),
   ];
 }

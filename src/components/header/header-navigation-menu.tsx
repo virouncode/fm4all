@@ -8,7 +8,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { PathnamesType } from "@/i18n/routing";
 import {
   Factory,
   HandPlatter,
@@ -16,6 +15,7 @@ import {
   Telescope,
   Users,
 } from "lucide-react";
+import { ComponentProps } from "react";
 
 import {
   Accordion,
@@ -27,36 +27,28 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 
+type LinkHrefType = ComponentProps<typeof Link>["href"];
+
 type HeaderNavigationMenuProps = {
   services: {
     title: string;
-    href: {
-      pathname: PathnamesType;
-      params: { slug: string };
-    };
+    href: LinkHrefType;
     linkText: string;
     icon: LucideIcon;
   }[];
   secteurs: {
     title: string;
-    href: {
-      pathname: PathnamesType;
-      params: { slug: string };
-    };
+    href: LinkHrefType;
     icon: LucideIcon;
   }[];
   rejoindre: {
     title: string;
-    href: {
-      pathname: PathnamesType;
-    };
+    href: LinkHrefType;
     icon: LucideIcon;
   }[];
   decouvrir: {
     title: string;
-    href: {
-      pathname: PathnamesType;
-    };
+    href: LinkHrefType;
     icon: LucideIcon;
   }[];
   orientation: "horizontal" | "vertical";
@@ -129,7 +121,6 @@ const HeaderNavigationMenu = ({
                   >
                     <NavigationMenuLink asChild className="text-base">
                       <Link
-                        //@ts-expect-error ok - href is a complex object
                         href={service.href}
                         title={service.linkText}
                         aria-label={service.linkText}
@@ -176,7 +167,6 @@ const HeaderNavigationMenu = ({
                   <li key={secteur.title} className="hover:bg-accent px-2">
                     <NavigationMenuLink asChild className="text-base">
                       <Link
-                        //@ts-expect-error ok - href is a complex object
                         href={secteur.href}
                         className="flex w-full flex-row items-center gap-4 hover:underline"
                       >
@@ -209,7 +199,6 @@ const HeaderNavigationMenu = ({
                   <li key={item.title} className="hover:bg-accent px-2">
                     <NavigationMenuLink asChild className="text-base">
                       <Link
-                        //@ts-expect-error ok - href is a complex object
                         href={item.href}
                         className="flex w-full flex-row items-center gap-4 hover:underline"
                       >
@@ -242,7 +231,6 @@ const HeaderNavigationMenu = ({
                   <li key={item.title} className="hover:bg-accent px-2">
                     <NavigationMenuLink asChild className="text-base">
                       <Link
-                        //@ts-expect-error ok - href is a complex object
                         href={item.href}
                         className="flex w-full flex-row items-center gap-4 hover:underline"
                       >
@@ -305,7 +293,6 @@ const HeaderNavigationMenu = ({
                     onClick={handleHideMobileNav}
                   >
                     <Link
-                      //@ts-expect-error ok - href is a complex object
                       href={service.href}
                       title={service.linkText}
                       aria-label={service.linkText}
@@ -360,10 +347,9 @@ const HeaderNavigationMenu = ({
                     onClick={handleHideMobileNav}
                   >
                     <Link
-                      //@ts-expect-error ok - href is a complex object
                       href={secteur.href}
                       className="flex w-full items-center gap-4 !text-lg hover:underline"
-                      title={secteur.href.pathname}
+                      title={secteur.title}
                     >
                       <secteur.icon className="size-5" />
                       {secteur.title}
@@ -393,7 +379,6 @@ const HeaderNavigationMenu = ({
                     onClick={handleHideMobileNav}
                   >
                     <Link
-                      //@ts-expect-error ok - href is a complex object
                       href={item.href}
                       title={item.title}
                       aria-label={item.title}
@@ -428,7 +413,6 @@ const HeaderNavigationMenu = ({
                     onClick={handleHideMobileNav}
                   >
                     <Link
-                      //@ts-expect-error ok - href is a complex object
                       href={item.href}
                       title={item.title}
                       aria-label={item.title}

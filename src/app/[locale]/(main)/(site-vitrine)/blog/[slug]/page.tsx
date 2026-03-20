@@ -25,13 +25,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import ArticlesCards from "./ArticlesCards";
 
-// export const dynamic = "force-static";
-// export const dynamicParams = false;
-
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: string }>;
+  params: Promise<{ slug: string; locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { slug, locale } = await params;
   const categorie = await getCategorie(slug);
@@ -65,7 +62,7 @@ export const generateStaticParams = async () => {
 const page = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: string }>;
+  params: Promise<{ slug: string; locale: LocaleType }>;
 }) => {
   const { slug, locale } = await params;
   setRequestLocale(locale);

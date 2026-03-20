@@ -10,6 +10,7 @@ import Services from "@/app/[locale]/(main)/(site-vitrine)/(home)/Services";
 import Slogan from "@/app/[locale]/(main)/(site-vitrine)/(home)/Slogan";
 import VideoPresentation from "@/app/[locale]/(main)/(site-vitrine)/(home)/VideoPresentation";
 import Why from "@/app/[locale]/(main)/(site-vitrine)/(home)/Why";
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
@@ -23,7 +24,7 @@ export const generateStaticParams = () => {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
   const title =
@@ -43,7 +44,7 @@ export const generateMetadata = async ({
 export default async function page({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);

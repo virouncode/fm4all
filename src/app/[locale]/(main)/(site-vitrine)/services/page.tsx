@@ -39,7 +39,11 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("ServicesPage");
@@ -177,8 +181,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
                     {sortedVilles.map((ville) => (
                       <li key={ville._id}>
                         <Link
-                          //@ts-expect-error je sais
-                          href={`/services/${ville.service.slug.current}/${ville.subSlug.current}`}
+                          href={{
+                            pathname: "/services/[slug]/[subSlug]",
+                            params: {
+                              slug: ville.service.slug.current,
+                              subSlug: ville.subSlug.current,
+                            },
+                          }}
                           className="underline"
                         >
                           {ville.titreCard}

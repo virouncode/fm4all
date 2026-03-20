@@ -1,10 +1,10 @@
 import { Link } from "@/i18n/navigation";
-import { ReactNode } from "react";
+import { ComponentProps, ReactNode } from "react";
 
 type ServicePresentationCardProps = {
   title: string;
   icons: ReactNode[];
-  href?: string | { pathname: string; params: Record<string, string | number> };
+  href?: ComponentProps<typeof Link>["href"];
   onClick?: () => void;
   className?: string;
 };
@@ -18,7 +18,6 @@ const ServicePresentationCard = ({
 }: ServicePresentationCardProps) => {
   if (href)
     return (
-      //@ts-expect-error  href is a complex object
       <Link href={href} title={title}>
         <div
           className={`flex items-center gap-4 rounded-xl border p-4 ${href ? "hover:border-primary hover:text-primary hover:border-2" : ""} ${className}`}

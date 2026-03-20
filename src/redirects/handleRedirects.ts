@@ -30,7 +30,7 @@ import {
 export const handleArticleRedirects = (
   req: NextRequest,
   pathSegments: string[],
-  locale: string,
+  locale: LocaleType,
 ): NextResponse | null => {
   if (
     (pathSegments[0] !== "articles" && pathSegments[0] !== "posts") ||
@@ -92,7 +92,7 @@ export const handleArticleRedirects = (
 export const handleServiceRedirects = (
   req: NextRequest,
   pathSegments: string[],
-  locale: string,
+  locale: LocaleType,
 ): NextResponse | null => {
   if (pathSegments[0] !== "services" || pathSegments.length < 2) {
     return null; // Pas un service, on ne fait rien
@@ -152,7 +152,7 @@ export const handleServiceRedirects = (
 export const handleSecteurRedirects = (
   req: NextRequest,
   pathSegments: string[],
-  locale: string,
+  locale: LocaleType,
 ): NextResponse | null => {
   if (
     (pathSegments[0] !== "secteurs" && pathSegments[0] !== "sectors") ||

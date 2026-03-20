@@ -16,7 +16,7 @@ import { z } from "zod";
 import { codePostalSchema } from "./codePostal.schema";
 import { typeBatimentSchema, typeOccupationSchema } from "./enums";
 import { phoneNumberSchema } from "./phone.schema";
-import { siretSchemaEmpty } from "./siret.schema.ts";
+import { siretSchemaEmpty } from "./siret.schema";
 
 export const selectProspectSchema = createSelectSchema(prospects);
 export type SelectProspectType = z.infer<typeof selectProspectSchema>;

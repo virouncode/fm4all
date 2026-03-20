@@ -2,7 +2,6 @@
 
 import ContactButton from "@/components/buttons/contact-button";
 import LocaleButton from "@/components/buttons/locale-button";
-import UserButton from "@/components/buttons/UserButton";
 import { Link } from "@/i18n/navigation";
 import { PathnamesType } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
@@ -424,7 +423,6 @@ const Header = () => {
             <ModeToggle />
             <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
             <LinkedinButton setIsMobileNavOpen={setIsMobileNavOpen} />
-            <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
           </div>
           <HeaderNavigationMenu
             services={services}

@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Link as I18nLink } from "@/i18n/navigation";
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { HomeIcon, Mail } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import Link from "next/link";
 
 export const generateStaticParams = () => {
   return generateLocaleParams();
@@ -23,7 +23,7 @@ export const generateStaticParams = () => {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
   return generateAlternates(
@@ -36,7 +36,11 @@ export const generateMetadata = async ({
   );
 };
 
-const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("TravailPage");
@@ -64,14 +68,14 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           className="ring-primary flex items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%]"
           asChild
         >
-          <Link
+          <a
             href="mailto:emploi@fm4all.com"
             className="flex items-center justify-center gap-2"
             title={locale === "fr" ? "Contacter par email" : "Contact by email"}
           >
             <Mail />
             {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}
-          </Link>
+          </a>
         </Button>
       </div>
 

@@ -9,6 +9,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { HomeIcon } from "lucide-react";
@@ -18,7 +19,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
   return generateAlternates(
@@ -37,7 +38,11 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("EngagementsPage");

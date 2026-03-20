@@ -3,11 +3,12 @@ import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import CityOut from "./CityOut";
+import { LocaleType } from "@/i18n/routing";
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
   return generateAlternates(
@@ -29,7 +30,7 @@ const page = async ({
   params,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }) => {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -44,7 +45,7 @@ const page = async ({
   } = await searchParams;
 
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col gap-4 px-6 pb-10 pt-4 md:px-20">
+    <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col gap-4 px-6 pt-4 pb-10 md:px-20">
       <CityOut
         destination={destination}
         codePostal={codePostal}

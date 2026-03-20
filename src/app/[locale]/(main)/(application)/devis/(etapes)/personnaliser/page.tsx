@@ -1,3 +1,4 @@
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import {
@@ -9,7 +10,7 @@ import {
   getRiaTarifs,
 } from "@/server/queries_a_classer/incendie/getIncendie";
 import { Metadata } from "next";
-import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import ServicesLoader from "../locaux/ServicesLoader";
 import PersonnaliserDevis from "./PersonnaliserDevis";
@@ -18,8 +19,12 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-export const generateMetadata = async (): Promise<Metadata> => {
-  const locale = await getLocale();
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}): Promise<Metadata> => {
+  const { locale } = await params;
   return generateAlternates(
     "personnaliserDevis",
     locale,
@@ -30,7 +35,11 @@ export const generateMetadata = async (): Promise<Metadata> => {
   );
 };
 
-const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const tPersonnaliser = await getTranslations("DevisPage.personnaliser");

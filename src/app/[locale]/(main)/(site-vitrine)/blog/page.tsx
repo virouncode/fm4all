@@ -20,7 +20,7 @@ import ArticlesCategorieCarousel from "./ArticlesCategorieCarousel";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
   return generateAlternates(
@@ -37,7 +37,11 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("BlogPage");

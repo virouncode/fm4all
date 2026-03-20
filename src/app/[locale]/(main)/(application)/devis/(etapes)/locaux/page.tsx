@@ -1,15 +1,20 @@
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import MesLocaux from "./MesLocaux";
 
 export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-export const generateMetadata = async (): Promise<Metadata> => {
-  const locale = await getLocale();
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}): Promise<Metadata> => {
+  const { locale } = await params;
   return generateAlternates(
     "locauxDevis",
     locale,
@@ -20,7 +25,11 @@ export const generateMetadata = async (): Promise<Metadata> => {
   );
 };
 
-const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("DevisPage.locaux");

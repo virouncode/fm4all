@@ -3,13 +3,18 @@ import Footer from "@/components/footer/footer";
 import Header from "@/components/header/header";
 import { routing } from "@/i18n/routing";
 
+import { LocaleType } from "@/i18n/routing";
 import { Metadata } from "next";
 import { hasLocale } from "next-intl";
-import { getLocale, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
-export const generateMetadata = async (): Promise<Metadata> => {
-  const locale = await getLocale();
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}): Promise<Metadata> => {
+  const { locale } = await params;
   const titleTemplate = "%s | fm4all";
   const title =
     locale === "fr"
@@ -19,10 +24,6 @@ export const generateMetadata = async (): Promise<Metadata> => {
     locale === "fr"
       ? "fm4all gère vos services généraux à Paris et en IDF : propreté, maintenance, etc. Obtenez dès maintenant un devis gratuit pour vos locaux."
       : "Facility Management services in Paris: fm4all provides cleaning, maintenance, fire safety, and more. Get your free quote online and simplify operations.";
-  const canonicalUrl =
-    locale === "fr" ? "https://www.fm4all.com/fr" : "https://www.fm4all.com/en";
-
-  // Structure des métadonnées
   return {
     metadataBase: new URL("https://www.fm4all.com"),
     title: {
@@ -30,13 +31,6 @@ export const generateMetadata = async (): Promise<Metadata> => {
       default: title,
     },
     description: description,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        fr: "https://www.fm4all.com/fr",
-        en: "https://www.fm4all.com/en",
-      },
-    },
   };
 };
 
@@ -45,7 +39,7 @@ export default async function SiteLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }>) {
   const { locale } = await params;
 

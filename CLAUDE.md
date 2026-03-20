@@ -1,8 +1,8 @@
 # FM4ALL - Guide de Développement pour Claude
 
-> **Note Importante**: Ce projet est en refonte. Les anciens fichiers (ex: providers de services individuels) ne doivent PAS être pris comme référence. Utilisez uniquement la nouvelle architecture décrite ci-dessous.
+> **Périmètre de ce projet** : Ce dépôt contient le **site vitrine marketing** (www.fm4all.com) et le **comparateur / générateur de devis** (parcours public, sans authentification). La plateforme de gestion opérationnelle (portail back-office : tickets, prestations, utilisateurs, etc.) a été extraite dans un projet séparé.
 
-> **RÈGLES MÉTIER DEVIS** : Toujours consulter [`docs/regles_metier.md`](docs/regles_metier.md) avant d'implémenter ou de modifier une permission sur les devis ou demandes de devis.
+> **Stack principale** : Next.js 14+ App Router · Sanity CMS · next-intl (FR/EN) · Tailwind CSS · shadcn/ui · Drizzle ORM (pour le devis)
 
 ---
 
@@ -13,6 +13,7 @@
 ### Étape 1 — Lire tous les fichiers concernés EN ENTIER
 
 Ne pas scanner, ne pas supposer. Lire ligne par ligne :
+
 - Le schéma DB (`db/schema/`)
 - Le schéma Zod (`zod-schemas/`)
 - L'action serveur (`server/actions/`)
@@ -29,6 +30,7 @@ Pour chaque prop passée d'un parent à un enfant : vérifier qu'elle est bien u
 ### Étape 3 — Vérifier chaque posture séparément
 
 Pour chaque fichier modifié, simuler mentalement :
+
 - Posture **client** : quel `entrepriseId` ? quels droits ? quel rendu ?
 - Posture **prestataire** : idem — attention aux tables différentes (`userPrestataireSiteAttributions` ≠ `userClientSiteAttributions`)
 - Posture **plateforme** : bypass actif ? cookie vérifié ?
@@ -44,6 +46,7 @@ Pour chaque fichier modifié, simuler mentalement :
 ```bash
 pnpm tsc --noEmit
 ```
+
 Zéro erreur. Zéro `any`. Zéro `@ts-ignore` sans justification.
 
 ### Étape 6 — Audit frontend obligatoire
@@ -51,28 +54,33 @@ Zéro erreur. Zéro `any`. Zéro `@ts-ignore` sans justification.
 Pour chaque composant modifié ou créé, vérifier ligne par ligne :
 
 **Rendu conditionnel**
+
 - Chaque `{condition && <Composant />}` : la condition est-elle correcte pour toutes les postures ?
 - Chaque `{condition ? <A /> : <B />}` : les deux branches sont-elles cohérentes avec les permissions réelles ?
 - Un composant jamais rendu parce que sa condition est toujours `false` = bug silencieux
 
 **Cohérence posture / permissions**
+
 - Chaque bouton d'action (Modifier, Supprimer, Attribuer...) : est-il conditionné par `canEdit` / `canManage` ?
 - `canEdit` est-il calculé avec le bon rôle selon la posture (`roleClientAdhesion` vs `rolePrestataireAdhesion`) ?
 - Un utilisateur en posture prestataire ne doit pas voir les contrôles basés sur `roleClientAdhesion`
 - Les permissions sont-elles vérifiées aussi côté serveur (action) et pas seulement côté UI ?
 
 **Données affichées**
+
 - Les données affichées correspondent-elles à l'entité sélectionnée (pas à l'utilisateur connecté) ?
 - Si l'utilisateur change d'entité sélectionnée (ex: autre utilisateur, autre client), le composant se vide-t-il et se recharge-t-il correctement ?
 - Une liste vide affiche-t-elle "Aucun X" alors que la DB contient des données = bug de fetch ou de condition
 
 **Props passées aux composants enfants**
+
 - Tracer chaque prop du parent vers l'enfant : est-elle bien reçue, bien utilisée, et du bon type ?
 - Une prop `undefined` ou `""` passée silencieusement à un enfant = comportement incorrect invisible
 
 ### Étape 7 — Simulation parcours utilisateur
 
 Pour chaque rôle (admin, manager, collaborateur) et chaque posture :
+
 1. **Ouverture** : quels éléments sont visibles / masqués / désactivés / pré-remplis ?
 2. **Action** : que se passe-t-il quand l'utilisateur clique sur X ?
 3. **Erreur** : que voit-il si la requête échoue ?
@@ -93,33 +101,21 @@ Avant d'écrire **la moindre ligne de code**, pour toute nouvelle feature ou sou
 
 ### Modules de référence par type de feature
 
-| Feature | Module de référence à lire EN PREMIER |
-|---------|---------------------------------------|
-| Table avec filtres + tri + infinite scroll | `/app/tickets` |
-| Formulaire create/edit en dialog | `/app/sites` |
-| Gestion hiérarchique | `/app/sites` (closure table) |
-| Permissions posture-aware | `/app/tickets` |
-| Upload fichiers / S3 | `/app/tickets/[ticketId]` |
+| Feature                             | Module de référence à lire EN PREMIER                            |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| Page dynamique Sanity avec metadata | `/services/[slug]/page.tsx` ou `/blog/[slug]/[subSlug]/page.tsx` |
+| Formulaire create/edit (RHF + Zod)  | Tout composant `*Form.tsx` dans `/devis/`                        |
+| Store Zustand multi-étapes          | `stores/` du module devis                                        |
+| Redirections SEO / slugs            | `redirects/handleRedirects.ts`                                   |
 
 ### Exemples de divergences à ne JAMAIS faire
 
 - ❌ Construire un objet `sortSearchParams = { serviceId: searchParams.serviceId }` au lieu de passer `searchParams` directement → bug string `"undefined"` dans l'URL
 - ❌ Utiliser `form.watch()` dans le render body au lieu de `useWatch()` → "Maximum update depth exceeded"
-- ❌ Construire un `<div relative>` autour d'un bouton pour un badge au lieu d'un `<span>` inline → badge mal positionné
-- ❌ Utiliser `Badge` en absolu au lieu de `<span className="... ml-1 rounded-full px-1.5 text-xs">` → idem
-- ❌ Créer un dialog de PJ avec deux sections séparées (existants en liste + section "ajouter") au lieu de copier exactement `EditAttachmentsDialog` (tickets) : `DialogTrigger asChild` + un seul `useFieldArray` + `RhfFileInput` pour TOUS les items + `useEffect → form.reset()` pour les URLs
+- ❌ Utiliser `next/navigation` au lieu de `@/i18n/navigation` → pathname contient la locale
+- ❌ Appeler `getLocale()` dans un layout au lieu d'extraire depuis `params` → moins fiable
 
-**En cas de doute** : demander "comment est-ce fait dans `/app/tickets` ?" et recopier exactement.
-
-### ⚠️ IMITER = COPIER-COLLER, PAS "S'INSPIRER"
-
-Quand on dit "imite `EditAttachmentsDialog`", cela signifie :
-1. **Ouvrir le fichier** et le lire entièrement
-2. **Copier la structure JSX exacte** : même `DialogTrigger asChild`, mêmes hooks dans le même ordre, même layout
-3. **Adapter uniquement** : le nom de l'action serveur appelée dans `onSubmit`, les props spécifiques
-4. **Ne rien ajouter** : pas de sections supplémentaires, pas d'états alternatifs, pas de logique "améliorée"
-
-"S'inspirer" = ré-inventer. Ce n'est pas acceptable. **Copier-coller puis adapter.**
+**En cas de doute** : lire le fichier existant le plus proche et copier sa structure exacte.
 
 ---
 
@@ -127,17 +123,18 @@ Quand on dit "imite `EditAttachmentsDialog`", cela signifie :
 
 ### Contexte Métier
 
-**FM4ALL** est une société de mise en relation et de courtage pour les services de **facility management / office management** des TPE/PME. Le positionnement clé : **"1 contact, 1 contrat, 1 facture"** pour l'ensemble des prestations externalisées.
+**FM4ALL** est une société de courtage en **facility management / office management** pour les TPE/PME de Paris et Île-de-France. Positionnement clé : **"1 contact, 1 contrat, 1 facture"** — toutes les prestations externalisées consolidées en un seul interlocuteur.
 
-**Problème résolu** : Les petites structures (< 3 000 m²) peinent à obtenir des devis compétitifs auprès de prestataires FM. FM4ALL automatise ce processus via un comparateur en ligne et un générateur de devis en quelques minutes, en jouant sur les volumes agrégés (moyenne -10% sur les tarifs).
+**Problème résolu** : Les petites structures (< 3 000 m²) ont du mal à accéder à des tarifs FM compétitifs. FM4ALL agrège la demande de ses clients pour négocier des remises volumes (−10% en moyenne) et automatise la génération de devis multi-services en quelques minutes.
 
-**Cibles clients** : TPE/PME, start-ups, cabinets médicaux, locaux commerciaux, entrepôts logistiques, espaces de coworking.
+**Cibles clients** : TPE/PME, start-ups, cabinets médicaux, espaces de coworking, locaux commerciaux, entrepôts logistiques.
 
-**Modèle économique** : FM4ALL porte le devis/contrat, facture le client, reverse aux prestataires, prend une marge (les partenaires font un "effort" tarifaire via les volumes agrégés) + facture des frais de gestion systématiques. Le client n'a qu'un seul interlocuteur.
+**Modèle économique** : FM4ALL joue un rôle d'intermédiaire — il porte le contrat, facture le client final, reverse aux prestataires et prend une marge. Le client n'a qu'une seule facture et un seul interlocuteur.
 
 ### Services Proposés
 
 9 domaines, chacun disponible en 3 niveaux (Essentiel / Confort / Excellence) :
+
 1. Nettoyage & propreté
 2. Maintenance multitechnique
 3. Sécurité incendie
@@ -145,77 +142,39 @@ Quand on dit "imite `EditAttachmentsDialog`", cela signifie :
 5. Fontaines à eau
 6. Fruits & Snacks
 7. Boissons variées
-8. Office Manager externalisé
-9. Pilotage FM4ALL
+8. Office Manager externalisé (HOF Manager, à partir d'une demi-journée/semaine)
+9. Pilotage FM4ALL (gestion déléguée complète)
 
 ---
 
-## Les Deux Outils de la Plateforme
+## Ce que contient CE projet
 
-### Outil 1 — Comparateur & Générateur de Devis
+### 1 — Site Vitrine Marketing (`/(site-vitrine)/`)
 
-Le point d'entrée public : le client configure ses locaux, sélectionne des services parmi le catalogue FM4ALL, et obtient un devis multi-services en quelques minutes avec les tarifs des partenaires.
+Le site public www.fm4all.com géré via **Sanity CMS** :
 
-- Accessible sans compte (parcours public)
-- Tarification temps réel basée sur le catalogue partenaires
-- FM4ALL porte le contrat et facture le client (`modeCommercial: "intermediaire_fm4all"`)
-- Résultat : un devis → signé → devient des **prestations** dans l'outil de gestion
+- Pages de présentation des services (nettoyage, maintenance, etc.) avec contenu riche (blocs, images, FAQ)
+- Pages par secteur d'activité (bureaux, cabinet médical, coworking…)
+- Blog d'articles (catégorisés, multi-langue)
+- Pages statiques (engagements, partenaires, FAQ, CGV, mentions légales, etc.)
+- Pages service × ville (SEO local, ex: nettoyage-paris, maintenance-lyon)
+- Internationalisation FR/EN via next-intl avec pathnames localisés
 
-### Outil 2 — Plateforme de Gestion Opérationnelle
+**Architecture** : Server Components statiques + `generateStaticParams()` pour les pages dynamiques Sanity. Pas de Client Components sauf exceptions (cookies banner, etc.).
 
-L'outil métier principal (cette application). Gère le cycle de vie complet des prestations après contractualisation.
+### 2 — Comparateur & Générateur de Devis (`/(application)/devis/`)
 
-**C'est ici que réside le principal défi : la flexibilité.**
+Le parcours public de configuration de devis multi-services :
 
-#### Postures Contractuelles Supportées
+- Accessible sans compte (parcours 100% public)
+- Multi-étapes : locaux → services (nettoyage, café, fontaines, snacks, etc.) → propositions prestataires → récapitulatif
+- Tarification temps réel depuis la DB (catalogue partenaires)
+- Sauvegarde de devis et envoi par email
+- Intégration avec le back-office (le devis signé devient des prestations dans l'autre projet)
 
-L'outil doit fonctionner dans tous ces cas sans être une usine à gaz :
+**Architecture** : Client Components avec état global (Zustand) pour le parcours multi-étapes + Server Actions pour les mutations (save devis, envoyer email).
 
-| Cas | Description | Flux de facturation |
-|-----|-------------|---------------------|
-| **Direct** | Client contracte directement avec un prestataire (FM4ALL hors équation) | Client → Prestataire |
-| **Intermédiaire FM4ALL** | FM4ALL porte le contrat, prend une marge, reverse aux prestataires | Client → FM4ALL → Prestataire(s) |
-| **FM4ALL prestataire** | FM4ALL est lui-même le prestataire (office manager, pilotage FM) | Client → FM4ALL |
-| **Gestion déléguée externe** | Prestataire porte le contrat, FM4ALL perçoit un % sur les prix | Client → Prestataire (FM4ALL en coulisse) |
-
-En code : `modeCommercial: "direct" | "intermediaire_fm4all"` sur chaque `clientService`.
-
-#### Principes de Flexibilité Structurelle (NE PAS OUBLIER)
-
-1. **Double casquette** : une entreprise peut être à la fois cliente ET prestataire
-2. **Standalone** : l'outil fonctionne même si FM4ALL n'est pas dans l'équation contractuelle
-3. **Prestataires sans compte** : un client peut gérer ses prestations même si ses prestataires n'ont pas de compte sur la plateforme (et inversement pour un prestataire vis-à-vis de ses clients)
-4. **Référencement croisé** : si client ET prestataire ont un compte, ils doivent pouvoir se référencer mutuellement
-5. **Posture plateforme FM4ALL** : peut agir AU NOM de n'importe quel client (vue cross-entreprises)
-
-#### Ce que doit pouvoir faire chaque acteur
-
-**Entreprise cliente** :
-- Créer/gérer ses sites (hiérarchie) et ses utilisateurs (attributions sites + rôles)
-- Créer des **prestations** (contrats opérationnels de services sur ses sites)
-- Créer des **exécutions** (prestataire + tarifs appliqués par prestation)
-- Gérer des **interventions/occurrences** avec **tâches** à effectuer
-- Créer/modifier/annuler des **tickets** et demandes de devis
-- Consulter des **analytics** (par période, par site, par service)
-- Basculer en posture prestataire si elle le souhaite
-
-**FM4ALL (posture plateforme)** :
-- Faire tout ce qu'un client peut faire, mais AU NOM de n'importe quelle entreprise cliente
-- Administrer les partenaires, les tarifs catalogue, les marges
-- En posture prestataire : se comporter comme n'importe quelle entreprise prestataire
-
-**Entreprise prestataire** :
-- Accéder aux tickets, demandes de devis, interventions qui la concernent
-- Agents : voir les tâches attribuées, pointer, soumettre des preuves (photos)
-- Responsables : émettre des rapports, valider les interventions
-
-**Système Multi-Rôles** :
-
-- **Client** : Demande des devis, gère ses sites, suit ses prestations
-- **Prestataire** : Gère ses interventions, planning, occurrences
-- **Plateforme** : Administration globale, pilotage cross-clients, paramétrage tarifaire
-
-Le système utilise un concept de **"posture"** (rôle actif) pour permettre aux utilisateurs ayant plusieurs rôles de basculer entre eux.
+> ⚠️ **Le portail back-office** (tickets, prestations, utilisateurs, sites, entreprises, facturation, etc.) a été **extrait dans un projet séparé**. Les changelogs ci-dessous font référence à cet historique mais ces modules ne sont **plus dans ce dépôt**.
 
 ---
 
@@ -231,11 +190,10 @@ Le système utilise un concept de **"posture"** (rôle actif) pour permettre aux
 
 ### Backend
 
-- **Drizzle ORM** avec PostgreSQL
+- **Drizzle ORM** avec PostgreSQL (utilisé par le module devis : tarifs, sauvegarde devis)
 - **next-safe-action** pour les Server Actions sécurisées
 - **Zod** pour la validation de schémas
-- **Pusher** pour les mises à jour temps réel
-- **Sanity CMS** pour le contenu
+- **Sanity CMS** pour le contenu du site vitrine (services, articles, secteurs)
 
 ### Outils de Développement
 
@@ -245,47 +203,85 @@ Le système utilise un concept de **"posture"** (rôle actif) pour permettre aux
 
 ---
 
-## Architecture de Référence: `/app/sites`
-
-La nouvelle architecture du projet est exemplifiée dans `/app/sites`. **Utilisez cette structure comme modèle pour toutes les nouvelles fonctionnalités**.
+## Architecture du Projet
 
 ### Structure des Dossiers
 
 ```
 src/
-├── app/[locale]/(main)/(application)/(portail)/app/
-│   └── sites/                              # Feature complète
-│       ├── page.tsx                        # Page serveur
-│       ├── SitesClient.tsx                 # Composant client principal
-│       ├── SiteFormDialog.tsx              # Formulaire create/edit
-│       ├── SiteDeleteDialog.tsx            # Confirmation suppression
-│       ├── SiteDetails.tsx                 # Vue détails
-│       ├── SitesTree.tsx                   # Arbre hiérarchique
-│       └── helpers.ts                      # Utilitaires locaux
+├── app/[locale]/(main)/
+│   ├── (site-vitrine)/                     # Site marketing public
+│   │   ├── (home)/                         # Page d'accueil
+│   │   ├── services/[slug]/[subSlug]/      # Pages service × ville
+│   │   ├── secteurs/[slug]/                # Pages secteur d'activité
+│   │   ├── blog/[slug]/[subSlug]/          # Articles de blog
+│   │   └── layout.tsx                      # Header + Footer + CookieBanner
+│   │
+│   └── (application)/devis/               # Comparateur/générateur de devis
+│       ├── (etapes)/                       # Étapes du parcours
+│       │   ├── locaux/                     # Config des locaux
+│       │   ├── nettoyage/                  # Service nettoyage
+│       │   ├── food-beverage/              # Café, fontaines, snacks
+│       │   └── ...                         # Autres services
+│       ├── layout.tsx                      # Layout devis (sidebar, total)
+│       └── sauvegarder/                    # Sauvegarde/envoi devis
+│
+├── sanity/                                 # CMS Sanity
+│   ├── lib/
+│   │   ├── client.ts                       # Client Sanity
+│   │   ├── image.ts                        # urlFor() helper
+│   │   └── live.ts                         # Live content (définition)
+│   ├── queries.ts                          # Toutes les GROQ queries
+│   └── schemaTypes/                        # Schémas Sanity (article, service, etc.)
+│
+├── i18n/
+│   ├── routing.ts                          # Config next-intl (locales, pathnames)
+│   └── navigation.ts                       # Link, useRouter, usePathname typés
 │
 ├── server/
-│   ├── actions/
-│   │   └── sitesActions.ts                 # Server Actions (mutations)
-│   ├── queries/
-│   │   └── sitesQueries.ts                 # Queries en lecture seule
-│   └── utils/
-│       └── sitesArborescence.utils.ts      # Logique métier complexe
-│
-├── zod-schemas/
-│   ├── sites.schema.ts                     # Schemas Zod + types
-│   └── enums.ts                            # Enums réutilisables
+│   ├── actions/                            # Server Actions (devis, emails)
+│   └── queries/                            # Queries DB pour le devis
 │
 ├── db/
-│   └── schema/
-│       └── sites.ts                        # Schéma Drizzle
+│   └── schema/                             # Schéma Drizzle (devis, tarifs partenaires)
+│
+├── zod-schemas/                            # Schemas Zod pour le devis
+│
+├── redirects/                              # Mappings SEO (slugs FR↔EN, legacy URLs)
+│   ├── handleRedirects.ts
+│   ├── urls.ts
+│   ├── articlesSlugMappings.ts
+│   ├── servicesSlugMappings.ts
+│   └── secteursSlugMappings.ts
+│
+├── lib/
+│   └── metadata/
+│       └── metadata-helpers.ts             # generateAlternates(), getLocaleFromPathname()
 │
 └── components/
-    ├── rhf/                                # Composants React Hook Form
-    │   ├── RhfInput.tsx
-    │   ├── RhfControlledSelect.tsx
-    │   └── RhfTextArea.tsx
+    ├── blocs/                              # Composants PortableText (Bloc, TltrCard)
+    ├── header/, footer/                    # Navigation site
+    ├── banners/                            # CookieBanner
     └── ui/                                 # Composants shadcn/ui
 ```
+
+### Modules de référence — Site Vitrine
+
+| Feature                         | Module de référence                               |
+| ------------------------------- | ------------------------------------------------- |
+| Page dynamique Sanity (service) | `/services/[slug]/page.tsx`                       |
+| Page dynamique Sanity (article) | `/blog/[slug]/[subSlug]/page.tsx`                 |
+| Page liste avec données Sanity  | `/services/page.tsx`                              |
+| Metadata + hreflang             | `generateAlternates()` dans `metadata-helpers.ts` |
+| Redirections SEO slug           | `redirects/handleRedirects.ts`                    |
+
+### Modules de référence — Devis (si back-office extrait)
+
+| Feature                            | Module de référence                  |
+| ---------------------------------- | ------------------------------------ |
+| Formulaire create/edit (RHF + Zod) | Patterns dans ce CLAUDE.md §Patterns |
+| Server Action avec validation      | `server/actions/*.ts`                |
+| Store Zustand multi-étapes         | `stores/`                            |
 
 ---
 
@@ -685,7 +681,10 @@ function LigneAccordion({ index }: { index: number }) {
 // Définir un type PreviewValues permissif pour la fonction de construction du preview
 type PreviewValues = {
   titre?: string;
-  lignes?: Array<{ designation?: string; prixUnitaireHtEur?: string; /* ... */ }>;
+  lignes?: Array<{
+    designation?: string;
+    prixUnitaireHtEur?: string /* ... */;
+  }>;
   // ...
 };
 
@@ -984,21 +983,30 @@ function MyComponent() {
 // ✅ CORRECT — lecture côté client pour affichage
 const postureActive = useAppStore((s) => s.postureActive);
 const activeRole =
-  postureActive === "plateforme" ? rolePlateformeAdhesion
-  : postureActive === "prestataire" ? rolePrestataireAdhesion
-  : roleClientAdhesion;
-const canEdit = postureActive === "plateforme" ? activeRole !== null : activeRole === "admin";
+  postureActive === "plateforme"
+    ? rolePlateformeAdhesion
+    : postureActive === "prestataire"
+      ? rolePrestataireAdhesion
+      : roleClientAdhesion;
+const canEdit =
+  postureActive === "plateforme" ? activeRole !== null : activeRole === "admin";
 ```
 
 **❌ Interdit** : Envoyer la posture depuis le client vers une server action **et s'y fier côté serveur**.
 
 ```typescript
 // ❌ FAUX — la posture vient du client, elle est falsifiable
-export const myAction = action.schema(z.object({
-  posture: z.string(), // ← NE JAMAIS FAIRE CONFIANCE À ÇA
-})).action(async ({ parsedInput }) => {
-  if (parsedInput.posture === "plateforme") { /* bypass ← FAILLE */ }
-});
+export const myAction = action
+  .schema(
+    z.object({
+      posture: z.string(), // ← NE JAMAIS FAIRE CONFIANCE À ÇA
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    if (parsedInput.posture === "plateforme") {
+      /* bypass ← FAILLE */
+    }
+  });
 
 // ✅ CORRECT — le backend lit TOUJOURS le cookie
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
@@ -1019,10 +1027,10 @@ Le cookie `fm4all:postureActive` (httpOnly, sameSite: lax, 180 jours) est la **s
 
 Un utilisateur FM4ALL peut avoir simultanément un `rolePlateformeAdhesion` ET un `roleClientAdhesion` ou `rolePrestataireAdhesion`. Si cet utilisateur bascule en posture `"client"` ou `"prestataire"`, son rôle plateforme **ne doit PAS** override ses permissions dans cette posture.
 
-| Fonction | Où l'utiliser | Comportement |
-|----------|---------------|--------------|
-| `getUserPlateformeAdhesion(userId)` | **Guards `page.tsx`** | Vérifie uniquement si l'user A le rôle en base — indépendant de la posture active |
-| `getEffectivePlateformeRole(userId)` | **Server actions** (bypasses) | Vérifie le rôle en base **ET** que la posture cookie = `"plateforme"` |
+| Fonction                             | Où l'utiliser                 | Comportement                                                                      |
+| ------------------------------------ | ----------------------------- | --------------------------------------------------------------------------------- |
+| `getUserPlateformeAdhesion(userId)`  | **Guards `page.tsx`**         | Vérifie uniquement si l'user A le rôle en base — indépendant de la posture active |
+| `getEffectivePlateformeRole(userId)` | **Server actions** (bypasses) | Vérifie le rôle en base **ET** que la posture cookie = `"plateforme"`             |
 
 ```typescript
 // ✅ Dans page.tsx — "Est-ce que cet user a le rôle plateforme ?"
@@ -1039,6 +1047,7 @@ if (platformRole?.role) return true; // bypass SEULEMENT si posture cookie = "pl
 **Fichier** : `src/server/utils/permissions.utils.ts`
 
 **Règle clé** : `if (posture !== "plateforme") return null` — PAS `if (posture && posture !== "plateforme")` :
+
 - Cookie absent → `posture = undefined` → `undefined !== "plateforme"` → `return null` ✅
 - Cookie = `"client"` → `return null` ✅
 - Cookie = `"plateforme"` → vérifie le rôle en base ✅
@@ -1205,16 +1214,19 @@ const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
     eq(userPrestataireAdhesions.statut, "actif"),
   ),
 });
-if (!prestataireAdhesion) redirect({ href: "/auth/unauthorized", locale: "fr" });
+if (!prestataireAdhesion)
+  redirect({ href: "/auth/unauthorized", locale: "fr" });
 ```
 
 **Pages concernées** :
+
 - Client uniquement : `/app/mes-prestataires/page.tsx`
 - Prestataire uniquement : `/app/mes-sites-clients/page.tsx`, `/app/mes-clients/page.tsx`
 
 **Note** : Les pages partagées entre postures (`/app/sites`, `/app/utilisateurs`, `/app/tickets`, etc.) n'ont pas besoin de guard posture — les actions serveur scopent les données par entreprise.
 
 ### Check Permission dans Server Actions
+
 ```typescript
 // Pattern: Check permission dans Server Actions
 export const getUsersAction = action
@@ -1774,9 +1786,9 @@ useEffect(() => {
 ```typescript
 // ❌ FAUX — sortSearchParams avec des propriétés undefined explicites
 const sortSearchParams = {
-  statut: searchParams.statut,  // peut être undefined
-  serviceId: searchParams.serviceId,  // ❌ undefined → spreade comme clé explicite
-  search: searchParams.search,  // ❌ undefined → spreade comme clé explicite
+  statut: searchParams.statut, // peut être undefined
+  serviceId: searchParams.serviceId, // ❌ undefined → spreade comme clé explicite
+  search: searchParams.search, // ❌ undefined → spreade comme clé explicite
 };
 router.replace({ query: { ...sortSearchParams, orderBy } });
 // → URL finale : ?serviceId=undefined&search=undefined  ← CORROMPU
@@ -1849,6 +1861,149 @@ Voir: `src/app/[locale]/(main)/(application)/(portail)/app/UserNavItems.tsx`
 
 ---
 
+## Patterns Site-Vitrine (Sanity + next-intl + SEO)
+
+### 1. Sanity — Fetch de contenu dans une page
+
+**Toujours utiliser le client Sanity direct** (pas `sanityFetch`/`SanityLive` — le live content n'est pas activé) :
+
+```typescript
+import { getService } from "@/sanity/queries";
+import { setRequestLocale } from "next-intl/server";
+
+export default async function page({
+  params,
+}: {
+  params: Promise<{ slug: string; locale: LocaleType }>;
+}) {
+  const { slug, locale } = await params;
+  setRequestLocale(locale); // ✅ TOUJOURS appeler setRequestLocale
+
+  const service = await getService(slug); // ← client Sanity standard
+  if (!service) notFound();
+  // ...
+}
+```
+
+**Ne PAS utiliser** `SanityLive` ou `sanityFetch` (définis dans `live.ts` mais non activés sur le site).
+
+### 2. Sanity — generateStaticParams obligatoire pour les pages dynamiques
+
+```typescript
+// Générer les params POUR LES DEUX LOCALES
+export const generateStaticParams = async () => {
+  const slugsFr = await fetchServiceSlugs("fr"); // Ou sans locale = fr par défaut
+  const slugsEn = await fetchServiceSlugs("en");
+  return [
+    ...slugsFr.map((slug) => ({ slug, locale: "fr" })),
+    ...slugsEn.map((slug) => ({ slug, locale: "en" })),
+  ];
+};
+```
+
+**Règle** : Toute page `[slug]/page.tsx` qui lit Sanity DOIT avoir `generateStaticParams`. Sans ça, la page est rendue à la demande (lent) et n'est pas préchargée au build.
+
+### 3. Metadata SEO — Utiliser generateAlternates()
+
+```typescript
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ slug: string; locale: LocaleType }>;
+}): Promise<Metadata> => {
+  const { slug, locale } = await params;
+  const service = await getService(slug);
+
+  return generateAlternates(
+    "servicePresentation", // Clé dans routing.ts pathnames
+    locale,
+    service?.baliseTitle ?? "",
+    service?.baliseDescription ?? "",
+    service?.imagePrincipale
+      ? urlFor(service.imagePrincipale).url()
+      : undefined,
+    {
+      fr: locale === "fr" ? slug : getServicesSlugFr(slug), // Slug dans l'autre locale
+      en: locale === "en" ? slug : getServicesSlugEn(slug),
+    },
+  );
+};
+```
+
+**Ne PAS** appeler `getLocale()` dans `generateMetadata` — extraire depuis `params` (plus fiable et compatible avec le cache statique).
+
+### 4. PortableText — Pattern ptComponents
+
+Le pattern `ptComponents` est IDENTIQUE dans les trois types de pages (service, secteur, article). **Ne pas redéfinir** — extraire dans un fichier partagé si besoin :
+
+```typescript
+// Actuellement dupliqué dans service/[slug]/page.tsx, secteurs/[slug]/page.tsx,
+// blog/[slug]/[subSlug]/page.tsx
+// ✅ Peut être extrait dans src/components/blocs/ptComponents.ts
+```
+
+**Règle actuelle** : le `SanityImageValue` inline type est aussi dupliqué → signaler si refactoring possible.
+
+### 5. Images Sanity — Toujours utiliser urlFor()
+
+```typescript
+import { urlFor } from "@/sanity/lib/image";
+
+// ✅ URL générée avec optimisation Sanity CDN
+const imageUrl = urlFor(service.imagePrincipale).url();
+
+// ✅ Avec dimensions spécifiques
+const imageUrl = urlFor(service.imagePrincipale).width(1200).height(630).url();
+```
+
+**Pour les images `fill`** (PortableText) :
+
+```tsx
+<div className="relative mx-auto my-6 h-[200px] w-full md:h-[400px]">
+  <Image
+    src={urlFor(value).url()}
+    alt={value.alt || "illustration"}
+    fill
+    className="m-0 object-contain"
+    sizes="(min-width:768px) 100vw"
+  />
+</div>
+```
+
+### 6. next-intl — Règles absolues
+
+```typescript
+// ✅ TOUJOURS
+import { Link, usePathname, useRouter, redirect } from "@/i18n/navigation";
+
+// ❌ JAMAIS — retourne le pathname avec locale (/fr/services/...)
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+```
+
+**Dans les layouts** : toujours `setRequestLocale(locale)` en premier.
+
+**Dans les pages serveur** : `setRequestLocale(locale)` + `getTranslations({ locale, namespace: "..." })`.
+
+### 7. Redirections SEO — Middleware
+
+Le middleware (`src/middleware.ts`) gère dans l'ordre :
+
+1. Redirections racine (`/` → `/fr`)
+2. Suppression trailing slash (`/fr/` → `/fr`)
+3. URLs supprimées → `410 Gone` (tags, brackets dans URL, etc.)
+4. Redirections legacy (`legacyRedirects` object dans `urls.ts`)
+5. Redirections contenu (articles, services, secteurs) via handlers Sanity
+6. `intlMiddleware` (next-intl)
+
+**Attention** : Les handlers d'articles/services/secteurs sont synchrones (pas de fetch Sanity). Ils utilisent les mappings statiques dans `redirects/*.ts`.
+
+### 8. routing.ts — État actuel
+
+Le `routing.ts` contient encore des routes portail (ex: `/app/tickets`, `/app/sites`) qui n'existent plus dans ce projet. Ces routes sont historiques et n'ont pas d'impact runtime (next-intl les ignore si aucune page ne les correspond). Elles peuvent être nettoyées progressivement.
+
+---
+
 ## Commandes Utiles
 
 ```bash
@@ -1865,7 +2020,7 @@ pnpm lint
 pnpm test
 pnpm test:watch
 
-# Drizzle
+# Drizzle (pour le module devis)
 pnpm db:push        # Push schema to DB
 pnpm db:studio      # Open Drizzle Studio
 pnpm db:generate    # Generate migrations
@@ -2340,6 +2495,7 @@ if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
 `S3_PRESIGN_READ_EXPIRES_SECONDS` vaut 60s par défaut. Ne jamais générer des URLs S3 côté serveur pour les passer dans une liste — elles seront expirées avant que l'utilisateur ne scrolle ou revienne sur la page.
 
 **Pattern correct pour afficher des images/logos dans une liste** :
+
 1. Passer `storageKey` dans les données (pas `url`)
 2. Créer un composant client qui appelle `getPresignedReadUrl()` au montage
 3. La colonne/carte utilise ce composant — URL toujours fraîche, fallback pendant le chargement
@@ -2399,22 +2555,33 @@ logoStorageKey: sql<string | null>`MAX(${documents.storageKey})`,
 - Rationale: un prestataire peut être partagé entre plusieurs clients → risque d'incohérence si un client modifie les données partagées. Le client contrôle déjà la relation via le module Prestations.
 
 **Règle : `notExists` pour filtrer utilisateurs éligibles** :
+
 ```typescript
 // Pattern: users dans l'entreprise (via arborescence self-ref) SANS l'adhésion cible
-const baseQuery = db.select({ id, prenom, nom, email }).from(user)
-  .innerJoin(usersArborescence, and(
-    eq(usersArborescence.descendantId, user.id),
-    eq(usersArborescence.ancetreId, user.id), // profondeur=0 = appartient à l'entreprise
-    eq(usersArborescence.entrepriseId, entrepriseId),
-  ))
-  .where(notExists(
-    db.select().from(userClientAdhesions).where(
-      and(
-        eq(userClientAdhesions.userId, user.id),
-        eq(userClientAdhesions.entrepriseId, entrepriseId),
-      ),
-    )
-  ));
+const baseQuery = db
+  .select({ id, prenom, nom, email })
+  .from(user)
+  .innerJoin(
+    usersArborescence,
+    and(
+      eq(usersArborescence.descendantId, user.id),
+      eq(usersArborescence.ancetreId, user.id), // profondeur=0 = appartient à l'entreprise
+      eq(usersArborescence.entrepriseId, entrepriseId),
+    ),
+  )
+  .where(
+    notExists(
+      db
+        .select()
+        .from(userClientAdhesions)
+        .where(
+          and(
+            eq(userClientAdhesions.userId, user.id),
+            eq(userClientAdhesions.entrepriseId, entrepriseId),
+          ),
+        ),
+    ),
+  );
 ```
 
 **Règle : Branches Drizzle explicites pour union de tables** :
@@ -2446,6 +2613,7 @@ Ne PAS essayer `const table = condition ? tableA : tableB` — le typage Drizzle
 ```
 
 **Règle frontend** :
+
 - `canManage = !selectedClient.hasActiveAdmin` (prestataire)
 - Passer `canManageOverride={canManage}` à `SitesTree`
 - Passer `currentUserRole={canManage ? "admin" : null}` à `SiteDetails`
@@ -2500,6 +2668,7 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 ```
 
 **`relations.ts` — Points d'attention** :
+
 - Mettre à jour `relations.ts` ne génère **jamais** de migration (abstraction TypeScript uniquement)
 - Quand deux relations existent entre les mêmes tables → `relationName` requis sur les DEUX côtés
 - Conflits de noms : importer une table avec alias (`as clientPrestataireRelationsTable`)
@@ -2521,9 +2690,11 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 - ✅ **11 fichiers d'actions** migrés : `getUserPlateformeAdhesion` → `getEffectivePlateformeRole`
 
 **Fichiers créés** :
+
 - `src/server/utils/permissions.utils.ts`
 
 **Fichiers modifiés** :
+
 - `src/server/queries/userAdhesions.query.ts`
 - `src/server/actions/clientServiceExecutionsActions.ts`
 - `src/server/actions/tacheListesTemplatesActions.ts`
@@ -2555,23 +2726,24 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 
 **Matrice de permissions tâches (référence)** :
 
-| Action | canExecute | canManage | isAssignée |
-|---|---|---|---|
-| Voir | ✅ | ✅ | — |
-| Créer tâche ad-hoc | ❌ | ✅ | — |
-| Modifier tâche ad-hoc | ❌ | ✅ | — |
-| Supprimer tâche ad-hoc | ❌ | ✅ | — |
-| Démarrer (→ en_cours) | ✅ | ✅ | — |
-| Terminer (→ terminee) | si assignée | ✅ | ✅ |
-| Non applicable | ✅ | ✅ | — |
-| Non honorée | ✅ | ✅ | — |
-| Annuler (→ annulee) | ❌ | ✅ | — |
-| Ajouter PJ (tâche en cours) | ✅ | ✅ | — |
-| Corriger tempsPasseSecondes | ❌ | ✅ | — |
+| Action                      | canExecute  | canManage | isAssignée |
+| --------------------------- | ----------- | --------- | ---------- |
+| Voir                        | ✅          | ✅        | —          |
+| Créer tâche ad-hoc          | ❌          | ✅        | —          |
+| Modifier tâche ad-hoc       | ❌          | ✅        | —          |
+| Supprimer tâche ad-hoc      | ❌          | ✅        | —          |
+| Démarrer (→ en_cours)       | ✅          | ✅        | —          |
+| Terminer (→ terminee)       | si assignée | ✅        | ✅         |
+| Non applicable              | ✅          | ✅        | —          |
+| Non honorée                 | ✅          | ✅        | —          |
+| Annuler (→ annulee)         | ❌          | ✅        | —          |
+| Ajouter PJ (tâche en cours) | ✅          | ✅        | —          |
+| Corriger tempsPasseSecondes | ❌          | ✅        | —          |
 
 **Rappel** : `canExecute` = admin + responsable_site + demandeur_site (client) / intervenant_site (prestataire) ; `canManage` = admin + responsable_site uniquement.
 
 **Fichiers modifiés** :
+
 - `src/zod-schemas/clientServiceOccurrences.schema.ts` — `updateTacheTempsPasseSchema` ajouté
 - `src/server/actions/clientServiceOccurrencesActions.ts` — 3 actions modifiées + 1 nouvelle
 - `src/app/[locale]/.../occurrences/[occurrenceId]/OccurrenceDetailClient.tsx` — boutons + temps passé
@@ -2590,6 +2762,7 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 **Pièges CSS à retenir** :
 
 #### ❌ `[&_p]:!important` cible TOUS les `<p>` enfants
+
 ```tsx
 // FAUX : mb-10 sur le <p> sera écrasé par [&_p]:!mb-0.5 du parent
 <div className="[&_p]:!mb-0.5">
@@ -2604,7 +2777,9 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 ```
 
 #### ❌ html2canvas ne peut pas charger les URLs S3 présignées (CORS)
+
 Pour les images dans une capture html2canvas, convertir en data URL :
+
 ```typescript
 const resp = await fetch(presignedUrl);
 const blob = await resp.blob();
@@ -2618,12 +2793,15 @@ const dataUrl = await new Promise<string>((resolve, reject) => {
 ```
 
 #### ❌ Alignement tables avec html2canvas : classes Tailwind ignorées
+
 Les classes `text-left`, `text-right`, `text-center` sur `<th>/<td>` peuvent ne pas être capturées.
 → Toujours utiliser `style={{ textAlign: "left" }}` inline.
 
 #### Pattern `userClientSiteAttributions` + hiérarchie de sites
+
 Quand on cherche un `responsable_site` pour un site donné, ne PAS faire de match exact sur `siteId`.
 Une attribution peut être sur un site parent avec `scope = "subtree"`. Toujours joindre `sitesArborescence` :
+
 ```typescript
 .innerJoin(sitesArborescence, and(
   eq(sitesArborescence.ancetreId, userClientSiteAttributions.siteId),
@@ -2664,18 +2842,22 @@ await onClientServiceChanged({ clientServiceId, now: new Date() });
 
 // 2. Initialiser hasActiveRegle depuis les données, jamais false en dur
 const [hasActiveRegle, setHasActiveRegle] = useState(
-  initialRegles.some((r) => r.actif)
+  initialRegles.some((r) => r.actif),
 );
 
 // 3. Deux variables pour hasActiveExecution selon l'usage
 const hasAnyActiveExecution = executions.some((e) => e.actif); // canActivate
-const hasActiveExecution = executions.some(                     // bandeau UI
-  (e) => e.actif && e.dateDebutValidite <= today &&
-    (e.dateFinValidite === null || e.dateFinValidite >= today)
+const hasActiveExecution = executions.some(
+  // bandeau UI
+  (e) =>
+    e.actif &&
+    e.dateDebutValidite <= today &&
+    (e.dateFinValidite === null || e.dateFinValidite >= today),
 );
 ```
 
 **Fichiers modifiés** :
+
 - `src/app/[locale]/.../prestations/[prestationId]/PrestationDetailsClient.tsx`
 - `src/app/[locale]/.../prestations/[prestationId]/RegleRecurrenceFormDialog.tsx`
 - `src/server/actions/clientServiceReglesRecurrenceActions.ts`
@@ -2692,6 +2874,7 @@ const hasActiveExecution = executions.some(                     // bandeau UI
 - 🟠 **`getSiteResponsableAction` sans vérification d'accès** (`devisActions.ts`) : N'importe quel utilisateur authentifié pouvait récupérer prénom/nom/email/téléphone du responsable de n'importe quel site. Ajout de `hasAccessToEntreprise` check.
 
 **Modules audités pour la première fois** :
+
 - ✅ Attribution des Sites (`userSiteAttributionsActions.ts` + `userPrestataireSiteAttributionsActions.ts`) — structure OK, règles §4-§10 bien implémentées, 1 bug corrigé
 - ✅ Auth (`auth.ts`, `inscription-admin/`, `reset-password/`, `email-ok/`, `unauthorized/`, `env.ts`) — flows corrects, 1 bug critique corrigé (Pusher secret)
 - 🚧 Devis (`devisActions.ts`, `devisDemandesActions.ts`, `devisPermissions.utils.ts`) — 3 bugs corrigés, module encore en cours de développement
@@ -2727,6 +2910,7 @@ const hasActiveExecution = executions.some(                     // bandeau UI
 - ✅ **Affichage emoji partout** : `{item.emoji && <span className="mr-1.5">{item.emoji}</span>}` ajouté dans tous les composants qui affichent des tâches
 
 **Fichiers d'affichage mis à jour** :
+
 - `PrestationDetailsClient.tsx` — onglets Planification (règles) et Exécution (checklist)
 - `OccurrenceDetailClient.tsx` — liste tâches + détail tâche courante
 - `OccurrenceDetailDialog.tsx` (calendrier) — popup interventions
@@ -2737,6 +2921,7 @@ const hasActiveExecution = executions.some(                     // bandeau UI
 - 4 picker dialogs (TacheListePicker, RegleTacheListePicker, OccurrenceTacheListePicker, ChecklistPicker)
 
 **Queries/types corrigés pour propager emoji** :
+
 - `ExecutionChecklistItem` (type) + query dans `clientServiceExecutions.query.ts` — `emoji` ajouté au SELECT et au push
 - `getOccurrenceTachesAction` — fallback template : `emoji` ajouté au SELECT + map
 - `getTacheItemsByTemplateAction` — `emoji` ajouté au SELECT + map
@@ -2768,12 +2953,13 @@ const hasActiveExecution = executions.some(                     // bandeau UI
 - 🟠 **M6** — `next/link` remplacé par `@/i18n/navigation` dans `terrain/not-found.tsx`
 - 🟠 **M8** — 5 queries indépendantes dans `getClientPrestatairesAvecDetails` parallélisées avec `Promise.all`
 - 🟡 **M9/N3** — 8 index DB manquants ajoutés + migration `0053_clammy_wallow.sql` : `serviceEntreprises.actif`, `sitesArborescence.profondeur`, `clientServiceOccurrences.createdAt`, `clientServiceOccurrences.started/done_by_field_session_id`, `occurrenceTaches.started/done_by_field_session_id`, `factureLigneAllocations.createdAt`
-- 🟡 **N5** — Multi-JOIN sur `entreprises` dans `tickets.query.ts` utilisait `sql\`entreprises AS xxx\`` (non typé) → remplacé par `alias(entreprises, "xxx")` de `drizzle-orm/pg-core`
+- 🟡 **N5** — Multi-JOIN sur `entreprises` dans `tickets.query.ts` utilisait `sql\`entreprises AS xxx\``(non typé) → remplacé par`alias(entreprises, "xxx")`de`drizzle-orm/pg-core`
 - 🟡 **N7** — `useEffect` secondaire de `PrestationsClient.tsx` utilisait les propriétés individuelles de `searchParams` → remplacé par l'objet entier (fix navigation client-side bloquée)
 
 **Nouveaux patterns** :
 
 #### Pusher canaux privés terrain (token-based)
+
 ```typescript
 // OccurrenceTerrain.tsx — créer un PusherClient dédié avec auth custom
 const PusherClientClass = (await import("pusher-js")).default;
@@ -2787,10 +2973,12 @@ pusherInstance = new PusherClientClass(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
 });
 channel = pusherInstance.subscribe(`private-terrain-${occurrenceId}`);
 ```
+
 - Utiliser `pusherInstance.disconnect()` dans le cleanup du useEffect
 - Ne JAMAIS utiliser `import("@/lib/pusher")` pour le client terrain (ce fichier est le client authentifié standard)
 
 #### Drizzle — Multi-JOIN sur la même table
+
 ```typescript
 // ❌ FAUX — sql`alias` perd le typage Drizzle
 .leftJoin(sql`entreprises AS demandeur_entreprise`, ...)
@@ -2804,9 +2992,11 @@ const assigneEntreprise = alias(entreprises, "assigne_entreprise");
 .leftJoin(demandeurEntreprise, eq(demandeurEntreprise.id, tickets.demandeurEntrepriseId))
 .orderBy(desc(demandeurEntreprise.nom)) // ← typé
 ```
+
 Déclarer les alias au **niveau module** (pas dans la fonction) pour éviter les recréations.
 
 #### Pattern N+1 → batch query (listes avec attachements)
+
 ```typescript
 // ❌ FAUX — N+1
 const withAttachments = await Promise.all(
@@ -2834,24 +3024,33 @@ return messages.map((m) => ({ ...m, attachments: byId.get(m.id) ?? [] }));
 ```
 
 #### clientPrestataireRelations — check obligatoire pour prestataire gérant prestations client
+
 ```typescript
 // Dans canManagePrestation, branche prestataire
 const relation = await db.query.clientPrestataireRelations.findFirst({
   where: and(
-    eq(clientPrestataireRelations.prestataireEntrepriseId, prestataireAdhesion.entrepriseId),
+    eq(
+      clientPrestataireRelations.prestataireEntrepriseId,
+      prestataireAdhesion.entrepriseId,
+    ),
     eq(clientPrestataireRelations.clientEntrepriseId, entrepriseId),
   ),
   columns: { id: true },
 });
 if (!relation) return { allowed: false };
 ```
+
 **Règle** : Un prestataire admin peut gérer les prestations d'un client **uniquement** s'il existe une entrée dans `clientPrestataireRelations`. Sans ce check, n'importe quel prestataire admin pouvait gérer toutes les prestations de tous les clients.
 
 ---
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 
-- `/app/sites` - Gestion hiérarchique avec closure table
-- `/app/utilisateurs` - Système de permissions & attributions
-- `/app/tickets` - Système tickets avec messages et visibilité
-- Ce document CLAUDE.md - Patterns et bonnes pratiques
+- `/services/[slug]/page.tsx` — Page dynamique Sanity avec metadata, generateStaticParams, PortableText
+- `/blog/[slug]/[subSlug]/page.tsx` — Article Sanity avec hreflang bilingue
+- `/services/page.tsx` — Page liste avec données Sanity + liens service×ville
+- `src/sanity/queries.ts` — Toutes les GROQ queries (source de vérité Sanity)
+- `src/lib/metadata/metadata-helpers.ts` — generateAlternates(), helpers SEO
+- `src/redirects/` — Gestion des redirections SEO et slugs FR↔EN
+- `src/middleware.ts` — Flux complet des redirections + next-intl
+- Ce document CLAUDE.md — Patterns et bonnes pratiques

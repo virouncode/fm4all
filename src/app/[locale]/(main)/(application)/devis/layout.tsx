@@ -10,7 +10,7 @@ export default async function DevisLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }>) {
   const { locale } = await params;
 

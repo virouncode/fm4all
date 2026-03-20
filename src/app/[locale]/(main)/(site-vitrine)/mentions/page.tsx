@@ -1,3 +1,4 @@
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
@@ -6,7 +7,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
   return generateAlternates(
@@ -23,7 +24,11 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("MentionsPage");
@@ -35,7 +40,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("1-identification-de-l-editeur-du-site")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col text-wrap hyphens-auto lg:w-2/3">
             <p>{t("nom-de-la-societe-fm4all")}</p>
             <p>{t("forme-juridique-sas")}</p>
             <p>{t("capital-social-30-000-eur")}</p>
@@ -59,7 +64,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("2-identification-de-l-hebergeur-du-site")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col text-wrap hyphens-auto lg:w-2/3">
             <p>{t("nom-de-l-hebergeur-vercel-inc")}</p>
             <p>{t("addresse-340-s-lemon-ave-4133-walnut-ca-91789-us")}</p>
             <p>{t("tel-559-288-7060")}</p>
@@ -69,7 +74,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("3-propriete-intellectuelle")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "tous-les-contenus-presents-sur-le-site-www-fm4all-com-incluant-de-maniere-non-limitative-les-graphismes-images-textes-videos-animations-sons-logos-gifs-et-icones-ainsi-que-leur-mise-en-forme-sont-la-propriete-exclusive-de-fm4all-a-l-exception-des-marques-logos-ou-contenus-appartenant-a-d-autres-societes-partenaires-ou-auteurs",
@@ -86,7 +91,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("4-donnees-personnelles-rgpd")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "fm4all-s-engage-a-ce-que-la-collecte-et-le-traitement-de-vos-donnees-effectues-a-partir-du-site-www-fm4all-com-soient-conformes-au-reglement-general-sur-la-protection-des-donnees-rgpd-et-a-la-loi-informatique-et-libertes",
@@ -108,7 +113,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("5-limite-de-responsabilite")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "fm4all-s-efforce-de-fournir-sur-le-site-www-fm4all-com-des-informations-aussi-precises-que-possible-toutefois-la-societe-ne-pourra-etre-tenue-responsable-des-omissions-des-inexactitudes-et-des-carences-dans-la-mise-a-jour-qu-elles-soient-de-son-fait-ou-du-fait-des-tiers-partenaires-qui-lui-fournissent-ces-informations",
@@ -125,7 +130,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("6-conditions-dutilisation-du-site")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "l-utilisation-du-site-www-fm4all-com-implique-l-acceptation-pleine-et-entiere-des-conditions-generales-d-utilisation-ci-apres-decrites-ces-conditions-d-utilisation-sont-susceptibles-d-etre-modifiees-ou-completees-a-tout-moment-les-utilisateurs-du-site-sont-donc-invites-a-les-consulter-de-maniere-reguliere",
@@ -147,7 +152,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("7-reglement-des-litiges")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "les-presentes-mentions-legales-sont-regies-par-le-droit-francais-en-cas-de-litige-relatif-a-l-utilisation-du-site-www-fm4all-com-la-competence-exclusive-est-attribuee-aux-tribunaux-competents-de-paris-sous-reserve-d-une-attribution-de-competence-specifique-decoulant-d-un-texte-de-loi-ou-reglementaire-particulier",
@@ -159,7 +164,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("8-services-fournis")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "le-site-www-fm4all-com-a-pour-objet-de-fournir-une-information-concernant-lensemble-des-activites-de-la-societe-fm4all-sefforce-de-fournir-sur-le-site-des-informations-aussi-precises-que-possible-toutefois-elle-ne-pourra-etre-tenue-responsable-des-omissions-des-inexactitudes-et-des-carences-dans-la-mise-a-jour-quelles-soient-de-son-fait-ou-du-fait-des-tiers-partenaires-qui-lui-fournissent-ces-informations",
@@ -171,7 +176,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("9-credits-et-conception-du-site")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>{t("conception-du-site-tiao-viroun-kattygnarath")}</p>
             <p>
               {t(

@@ -1,4 +1,3 @@
-import { getCookieCache } from "better-auth/cookies";
 import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
@@ -18,40 +17,6 @@ import { goneUrls, legacyRedirects } from "./redirects/urls";
 
 // next-intl middleware
 const intlMiddleware = createMiddleware(routing);
-
-// ============================================================================
-// Helpers
-// ============================================================================
-
-/** Vérifie si la route (sans locale) est protégée (/app/*) */
-function isProtectedRoute(pathnameWithoutLocale: string): boolean {
-  return pathnameWithoutLocale.startsWith("/app");
-}
-
-/** Récupération session via cookie Better-auth, fallback API */
-async function resolveSession(req: NextRequest) {
-  const cookieData = await getCookieCache(req);
-  if (cookieData?.session && cookieData?.user) {
-    return { session: cookieData.session, user: cookieData.user };
-  }
-
-  try {
-    const response = await fetch(`${req.nextUrl.origin}/api/auth/get-session`, {
-      headers: { cookie: req.headers.get("cookie") || "" },
-    });
-
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    if (data.session && data.user) {
-      return { session: data.session, user: data.user };
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 // ============================================================================
 // MIDDLEWARE PRINCIPAL
@@ -96,34 +61,19 @@ export async function middleware(req: NextRequest) {
   if (!locale) return intlMiddleware(req);
 
   // ============================================================================
-  // 2. Redirections SEO articles/services/secteurs (routes publiques)
+  // 2. Redirections SEO articles/services/secteurs
   // ============================================================================
-  if (!isProtectedRoute(pathnameWithoutLocale)) {
-    const parts = pathnameWithoutLocale.split("/").filter(Boolean);
+  const parts = pathnameWithoutLocale.split("/").filter(Boolean);
 
-    const r1 = handleArticleRedirects(req, parts, locale);
-    if (r1) return r1;
+  const r1 = handleArticleRedirects(req, parts, locale);
+  if (r1) return r1;
 
-    const r2 = handleServiceRedirects(req, parts, locale);
-    if (r2) return r2;
+  const r2 = handleServiceRedirects(req, parts, locale);
+  if (r2) return r2;
 
-    const r3 = handleSecteurRedirects(req, parts, locale);
-    if (r3) return r3;
+  const r3 = handleSecteurRedirects(req, parts, locale);
+  if (r3) return r3;
 
-    return intlMiddleware(req);
-  }
-
-  // ============================================================================
-  // 3. Route protégée /app → vérification session
-  // ============================================================================
-  const sessionData = await resolveSession(req);
-
-  if (!sessionData) {
-    return NextResponse.redirect(new URL(`/${locale}/auth/login`, req.url));
-  }
-
-  // Session OK → next-intl rend la page
-  // (les permissions granulaires sont gérées côté layout/server actions)
   return intlMiddleware(req);
 }
 

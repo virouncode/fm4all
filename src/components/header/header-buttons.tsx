@@ -7,7 +7,6 @@ import ContactButton from "../buttons/contact-button";
 import DevisButton from "../buttons/devis-button";
 import LinkedinButton from "../buttons/linkedin-button";
 import LocaleButton from "../buttons/locale-button";
-import UserButton from "../buttons/UserButton";
 import { ModeToggle } from "../theme/mode-toggle";
 
 type HeaderButtonsProps = {
@@ -50,10 +49,6 @@ const HeaderButtons = ({
         className="hidden md:flex"
       />
       <LinkedinButton
-        setIsMobileNavOpen={setIsMobileNavOpen}
-        className="hidden md:flex"
-      />
-      <UserButton
         setIsMobileNavOpen={setIsMobileNavOpen}
         className="hidden md:flex"
       />

@@ -43,6 +43,7 @@ export async function uploadFileToS3(params: {
 
   const { uploadUrl, key, previewUrl, headers } = result.data;
 
+  // Validation des données retournées
   if (!uploadUrl || !key || !previewUrl) {
     throw new Error(
       `Données incomplètes: uploadUrl=${!!uploadUrl}, key=${!!key}, previewUrl=${!!previewUrl}`,
@@ -57,6 +58,7 @@ export async function uploadFileToS3(params: {
   });
 
   if (!uploadResponse.ok) {
+    await uploadResponse.text();
     throw new Error(
       `Échec de l'upload S3: ${uploadResponse.status} ${uploadResponse.statusText}`,
     );

@@ -1,7 +1,8 @@
 import { Link } from "@/i18n/navigation";
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
-import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Metadata } from "next/types";
 import { Suspense } from "react";
@@ -12,8 +13,12 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-export const generateMetadata = async (): Promise<Metadata> => {
-  const locale = await getLocale();
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}): Promise<Metadata> => {
+  const { locale } = await params;
   return generateAlternates(
     "servicesDevis",
     locale,
@@ -28,7 +33,7 @@ const page = async ({
   params,
   searchParams,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
   const { locale } = await params;

@@ -34,9 +34,6 @@ import {
   SanityImageHotspot,
 } from "../../../../../../../../sanity.types";
 
-// export const dynamic = "force-static";
-// export const dynamicParams = false;
-
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
@@ -73,7 +70,7 @@ const ptComponents = {
             alt={value.alt || "article illustration"}
             fill
             className="m-0 object-contain"
-            sizes="(min-width:768px) 100vw"
+            sizes="(min-width:768px) 100vw, 100vw"
           />
         </div>
       );
@@ -109,7 +106,7 @@ export type PtComponentsType = typeof ptComponents;
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string; subSlug: string; locale: string }>;
+  params: Promise<{ slug: string; subSlug: string; locale: LocaleType }>;
 }) => {
   const { slug, subSlug, locale } = await params;
   const article = await getArticle(subSlug);
@@ -196,146 +193,27 @@ const page = async ({
   const articleImageAlt = article.imagePrincipale?.alt
     ? article.imagePrincipale.alt
     : tGlobal("illustration-de-l-article");
-  const articleImageBloc1Url = article.imageBloc1
-    ? urlFor(article.imageBloc1)
-    : null;
-  const articleImageBloc1Alt = article.imageBloc1?.alt
-    ? article.imageBloc1.alt
-    : tGlobal("illustration-de-l-article");
-  const articleImageBloc2Url = article.imageBloc2
-    ? urlFor(article.imageBloc2)
-    : null;
-  const articleImageBloc2Alt = article.imageBloc2?.alt
-    ? article.imageBloc2.alt
-    : tGlobal("illustration-de-l-article");
-  const articleImageBloc3Url = article.imageBloc3
-    ? urlFor(article.imageBloc3)
-    : null;
-  const articleImageBloc3Alt = article.imageBloc3?.alt
-    ? article.imageBloc3.alt
-    : tGlobal("illustration-de-l-article");
-  const articleImageBloc4Url = article.imageBloc4
-    ? urlFor(article.imageBloc4)
-    : null;
-  const articleImageBloc4Alt = article.imageBloc4?.alt
-    ? article.imageBloc4.alt
-    : tGlobal("illustration-de-l-article");
-  const articleImageBloc5Url = article.imageBloc5
-    ? urlFor(article.imageBloc5)
-    : null;
-  const articleImageBloc5Alt = article.imageBloc5?.alt
-    ? article.imageBloc5.alt
-    : tGlobal("illustration-de-l-article");
-  const articleImageBloc6Url = article.imageBloc6
-    ? urlFor(article.imageBloc6)
-    : null;
-  const articleImageBloc6Alt = article.imageBloc6?.alt
-    ? article.imageBloc6.alt
-    : tGlobal("illustration-de-l-article");
-
-  const articleImageBloc7Url = article.imageBloc7
-    ? urlFor(article.imageBloc7)
-    : null;
-  const articleImageBloc7Alt = article.imageBloc7?.alt
-    ? article.imageBloc7.alt
-    : tGlobal("illustration-de-l-article");
-
-  const articleImageBloc8Url = article.imageBloc8
-    ? urlFor(article.imageBloc8)
-    : null;
-  const articleImageBloc8Alt = article.imageBloc8?.alt
-    ? article.imageBloc8.alt
-    : tGlobal("illustration-de-l-article");
-
-  const articleImageBloc9Url = article.imageBloc9
-    ? urlFor(article.imageBloc9)
-    : null;
-  const articleImageBloc9Alt = article.imageBloc9?.alt
-    ? article.imageBloc9.alt
-    : tGlobal("illustration-de-l-article");
-
-  const articleImageBloc10Url = article.imageBloc10
-    ? urlFor(article.imageBloc10)
-    : null;
-  const articleImageBloc10Alt = article.imageBloc10?.alt
-    ? article.imageBloc10.alt
-    : tGlobal("illustration-de-l-article");
   const categorie = article.categorie as ArticleCategory;
-
   const categorieSlug = categorie.slug?.current;
 
   const articleBlocs = [
-    {
-      id: 1,
-      imageUrl: articleImageBloc1Url,
-      imageAlt: articleImageBloc1Alt,
-      bloc: article.bloc1,
-      side: "left" as const,
-    },
-    {
-      id: 2,
-      imageUrl: articleImageBloc2Url,
-      imageAlt: articleImageBloc2Alt,
-      bloc: article.bloc2,
-      side: "right" as const,
-    },
-    {
-      id: 3,
-      imageUrl: articleImageBloc3Url,
-      imageAlt: articleImageBloc3Alt,
-      bloc: article.bloc3,
-      side: "left" as const,
-    },
-    {
-      id: 4,
-      imageUrl: articleImageBloc4Url,
-      imageAlt: articleImageBloc4Alt,
-      bloc: article.bloc4,
-      side: "right" as const,
-    },
-    {
-      id: 5,
-      imageUrl: articleImageBloc5Url,
-      imageAlt: articleImageBloc5Alt,
-      bloc: article.bloc5,
-      side: "left" as const,
-    },
-    {
-      id: 6,
-      imageUrl: articleImageBloc6Url,
-      imageAlt: articleImageBloc6Alt,
-      bloc: article.bloc6,
-      side: "right" as const,
-    },
-    {
-      id: 7,
-      imageUrl: articleImageBloc7Url,
-      imageAlt: articleImageBloc7Alt,
-      bloc: article.bloc7,
-      side: "left" as const,
-    },
-    {
-      id: 8,
-      imageUrl: articleImageBloc8Url,
-      imageAlt: articleImageBloc8Alt,
-      bloc: article.bloc8,
-      side: "right" as const,
-    },
-    {
-      id: 9,
-      imageUrl: articleImageBloc9Url,
-      imageAlt: articleImageBloc9Alt,
-      bloc: article.bloc9,
-      side: "left" as const,
-    },
-    {
-      id: 10,
-      imageUrl: articleImageBloc10Url,
-      imageAlt: articleImageBloc10Alt,
-      bloc: article.bloc10,
-      side: "right" as const,
-    },
-  ];
+    { image: article.imageBloc1, bloc: article.bloc1 },
+    { image: article.imageBloc2, bloc: article.bloc2 },
+    { image: article.imageBloc3, bloc: article.bloc3 },
+    { image: article.imageBloc4, bloc: article.bloc4 },
+    { image: article.imageBloc5, bloc: article.bloc5 },
+    { image: article.imageBloc6, bloc: article.bloc6 },
+    { image: article.imageBloc7, bloc: article.bloc7 },
+    { image: article.imageBloc8, bloc: article.bloc8 },
+    { image: article.imageBloc9, bloc: article.bloc9 },
+    { image: article.imageBloc10, bloc: article.bloc10 },
+  ].map(({ image, bloc }, index) => ({
+    id: index + 1,
+    imageUrl: image ? urlFor(image) : null,
+    imageAlt: image?.alt ?? tGlobal("illustration-de-l-article"),
+    bloc,
+    side: (index % 2 === 0 ? "left" : "right") as "left" | "right",
+  }));
 
   return (
     <main className="mx-auto mb-24 max-w-7xl px-6 py-4 hyphens-auto md:px-20">

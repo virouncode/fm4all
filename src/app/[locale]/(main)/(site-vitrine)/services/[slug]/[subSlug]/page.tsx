@@ -30,9 +30,6 @@ import { notFound } from "next/navigation";
 import { Service } from "../../../../../../../../sanity.types";
 import FAQService from "../FAQService";
 
-// export const dynamic = "force-static";
-// export const dynamicParams = false;
-
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
@@ -103,7 +100,7 @@ const ptComponents = {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string; subSlug: string; locale: string }>;
+  params: Promise<{ slug: string; subSlug: string; locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { slug, subSlug, locale } = await params;
   const service = await getServiceVille(slug, subSlug, locale as LocaleType);
@@ -154,7 +151,7 @@ export default async function page({
 }) {
   const { slug, subSlug, locale } = await params;
   setRequestLocale(locale);
-  const tGlobal = await getTranslations({ locale, namespace: "Global" }); //car force-static
+  const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const t = await getTranslations({ locale, namespace: "ServicesPage" });
 
   const service = await getServiceVille(slug, subSlug, locale as LocaleType);

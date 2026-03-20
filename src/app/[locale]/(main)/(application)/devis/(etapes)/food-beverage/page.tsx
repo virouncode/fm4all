@@ -1,7 +1,8 @@
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { getLocale, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import ServicesLoader from "../locaux/ServicesLoader";
 import FoodBeverage from "./FoodBeverage";
@@ -10,8 +11,12 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-export const generateMetadata = async (): Promise<Metadata> => {
-  const locale = await getLocale();
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}): Promise<Metadata> => {
+  const { locale } = await params;
   return generateAlternates(
     "foodDevis",
     locale,
@@ -22,7 +27,11 @@ export const generateMetadata = async (): Promise<Metadata> => {
   );
 };
 
-const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: LocaleType }>;
+}) => {
   const { locale } = await params;
   setRequestLocale(locale);
 
