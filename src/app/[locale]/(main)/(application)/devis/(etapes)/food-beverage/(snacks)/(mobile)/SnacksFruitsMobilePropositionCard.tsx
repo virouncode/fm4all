@@ -38,7 +38,7 @@ const SnacksFruitsMobilePropositionCard = ({
     logoStorageKey,
     anneeCreation,
     ca,
-    effectifFournisseur,
+    effectifPrestataire,
     nbClients,
     noteGoogle,
     nbAvis,
@@ -245,7 +245,7 @@ const SnacksFruitsMobilePropositionCard = ({
                   locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
-                  effectif={effectifFournisseur}
+                  effectifPrestataire={effectifPrestataire}
                   nbClients={nbClients}
                   noteGoogle={noteGoogle}
                   nbAvis={nbAvis}

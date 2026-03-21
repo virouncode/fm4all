@@ -23,7 +23,7 @@ type NettoyageMobileOptionsDimanchePropositionsProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -36,7 +36,7 @@ type NettoyageMobileOptionsDimanchePropositionsProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -176,7 +176,7 @@ const NettoyageMobileOptionsDimancheCard = ({
                       locationUrl={null}
                       anneeCreation={dimancheProposition.anneeCreation}
                       ca={dimancheProposition.ca}
-                      effectif={dimancheProposition.effectif}
+                      effectifPrestataire={dimancheProposition.effectifPrestataire}
                       nbClients={dimancheProposition.nbClients}
                       noteGoogle={dimancheProposition.noteGoogle}
                       nbAvis={dimancheProposition.nbAvis}

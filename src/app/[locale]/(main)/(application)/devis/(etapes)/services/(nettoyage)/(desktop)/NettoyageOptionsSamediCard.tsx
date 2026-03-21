@@ -22,7 +22,7 @@ type NettoyageOptionsSamediCardProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -35,7 +35,7 @@ type NettoyageOptionsSamediCardProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;

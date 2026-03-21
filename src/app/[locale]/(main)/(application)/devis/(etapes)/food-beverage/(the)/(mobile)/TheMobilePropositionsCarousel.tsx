@@ -26,7 +26,7 @@ type TheMobilePropositionsCarouselProps = {
     entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     prixUnitaire: number | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
   }[];
   handleClickProposition: (proposition: {
     totalAnnuel: number | null;
@@ -45,7 +45,7 @@ type TheMobilePropositionsCarouselProps = {
     entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     prixUnitaire: number | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
   }) => void;
   nbTassesParJour: number;
 };

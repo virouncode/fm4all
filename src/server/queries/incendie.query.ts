@@ -56,7 +56,7 @@ export const getIncendieTarifs = async (surface: string) => {
         logoStorageKey: documents.storageKey,
         anneeCreation: entrepriseInfos.anneeCreation,
         ca: entrepriseInfos.ca,
-        effectif: entrepriseInfos.effectif,
+        effectifPrestataire: entrepriseInfos.effectif,
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,

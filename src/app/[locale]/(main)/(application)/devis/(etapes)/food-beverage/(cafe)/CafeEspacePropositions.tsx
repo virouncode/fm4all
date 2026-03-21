@@ -140,7 +140,7 @@ const CafeEspacePropositions = ({
         logoStorageKey,
         anneeCreation,
         ca,
-        effectifFournisseur,
+        effectifPrestataire,
         nbClients,
         noteGoogle,
         nbAvis,
@@ -244,7 +244,7 @@ const CafeEspacePropositions = ({
         logoStorageKey,
         anneeCreation,
         ca,
-        effectifFournisseur,
+        effectifPrestataire,
         nbClients,
         noteGoogle,
         nbAvis,
@@ -282,7 +282,7 @@ const CafeEspacePropositions = ({
         logoStorageKey: string | null;
         anneeCreation: number | null;
         ca: string | null;
-        effectifFournisseur: string | null;
+        effectifPrestataire: string | null;
         nbClients: number | null;
         noteGoogle: string | null;
         nbAvis: number | null;
@@ -331,7 +331,7 @@ const CafeEspacePropositions = ({
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -460,7 +460,7 @@ const CafeEspacePropositions = ({
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;

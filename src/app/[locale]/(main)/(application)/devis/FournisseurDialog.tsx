@@ -11,7 +11,7 @@ type FournisseurDialogProps = {
   nomPrestataire: string | null;
   anneeCreation: number | null;
   ca: string | null;
-  effectif: string | null;
+  effectifPrestataire: string | null;
   nbClients: number | null;
   noteGoogle: string | null;
   nbAvis: number | null;
@@ -26,7 +26,7 @@ const FournisseurDialog = ({
   nomPrestataire,
   anneeCreation,
   ca,
-  effectif,
+  effectifPrestataire,
   nbClients,
   noteGoogle,
   nbAvis,
@@ -104,7 +104,7 @@ const FournisseurDialog = ({
         {t("chiffre-d-affaires")} {ca}
       </p>
       <p>
-        {t("effectif")} {effectif}
+        {t("effectif")} {effectifPrestataire}
       </p>
       <p>
         {t("nombre-de-clients")} {nbClients}

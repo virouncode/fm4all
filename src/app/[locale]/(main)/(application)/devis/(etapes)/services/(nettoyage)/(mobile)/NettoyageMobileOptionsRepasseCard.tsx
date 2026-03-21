@@ -25,7 +25,7 @@ type NettoyageMobileOptionsRepasseCardProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -40,7 +40,7 @@ type NettoyageMobileOptionsRepasseCardProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -200,7 +200,7 @@ const NettoyageMobileOptionsRepasseCard = ({
                       locationUrl={null}
                       anneeCreation={repasseProposition.anneeCreation}
                       ca={repasseProposition.ca}
-                      effectif={repasseProposition.effectif}
+                      effectifPrestataire={repasseProposition.effectifPrestataire}
                       nbClients={repasseProposition.nbClients}
                       noteGoogle={repasseProposition.noteGoogle}
                       nbAvis={repasseProposition.nbAvis}

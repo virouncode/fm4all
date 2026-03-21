@@ -41,7 +41,7 @@ const MaintenancePropositions = ({
       logoStorageKey,
       anneeCreation,
       ca,
-      effectif: effectifFournisseur,
+      effectifPrestataire,
       nbClients,
       noteGoogle,
       nbAvis,
@@ -84,7 +84,7 @@ const MaintenancePropositions = ({
       logoStorageKey,
       anneeCreation,
       ca,
-      effectifFournisseur,
+      effectifPrestataire,
       nbClients,
       noteGoogle,
       nbAvis,
@@ -111,7 +111,7 @@ const MaintenancePropositions = ({
         logoStorageKey: string | null;
         anneeCreation: number | null;
         ca: string | null;
-        effectifFournisseur: string | null;
+        effectifPrestataire: string | null;
         nbClients: number | null;
         noteGoogle: string | null;
         nbAvis: number | null;
@@ -150,7 +150,7 @@ const MaintenancePropositions = ({
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;

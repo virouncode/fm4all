@@ -9,7 +9,7 @@ type SecuriteIncendieMobileCardsProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -30,7 +30,7 @@ type SecuriteIncendieMobileCardsProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;

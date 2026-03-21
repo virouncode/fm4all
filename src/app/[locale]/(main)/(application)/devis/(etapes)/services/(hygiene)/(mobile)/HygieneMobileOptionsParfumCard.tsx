@@ -24,7 +24,7 @@ type HygieneMobileOptionsParfumCardProps = {
     anneeCreation: number | null;
     logoStorageKey: string | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -51,7 +51,7 @@ type HygieneMobileOptionsParfumCardProps = {
       anneeCreation: number | null;
       logoStorageKey: string | null;
       ca: string | null;
-      effectifFournisseur: string | null;
+      effectifPrestataire: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
@@ -92,7 +92,7 @@ const HygieneMobileOptionsParfumCard = ({
     logoStorageKey,
     anneeCreation,
     ca,
-    effectifFournisseur,
+    effectifPrestataire,
     nbClients,
     noteGoogle,
     nbAvis,
@@ -265,7 +265,7 @@ const HygieneMobileOptionsParfumCard = ({
                   locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
-                  effectif={effectifFournisseur}
+                  effectifPrestataire={effectifPrestataire}
                   nbClients={nbClients}
                   noteGoogle={noteGoogle}
                   nbAvis={nbAvis}

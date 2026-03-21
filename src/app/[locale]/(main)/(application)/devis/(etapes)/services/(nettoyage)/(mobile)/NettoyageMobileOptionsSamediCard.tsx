@@ -24,7 +24,7 @@ type NettoyageMobileOptionsSamediPropositionsProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -37,7 +37,7 @@ type NettoyageMobileOptionsSamediPropositionsProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -175,7 +175,7 @@ const NettoyageMobileOptionsSamediCard = ({
                       locationUrl={null}
                       anneeCreation={samediProposition.anneeCreation}
                       ca={samediProposition.ca}
-                      effectif={samediProposition.effectif}
+                      effectifPrestataire={samediProposition.effectifPrestataire}
                       nbClients={samediProposition.nbClients}
                       noteGoogle={samediProposition.noteGoogle}
                       nbAvis={samediProposition.nbAvis}

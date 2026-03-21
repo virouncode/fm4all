@@ -70,7 +70,7 @@ export const getFormattedHygienePropositions = (
     const logoStorageKey = hygieneDistribTarifsFournisseur[0].logoStorageKey;
     const anneeCreation = hygieneDistribTarifsFournisseur[0].anneeCreation;
     const ca = hygieneDistribTarifsFournisseur[0].ca;
-    const effectifFournisseur = hygieneDistribTarifsFournisseur[0].effectif;
+    const effectifPrestataire = hygieneDistribTarifsFournisseur[0].effectifPrestataire;
     const nbClients = hygieneDistribTarifsFournisseur[0].nbClients;
     const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
     const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
@@ -118,7 +118,7 @@ export const getFormattedHygienePropositions = (
       logoStorageKey,
       anneeCreation,
       ca,
-      effectifFournisseur,
+      effectifPrestataire,
       nbClients,
       noteGoogle,
       nbAvis,

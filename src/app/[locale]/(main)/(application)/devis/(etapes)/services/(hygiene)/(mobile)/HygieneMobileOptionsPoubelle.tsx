@@ -17,7 +17,7 @@ type HygieneMobileOptionsPoubelleProps = {
     anneeCreation: number | null;
     logoStorageKey: string | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -45,7 +45,7 @@ type HygieneMobileOptionsPoubelleProps = {
       anneeCreation: number | null;
       logoStorageKey: string | null;
       ca: string | null;
-      effectifFournisseur: string | null;
+      effectifPrestataire: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;

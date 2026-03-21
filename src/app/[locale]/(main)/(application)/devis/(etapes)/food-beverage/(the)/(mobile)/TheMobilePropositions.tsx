@@ -24,7 +24,7 @@ type TheMobilePropositionsProps = {
     entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     prixUnitaire: number | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
   }[];
   handleClickProposition: (proposition: {
     totalAnnuel: number | null;
@@ -43,7 +43,7 @@ type TheMobilePropositionsProps = {
     entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     prixUnitaire: number | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
   }) => void;
   handleIncrement: () => void;
   handleDecrement: () => void;

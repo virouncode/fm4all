@@ -15,7 +15,7 @@ type CafeEspacePropositionFournisseurLogoProps = {
   logoStorageKey: string | null;
   anneeCreation: number | null;
   ca: string | null;
-  effectifFournisseur: string | null;
+  effectifPrestataire: string | null;
   nbClients: number | null;
   noteGoogle: string | null;
   nbAvis: number | null;
@@ -28,7 +28,7 @@ const CafeEspacePropositionFournisseurLogo = ({
   logoStorageKey,
   anneeCreation,
   ca,
-  effectifFournisseur,
+  effectifPrestataire,
   nbClients,
   noteGoogle,
   nbAvis,
@@ -68,7 +68,7 @@ const CafeEspacePropositionFournisseurLogo = ({
           locationUrl={null}
           anneeCreation={anneeCreation}
           ca={ca}
-          effectif={effectifFournisseur}
+          effectifPrestataire={effectifPrestataire}
           nbClients={nbClients}
           noteGoogle={noteGoogle}
           nbAvis={nbAvis}

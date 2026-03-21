@@ -21,7 +21,7 @@ export const selectHygieneConsoTarifsSchema = createSelectSchema(
   logoStorageKey: z.string().nullable(),
   anneeCreation: z.number().nullable(),
   ca: z.string().nullable(),
-  effectif: z.string().nullable(),
+  effectifPrestataire: z.string().nullable(),
   nbClients: z.number().nullable(),
   noteGoogle: z.string().nullable(),
   nbAvis: z.number().nullable(),

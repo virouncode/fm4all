@@ -23,7 +23,7 @@ export type SnacksFruitsPropositionItem = {
   logoStorageKey: string | null;
   anneeCreation: number | null;
   ca: string | null;
-  effectifFournisseur: string | null;
+  effectifPrestataire: string | null;
   nbClients: number | null;
   noteGoogle: string | null;
   nbAvis: number | null;

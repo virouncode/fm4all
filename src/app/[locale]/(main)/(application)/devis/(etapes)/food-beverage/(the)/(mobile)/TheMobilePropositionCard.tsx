@@ -34,7 +34,7 @@ type TheMobilePropositionCardProps = {
     entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     prixUnitaire: number | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
   };
   handleClickProposition: (proposition: {
     totalAnnuel: number | null;
@@ -53,7 +53,7 @@ type TheMobilePropositionCardProps = {
     entrepriseId: string;
     gamme: "essentiel" | "confort" | "excellence";
     prixUnitaire: number | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
   }) => void;
   nbTassesParJour: number;
 };
@@ -78,7 +78,7 @@ const TheMobilePropositionCard = ({
     nbClients,
     noteGoogle,
     nbAvis,
-    effectifFournisseur,
+    effectifPrestataire,
     totalAnnuel,
   } = proposition;
 
@@ -238,7 +238,7 @@ const TheMobilePropositionCard = ({
                   locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
-                  effectif={effectifFournisseur}
+                  effectifPrestataire={effectifPrestataire}
                   nbClients={nbClients}
                   noteGoogle={noteGoogle}
                   nbAvis={nbAvis}

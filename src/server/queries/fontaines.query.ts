@@ -22,11 +22,11 @@ export const getFontainesTarifs = async () => {
       .select({
         ...getTableColumns(fontainesTarifs),
         nomPrestataire: entreprises.nom,
-        slogan: entrepriseInfos.slogan,
+        sloganPrestataire: entrepriseInfos.slogan,
         logoStorageKey: documents.storageKey,
         anneeCreation: entrepriseInfos.anneeCreation,
         ca: entrepriseInfos.ca,
-        effectif: entrepriseInfos.effectif,
+        effectifPrestataire: entrepriseInfos.effectif,
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,

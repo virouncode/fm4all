@@ -34,7 +34,7 @@ type NettoyageMobileOptionsVitrerieCardProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -52,7 +52,7 @@ type NettoyageMobileOptionsVitrerieCardProps = {
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectif: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -267,7 +267,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
                       locationUrl={null}
                       anneeCreation={vitrerieProposition.anneeCreation}
                       ca={vitrerieProposition.ca}
-                      effectif={vitrerieProposition.effectif}
+                      effectifPrestataire={vitrerieProposition.effectifPrestataire}
                       nbClients={vitrerieProposition.nbClients}
                       noteGoogle={vitrerieProposition.noteGoogle}
                       nbAvis={vitrerieProposition.nbAvis}

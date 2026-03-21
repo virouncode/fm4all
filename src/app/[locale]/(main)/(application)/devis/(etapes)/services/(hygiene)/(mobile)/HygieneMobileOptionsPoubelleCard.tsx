@@ -24,7 +24,7 @@ type HygieneMobileOptionsPoubelleCardProps = {
     anneeCreation: number | null;
     logoStorageKey: string | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -51,7 +51,7 @@ type HygieneMobileOptionsPoubelleCardProps = {
       anneeCreation: number | null;
       logoStorageKey: string | null;
       ca: string | null;
-      effectifFournisseur: string | null;
+      effectifPrestataire: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
@@ -91,7 +91,7 @@ const HygieneMobileOptionsPoubelleCard = ({
     logoStorageKey,
     anneeCreation,
     ca,
-    effectifFournisseur,
+    effectifPrestataire,
     nbClients,
     noteGoogle,
     nbAvis,
@@ -262,7 +262,7 @@ const HygieneMobileOptionsPoubelleCard = ({
                   locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
-                  effectif={effectifFournisseur}
+                  effectifPrestataire={effectifPrestataire}
                   nbClients={nbClients}
                   noteGoogle={noteGoogle}
                   nbAvis={nbAvis}

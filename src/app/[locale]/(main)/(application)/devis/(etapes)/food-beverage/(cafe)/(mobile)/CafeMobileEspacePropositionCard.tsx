@@ -48,7 +48,7 @@ const CafeMobileEspacePropositionCard = ({
     logoStorageKey,
     anneeCreation,
     ca,
-    effectifFournisseur,
+    effectifPrestataire,
     nbClients,
     noteGoogle,
     nbAvis,
@@ -264,7 +264,7 @@ const CafeMobileEspacePropositionCard = ({
                   locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
-                  effectif={effectifFournisseur}
+                  effectifPrestataire={effectifPrestataire}
                   nbClients={nbClients}
                   noteGoogle={noteGoogle}
                   nbAvis={nbAvis}

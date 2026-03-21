@@ -24,7 +24,7 @@ type HygieneMobileOptionsDesinfectantCardProps = {
     anneeCreation: number | null;
     logoStorageKey: string | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
@@ -51,7 +51,7 @@ type HygieneMobileOptionsDesinfectantCardProps = {
       anneeCreation: number | null;
       logoStorageKey: string | null;
       ca: string | null;
-      effectifFournisseur: string | null;
+      effectifPrestataire: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;
@@ -91,7 +91,7 @@ const HygieneMobileOptionsDesinfectantCard = ({
     logoStorageKey,
     anneeCreation,
     ca,
-    effectifFournisseur,
+    effectifPrestataire,
     nbClients,
     noteGoogle,
     nbAvis,
@@ -264,7 +264,7 @@ const HygieneMobileOptionsDesinfectantCard = ({
                   locationUrl={null}
                   anneeCreation={anneeCreation}
                   ca={ca}
-                  effectif={effectifFournisseur}
+                  effectifPrestataire={effectifPrestataire}
                   nbClients={nbClients}
                   noteGoogle={noteGoogle}
                   nbAvis={nbAvis}

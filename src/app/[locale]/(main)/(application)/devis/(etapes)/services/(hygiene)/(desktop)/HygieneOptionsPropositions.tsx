@@ -104,7 +104,7 @@ const HygieneOptionsPropositions = ({
     const anneeCreation = hygieneDistribTarifsFournisseur[0].anneeCreation;
     const logoStorageKey = hygieneDistribTarifsFournisseur[0].logoStorageKey;
     const ca = hygieneDistribTarifsFournisseur[0].ca;
-    const effectifFournisseur = hygieneDistribTarifsFournisseur[0].effectif;
+    const effectifPrestataire = hygieneDistribTarifsFournisseur[0].effectifPrestataire;
     const nbClients = hygieneDistribTarifsFournisseur[0].nbClients;
     const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
     const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
@@ -114,7 +114,7 @@ const HygieneOptionsPropositions = ({
       anneeCreation,
       logoStorageKey,
       ca,
-      effectifFournisseur,
+      effectifPrestataire,
       nbClients,
       noteGoogle,
       nbAvis,
@@ -143,7 +143,7 @@ const HygieneOptionsPropositions = ({
       anneeCreation: number | null;
       logoStorageKey: string | null;
       ca: string | null;
-      effectifFournisseur: string | null;
+      effectifPrestataire: string | null;
       nbClients: number | null;
       noteGoogle: string | null;
       nbAvis: number | null;

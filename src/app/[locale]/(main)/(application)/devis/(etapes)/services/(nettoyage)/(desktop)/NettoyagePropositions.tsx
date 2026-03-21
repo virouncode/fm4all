@@ -60,7 +60,7 @@ const NettoyagePropositions = ({
       logoStorageKey,
       anneeCreation,
       ca,
-      effectif: effectifFournisseur,
+      effectifPrestataire,
       nbClients,
       noteGoogle,
       nbAvis,
@@ -81,7 +81,7 @@ const NettoyagePropositions = ({
       logoStorageKey,
       anneeCreation,
       ca,
-      effectifFournisseur,
+      effectifPrestataire,
       nbClients,
       noteGoogle,
       nbAvis,
@@ -104,7 +104,7 @@ const NettoyagePropositions = ({
         logoStorageKey: string | null;
         anneeCreation: number | null;
         ca: string | null;
-        effectifFournisseur: string | null;
+        effectifPrestataire: string | null;
         nbClients: number | null;
         noteGoogle: string | null;
         nbAvis: number | null;
@@ -139,7 +139,7 @@ const NettoyagePropositions = ({
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;

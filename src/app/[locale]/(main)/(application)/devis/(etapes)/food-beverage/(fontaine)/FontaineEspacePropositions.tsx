@@ -122,7 +122,7 @@ const FontaineEspacePropositions = ({
         logoStorageKey: tarif.logoStorageKey,
         anneeCreation: tarif.anneeCreation,
         ca: tarif.ca,
-        effectifFournisseur: tarif.effectifFournisseur,
+        effectifPrestataire: tarif.effectifPrestataire,
         nbClients: tarif.nbClients,
         noteGoogle: tarif.noteGoogle,
         nbAvis: tarif.nbAvis,
@@ -154,7 +154,7 @@ const FontaineEspacePropositions = ({
         logoStorageKey: string | null;
         anneeCreation: number | null;
         ca: string | null;
-        effectifFournisseur: string | null;
+        effectifPrestataire: string | null;
         nbClients: number | null;
         noteGoogle: string | null;
         nbAvis: number | null;
@@ -199,7 +199,7 @@ const FontaineEspacePropositions = ({
     logoStorageKey: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectifPrestataire: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;

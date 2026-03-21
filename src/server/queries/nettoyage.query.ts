@@ -1,4 +1,3 @@
-import "server-only";
 import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import {
@@ -28,6 +27,7 @@ import {
 } from "@/zod-schemas/nettoyageVitrerie.schema";
 import { eq, getTableColumns } from "drizzle-orm";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+import "server-only";
 
 const prestataireColumns = {
   nomPrestataire: entreprises.nom,
@@ -35,7 +35,7 @@ const prestataireColumns = {
   logoStorageKey: documents.storageKey,
   anneeCreation: entrepriseInfos.anneeCreation,
   ca: entrepriseInfos.ca,
-  effectif: entrepriseInfos.effectif,
+  effectifPrestataire: entrepriseInfos.effectif,
   nbClients: entrepriseInfos.nbClients,
   noteGoogle: entrepriseInfos.noteGoogle,
   nbAvis: entrepriseInfos.nbAvis,
@@ -103,6 +103,7 @@ export const getNettoyageTarifs = async (surface: string) => {
       .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId))
       .where(eq(nettoyageTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
+
     const validatedResults = results.map((result) =>
       selectNettoyageTarifsSchema.parse(result),
     );
