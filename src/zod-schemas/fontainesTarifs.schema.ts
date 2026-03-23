@@ -14,6 +14,7 @@ export const selectFontainesTarifsSchema = createSelectSchema(
   nbClients: z.number().nullable(),
   noteGoogle: z.string().nullable(),
   nbAvis: z.number().nullable(),
+  imageStorageKey: z.string().nullable(),
 });
 export type SelectFontainesTarifsType =
   z.infer<typeof selectFontainesTarifsSchema>;

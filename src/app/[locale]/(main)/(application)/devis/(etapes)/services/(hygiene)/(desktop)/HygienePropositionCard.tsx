@@ -13,7 +13,7 @@ import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { GammeType } from "@/zod-schemas/gamme.schema";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import Image from "next/image";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 
 type HygienePropositionCardProps = {
   proposition: {
@@ -37,9 +37,9 @@ type HygienePropositionCardProps = {
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   };
   handleClickProposition: (proposition: {
     gamme: GammeType;
@@ -62,9 +62,9 @@ type HygienePropositionCardProps = {
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   }) => void;
   prixInstalDistrib: number | null;
 };
@@ -113,41 +113,52 @@ const HygienePropositionCard = ({
     </p>
   );
 
+  const hasAnyImage =
+    proposition.imageStorageKeyEmp || proposition.imageStorageKeyPh || proposition.imageStorageKeySavon;
   const imgProduit = (
     <div className="flex items-center justify-between gap-2">
-      {proposition.imageUrlEmp ? (
+      {hasAnyImage ? (
+        <>
+          {proposition.imageStorageKeyEmp && (
+            <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
+              <PresignedTarifImage
+                storageKey={proposition.imageStorageKeyEmp}
+                fallbackSrc="/img/services/hygiene_fallback.webp"
+                alt={tHygiene("illustration-essuie-mains-papier")}
+                sizes="(min-width:768px) 20vw"
+              />
+            </div>
+          )}
+          {proposition.imageStorageKeyPh && (
+            <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
+              <PresignedTarifImage
+                storageKey={proposition.imageStorageKeyPh}
+                fallbackSrc="/img/services/hygiene_fallback.webp"
+                alt={tHygiene("illustration-distributeur-papier-hygienique")}
+                sizes="(min-width:768px) 20vw"
+              />
+            </div>
+          )}
+          {proposition.imageStorageKeySavon && (
+            <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
+              <PresignedTarifImage
+                storageKey={proposition.imageStorageKeySavon}
+                fallbackSrc="/img/services/hygiene_fallback.webp"
+                alt={tHygiene("illustration-distributeur-savon")}
+                sizes="(min-width:768px) 20vw"
+              />
+            </div>
+          )}
+        </>
+      ) : (
         <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-          <Image
-            src={proposition.imageUrlEmp}
-            alt={tHygiene("illustration-essuie-mains-papier")}
-            fill
-            className="object-contain"
-            sizes="(min-width:768px) 20vw"
+          <PresignedTarifImage
+            storageKey={null}
+            fallbackSrc="/img/services/hygiene_fallback.webp"
+            alt={tHygiene("illustration-hygiene-sanitaire")}
           />
         </div>
-      ) : null}
-      {proposition.imageUrlPh ? (
-        <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-          <Image
-            src={proposition.imageUrlPh}
-            alt={tHygiene("illustration-distributeur-papier-hygienique")}
-            fill
-            className="object-contain"
-            sizes="(min-width:768px) 20vw"
-          />
-        </div>
-      ) : null}
-      {proposition.imageUrlSavon ? (
-        <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-          <Image
-            src={proposition.imageUrlSavon}
-            alt={tHygiene("illustration-distributeur-savon")}
-            fill
-            className="object-contain"
-            sizes="(min-width:768px) 20vw"
-          />
-        </div>
-      ) : null}
+      )}
     </div>
   );
 

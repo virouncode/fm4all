@@ -1,2 +1,0 @@
-ALTER TABLE "client_service_regles_recurrence" ADD COLUMN "tache_liste_template_id" uuid;--> statement-breakpoint
-ALTER TABLE "client_service_regles_recurrence" ADD CONSTRAINT "client_service_regles_recurrence_tache_liste_template_id_tache_listes_templates_id_fk" FOREIGN KEY ("tache_liste_template_id") REFERENCES "public"."tache_listes_templates"("id") ON DELETE set null ON UPDATE no action;

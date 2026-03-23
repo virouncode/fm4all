@@ -61,9 +61,18 @@ export const getFormattedHygienePropositions = (
         (tarif) => tarif.type === "ph" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
-    const imageUrlEmp = null;
-    const imageUrlSavon = null;
-    const imageUrlPh = null;
+    const imageStorageKeyEmp =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "emp" && tarif.gamme === gamme,
+      )?.imageStorageKey ?? null;
+    const imageStorageKeySavon =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "savon" && tarif.gamme === gamme,
+      )?.imageStorageKey ?? null;
+    const imageStorageKeyPh =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "ph" && tarif.gamme === gamme,
+      )?.imageStorageKey ?? null;
 
     const nomPrestataire = hygieneDistribTarifsFournisseur[0].nomPrestataire;
     const sloganPrestataire = hygieneDistribTarifsFournisseur[0].slogan;
@@ -132,9 +141,9 @@ export const getFormattedHygienePropositions = (
       prixInstalDistrib,
       totalAnnuelTrilogie,
       minFacturation,
-      imageUrlEmp,
-      imageUrlSavon,
-      imageUrlPh,
+      imageStorageKeyEmp,
+      imageStorageKeySavon,
+      imageStorageKeyPh,
     };
   });
   return propositions;

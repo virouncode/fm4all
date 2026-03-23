@@ -1,2 +1,0 @@
-CREATE TYPE "public"."mode_pilotage" AS ENUM('client', 'prestataire', 'collaboration');--> statement-breakpoint
-ALTER TABLE "client_service_executions" ADD COLUMN "mode_pilotage" "mode_pilotage" DEFAULT 'client' NOT NULL;

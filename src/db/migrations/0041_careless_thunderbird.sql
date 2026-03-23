@@ -1,1 +1,0 @@
--- ALTER TYPE "public"."document_visibilite" ADD VALUE 'partage';

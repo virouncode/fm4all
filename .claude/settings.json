@@ -240,7 +240,22 @@
       "Bash(ls -la \"/Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\(main\\)/\\(application\\)/devis/afficher/\")",
       "Bash(find \"/Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/locaux\" -name \"initialisationDevis*\")",
       "Bash(ls \"/Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/food-beverage/\")",
-      "Bash(ls \"/Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/personnaliser/\")"
+      "Bash(ls \"/Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/personnaliser/\")",
+      "Bash(sed -n '40,50p' \"src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/services/\\(maintenance\\)/MaintenancePropositions.tsx\")",
+      "Bash(sed -n '60,70p' \"src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/services/\\(nettoyage\\)/\\(desktop\\)/NettoyagePropositions.tsx\")",
+      "Bash(sed -n '70,100p' \"src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/services/\\(nettoyage\\)/NettoyageOptions.tsx\")",
+      "Bash(sed -n '55,70p' \"src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/services/\\(maintenance\\)/MaintenancePropositions.tsx\")",
+      "Bash(sed -n '55,70p' \"src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/services/\\(nettoyage\\)/\\(desktop\\)/NettoyagePropositions.tsx\")",
+      "Bash(sed -n '65,80p' \"src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/food-beverage/\\(cafe\\)/CafeEspacePropositionFournisseurLogo.tsx\")",
+      "Bash(sed -n '240,255p' \"src/app/[locale]/\\(main\\)/\\(application\\)/devis/\\(etapes\\)/food-beverage/\\(the\\)/\\(mobile\\)/TheMobilePropositionCard.tsx\")",
+      "Bash(git mv:*)",
+      "Bash(grep -r \"Fournisseur\" src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/ --include=\"*.tsx\" -l)",
+      "Bash(grep -rn \"imageId\\\\|imageUrl\\\\|image_id\" src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/ --include=\"*.tsx\" -l)",
+      "Bash(grep -rn \"logoStorageKey\\\\|imageUrl\" /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/\\\\\\(etapes\\\\\\)/food-beverage/\\\\\\(cafe\\\\\\)/\\\\\\(mobile\\\\\\)/CafeMobileEspacePropositionCard.tsx)",
+      "Bash(ls -la /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/\\\\\\(etapes\\\\\\)/food-beverage/\\\\\\(fontaine\\\\\\)/)",
+      "Bash(/tmp/analyze_fournisseur.sh:*)",
+      "Bash(chmod +x /tmp/analyze_fournisseur.sh)",
+      "Bash(bash /tmp/analyze_fournisseur.sh)"
     ],
     "additionalDirectories": [
       "/Users/virounkattygnarath/.claude/projects/-Users-virounkattygnarath-Desktop-fm4all/memory",
@@ -256,7 +271,9 @@
       "/Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/(main)/(application)/devis/(etapes)/services/(incendie)/(mobile)",
       "/Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/(main)/(application)/devis/(etapes)/food-beverage/(the)/(mobile)",
       "/Users/virounkattygnarath/Desktop/fm4all/src/lib",
-      "/Users/virounkattygnarath/Desktop/fm4all/src/components/provider"
+      "/Users/virounkattygnarath/Desktop/fm4all/src/components/provider",
+      "/Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/(main)/(application)/devis/(etapes)/services/(nettoyage)",
+      "/Users/virounkattygnarath/Desktop/fm4all"
     ]
   }
 }

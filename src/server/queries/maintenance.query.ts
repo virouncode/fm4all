@@ -71,7 +71,7 @@ export const getMaintenanceTarifs = async (surface: string) => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId))
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
       .where(eq(maintenanceTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>

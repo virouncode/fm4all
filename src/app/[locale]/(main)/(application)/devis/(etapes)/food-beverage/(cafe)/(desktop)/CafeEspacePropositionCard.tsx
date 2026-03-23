@@ -14,7 +14,7 @@ import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { GammeType } from "@/zod-schemas/gamme.schema";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import Image from "next/image";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 
 export type CafePropositionItem = {
   id: string;
@@ -31,7 +31,7 @@ export type CafePropositionItem = {
   gamme: GammeType;
   modele: string | null;
   marque: string | null;
-  imageUrl: null;
+  imageStorageKey: string | null;
   infos: string | null;
   reconditionne: boolean | null;
   typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -126,17 +126,15 @@ const CafeEspacePropositionCard = ({
       <li className="list-check">{tCafe("chocolat-en-poudre-machine")}</li>
     );
 
-  const imgProduit = proposition.imageUrl ? (
+  const imgProduit = (
     <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-      <Image
-        src={proposition.imageUrl}
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc="/img/services/cafe_fallback.webp"
         alt={`illustration ${proposition.marque} ${proposition.modele}`}
-        fill
-        className="object-contain"
-        sizes="(min-width:768px) 33vw"
       />
     </div>
-  ) : null;
+  );
 
   const infosEssentiel = (
     <li className="list-check">

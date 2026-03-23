@@ -16,7 +16,7 @@ import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import Image from "next/image";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import { ChangeEvent } from "react";
 import { HygieneOptionsType } from "./HygieneOptionsPropositions";
 
@@ -44,10 +44,10 @@ type HygieneOptionsParfumCardProps = {
       totalParfum: number | null;
       totalBalai: number | null;
       totalPoubelle: number | null;
-      imageUrlDesinfectant: string | null;
-      imageUrlParfum: string | null;
-      imageUrlBalai: string | null;
-      imageUrlPoubelle: string | null;
+      imageStorageKeyDesinfectant: string | null;
+      imageStorageKeyParfum: string | null;
+      imageStorageKeyBalai: string | null;
+      imageStorageKeyPoubelle: string | null;
     },
   ) => void;
   handleChangeDistribNbr: (
@@ -75,10 +75,10 @@ type HygieneOptionsParfumCardProps = {
     totalParfum: number | null;
     totalBalai: number | null;
     totalPoubelle: number | null;
-    imageUrlDesinfectant: string | null;
-    imageUrlParfum: string | null;
-    imageUrlBalai: string | null;
-    imageUrlPoubelle: string | null;
+    imageStorageKeyDesinfectant: string | null;
+    imageStorageKeyParfum: string | null;
+    imageStorageKeyBalai: string | null;
+    imageStorageKeyPoubelle: string | null;
   }[];
 };
 
@@ -152,17 +152,15 @@ const HygieneOptionsParfumCard = ({
                 : tGlobal("excellence")}
           </p>
         );
-        const imgProduit = proposition.imageUrlParfum ? (
+        const imgProduit = (
           <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-            <Image
-              src={proposition.imageUrlParfum}
+            <PresignedTarifImage
+              storageKey={proposition.imageStorageKeyParfum}
+              fallbackSrc="/img/services/hygiene_fallback.webp"
               alt="illustration-diffuseur-parfum"
-              fill
-              className="object-contain"
-              sizes="(min-width:768px) 33vw"
             />
           </div>
-        ) : null;
+        );
         const infosProduit = (
           <ul className="mx-auto flex flex-col px-4 text-xs">
             {locale === "fr" ? (

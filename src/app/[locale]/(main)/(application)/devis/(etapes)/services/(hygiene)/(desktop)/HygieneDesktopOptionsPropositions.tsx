@@ -36,10 +36,10 @@ type HygieneDesktopOptionsPropositionsProps = {
     totalParfum: number | null;
     totalBalai: number | null;
     totalPoubelle: number | null;
-    imageUrlDesinfectant: string | null;
-    imageUrlParfum: string | null;
-    imageUrlBalai: string | null;
-    imageUrlPoubelle: string | null;
+    imageStorageKeyDesinfectant: string | null;
+    imageStorageKeyParfum: string | null;
+    imageStorageKeyBalai: string | null;
+    imageStorageKeyPoubelle: string | null;
   }[];
   handleClickProposition: (
     type: HygieneOptionsType,
@@ -63,10 +63,10 @@ type HygieneDesktopOptionsPropositionsProps = {
       totalParfum: number | null;
       totalBalai: number | null;
       totalPoubelle: number | null;
-      imageUrlDesinfectant: string | null;
-      imageUrlParfum: string | null;
-      imageUrlBalai: string | null;
-      imageUrlPoubelle: string | null;
+      imageStorageKeyDesinfectant: string | null;
+      imageStorageKeyParfum: string | null;
+      imageStorageKeyBalai: string | null;
+      imageStorageKeyPoubelle: string | null;
     },
   ) => void;
 };

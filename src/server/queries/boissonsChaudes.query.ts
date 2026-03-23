@@ -22,7 +22,10 @@ import { selectSucreConsoTarifsSchema } from "@/zod-schemas/sucreConsoTarifs.sch
 import { selectTheConsoTarifsSchema } from "@/zod-schemas/theConsoTarifs.schema";
 import { getGlobalTag } from "@/lib/data-cache";
 import { eq, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
+const imageDoc = alias(documents, "image_doc");
 
 export const getCafeMachinesTarifs = async () => {
   "use cache";
@@ -40,6 +43,7 @@ export const getCafeMachinesTarifs = async () => {
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(cafeMachinesTarifs)
       .innerJoin(
@@ -50,7 +54,8 @@ export const getCafeMachinesTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, cafeMachinesTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectCafeMachinesTarifsSchema.parse(result),
@@ -103,7 +108,7 @@ export const getCafeConsoTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectCafeConsoTarifsSchema.parse(result),
@@ -138,7 +143,7 @@ export const getLaitConsoTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectLaitConsoTarifsSchema.parse(result),
@@ -184,7 +189,7 @@ export const getChocolatConsoTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectChocolatConsoTarifsSchema.parse(result),
@@ -232,7 +237,7 @@ export const getTheConsoTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectTheConsoTarifsSchema.parse(result),
@@ -268,7 +273,7 @@ export const getSucreConsoTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectSucreConsoTarifsSchema.parse(result),

@@ -9,7 +9,7 @@ import {
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 
-type SnacksFruitsPropositionLogoProps = {
+type FontaineEspacePropositionPrestataireLogoProps = {
   nomPrestataire: string | null;
   logoStorageKey: string | null;
   sloganPrestataire: string | null;
@@ -19,9 +19,10 @@ type SnacksFruitsPropositionLogoProps = {
   nbClients: number | null;
   noteGoogle: string | null;
   nbAvis: number | null;
+  entrepriseId: string;
 };
 
-const SnacksFruitsPropositionLogo = ({
+const FontaineEspacePropositionPrestataireLogo = ({
   nomPrestataire,
   logoStorageKey,
   sloganPrestataire,
@@ -31,7 +32,7 @@ const SnacksFruitsPropositionLogo = ({
   nbClients,
   noteGoogle,
   nbAvis,
-}: SnacksFruitsPropositionLogoProps) => {
+}: FontaineEspacePropositionPrestataireLogoProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -77,4 +78,4 @@ const SnacksFruitsPropositionLogo = ({
   );
 };
 
-export default SnacksFruitsPropositionLogo;
+export default FontaineEspacePropositionPrestataireLogo;

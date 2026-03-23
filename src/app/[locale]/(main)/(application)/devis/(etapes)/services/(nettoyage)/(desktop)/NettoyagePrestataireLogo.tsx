@@ -1,3 +1,5 @@
+"use client";
+
 import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import {
   Dialog,
@@ -9,7 +11,7 @@ import {
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 
-type SnacksFruitsPropositionLogoProps = {
+type NettoyagePrestataireLogoProps = {
   nomPrestataire: string | null;
   logoStorageKey: string | null;
   sloganPrestataire: string | null;
@@ -21,7 +23,7 @@ type SnacksFruitsPropositionLogoProps = {
   nbAvis: number | null;
 };
 
-const SnacksFruitsPropositionLogo = ({
+const NettoyagePrestataireLogo = ({
   nomPrestataire,
   logoStorageKey,
   sloganPrestataire,
@@ -31,7 +33,7 @@ const SnacksFruitsPropositionLogo = ({
   nbClients,
   noteGoogle,
   nbAvis,
-}: SnacksFruitsPropositionLogoProps) => {
+}: NettoyagePrestataireLogoProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -41,7 +43,7 @@ const SnacksFruitsPropositionLogo = ({
               <Image
                 src={logoStorageKey}
                 alt={`logo-de-${nomPrestataire}`}
-                fill={true}
+                fill
                 className="h-full w-full cursor-pointer object-contain"
                 sizes="(min-width:768px) 100vw"
               />
@@ -77,4 +79,4 @@ const SnacksFruitsPropositionLogo = ({
   );
 };
 
-export default SnacksFruitsPropositionLogo;
+export default NettoyagePrestataireLogo;

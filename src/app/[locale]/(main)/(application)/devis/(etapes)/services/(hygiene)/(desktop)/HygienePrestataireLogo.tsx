@@ -1,3 +1,4 @@
+"use client";
 import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import {
   Dialog,
@@ -8,8 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
-
-type SnacksFruitsPropositionLogoProps = {
+type HygienePrestataireLogoProps = {
   nomPrestataire: string | null;
   logoStorageKey: string | null;
   sloganPrestataire: string | null;
@@ -21,7 +21,7 @@ type SnacksFruitsPropositionLogoProps = {
   nbAvis: number | null;
 };
 
-const SnacksFruitsPropositionLogo = ({
+const HygienePrestataireLogo = ({
   nomPrestataire,
   logoStorageKey,
   sloganPrestataire,
@@ -31,18 +31,18 @@ const SnacksFruitsPropositionLogo = ({
   nbClients,
   noteGoogle,
   nbAvis,
-}: SnacksFruitsPropositionLogoProps) => {
+}: HygienePrestataireLogoProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="relative flex h-full w-1/4 items-center justify-center p-2">
+        <div className="relative flex h-1/4 w-full cursor-pointer items-center justify-center p-2">
           {logoStorageKey ? (
             <div className="relative h-full w-full">
               <Image
                 src={logoStorageKey}
                 alt={`logo-de-${nomPrestataire}`}
-                fill={true}
-                className="h-full w-full cursor-pointer object-contain"
+                fill
+                className="h-full w-full object-contain"
                 sizes="(min-width:768px) 100vw"
               />
             </div>
@@ -50,7 +50,7 @@ const SnacksFruitsPropositionLogo = ({
             nomPrestataire
           )}
           <SquareArrowOutUpRight
-            className="absolute top-2 right-2 cursor-pointer hover:opacity-70"
+            className="absolute top-0 right-0 hover:opacity-70"
             size={16}
             color="#000000"
           />
@@ -77,4 +77,4 @@ const SnacksFruitsPropositionLogo = ({
   );
 };
 
-export default SnacksFruitsPropositionLogo;
+export default HygienePrestataireLogo;

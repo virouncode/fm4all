@@ -1,7 +1,7 @@
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites.schema";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs.schema";
 import HygieneDistribQuantitesInputs from "./HygieneDistribQuantitesInputs";
-import HygieneFournisseurLogo from "./HygieneFournisseurLogo";
+import HygienePrestataireLogo from "./HygienePrestataireLogo";
 import HygienePropositionCard from "./HygienePropositionCard";
 
 type HygieneDesktopPropositionsProps = {
@@ -39,9 +39,9 @@ type HygieneDesktopPropositionsProps = {
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   }) => void;
   prixInstalDistrib: number | null;
   propositions: {
@@ -65,9 +65,9 @@ type HygieneDesktopPropositionsProps = {
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   }[];
 };
 
@@ -88,7 +88,7 @@ const HygieneDesktopPropositions = ({
     <div className="flex h-full flex-col overflow-auto rounded-xl border">
       <div className="flex flex-1 border-b">
         <div className="flex w-1/4 flex-col items-center justify-center p-4">
-          <HygieneFournisseurLogo {...propositions[0]} />
+          <HygienePrestataireLogo {...propositions[0]} />
           <HygieneDistribQuantitesInputs
             hygieneDistribQuantite={hygieneDistribQuantite}
             hygieneDistribTarifs={hygieneDistribTarifs}

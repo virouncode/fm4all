@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import StarRating from "@/components/star/StarRating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
@@ -217,7 +217,7 @@ const NettoyageMobilePropositionCard = ({
                 <DialogHeader>
                   <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
-                <FournisseurDialog
+                <PrestataireDialog
                   sloganPrestataire={sloganPrestataire}
                   logoStorageKey={logoStorageKey}
                   nomPrestataire={nomPrestataire}

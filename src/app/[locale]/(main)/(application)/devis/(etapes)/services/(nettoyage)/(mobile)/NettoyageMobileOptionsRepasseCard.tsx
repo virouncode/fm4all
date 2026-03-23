@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import StarRating from "@/components/star/StarRating";
 import {
   Dialog,
@@ -193,7 +193,7 @@ const NettoyageMobileOptionsRepasseCard = ({
                     <DialogHeader>
                       <DialogTitle>{nomPrestataire}</DialogTitle>
                     </DialogHeader>
-                    <FournisseurDialog
+                    <PrestataireDialog
                       sloganPrestataire={repasseProposition.slogan}
                       logoStorageKey={repasseProposition.logoStorageKey}
                       nomPrestataire={repasseProposition.nomPrestataire}

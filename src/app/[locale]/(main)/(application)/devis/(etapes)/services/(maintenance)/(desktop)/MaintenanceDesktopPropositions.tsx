@@ -1,4 +1,4 @@
-import MaintenanceFournisseurLogo from "./MaintenanceFournisseurLogo";
+import MaintenancePrestataireLogo from "./MaintenancePrestataireLogo";
 import MaintenancePropositionCard from "./MaintenancePropositionCard";
 
 type MaintenanceDesktopPropositionsProps = {
@@ -60,7 +60,7 @@ const MaintenanceDesktopPropositions = ({
               className="flex flex-1 border-b"
               key={propositions[0].entrepriseId}
             >
-              <MaintenanceFournisseurLogo {...propositions[0]} />
+              <MaintenancePrestataireLogo {...propositions[0]} />
               {propositions.map((proposition) => (
                 <MaintenancePropositionCard
                   key={proposition.id}

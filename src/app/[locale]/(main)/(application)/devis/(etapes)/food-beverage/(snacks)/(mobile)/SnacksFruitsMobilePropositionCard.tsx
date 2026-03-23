@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import { SnacksFruitsPropositionItem } from "@/app/[locale]/(main)/(application)/devis/(etapes)/food-beverage/(snacks)/(desktop)/SnacksFruitsPropositionCard";
 import StarRating from "@/components/star/StarRating";
 import { CarouselItem } from "@/components/ui/carousel";
@@ -238,7 +238,7 @@ const SnacksFruitsMobilePropositionCard = ({
                 <DialogHeader>
                   <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
-                <FournisseurDialog
+                <PrestataireDialog
                   sloganPrestataire={sloganPrestataire}
                   logoStorageKey={logoStorageKey}
                   nomPrestataire={nomPrestataire}

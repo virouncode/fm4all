@@ -1,1 +1,0 @@
-ALTER TABLE "tickets" ADD COLUMN "prise_en_charge_at" timestamp (3) with time zone;

@@ -1,3 +1,5 @@
+"use client";
+
 import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import {
   Dialog,
@@ -9,10 +11,10 @@ import {
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 
-type SnacksFruitsPropositionLogoProps = {
+type MaintenancePrestataireLogoProps = {
   nomPrestataire: string | null;
-  logoStorageKey: string | null;
   sloganPrestataire: string | null;
+  logoStorageKey: string | null;
   anneeCreation: number | null;
   ca: string | null;
   effectifPrestataire: string | null;
@@ -21,28 +23,28 @@ type SnacksFruitsPropositionLogoProps = {
   nbAvis: number | null;
 };
 
-const SnacksFruitsPropositionLogo = ({
+const MaintenancePrestataireLogo = ({
   nomPrestataire,
-  logoStorageKey,
   sloganPrestataire,
+  logoStorageKey,
   anneeCreation,
   ca,
   effectifPrestataire,
   nbClients,
   noteGoogle,
   nbAvis,
-}: SnacksFruitsPropositionLogoProps) => {
+}: MaintenancePrestataireLogoProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="relative flex h-full w-1/4 items-center justify-center p-2">
+        <div className="relative flex h-full w-1/4 cursor-pointer items-center justify-center p-4">
           {logoStorageKey ? (
             <div className="relative h-full w-full">
               <Image
                 src={logoStorageKey}
                 alt={`logo-de-${nomPrestataire}`}
-                fill={true}
-                className="h-full w-full cursor-pointer object-contain"
+                fill
+                className="h-full w-full object-contain"
                 sizes="(min-width:768px) 100vw"
               />
             </div>
@@ -50,7 +52,7 @@ const SnacksFruitsPropositionLogo = ({
             nomPrestataire
           )}
           <SquareArrowOutUpRight
-            className="absolute top-2 right-2 cursor-pointer hover:opacity-70"
+            className="absolute top-2 right-2 hover:opacity-70"
             size={16}
             color="#000000"
           />
@@ -77,4 +79,4 @@ const SnacksFruitsPropositionLogo = ({
   );
 };
 
-export default SnacksFruitsPropositionLogo;
+export default MaintenancePrestataireLogo;

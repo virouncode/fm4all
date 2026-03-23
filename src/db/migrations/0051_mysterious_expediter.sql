@@ -1,1 +1,0 @@
-ALTER TABLE "tache_liste_items" ADD COLUMN "emoji" varchar(10);

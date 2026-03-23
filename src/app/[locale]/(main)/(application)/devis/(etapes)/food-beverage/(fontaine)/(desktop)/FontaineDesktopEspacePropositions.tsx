@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import AddEspaceButton from "../../(cafe)/AddEspaceButton";
 import NextEspaceButton from "../../(cafe)/NextEspaceButton";
 import FontaineEspacePropositionCard from "../FontaineEspacePropositionCard";
-import FontaineEspacePropositionFournisseurLogo from "../FontaineEspacePropositionFournisseurLogo";
+import FontaineEspacePropositionPrestataireLogo from "../FontaineEspacePropositionPrestataireLogo";
 
 type FontaineDesktopEspacePropositionsProps = {
   formattedPropositions: FontaineMobilePropositionItem[][];
@@ -39,7 +39,7 @@ const FontaineDesktopEspacePropositions = ({
             className="flex flex-1 border-b"
             key={propositions[0].entrepriseId}
           >
-            <FontaineEspacePropositionFournisseurLogo {...propositions[0]} />
+            <FontaineEspacePropositionPrestataireLogo {...propositions[0]} />
             {propositions.map((proposition) => (
               <FontaineEspacePropositionCard
                 key={proposition.id}

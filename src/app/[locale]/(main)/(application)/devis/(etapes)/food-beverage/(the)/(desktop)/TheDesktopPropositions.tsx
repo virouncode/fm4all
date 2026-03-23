@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
 import ThePropositionCard from "./ThePropositionCard";
-import ThePropositionFournisseurLogo from "./ThePropositionFournisseurLogo";
+import ThePropositionPrestataireLogo from "./ThePropositionPrestataireLogo";
 import ThePropositionsInput from "./ThePropositionsInput";
 
 type TheDesktopPropositionsProps = {
@@ -60,7 +60,7 @@ const TheDesktopPropositions = ({
     <div className="flex h-full flex-col overflow-auto rounded-xl border">
       <div className="flex flex-1 border-b">
         <div className="flex w-1/4 flex-col items-center justify-center p-4">
-          <ThePropositionFournisseurLogo {...propositions[0]} />
+          <ThePropositionPrestataireLogo {...propositions[0]} />
           <ThePropositionsInput
             nbPersonnes={nbPersonnes}
             handleChange={handleChangeNbPersonnes}

@@ -1,1 +1,0 @@
-ALTER TABLE "sites" ADD COLUMN "actif" boolean DEFAULT true NOT NULL;

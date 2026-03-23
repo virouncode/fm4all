@@ -1,8 +1,0 @@
-ALTER TABLE "client_service_occurrences" ADD COLUMN "started_by_field_session_id" uuid;--> statement-breakpoint
-ALTER TABLE "client_service_occurrences" ADD COLUMN "done_by_field_session_id" uuid;--> statement-breakpoint
-ALTER TABLE "occurrence_taches" ADD COLUMN "started_by_field_session_id" uuid;--> statement-breakpoint
-ALTER TABLE "occurrence_taches" ADD COLUMN "done_by_field_session_id" uuid;--> statement-breakpoint
-ALTER TABLE "client_service_occurrences" ADD CONSTRAINT "client_service_occurrences_started_by_field_session_id_occurrence_field_sessions_id_fk" FOREIGN KEY ("started_by_field_session_id") REFERENCES "public"."occurrence_field_sessions"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "client_service_occurrences" ADD CONSTRAINT "client_service_occurrences_done_by_field_session_id_occurrence_field_sessions_id_fk" FOREIGN KEY ("done_by_field_session_id") REFERENCES "public"."occurrence_field_sessions"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "occurrence_taches" ADD CONSTRAINT "occurrence_taches_started_by_field_session_id_occurrence_field_sessions_id_fk" FOREIGN KEY ("started_by_field_session_id") REFERENCES "public"."occurrence_field_sessions"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "occurrence_taches" ADD CONSTRAINT "occurrence_taches_done_by_field_session_id_occurrence_field_sessions_id_fk" FOREIGN KEY ("done_by_field_session_id") REFERENCES "public"."occurrence_field_sessions"("id") ON DELETE set null ON UPDATE no action;

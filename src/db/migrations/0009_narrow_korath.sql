@@ -1,3 +1,0 @@
-ALTER TABLE "documents_links" ADD COLUMN "ticket_message_id" uuid;--> statement-breakpoint
-ALTER TABLE "documents_links" ADD CONSTRAINT "documents_links_ticket_message_id_ticket_messages_id_fk" FOREIGN KEY ("ticket_message_id") REFERENCES "public"."ticket_messages"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "documents_links_ticket_message_idx" ON "documents_links" USING btree ("ticket_message_id");

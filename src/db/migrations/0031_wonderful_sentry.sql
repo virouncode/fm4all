@@ -1,1 +1,0 @@
-ALTER TABLE "entreprises" ADD COLUMN "numero_tva" text;

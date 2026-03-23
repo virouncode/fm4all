@@ -74,10 +74,22 @@ const HygieneOptionsPropositions = ({
         (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
-    const imageUrlDesinfectant = null;
-    const imageUrlParfum = null;
-    const imageUrlBalai = null;
-    const imageUrlPoubelle = null;
+    const imageStorageKeyDesinfectant =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme,
+      )?.imageStorageKey ?? null;
+    const imageStorageKeyParfum =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme,
+      )?.imageStorageKey ?? null;
+    const imageStorageKeyBalai =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "balai" && tarif.gamme === gamme,
+      )?.imageStorageKey ?? null;
+    const imageStorageKeyPoubelle =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme,
+      )?.imageStorageKey ?? null;
 
     const totalDesinfectant =
       paParPersonneDesinfectant !== null &&
@@ -128,10 +140,10 @@ const HygieneOptionsPropositions = ({
       totalParfum,
       totalBalai,
       totalPoubelle,
-      imageUrlDesinfectant,
-      imageUrlParfum,
-      imageUrlBalai,
-      imageUrlPoubelle,
+      imageStorageKeyDesinfectant,
+      imageStorageKeyParfum,
+      imageStorageKeyBalai,
+      imageStorageKeyPoubelle,
     };
   });
 
@@ -157,10 +169,10 @@ const HygieneOptionsPropositions = ({
       totalParfum: number | null;
       totalBalai: number | null;
       totalPoubelle: number | null;
-      imageUrlDesinfectant: string | null;
-      imageUrlParfum: string | null;
-      imageUrlBalai: string | null;
-      imageUrlPoubelle: string | null;
+      imageStorageKeyDesinfectant: string | null;
+      imageStorageKeyParfum: string | null;
+      imageStorageKeyBalai: string | null;
+      imageStorageKeyPoubelle: string | null;
     },
   ) => {
     const {

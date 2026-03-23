@@ -40,9 +40,9 @@ type HygieneMobilePropositionsProps = {
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   }) => void;
   prixInstalDistrib: number | null;
   propositions: {
@@ -66,9 +66,9 @@ type HygieneMobilePropositionsProps = {
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   }[];
 
   handleIncrement: (type: "emp" | "savon" | "ph") => void;

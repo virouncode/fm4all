@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import StarRating from "@/components/star/StarRating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
@@ -15,6 +15,7 @@ import { formatNumber } from "@/lib/utils/formatNumber";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { useLocale, useTranslations } from "next-intl";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import Image from "next/image";
 import { getTypeFontaine } from "../getTypeFontaine";
 
@@ -32,7 +33,7 @@ export type FontaineMobilePropositionItem = {
   nbAvis: number | null;
   modele: string | null;
   marque: string | null;
-  imageUrl: null;
+  imageStorageKey: string | null;
   infos: string | null;
   typePose: "aposer" | "colonne" | "comptoir";
   reconditionne: boolean | null;
@@ -81,7 +82,7 @@ const FontaineMobileEspacePropositionCard = ({
     totalInstallation,
     marque,
     modele,
-    imageUrl,
+    imageStorageKey,
   } = proposition;
 
   const totalMensuelText = totalAnnuel ? (
@@ -236,20 +237,19 @@ const FontaineMobileEspacePropositionCard = ({
     </ul>
   );
 
+  const fontaineFallback =
+    typePose === "aposer"
+      ? "/img/services/fontaine_aposer.webp"
+      : typePose === "colonne"
+        ? "/img/services/fontaine_colonne.webp"
+        : "/img/services/fontaine_comptoir.webp";
+
   const imgProduit = (
     <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-200">
-      <Image
-        src={
-          imageUrl ??
-          (typePose === "aposer"
-            ? "/img/services/fontaine_aposer.webp"
-            : typePose === "colonne"
-              ? "/img/services/fontaine_colonne.webp"
-              : "/img/services/fontaine_comptoir.webp")
-        }
+      <PresignedTarifImage
+        storageKey={imageStorageKey}
+        fallbackSrc={fontaineFallback}
         alt={`illustration ${marque} ${modele}`}
-        fill
-        className="cursor-pointer object-contain"
         sizes="(max-width:768px) 33vw"
       />
     </div>
@@ -257,18 +257,10 @@ const FontaineMobileEspacePropositionCard = ({
 
   const imgProduitDialog = (
     <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-      <Image
-        src={
-          imageUrl ??
-          (typePose === "aposer"
-            ? "/img/services/fontaine_aposer.webp"
-            : typePose === "colonne"
-              ? "/img/services/fontaine_colonne.webp"
-              : "/img/services/fontaine_comptoir.webp")
-        }
+      <PresignedTarifImage
+        storageKey={imageStorageKey}
+        fallbackSrc={fontaineFallback}
         alt={`illustration ${marque} ${modele}`}
-        fill
-        className="object-contain"
         sizes="(max-width:768px) 100vw"
       />
     </div>
@@ -332,7 +324,7 @@ const FontaineMobileEspacePropositionCard = ({
                     {nomPrestataire}
                   </DialogTitle>
                 </DialogHeader>
-                <FournisseurDialog
+                <PrestataireDialog
                   sloganPrestataire={sloganPrestataire}
                   logoStorageKey={logoStorageKey}
                   nomPrestataire={nomPrestataire}

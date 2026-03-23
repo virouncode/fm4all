@@ -12,7 +12,10 @@ import { getGlobalTag } from "@/lib/data-cache";
 import { selectFontainesModelesSchema } from "@/zod-schemas/fontainesModeles.schema";
 import { selectFontainesTarifsSchema } from "@/zod-schemas/fontainesTarifs.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
+const imageDoc = alias(documents, "image_doc");
 
 export const getFontainesTarifs = async () => {
   "use cache";
@@ -30,6 +33,7 @@ export const getFontainesTarifs = async () => {
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(fontainesTarifs)
       .innerJoin(
@@ -40,7 +44,8 @@ export const getFontainesTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, fontainesTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectFontainesTarifsSchema.parse(result),

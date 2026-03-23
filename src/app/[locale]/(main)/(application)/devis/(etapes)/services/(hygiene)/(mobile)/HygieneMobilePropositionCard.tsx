@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import StarRating from "@/components/star/StarRating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
@@ -14,6 +14,7 @@ import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useLocale, useTranslations } from "next-intl";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import Image from "next/image";
 
 type HygieneMobilePropositionCardProps = {
@@ -38,9 +39,9 @@ type HygieneMobilePropositionCardProps = {
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   };
   handleClickProposition: (proposition: {
     gamme: "essentiel" | "confort" | "excellence";
@@ -63,9 +64,9 @@ type HygieneMobilePropositionCardProps = {
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   }) => void;
   prixInstalDistrib: number | null;
 };
@@ -119,51 +120,47 @@ const HygieneMobilePropositionCard = ({
   );
   const imgProduit = (
     <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-200">
-      <Image
-        src={
-          proposition.imageUrlEmp ||
-          proposition.imageUrlSavon ||
-          proposition.imageUrlPh ||
-          "/img/services/hygiene.webp"
+      <PresignedTarifImage
+        storageKey={
+          proposition.imageStorageKeyEmp ||
+          proposition.imageStorageKeySavon ||
+          proposition.imageStorageKeyPh ||
+          null
         }
+        fallbackSrc="/img/services/hygiene.webp"
         alt={tHygiene("illustration-hygiene-sanitaire")}
-        fill
-        className="cursor-pointer object-contain"
         sizes="(max-width:768px) 33vw"
       />
     </div>
   );
   const imgProduitDialog = (
     <div className="flex w-full items-center justify-between gap-2">
-      {proposition.imageUrlEmp ? (
+      {proposition.imageStorageKeyEmp ? (
         <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-          <Image
-            src={proposition.imageUrlEmp}
+          <PresignedTarifImage
+            storageKey={proposition.imageStorageKeyEmp}
+            fallbackSrc="/img/services/hygiene_fallback.webp"
             alt="illustration-essuie-mains-papier"
-            fill
-            className="object-contain"
             sizes="(max-width:768px) 33vw"
           />
         </div>
       ) : null}
-      {proposition.imageUrlPh ? (
+      {proposition.imageStorageKeyPh ? (
         <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-          <Image
-            src={proposition.imageUrlPh}
+          <PresignedTarifImage
+            storageKey={proposition.imageStorageKeyPh}
+            fallbackSrc="/img/services/hygiene_fallback.webp"
             alt={tHygiene("illustration-distributeur-papier-hygienique")}
-            fill
-            className="object-contain"
             sizes="(max-width:768px) 33vw"
           />
         </div>
       ) : null}
-      {proposition.imageUrlSavon ? (
+      {proposition.imageStorageKeySavon ? (
         <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-          <Image
-            src={proposition.imageUrlSavon}
+          <PresignedTarifImage
+            storageKey={proposition.imageStorageKeySavon}
+            fallbackSrc="/img/services/hygiene_fallback.webp"
             alt={tHygiene("illustration-distributeur-savon")}
-            fill
-            className="object-contain"
             sizes="(max-width:768px) 33vw"
           />
         </div>
@@ -287,7 +284,7 @@ const HygieneMobilePropositionCard = ({
                 <DialogHeader>
                   <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
-                <FournisseurDialog
+                <PrestataireDialog
                   sloganPrestataire={sloganPrestataire}
                   logoStorageKey={logoStorageKey}
                   nomPrestataire={nomPrestataire}

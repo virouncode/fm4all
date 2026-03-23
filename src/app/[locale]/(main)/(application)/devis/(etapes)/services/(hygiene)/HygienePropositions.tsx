@@ -97,9 +97,9 @@ const HygienePropositions = ({
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
     minFacturation: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    imageStorageKeyEmp: string | null;
+    imageStorageKeySavon: string | null;
+    imageStorageKeyPh: string | null;
   }) => {
     const {
       gamme,

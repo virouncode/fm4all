@@ -13,7 +13,7 @@ import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import Image from "next/image";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import { getTypeFontaine } from "./getTypeFontaine";
 import { FontaineMobilePropositionItem } from "./(mobile)/FontaineMobileEspacePropositionCard";
 
@@ -197,21 +197,19 @@ const FontaineEspacePropositionCard = ({
     </ul>
   );
 
+  const fontaineFallback =
+    proposition.typePose === "aposer"
+      ? "/img/services/fontaine_aposer.webp"
+      : proposition.typePose === "colonne"
+        ? "/img/services/fontaine_colonne.webp"
+        : "/img/services/fontaine_comptoir.webp";
+
   const imgProduit = (
     <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-      <Image
-        src={
-          proposition.imageUrl ??
-          (proposition.typePose === "aposer"
-            ? "/img/services/fontaine_aposer.webp"
-            : proposition.typePose === "colonne"
-              ? "/img/services/fontaine_colonne.webp"
-              : "/img/services/fontaine_comptoir.webp")
-        }
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc={fontaineFallback}
         alt={`illustration ${proposition.marque} ${proposition.modele}`}
-        fill
-        className="object-contain"
-        sizes="(min-width:768px) 33vw"
       />
     </div>
   );

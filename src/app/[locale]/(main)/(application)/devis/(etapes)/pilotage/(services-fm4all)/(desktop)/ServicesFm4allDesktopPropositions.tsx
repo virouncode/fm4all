@@ -1,6 +1,6 @@
 import { GammeType } from "@/zod-schemas/gamme.schema";
 import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All.schema";
-import ServicesFm4AllFournisseurLogo from "../ServicesFm4AllFournisseurLogo";
+import ServicesFm4AllPrestataireLogo from "../ServicesFm4AllPrestataireLogo";
 import ServicesFm4AllPropositionCard from "../ServicesFm4AllPropositionCard";
 
 type ServicesFm4allDesktopPropositionsProps = {
@@ -75,7 +75,7 @@ const ServicesFm4allDesktopPropositions = ({
   return (
     <div className="flex h-full flex-col overflow-auto rounded-xl border">
       <div className="flex flex-1 border-b">
-        <ServicesFm4AllFournisseurLogo />
+        <ServicesFm4AllPrestataireLogo />
         {formattedPropositions.map((proposition) => (
           <ServicesFm4AllPropositionCard
             key={proposition.id}

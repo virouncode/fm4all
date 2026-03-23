@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import StarRating from "@/components/star/StarRating";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 
@@ -168,7 +168,7 @@ const NettoyageMobileOptionsSamediCard = ({
                     <DialogHeader>
                       <DialogTitle>{nomPrestataire}</DialogTitle>
                     </DialogHeader>
-                    <FournisseurDialog
+                    <PrestataireDialog
                       sloganPrestataire={samediProposition.slogan}
                       logoStorageKey={samediProposition.logoStorageKey}
                       nomPrestataire={samediProposition.nomPrestataire}

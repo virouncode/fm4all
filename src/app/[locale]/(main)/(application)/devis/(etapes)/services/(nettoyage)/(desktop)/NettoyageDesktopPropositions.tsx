@@ -1,5 +1,5 @@
 import { GammeType } from "@/zod-schemas/gamme.schema";
-import NettoyageFournisseurLogo from "./NettoyageFournisseurLogo";
+import NettoyagePrestataireLogo from "./NettoyagePrestataireLogo";
 import NettoyagePropositionCard from "./NettoyagePropositionCard";
 
 type NettoyageDesktopPropositionsProps = {
@@ -53,7 +53,7 @@ const NettoyageDesktopPropositions = ({
               className="flex flex-1 border-b"
               key={propositions[0].entrepriseId}
             >
-              <NettoyageFournisseurLogo {...propositions[0]} />
+              <NettoyagePrestataireLogo {...propositions[0]} />
               {propositions.map((proposition) => (
                 <NettoyagePropositionCard
                   key={proposition.id}

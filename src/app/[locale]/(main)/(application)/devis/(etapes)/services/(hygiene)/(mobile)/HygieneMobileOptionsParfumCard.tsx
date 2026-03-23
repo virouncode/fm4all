@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import StarRating from "@/components/star/StarRating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
@@ -14,6 +14,7 @@ import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useLocale, useTranslations } from "next-intl";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import Image from "next/image";
 import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
 
@@ -38,10 +39,10 @@ type HygieneMobileOptionsParfumCardProps = {
     totalParfum: number | null;
     totalBalai: number | null;
     totalPoubelle: number | null;
-    imageUrlDesinfectant: string | null;
-    imageUrlParfum: string | null;
-    imageUrlBalai: string | null;
-    imageUrlPoubelle: string | null;
+    imageStorageKeyDesinfectant: string | null;
+    imageStorageKeyParfum: string | null;
+    imageStorageKeyBalai: string | null;
+    imageStorageKeyPoubelle: string | null;
   };
   handleClickProposition: (
     type: HygieneOptionsType,
@@ -65,10 +66,10 @@ type HygieneMobileOptionsParfumCardProps = {
       totalParfum: number | null;
       totalBalai: number | null;
       totalPoubelle: number | null;
-      imageUrlDesinfectant: string | null;
-      imageUrlParfum: string | null;
-      imageUrlBalai: string | null;
-      imageUrlPoubelle: string | null;
+      imageStorageKeyDesinfectant: string | null;
+      imageStorageKeyParfum: string | null;
+      imageStorageKeyBalai: string | null;
+      imageStorageKeyPoubelle: string | null;
     },
   ) => void;
 };
@@ -85,7 +86,7 @@ const HygieneMobileOptionsParfumCard = ({
   const hygiene = useHygieneStore((s) => s.hygiene);
   const {
     gamme,
-    imageUrlParfum,
+    imageStorageKeyParfum,
     totalParfum,
     nomPrestataire,
     sloganPrestataire,
@@ -118,11 +119,10 @@ const HygieneMobileOptionsParfumCard = ({
 
   const imgProduit = (
     <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
-      <Image
-        src={`${imageUrlParfum || "/img/services/hygiene.webp"}`}
-        alt={`illustration de distributeur de parfum`}
-        fill
-        className="cursor-pointer object-contain"
+      <PresignedTarifImage
+        storageKey={imageStorageKeyParfum}
+        fallbackSrc="/img/services/hygiene.webp"
+        alt="illustration de distributeur de parfum"
         sizes="(max-width:768px) 33vw"
       />
     </div>
@@ -130,11 +130,10 @@ const HygieneMobileOptionsParfumCard = ({
 
   const imgProduitDialog = (
     <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
-      <Image
-        src={`${imageUrlParfum || "/img/services/hygiene.webp"}`}
-        alt={`illustration de distributeur de parfum`}
-        fill
-        className="cursor-pointer object-contain"
+      <PresignedTarifImage
+        storageKey={imageStorageKeyParfum}
+        fallbackSrc="/img/services/hygiene.webp"
+        alt="illustration de distributeur de parfum"
         sizes="(max-width:768px) 100vw"
       />
     </div>
@@ -258,7 +257,7 @@ const HygieneMobileOptionsParfumCard = ({
                 <DialogHeader>
                   <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
-                <FournisseurDialog
+                <PrestataireDialog
                   sloganPrestataire={sloganPrestataire}
                   logoStorageKey={logoStorageKey}
                   nomPrestataire={nomPrestataire}

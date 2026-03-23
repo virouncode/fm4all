@@ -100,7 +100,7 @@ export const getNettoyageTarifs = async (surface: string) => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId))
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
       .where(eq(nettoyageTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
 
@@ -160,7 +160,7 @@ export const getRepasseTarifs = async (surface: string) => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId))
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
       .where(eq(nettoyageRepasseTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
@@ -218,7 +218,7 @@ export const getVitrerieTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectVitrerieTarifsSchema.parse(result),

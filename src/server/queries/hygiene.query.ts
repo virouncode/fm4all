@@ -32,7 +32,10 @@ import {
 } from "@/zod-schemas/hygieneInstalDistribTarifs.schema";
 import { selectHygieneMinFacturationSchema } from "@/zod-schemas/hygieneMinFacturation.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
+const imageDoc = alias(documents, "image_doc");
 
 export const getHygieneDistribQuantite = async (effectif: string) => {
   "use cache";
@@ -76,6 +79,7 @@ export const getHygieneDistribTarifs = async () => {
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(hygieneDistribTarifs)
       .innerJoin(
@@ -86,7 +90,8 @@ export const getHygieneDistribTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, hygieneDistribTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectHygieneDistribTarifsSchema.parse(result),
@@ -248,7 +253,7 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId))
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
       .where(eq(hygieneConsoTarifs.effectif, roundedEffectif));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>

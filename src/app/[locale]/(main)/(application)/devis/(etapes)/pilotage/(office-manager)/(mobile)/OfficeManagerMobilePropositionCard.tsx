@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import {
   Dialog,
   DialogContent,
@@ -297,7 +297,7 @@ const OfficeManagerMobilePropositionCard = ({
               <DialogHeader>
                 <DialogTitle>fm4all</DialogTitle>
               </DialogHeader>
-              <FournisseurDialog
+              <PrestataireDialog
                 sloganPrestataire={tOfficeManager(
                   "le-facility-management-pour-tous",
                 )}

@@ -112,7 +112,7 @@ const FontaineEspacePropositions = ({
       const marque =
         fontainesModeles.find((modele) => modele.id === tarif.fontaineId)
           ?.marque ?? null;
-      const imageUrl = null;
+      const imageStorageKey = tarif.imageStorageKey ?? null;
 
       return {
         id: tarif.id,
@@ -128,7 +128,7 @@ const FontaineEspacePropositions = ({
         nbAvis: tarif.nbAvis,
         modele,
         marque,
-        imageUrl,
+        imageStorageKey,
         infos: tarif.infos,
         typePose: tarif.typePose,
         reconditionne: tarif.reconditionne,
@@ -160,7 +160,7 @@ const FontaineEspacePropositions = ({
         nbAvis: number | null;
         modele: string | null;
         marque: string | null;
-        imageUrl: null;
+        imageStorageKey: string | null;
         infos: string | null;
         typePose: TypesPoseType;
         reconditionne: boolean | null;
@@ -205,7 +205,7 @@ const FontaineEspacePropositions = ({
     nbAvis: number | null;
     modele: string | null;
     marque: string | null;
-    imageUrl: null;
+    imageStorageKey: string | null;
     infos: string | null;
     typePose: TypesPoseType;
     reconditionne: boolean | null;
@@ -299,7 +299,7 @@ const FontaineEspacePropositions = ({
     logoStorageKey: string | null;
     modele: string | null;
     marque: string | null;
-    imageUrl: null;
+    imageStorageKey: string | null;
     infos: string | null;
     typePose: TypesPoseType;
     reconditionne: boolean | null;

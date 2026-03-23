@@ -60,7 +60,7 @@ export const getFruitsTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectFruitsTarifsSchema.parse(result),
@@ -111,7 +111,7 @@ export const getSnacksTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectSnacksTarifsSchema.parse(result),
@@ -164,7 +164,7 @@ export const getBoissonsTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectBoissonsTarifsSchema.parse(result),
@@ -199,7 +199,7 @@ export const getFoodLivraisonTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entrepriseInfos.logoDocumentId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectFoodLivraisonTarifsSchema.parse(result),

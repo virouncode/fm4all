@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import StarRating from "@/components/star/StarRating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
@@ -16,6 +16,7 @@ import { CafePropositionItem } from "@/app/[locale]/(main)/(application)/devis/(
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { useLocale, useTranslations } from "next-intl";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import Image from "next/image";
 
 export type CafeMobilePropositionItem = CafePropositionItem;
@@ -58,7 +59,7 @@ const CafeMobileEspacePropositionCard = ({
     typeLait,
     marque,
     modele,
-    imageUrl,
+    imageStorageKey,
   } = proposition;
   const color = getFm4AllColor(gamme);
 
@@ -104,11 +105,10 @@ const CafeMobileEspacePropositionCard = ({
 
   const imgProduit = (
     <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-200">
-      <Image
-        src={imageUrl ?? "/img/services/cafe.webp"}
+      <PresignedTarifImage
+        storageKey={imageStorageKey}
+        fallbackSrc="/img/services/cafe.webp"
         alt={`illustration ${marque} ${modele}`}
-        fill
-        className="cursor-pointer object-contain"
         sizes="(max-width:768px) 33vw"
       />
     </div>
@@ -116,11 +116,10 @@ const CafeMobileEspacePropositionCard = ({
 
   const imgProduitDialog = (
     <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-      <Image
-        src={imageUrl ?? "/img/services/cafe.webp"}
+      <PresignedTarifImage
+        storageKey={imageStorageKey}
+        fallbackSrc="/img/services/cafe.webp"
         alt={`illustration ${marque} ${modele}`}
-        fill
-        className="object-contain"
         sizes="(max-width:768px) 100vw"
       />
     </div>
@@ -257,7 +256,7 @@ const CafeMobileEspacePropositionCard = ({
                 <DialogHeader>
                   <DialogTitle>{nomPrestataire}</DialogTitle>
                 </DialogHeader>
-                <FournisseurDialog
+                <PrestataireDialog
                   sloganPrestataire={sloganPrestataire}
                   logoStorageKey={logoStorageKey}
                   nomPrestataire={nomPrestataire}

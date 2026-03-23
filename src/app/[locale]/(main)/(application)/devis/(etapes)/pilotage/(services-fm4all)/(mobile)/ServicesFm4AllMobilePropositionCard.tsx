@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
   Dialog,
@@ -308,7 +308,7 @@ const ServicesFm4AllMobilePropositionCard = ({
                 <DialogHeader>
                   <DialogTitle>{"fm4all"}</DialogTitle>
                 </DialogHeader>
-                <FournisseurDialog
+                <PrestataireDialog
                   sloganPrestataire={tGlobal(
                     "le-facility-management-pour-tous",
                   )}

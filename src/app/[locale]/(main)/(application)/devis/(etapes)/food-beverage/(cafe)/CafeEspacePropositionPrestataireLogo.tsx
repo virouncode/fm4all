@@ -9,29 +9,30 @@ import {
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 
-type SnacksFruitsPropositionLogoProps = {
+type CafeEspacePropositionPrestataireLogoProps = {
   nomPrestataire: string | null;
-  logoStorageKey: string | null;
   sloganPrestataire: string | null;
+  logoStorageKey: string | null;
   anneeCreation: number | null;
   ca: string | null;
   effectifPrestataire: string | null;
   nbClients: number | null;
   noteGoogle: string | null;
   nbAvis: number | null;
+  [key: string]: unknown;
 };
 
-const SnacksFruitsPropositionLogo = ({
+const CafeEspacePropositionPrestataireLogo = ({
   nomPrestataire,
-  logoStorageKey,
   sloganPrestataire,
+  logoStorageKey,
   anneeCreation,
   ca,
   effectifPrestataire,
   nbClients,
   noteGoogle,
   nbAvis,
-}: SnacksFruitsPropositionLogoProps) => {
+}: CafeEspacePropositionPrestataireLogoProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -41,7 +42,7 @@ const SnacksFruitsPropositionLogo = ({
               <Image
                 src={logoStorageKey}
                 alt={`logo-de-${nomPrestataire}`}
-                fill={true}
+                fill
                 className="h-full w-full cursor-pointer object-contain"
                 sizes="(min-width:768px) 100vw"
               />
@@ -77,4 +78,4 @@ const SnacksFruitsPropositionLogo = ({
   );
 };
 
-export default SnacksFruitsPropositionLogo;
+export default CafeEspacePropositionPrestataireLogo;

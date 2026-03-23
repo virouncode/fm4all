@@ -1,4 +1,4 @@
-import OfficeManagerFournisseurLogo from "../OfficeManagerFournisseurLogo";
+import OfficeManagerPrestataireLogo from "../OfficeManagerPrestataireLogo";
 import OfficeManagerInputs from "../OfficeManagerInputs";
 import OfficeManagerPropositionCard from "../OfficeManagerPropositionCard";
 
@@ -52,7 +52,7 @@ const OfficeManagerDesktopPropositions = ({
               key={proposition.entrepriseId}
             >
               <div className="flex w-1/4 flex-col items-center justify-center gap-6 p-4">
-                <OfficeManagerFournisseurLogo {...proposition} />
+                <OfficeManagerPrestataireLogo {...proposition} />
                 <OfficeManagerInputs
                   demiJParSemaineEssentiel={demiJParSemaineEssentiel}
                   handleChangeDemiJParSemaine={handleChangeDemiJParSemaine}

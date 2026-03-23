@@ -9,10 +9,10 @@ import {
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 
-type SnacksFruitsPropositionLogoProps = {
+type ThePropositionsProps = {
   nomPrestataire: string | null;
+  slogan: string | null;
   logoStorageKey: string | null;
-  sloganPrestataire: string | null;
   anneeCreation: number | null;
   ca: string | null;
   effectifPrestataire: string | null;
@@ -21,28 +21,28 @@ type SnacksFruitsPropositionLogoProps = {
   nbAvis: number | null;
 };
 
-const SnacksFruitsPropositionLogo = ({
+const ThePropositionPrestataireLogo = ({
   nomPrestataire,
+  slogan,
   logoStorageKey,
-  sloganPrestataire,
   anneeCreation,
   ca,
   effectifPrestataire,
   nbClients,
   noteGoogle,
   nbAvis,
-}: SnacksFruitsPropositionLogoProps) => {
+}: ThePropositionsProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="relative flex h-full w-1/4 items-center justify-center p-2">
+        <div className="relative flex h-1/2 w-full cursor-pointer items-center justify-center p-2">
           {logoStorageKey ? (
             <div className="relative h-full w-full">
               <Image
                 src={logoStorageKey}
                 alt={`logo-de-${nomPrestataire}`}
-                fill={true}
-                className="h-full w-full cursor-pointer object-contain"
+                fill
+                className="h-full w-full object-contain"
                 sizes="(min-width:768px) 100vw"
               />
             </div>
@@ -50,7 +50,7 @@ const SnacksFruitsPropositionLogo = ({
             nomPrestataire
           )}
           <SquareArrowOutUpRight
-            className="absolute top-2 right-2 cursor-pointer hover:opacity-70"
+            className="absolute top-0 right-0 hover:opacity-70"
             size={16}
             color="#000000"
           />
@@ -61,7 +61,7 @@ const SnacksFruitsPropositionLogo = ({
           <DialogTitle>{nomPrestataire}</DialogTitle>
         </DialogHeader>
         <PrestataireDialog
-          sloganPrestataire={sloganPrestataire}
+          sloganPrestataire={slogan}
           logoStorageKey={logoStorageKey}
           nomPrestataire={nomPrestataire}
           locationUrl={null}
@@ -77,4 +77,4 @@ const SnacksFruitsPropositionLogo = ({
   );
 };
 
-export default SnacksFruitsPropositionLogo;
+export default ThePropositionPrestataireLogo;

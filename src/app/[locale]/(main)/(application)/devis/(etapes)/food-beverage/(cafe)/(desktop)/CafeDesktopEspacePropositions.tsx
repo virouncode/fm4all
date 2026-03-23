@@ -2,7 +2,7 @@ import NextServiceButton from "@/app/[locale]/(main)/(application)/devis/NextSer
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { useTranslations } from "next-intl";
 import AddEspaceButton from "../AddEspaceButton";
-import CafeEspacePropositionFournisseurLogo from "../CafeEspacePropositionFournisseurLogo";
+import CafeEspacePropositionPrestataireLogo from "../CafeEspacePropositionPrestataireLogo";
 import NextEspaceButton from "../NextEspaceButton";
 import CafeEspacePropositionCard from "./CafeEspacePropositionCard";
 import type { CafePropositionItem } from "./CafeEspacePropositionCard";
@@ -39,7 +39,7 @@ const CafeDesktopEspacePropositions = ({
             className="flex flex-1 border-b"
             key={propositions[0].entrepriseId}
           >
-            <CafeEspacePropositionFournisseurLogo {...propositions[0]} />
+            <CafeEspacePropositionPrestataireLogo {...propositions[0]} />
             {propositions.map((proposition) => (
               <CafeEspacePropositionCard
                 key={proposition.id}

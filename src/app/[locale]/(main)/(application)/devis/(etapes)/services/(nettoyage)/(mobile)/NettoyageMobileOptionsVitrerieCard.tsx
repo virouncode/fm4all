@@ -1,4 +1,4 @@
-import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
+import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
 import StarRating from "@/components/star/StarRating";
 import { Button } from "@/components/ui/button";
 import {
@@ -260,7 +260,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
                         {nettoyage.infos.nomPrestataire}
                       </DialogTitle>
                     </DialogHeader>
-                    <FournisseurDialog
+                    <PrestataireDialog
                       sloganPrestataire={vitrerieProposition.slogan}
                       logoStorageKey={vitrerieProposition.logoStorageKey}
                       nomPrestataire={vitrerieProposition.nomPrestataire}

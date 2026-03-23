@@ -65,10 +65,6 @@ export const entrepriseInfos = pgTable(
       .references(() => entreprises.id, { onDelete: "cascade" }),
     slogan: varchar("slogan", { length: 512 }),
     presentation: text("presentation"),
-    logoDocumentId: uuid("logo_document_id").references(
-      (): AnyPgColumn => documents.id,
-      { onDelete: "set null" },
-    ),
     noteGoogle: varchar("note_google", { length: 4 }),
     nbAvis: integer("nb_avis"),
     anneeCreation: integer("annee_creation"),
@@ -82,7 +78,6 @@ export const entrepriseInfos = pgTable(
   },
   (table) => [
     uniqueIndex("entreprise_infos_entreprise_id_udx").on(table.entrepriseId),
-    index("entreprise_infos_logo_document_idx").on(table.logoDocumentId),
   ],
 );
 
