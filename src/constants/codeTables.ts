@@ -97,6 +97,20 @@ export const documentCategorieCT = [
   },
   { code: "tache_piece_jointe", name: "Pièce jointe (tâche)" },
   { code: "devis_temporaire", name: "Devis temporaire" },
+
+  // Catalogue machines
+  { code: "machine_a_cafe", name: "Photo machine à café (catalogue)" },
+  { code: "fontaine", name: "Photo fontaine à eau (catalogue)" },
+
+  // Vitrine prestataire
+  { code: "vitrine_nettoyage", name: "Photo vitrine nettoyage" },
+  { code: "vitrine_hygiene", name: "Photo vitrine hygiène" },
+  { code: "vitrine_maintenance", name: "Photo vitrine maintenance multitechnique" },
+  { code: "vitrine_incendie", name: "Photo vitrine sécurité incendie" },
+  { code: "vitrine_cafe", name: "Photo vitrine café & boissons chaudes" },
+  { code: "vitrine_snacks", name: "Photo vitrine snacks & fruits" },
+  { code: "vitrine_fontaines", name: "Photo vitrine fontaines à eau" },
+  { code: "vitrine_office_manager", name: "Photo vitrine office manager" },
 ] as const;
 
 export const documentCategorieCodes = documentCategorieCT.map(

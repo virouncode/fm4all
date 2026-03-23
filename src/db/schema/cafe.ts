@@ -64,9 +64,6 @@ export const cafeMachinesTarifs = pgTable(
       onDelete: "set null",
     }),
     reconditionne: boolean().default(false),
-    imageId: uuid("image_id").references(() => documents.id, {
-      onDelete: "set null",
-    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),

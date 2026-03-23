@@ -1,5 +1,6 @@
 import {
   AnyPgColumn,
+  boolean,
   index,
   integer,
   pgTable,
@@ -91,6 +92,7 @@ export const entrepriseRoles = pgTable(
         onDelete: "cascade",
       }),
     role: roleEntrepriseEnum("role").notNull(),
+    estSurComparateur: boolean("est_sur_comparateur").notNull().default(false),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),
