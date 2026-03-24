@@ -11,9 +11,9 @@ import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { GammeType } from "@/zod-schemas/gamme.schema";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 
 export type SnacksFruitsPropositionItem = {
   id: string;
@@ -29,6 +29,9 @@ export type SnacksFruitsPropositionItem = {
   nbAvis: number | null;
   isSamePrestataire: boolean;
   gamme: GammeType;
+  imageStorageKeyFruits: string | null;
+  imageStorageKeySnacks: string | null;
+  imageStorageKeyBoissons: string | null;
   fruitsKgParSemaine: number | null;
   snacksPortionsParSemaine: number | null;
   boissonsConsosParSemaine: number | null;
@@ -185,29 +188,26 @@ const SnacksFruitsPropositionCard = ({
   const imgProduit = (
     <div className="flex items-center justify-between gap-2">
       <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
-        <Image
-          src="/img/services/fruits.webp"
+        <PresignedTarifImage
+          storageKey={proposition.imageStorageKeyFruits}
+          fallbackSrc="/img/services/fruits.webp"
           alt="illustration-corbeille-fruits"
-          fill
-          className="object-cover"
           sizes="(min-width:768px) 20vw"
         />
       </div>
       <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
-        <Image
-          src="/img/services/snacks.webp"
+        <PresignedTarifImage
+          storageKey={proposition.imageStorageKeySnacks}
+          fallbackSrc="/img/services/snacks.webp"
           alt="illustration-snacks"
-          fill
-          className="object-cover"
           sizes="(min-width:768px) 20vw"
         />
       </div>
       <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
-        <Image
-          src="/img/services/boissons.webp"
+        <PresignedTarifImage
+          storageKey={proposition.imageStorageKeyBoissons}
+          fallbackSrc="/img/services/boissons.webp"
           alt="illustration-boissons"
-          fill
-          className="object-cover"
           sizes="(min-width:768px) 20vw"
         />
       </div>
@@ -243,25 +243,26 @@ const SnacksFruitsPropositionCard = ({
             </span>
           </div>
 
-          <Dialog>
-            <DialogTrigger asChild>
-              <Info
-                size={16}
-                className="cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              {imgProduit}
-              <p className="text-end text-xs italic">
-                {t("photos-non-contractuelles")}
-              </p>
-              {infosProduitDialog}
-            </DialogContent>
-          </Dialog>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Info
+                  size={16}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                </DialogHeader>
+                {imgProduit}
+                <p className="text-end text-xs italic">
+                  {t("photos-non-contractuelles")}
+                </p>
+                {infosProduitDialog}
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         {infosProduit}
       </div>

@@ -54,7 +54,8 @@ const OfficeManagerPropositions = ({
 
   const propositions = officeManagerTarifs.map((tarif) => {
     let { entrepriseId, nomPrestataire, slogan } = tarif;
-    const { id, demiTjm, demiTjmPremium, logoStorageKey } = tarif;
+    const { id, demiTjm, demiTjmPremium, logoStorageKey, imageStorageKey } =
+      tarif;
     if (false) {
       entrepriseId = "00000000-0000-0000-0000-000000000000";
       nomPrestataire = "FM4ALL";
@@ -76,6 +77,7 @@ const OfficeManagerPropositions = ({
       nomPrestataire,
       sloganPrestataire: slogan,
       logoStorageKey,
+      imageStorageKey,
       totalAnnuel,
       demiJParSemaine,
       demiTjm,
@@ -89,6 +91,7 @@ const OfficeManagerPropositions = ({
     nomPrestataire: string;
     sloganPrestataire: string | null;
     logoStorageKey: string | null;
+    imageStorageKey: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;

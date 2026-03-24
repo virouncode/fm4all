@@ -55,7 +55,8 @@ export const getCafeMachinesTarifs = async () => {
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
       .leftJoin(documents, eq(documents.id, entreprises.logoId))
-      .leftJoin(imageDoc, eq(imageDoc.id, cafeMachinesTarifs.imageId));
+      .leftJoin(cafeMachines, eq(cafeMachines.id, cafeMachinesTarifs.cafeMachineId))
+      .leftJoin(imageDoc, eq(imageDoc.id, cafeMachines.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectCafeMachinesTarifsSchema.parse(result),
@@ -98,6 +99,7 @@ export const getCafeConsoTarifs = async () => {
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(cafeConsoTarifs)
       .innerJoin(
@@ -108,7 +110,8 @@ export const getCafeConsoTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entreprises.logoId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, cafeConsoTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectCafeConsoTarifsSchema.parse(result),

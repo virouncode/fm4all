@@ -22,7 +22,10 @@ import { selectFruitsTarifsSchema } from "@/zod-schemas/fruitsTarifs.schema";
 import { selectSnacksQuantitesSchema } from "@/zod-schemas/snacksQuantites.schema";
 import { selectSnacksTarifsSchema } from "@/zod-schemas/snacksTarifs.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
+const imageDoc = alias(documents, "image_doc");
 
 export const getFruitsQuantites = async () => {
   "use cache";
@@ -53,6 +56,7 @@ export const getFruitsTarifs = async () => {
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(fruitsTarifs)
       .innerJoin(entreprises, eq(entreprises.id, fruitsTarifs.entrepriseId))
@@ -60,7 +64,8 @@ export const getFruitsTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entreprises.logoId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, fruitsTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectFruitsTarifsSchema.parse(result),
@@ -104,6 +109,7 @@ export const getSnacksTarifs = async () => {
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(snacksTarifs)
       .innerJoin(entreprises, eq(entreprises.id, snacksTarifs.entrepriseId))
@@ -111,7 +117,8 @@ export const getSnacksTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entreprises.logoId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, snacksTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectSnacksTarifsSchema.parse(result),
@@ -157,6 +164,7 @@ export const getBoissonsTarifs = async () => {
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(boissonsTarifs)
       .innerJoin(entreprises, eq(entreprises.id, boissonsTarifs.entrepriseId))
@@ -164,7 +172,8 @@ export const getBoissonsTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entreprises.logoId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, boissonsTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectBoissonsTarifsSchema.parse(result),

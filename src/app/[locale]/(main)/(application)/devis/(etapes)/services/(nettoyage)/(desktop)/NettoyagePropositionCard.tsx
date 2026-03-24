@@ -10,11 +10,11 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { GammeType } from "@/zod-schemas/gamme.schema";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 
 type NettoyagePropositionCardProps = {
   handleClickProposition: (proposition: {
@@ -34,6 +34,9 @@ type NettoyagePropositionCardProps = {
     tauxHoraire: number;
     gamme: GammeType;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
+    hygienePartenaireEntrepriseId: string | null;
   }) => void;
   proposition: {
     id: string;
@@ -52,6 +55,9 @@ type NettoyagePropositionCardProps = {
     tauxHoraire: number;
     gamme: GammeType;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
+    hygienePartenaireEntrepriseId: string | null;
   };
 };
 
@@ -134,12 +140,11 @@ const NettoyagePropositionCard = ({
 
   const imgProduit = (
     <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
-      <Image
-        src={"/img/services/nettoyage.webp"}
-        alt={`illustration de nettoyage`}
-        fill
-        className="cursor-pointer object-contain object-center"
-        sizes="(max-width:768px) 33vw"
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc="/img/services/nettoyage.webp"
+        alt="illustration de nettoyage"
+        sizes="(min-width:768px) 33vw"
       />
     </div>
   );
@@ -167,12 +172,12 @@ const NettoyagePropositionCard = ({
       <div>
         <div className="flex items-center gap-2">
           {totalMensuelText}
+          <div onClick={(e) => e.stopPropagation()}>
           <Dialog>
             <DialogTrigger asChild>
               <Info
                 size={16}
                 className="cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
               />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -188,10 +193,14 @@ const NettoyagePropositionCard = ({
                   {infosProduit}
                   {hParSemaineText}
                   {nbPassagesParSemaineText}
+                  {proposition.infos && (
+                    <li className="list-check">{proposition.infos}</li>
+                  )}
                 </ul>
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
         <ul className="ml-4 flex flex-col text-xs">
           {infosProduit}

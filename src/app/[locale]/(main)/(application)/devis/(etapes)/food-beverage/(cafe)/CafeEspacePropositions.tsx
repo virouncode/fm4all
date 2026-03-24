@@ -7,7 +7,6 @@ import {
   RATIO_SUCRE,
 } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
-import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMachines";
@@ -26,6 +25,7 @@ import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs.schem
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs.schema";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
+import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import CafeDesktopEspacePropositions from "./(desktop)/CafeDesktopEspacePropositions";
 import CafeMobileEspacePropositions from "./(mobile)/CafeMobileEspacePropositions";
@@ -146,6 +146,7 @@ const CafeEspacePropositions = ({
         nbAvis,
         gamme,
         prixUnitaire,
+        imageStorageKey: imageConsoStorageKey,
       } = tarif;
       //MACHINES
       const machinesTarifFournisseur = machinesTarifs.find(
@@ -252,6 +253,7 @@ const CafeEspacePropositions = ({
         modele,
         marque,
         imageStorageKey,
+        imageConsoStorageKey,
         infos,
         reconditionne,
         typeLait,
@@ -290,6 +292,7 @@ const CafeEspacePropositions = ({
         modele: string | null;
         marque: string | null;
         imageStorageKey: string | null;
+        imageConsoStorageKey: string | null;
         infos: string | null;
         reconditionne: boolean | null;
         typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -339,6 +342,7 @@ const CafeEspacePropositions = ({
     modele: string | null;
     marque: string | null;
     imageStorageKey: string | null;
+    imageConsoStorageKey: string | null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -468,6 +472,7 @@ const CafeEspacePropositions = ({
     modele: string | null;
     marque: string | null;
     imageStorageKey: string | null;
+    imageConsoStorageKey: string | null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -563,12 +568,12 @@ const CafeEspacePropositions = ({
       //Pour chaque espace et le the si gammeCafeSelected je mets à jour les prix et le total
 
       if (entrepriseId !== cafe.infos.entrepriseId) {
-        toast({
-          title: t("fournisseur-selectionne"),
+        toast.info(t("prestataire-selectionne"), {
           description: tCafe(
-            "vous-avez-choisi-nomfournisseur-pour-le-cafe-ce-prestataire-assurera-la-prestation-thes-varies",
+            "vous-avez-choisi-nomprestataire-pour-le-cafe-ce-prestataire-assurera-la-prestation-thes-varies",
             { nomPrestataire },
           ),
+          position: "top-center",
         });
       }
       const newCafeInfos = {
@@ -816,14 +821,12 @@ const CafeEspacePropositions = ({
 
   const handleAlert = () => {
     if (!espace.infos.gammeCafeSelected) {
-      toast({
-        description: tCafe(
+      toast.error(
+        tCafe(
           "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces",
         ),
-        duration: 3000,
-        variant: "destructive",
-        className: "left-0",
-      });
+        { duration: 3000 },
+      );
       return;
     }
   };

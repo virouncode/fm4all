@@ -12,9 +12,10 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 
 type NettoyageMobilePropositionCardProps = {
   handleClickProposition: (proposition: {
@@ -34,6 +35,9 @@ type NettoyageMobilePropositionCardProps = {
     tauxHoraire: number;
     gamme: "essentiel" | "confort" | "excellence";
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
+    hygienePartenaireEntrepriseId: string | null;
   }) => void;
   proposition: {
     id: string;
@@ -52,6 +56,9 @@ type NettoyageMobilePropositionCardProps = {
     tauxHoraire: number;
     gamme: "essentiel" | "confort" | "excellence";
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
+    hygienePartenaireEntrepriseId: string | null;
   };
 };
 
@@ -134,6 +141,9 @@ const NettoyageMobilePropositionCard = ({
       </li>
       {hParSemaineText}
       {nbPassagesParSemaineText}
+      {proposition.infos && (
+        <li className="list-check">{proposition.infos}</li>
+      )}
     </ul>
   );
 
@@ -149,11 +159,10 @@ const NettoyageMobilePropositionCard = ({
 
   const imgProduit = (
     <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
-      <Image
-        src={"/img/services/nettoyage.webp"}
-        alt={`illustration de nettoyage`}
-        fill
-        className="cursor-pointer object-contain"
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc="/img/services/nettoyage.webp"
+        alt="illustration de nettoyage"
         sizes="(max-width:768px) 33vw"
       />
     </div>
@@ -161,11 +170,10 @@ const NettoyageMobilePropositionCard = ({
 
   const imgProduitDialog = (
     <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
-      <Image
-        src={"/img/services/nettoyage.webp"}
-        alt={`illustration de nettoyage`}
-        fill
-        className="object-contain object-center"
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc="/img/services/nettoyage.webp"
+        alt="illustration de nettoyage"
         sizes="(max-width:768px) 100vw"
       />
     </div>
@@ -182,55 +190,58 @@ const NettoyageMobilePropositionCard = ({
         }`}
       >
         <div className="flex h-1/2 items-center gap-2 border-b border-slate-200 pb-2">
-          <Dialog>
-            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="pointer-events-auto w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-4">
-                {imgProduitDialog}
-                <p className="text-end text-xs italic">
-                  {t("photo-non-contractuelle")}
-                </p>
-                {infosProduitDialog}
-              </div>
-            </DialogContent>
-          </Dialog>
-          <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomPrestataire}</p>
+          <div onClick={(e) => e.stopPropagation()}>
             <Dialog>
-              <DialogTrigger asChild>
-                {logoStorageKey ? (
-                  <div className="relative h-10">
-                    <Image
-                      src={logoStorageKey}
-                      alt={`logo-de-${nomPrestataire}`}
-                      fill
-                      className="cursor-pointer object-contain object-left"
-                      sizes="(max-width:768px) 100vw"
-                    />
-                  </div>
-                ) : null}
-              </DialogTrigger>
-              <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+              <DialogTrigger asChild>{imgProduit}</DialogTrigger>
+              <DialogContent className="pointer-events-auto w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomPrestataire}</DialogTitle>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
                 </DialogHeader>
-                <PrestataireDialog
-                  sloganPrestataire={sloganPrestataire}
-                  logoStorageKey={logoStorageKey}
-                  nomPrestataire={nomPrestataire}
-                  locationUrl={null}
-                  anneeCreation={anneeCreation}
-                  ca={ca}
-                  effectifPrestataire={effectifPrestataire}
-                  nbClients={nbClients}
-                  noteGoogle={noteGoogle}
-                  nbAvis={nbAvis}
-                />
+                <div className="flex flex-col gap-4">
+                  {imgProduitDialog}
+                  <p className="text-end text-xs italic">
+                    {t("photo-non-contractuelle")}
+                  </p>
+                  {infosProduitDialog}
+                </div>
               </DialogContent>
             </Dialog>
+          </div>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{nomPrestataire}</p>
+            <div onClick={(e) => e.stopPropagation()}>
+              <Dialog>
+                <DialogTrigger asChild>
+                  {logoStorageKey ? (
+                    <div className="relative h-10">
+                      <PresignedLogoImage
+                        storageKey={logoStorageKey}
+                        alt={`logo-de-${nomPrestataire}`}
+                        className="cursor-pointer object-contain object-left"
+                        sizes="(max-width:768px) 100vw"
+                      />
+                    </div>
+                  ) : null}
+                </DialogTrigger>
+                <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+                  <DialogHeader>
+                    <DialogTitle>{nomPrestataire}</DialogTitle>
+                  </DialogHeader>
+                  <PrestataireDialog
+                    sloganPrestataire={sloganPrestataire}
+                    logoStorageKey={logoStorageKey}
+                    nomPrestataire={nomPrestataire}
+                    locationUrl={null}
+                    anneeCreation={anneeCreation}
+                    ca={ca}
+                    effectifPrestataire={effectifPrestataire}
+                    nbClients={nbClients}
+                    noteGoogle={noteGoogle}
+                    nbAvis={nbAvis}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
             {noteGoogle && nbAvis && (
               <div className="flex items-center gap-1 text-xs">
                 <p>{noteGoogle}</p>

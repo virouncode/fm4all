@@ -20,6 +20,7 @@ export const selectMaintenanceTarifsSchema = createSelectSchema(
   nbClients: z.number().nullable(),
   noteGoogle: z.string().nullable(),
   nbAvis: z.number().nullable(),
+  imageStorageKey: z.string().nullable(),
 });
 
 export type SelectMaintenanceTarifsType = z.infer<

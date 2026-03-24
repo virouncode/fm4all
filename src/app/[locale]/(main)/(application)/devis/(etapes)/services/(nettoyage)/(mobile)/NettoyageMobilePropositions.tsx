@@ -20,6 +20,9 @@ type NettoyageMobilePropositionsProps = {
     tauxHoraire: number;
     gamme: GammeType;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
+    hygienePartenaireEntrepriseId: string | null;
   }) => void;
   formattedPropositions: {
     id: string;
@@ -38,6 +41,9 @@ type NettoyageMobilePropositionsProps = {
     tauxHoraire: number;
     gamme: "essentiel" | "confort" | "excellence";
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
+    hygienePartenaireEntrepriseId: string | null;
   }[][];
 };
 

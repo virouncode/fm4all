@@ -13,6 +13,7 @@ type OfficeManagerDesktopPropositionsProps = {
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
+    imageStorageKey: string | null;
   }[];
   demiJParSemaineEssentiel: number | null;
   demiJParSemaineConfort: number | null;
@@ -30,6 +31,7 @@ type OfficeManagerDesktopPropositionsProps = {
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
+    imageStorageKey: string | null;
   }) => void;
 };
 

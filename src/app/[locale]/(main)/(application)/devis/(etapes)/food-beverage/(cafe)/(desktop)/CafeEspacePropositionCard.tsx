@@ -32,6 +32,7 @@ export type CafePropositionItem = {
   modele: string | null;
   marque: string | null;
   imageStorageKey: string | null;
+  imageConsoStorageKey: string | null;
   infos: string | null;
   reconditionne: boolean | null;
   typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -127,12 +128,22 @@ const CafeEspacePropositionCard = ({
     );
 
   const imgProduit = (
-    <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-      <PresignedTarifImage
-        storageKey={proposition.imageStorageKey}
-        fallbackSrc="/img/services/cafe_fallback.webp"
-        alt={`illustration ${proposition.marque} ${proposition.modele}`}
-      />
+    <div className="flex items-center gap-2">
+      <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
+        <PresignedTarifImage
+          storageKey={proposition.imageStorageKey}
+          fallbackSrc="/img/services/cafe_machine_fallback.webp"
+          alt={`illustration ${proposition.marque} ${proposition.modele}`}
+        />
+      </div>
+      <span className="text-2xl font-bold text-slate-400">+</span>
+      <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
+        <PresignedTarifImage
+          storageKey={proposition.imageConsoStorageKey}
+          fallbackSrc="/img/services/cafe_conso_fallback.webp"
+          alt="illustration consommables café"
+        />
+      </div>
     </div>
   );
 
@@ -253,25 +264,26 @@ const CafeEspacePropositionCard = ({
       <div>
         <div className="flex items-center gap-2">
           {totalMensuelText}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Info
-                size={16}
-                className="cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              {imgProduit}
-              <p className="text-end text-xs italic">
-                {t("photo-non-contractuelle")}
-              </p>
-              {infosProduitDialog}
-            </DialogContent>
-          </Dialog>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Info
+                  size={16}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                </DialogHeader>
+                {imgProduit}
+                <p className="text-end text-xs italic">
+                  {t("photo-non-contractuelle")}
+                </p>
+                {infosProduitDialog}
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         {prixInstallationText}
         {infosProduit}

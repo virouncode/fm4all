@@ -23,6 +23,8 @@ type MaintenanceMobilePropositionsProps = {
     totalAnnuelLegio: number | null;
     totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
   }[][];
   handleClickProposition: (proposition: {
     id: string;
@@ -45,6 +47,8 @@ type MaintenanceMobilePropositionsProps = {
     totalAnnuelLegio: number | null;
     totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
   }) => void;
 };
 

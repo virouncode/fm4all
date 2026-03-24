@@ -1,3 +1,4 @@
+import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
 import StarRating from "@/components/star/StarRating";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -74,10 +75,9 @@ const PrestataireDialog = ({
       )}
       {logoStorageKey ? (
         <div className="relative h-[50px] w-full">
-          <Image
-            src={logoStorageKey}
+          <PresignedLogoImage
+            storageKey={logoStorageKey}
             alt={`logo-de-${nomPrestataire}`}
-            fill
             className={`object-contain ${nomPrestataire === "CASTALIE" ? "blur-lg" : ""} ${darkLogoUrl ? "dark:hidden" : ""}`}
             sizes="(max-width:768px) 25vw, 100vw"
           />

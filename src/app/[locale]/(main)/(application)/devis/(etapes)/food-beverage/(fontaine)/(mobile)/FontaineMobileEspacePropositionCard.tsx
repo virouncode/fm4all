@@ -15,8 +15,8 @@ import { formatNumber } from "@/lib/utils/formatNumber";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { useLocale, useTranslations } from "next-intl";
+import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
 import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
-import Image from "next/image";
 import { getTypeFontaine } from "../getTypeFontaine";
 
 export type FontaineMobilePropositionItem = {
@@ -277,19 +277,21 @@ const FontaineMobileEspacePropositionCard = ({
         }`}
       >
         <div className="flex h-1/2 items-center gap-2 border-b border-slate-200 pb-2">
-          <Dialog>
-            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              {imgProduitDialog}
-              <p className="text-end text-xs italic">
-                {t("photo-non-contractuelle")}
-              </p>
-              {infosProduitDialog}
-            </DialogContent>
-          </Dialog>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dialog>
+              <DialogTrigger asChild>{imgProduit}</DialogTrigger>
+              <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+                <DialogHeader>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                </DialogHeader>
+                {imgProduitDialog}
+                <p className="text-end text-xs italic">
+                  {t("photo-non-contractuelle")}
+                </p>
+                {infosProduitDialog}
+              </DialogContent>
+            </Dialog>
+          </div>
           <div className="flex h-full w-2/3 flex-col gap-1">
             <p
               className={`text-sm font-bold ${
@@ -298,46 +300,47 @@ const FontaineMobileEspacePropositionCard = ({
             >
               {nomPrestataire}
             </p>
-            <Dialog>
-              <DialogTrigger asChild>
-                {logoStorageKey ? (
-                  <div
-                    className={`relative h-10 ${
-                      ""
-                    }`}
-                  >
-                    <Image
-                      src={logoStorageKey}
-                      alt={`logo-de-${nomPrestataire}`}
-                      fill={true}
-                      className="cursor-pointer object-contain object-left"
-                      sizes="(max-width:768px) 100vw"
-                    />
-                  </div>
-                ) : null}
-              </DialogTrigger>
-              <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-                <DialogHeader>
-                  <DialogTitle
-                    className={`${""} `}
-                  >
-                    {nomPrestataire}
-                  </DialogTitle>
-                </DialogHeader>
-                <PrestataireDialog
-                  sloganPrestataire={sloganPrestataire}
-                  logoStorageKey={logoStorageKey}
-                  nomPrestataire={nomPrestataire}
-                  locationUrl={null}
-                  anneeCreation={anneeCreation}
-                  ca={ca}
-                  effectifPrestataire={effectifPrestataire}
-                  nbClients={nbClients}
-                  noteGoogle={noteGoogle}
-                  nbAvis={nbAvis}
-                />
-              </DialogContent>
-            </Dialog>
+            <div onClick={(e) => e.stopPropagation()}>
+              <Dialog>
+                <DialogTrigger asChild>
+                  {logoStorageKey ? (
+                    <div
+                      className={`relative h-10 ${
+                        ""
+                      }`}
+                    >
+                      <PresignedLogoImage
+                        storageKey={logoStorageKey}
+                        alt={`logo-de-${nomPrestataire}`}
+                        className="cursor-pointer object-contain object-left"
+                        sizes="(max-width:768px) 100vw"
+                      />
+                    </div>
+                  ) : null}
+                </DialogTrigger>
+                <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+                  <DialogHeader>
+                    <DialogTitle
+                      className={`${""} `}
+                    >
+                      {nomPrestataire}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <PrestataireDialog
+                    sloganPrestataire={sloganPrestataire}
+                    logoStorageKey={logoStorageKey}
+                    nomPrestataire={nomPrestataire}
+                    locationUrl={null}
+                    anneeCreation={anneeCreation}
+                    ca={ca}
+                    effectifPrestataire={effectifPrestataire}
+                    nbClients={nbClients}
+                    noteGoogle={noteGoogle}
+                    nbAvis={nbAvis}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
             {noteGoogle && nbAvis && (
               <div className="flex items-center gap-1 text-xs">
                 <p>{noteGoogle}</p>

@@ -14,7 +14,10 @@ import { roundSurface } from "@/lib/utils/roundSurface";
 import { selectOfficeManagerQuantitesSchema } from "@/zod-schemas/officeManagerQuantites.schema";
 import { selectOfficeManagerTarifsSchema } from "@/zod-schemas/officeManagerTarifs.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
+const imageDoc = alias(documents, "image_doc");
 
 export const getOfficeManagerQuantites = async (
   surface: string,
@@ -62,6 +65,7 @@ export const getOfficeManagerTarifs = async () => {
         nomPrestataire: entreprises.nom,
         slogan: entrepriseInfos.slogan,
         logoStorageKey: documents.storageKey,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(officeManagerTarifs)
       .innerJoin(
@@ -72,7 +76,8 @@ export const getOfficeManagerTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entreprises.logoId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, officeManagerTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectOfficeManagerTarifsSchema.parse(result),

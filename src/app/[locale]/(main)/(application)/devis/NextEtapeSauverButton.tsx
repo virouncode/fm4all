@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
@@ -49,9 +49,7 @@ const NextEtapeSauverButton = () => {
             (totalServicesFm4All.totalRemiseCa ?? 0) -
             (totalServicesFm4All.totalRemiseHof ?? 0);
     if (!totalFinalServicesFm4All) {
-      toast({
-        variant: "destructive",
-        title: tFm4all("panier-vide"),
+      toast.error(tFm4all("panier-vide"), {
         description: tFm4all(
           "vous-navez-choisi-aucun-service-veuillez-selectionner-au-moins-un-service",
         ),

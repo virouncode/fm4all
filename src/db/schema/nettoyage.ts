@@ -36,6 +36,9 @@ export const nettoyageTarifs = pgTable(
     tauxHoraire: integer("taux_horaire").notNull(),
     surface: integer().notNull(),
     gamme: gammeEnum().notNull(),
+    hygienePartenaireEntrepriseId: uuid(
+      "hygiene_partenaire_entreprise_id",
+    ).references(() => entreprises.id, { onDelete: "set null" }),
     imageId: uuid("image_id").references(() => documents.id, {
       onDelete: "set null",
     }),

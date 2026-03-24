@@ -168,28 +168,29 @@ const SecuriteIncendiePropostionCard = ({
       <div>
         <div className="flex items-center gap-2">
           {totalMensuelText}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Info
-                size={16}
-                className="cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-4">
-                {infosText}
-                {imgProduit}
-                <p className="text-end text-xs italic">
-                  {t("photo-non-contractuelle")}
-                </p>
-                {infosProduitDialog}
-              </div>
-            </DialogContent>
-          </Dialog>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Info
+                  size={16}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4">
+                  {infosText}
+                  {imgProduit}
+                  <p className="text-end text-xs italic">
+                    {t("photo-non-contractuelle")}
+                  </p>
+                  {infosProduitDialog}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         {infosProduit}
       </div>

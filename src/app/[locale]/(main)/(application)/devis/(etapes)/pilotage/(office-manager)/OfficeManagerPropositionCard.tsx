@@ -11,7 +11,7 @@ import { formatNumber } from "@/lib/utils/formatNumber";
 import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 
 type OfficeManagerPropositionCardProps = {
   proposition: {
@@ -24,6 +24,7 @@ type OfficeManagerPropositionCardProps = {
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
+    imageStorageKey: string | null;
   };
   handleClickProposition: (proposition: {
     id: string;
@@ -35,6 +36,7 @@ type OfficeManagerPropositionCardProps = {
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
+    imageStorageKey: string | null;
   }) => void;
   demiJParSemaineConfort: number | null;
   demiJParSemaineExcellence: number | null;
@@ -211,11 +213,10 @@ const OfficeManagerPropositionCard = ({
 
   const imgProduit = (
     <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
-      <Image
-        src={"/img/services/office-managers.webp"}
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc="/img/services/office-managers.webp"
         alt={tOfficeManager("illustration-doffice-managers")}
-        fill={true}
-        className="cursor-pointer object-contain object-center"
         sizes="(min-width:768px) 33vw"
       />
     </div>
@@ -244,32 +245,33 @@ const OfficeManagerPropositionCard = ({
       <div>
         <div className="flex items-center gap-2">
           {totalMensuelText}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Info
-                size={16}
-                className="cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-4">
-                {imgProduit}
-                <p className="text-end text-xs italic">
-                  {t("photo-non-contractuelle")}
-                </p>
-                <ul className="mx-auto flex flex-col px-4 text-sm">
-                  {demiJParSemaineText}
-                  {presenceText}
-                  {premiumText}
-                  {infosProduit}
-                </ul>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Info
+                  size={16}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4">
+                  {imgProduit}
+                  <p className="text-end text-xs italic">
+                    {t("photo-non-contractuelle")}
+                  </p>
+                  <ul className="mx-auto flex flex-col px-4 text-sm">
+                    {demiJParSemaineText}
+                    {presenceText}
+                    {premiumText}
+                    {infosProduit}
+                  </ul>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         <ul className="ml-4 flex flex-col text-xs">
           {demiJParSemaineText}

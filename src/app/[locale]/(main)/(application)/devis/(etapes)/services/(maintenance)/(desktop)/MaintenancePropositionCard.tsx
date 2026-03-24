@@ -15,7 +15,7 @@ import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
 import { GammeType } from "@/zod-schemas/gamme.schema";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 
 type MaintenancePropositionCardProps = {
   proposition: {
@@ -39,6 +39,8 @@ type MaintenancePropositionCardProps = {
     totalAnnuelLegio: number | null;
     totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
   };
   handleClickProposition: (proposition: {
     id: string;
@@ -61,6 +63,8 @@ type MaintenancePropositionCardProps = {
     totalAnnuelLegio: number | null;
     totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
   }) => void;
 };
 
@@ -153,11 +157,10 @@ const MaintenancePropositionCard = ({
 
   const imgProduit = (
     <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
-      <Image
-        src={"/img/services/maintenance.webp"}
-        alt={`illustration de maintenance`}
-        fill
-        className="cursor-pointer object-contain object-center"
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc="/img/services/maintenance.webp"
+        alt="illustration de maintenance"
         sizes="(min-width:768px) 33vw"
       />
     </div>
@@ -186,29 +189,33 @@ const MaintenancePropositionCard = ({
       <div>
         <div className="flex items-center gap-2">
           {totalMensuelText}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Info
-                size={16}
-                className="cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-4">
-                {imgProduit}
-                <p className="text-end text-xs italic">
-                  {t("photo-non-contractuelle")}
-                </p>
-                <ul className="mx-auto flex flex-col px-4 text-sm">
-                  {infosProduit}
-                </ul>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Info
+                  size={16}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4">
+                  {imgProduit}
+                  <p className="text-end text-xs italic">
+                    {t("photo-non-contractuelle")}
+                  </p>
+                  <ul className="mx-auto flex flex-col px-4 text-sm">
+                    {infosProduit}
+                    {proposition.infos && (
+                      <li className="list-check">{proposition.infos}</li>
+                    )}
+                  </ul>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         <ul className="ml-4 flex flex-col text-xs">{infosProduit}</ul>
       </div>

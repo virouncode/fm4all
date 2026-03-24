@@ -8,8 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
 import { SquareArrowOutUpRight } from "lucide-react";
-import Image from "next/image";
 
 type MaintenancePrestataireLogoProps = {
   nomPrestataire: string | null;
@@ -40,10 +40,9 @@ const MaintenancePrestataireLogo = ({
         <div className="relative flex h-full w-1/4 cursor-pointer items-center justify-center p-4">
           {logoStorageKey ? (
             <div className="relative h-full w-full">
-              <Image
-                src={logoStorageKey}
+              <PresignedLogoImage
+                storageKey={logoStorageKey}
                 alt={`logo-de-${nomPrestataire}`}
-                fill
                 className="h-full w-full object-contain"
                 sizes="(min-width:768px) 100vw"
               />

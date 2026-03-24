@@ -1,4 +1,4 @@
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
@@ -71,9 +71,7 @@ const CafeMobileEspace = ({
       cafeEspacesIds.slice(-1)[0] !== espace.infos.espaceId &&
       cafeEspacesIds[0] !== espace.infos.espaceId
     ) {
-      toast({
-        description: t("veuillez-dabord-retirer-les-espaces-suivants"),
-        variant: "destructive",
+      toast.error(t("veuillez-dabord-retirer-les-espaces-suivants"), {
         duration: 3000,
       });
     }

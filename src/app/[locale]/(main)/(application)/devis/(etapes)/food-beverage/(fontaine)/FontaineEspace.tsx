@@ -1,4 +1,4 @@
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
@@ -81,9 +81,7 @@ const FontaineEspace = ({
       fontainesEspacesIds.slice(-1)[0] !== espace.infos.espaceId &&
       fontainesEspacesIds[0] !== espace.infos.espaceId
     ) {
-      toast({
-        description: "Veuillez d'abord retirer les espaces suivants",
-        variant: "destructive",
+      toast.error("Veuillez d'abord retirer les espaces suivants", {
         duration: 3000,
       });
     }

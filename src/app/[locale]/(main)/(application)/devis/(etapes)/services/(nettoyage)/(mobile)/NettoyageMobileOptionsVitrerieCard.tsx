@@ -16,6 +16,7 @@ import { formatNumber } from "@/lib/utils/formatNumber";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
+import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
 import Image from "next/image";
 import React from "react";
 import { useShallow } from "zustand/shallow";
@@ -244,10 +245,9 @@ const NettoyageMobileOptionsVitrerieCard = ({
                   <DialogTrigger asChild>
                     {nettoyage.infos.logoStorageKey ? (
                       <div className="relative h-10">
-                        <Image
-                          src={nettoyage.infos.logoStorageKey}
+                        <PresignedLogoImage
+                          storageKey={nettoyage.infos.logoStorageKey}
                           alt={`logo-de-${nettoyage.infos.nomPrestataire}`}
-                          fill
                           className="cursor-pointer object-contain object-left"
                           sizes="(max-width:768px) 100vw"
                         />
@@ -291,10 +291,9 @@ const NettoyageMobileOptionsVitrerieCard = ({
               </>
             ) : nettoyage.infos.logoStorageKey ? (
               <div className="relative h-10">
-                <Image
-                  src={nettoyage.infos.logoStorageKey}
+                <PresignedLogoImage
+                  storageKey={nettoyage.infos.logoStorageKey}
                   alt={`logo-de-${nettoyage.infos.nomPrestataire}`}
-                  fill
                   className="cursor-pointer object-contain object-left"
                   sizes="(max-width:768px) 100vw"
                 />

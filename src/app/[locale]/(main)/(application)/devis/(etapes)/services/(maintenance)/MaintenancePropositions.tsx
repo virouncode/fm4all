@@ -48,6 +48,8 @@ const MaintenancePropositions = ({
       entrepriseId,
       hParPassage,
       tauxHoraire,
+      imageStorageKey,
+      infos,
     } = tarif;
     const freqAnnuelle =
       maintenanceQuantites.find((quantite) => quantite.gamme === tarif.gamme)
@@ -96,6 +98,8 @@ const MaintenancePropositions = ({
       totalAnnuelLegio,
       totalAnnuelQualiteAir,
       totalAnnuel,
+      imageStorageKey,
+      infos,
     };
   });
 
@@ -123,6 +127,8 @@ const MaintenancePropositions = ({
         totalAnnuelLegio: number | null;
         totalAnnuelQualiteAir: number | null;
         totalAnnuel: number | null;
+        imageStorageKey: string | null;
+        infos: string | null;
       }[]
     >
   >((acc, item) => {
@@ -162,6 +168,8 @@ const MaintenancePropositions = ({
     totalAnnuelLegio: number | null;
     totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
   }) => {
     const {
       gamme,

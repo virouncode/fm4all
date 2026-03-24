@@ -20,6 +20,7 @@ export const selectRepasseTarifsSchema = createSelectSchema(
   nbClients: z.number().nullable(),
   noteGoogle: z.string().nullable(),
   nbAvis: z.number().nullable(),
+  imageStorageKey: z.string().nullable(),
 });
 
 export type SelectRepasseTarifsType = z.infer<typeof selectRepasseTarifsSchema>;

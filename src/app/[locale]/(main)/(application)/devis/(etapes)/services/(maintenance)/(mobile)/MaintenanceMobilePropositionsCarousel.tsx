@@ -30,6 +30,8 @@ type MaintenanceMobilePropositionsCarouselProps = {
     totalAnnuelLegio: number | null;
     totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
   }) => void;
   propositions: {
     id: string;
@@ -52,6 +54,8 @@ type MaintenanceMobilePropositionsCarouselProps = {
     totalAnnuelLegio: number | null;
     totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
   }[];
 };
 

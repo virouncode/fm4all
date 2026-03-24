@@ -268,63 +268,67 @@ const ServicesFm4AllMobilePropositionCard = ({
         }${!total ? "pointer-events-none opacity-50" : ""}`}
       >
         <div className="flex h-1/3 items-center gap-2 border-b border-slate-200 pb-2">
-          <Dialog>
-            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col items-center gap-4">
-                {imgProduitDialog}
-                <p className="text-end text-xs italic">
-                  {t("photo-non-contractuelle")}
-                </p>
-                {infosProduitDialog}
-              </div>
-            </DialogContent>
-          </Dialog>
-          <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{"fm4all"}</p>
+          <div onClick={(e) => e.stopPropagation()}>
             <Dialog>
-              <DialogTrigger asChild>
-                <div className="relative h-10">
-                  <Image
-                    src={"/img/logo_full.webp"}
-                    alt={`logo-de-fm4all`}
-                    fill
-                    className="cursor-pointer object-contain object-left dark:hidden"
-                    sizes="(max-width:768px) 100vw"
-                  />
-                  <Image
-                    src={"/img/logo_full_dark_mode.webp"}
-                    alt={`logo-de-fm4all`}
-                    fill
-                    className="hidden cursor-pointer object-contain object-left dark:block"
-                    sizes="(max-width:768px) 100vw"
-                  />
-                </div>
-              </DialogTrigger>
+              <DialogTrigger asChild>{imgProduit}</DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{"fm4all"}</DialogTitle>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
                 </DialogHeader>
-                <PrestataireDialog
-                  sloganPrestataire={tGlobal(
-                    "le-facility-management-pour-tous",
-                  )}
-                  logoStorageKey={"/img/logo_full.webp"}
-                  darkLogoUrl={"/img/logo_full_dark_mode.webp"}
-                  nomPrestataire={"fm4all"}
-                  locationUrl={null}
-                  anneeCreation={2025}
-                  ca={null}
-                  effectifPrestataire={null}
-                  nbClients={null}
-                  noteGoogle={null}
-                  nbAvis={null}
-                />
+                <div className="flex flex-col items-center gap-4">
+                  {imgProduitDialog}
+                  <p className="text-end text-xs italic">
+                    {t("photo-non-contractuelle")}
+                  </p>
+                  {infosProduitDialog}
+                </div>
               </DialogContent>
             </Dialog>
+          </div>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{"fm4all"}</p>
+            <div onClick={(e) => e.stopPropagation()}>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div className="relative h-10">
+                    <Image
+                      src={"/img/logo_full.webp"}
+                      alt={`logo-de-fm4all`}
+                      fill
+                      className="cursor-pointer object-contain object-left dark:hidden"
+                      sizes="(max-width:768px) 100vw"
+                    />
+                    <Image
+                      src={"/img/logo_full_dark_mode.webp"}
+                      alt={`logo-de-fm4all`}
+                      fill
+                      className="hidden cursor-pointer object-contain object-left dark:block"
+                      sizes="(max-width:768px) 100vw"
+                    />
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+                  <DialogHeader>
+                    <DialogTitle>{"fm4all"}</DialogTitle>
+                  </DialogHeader>
+                  <PrestataireDialog
+                    sloganPrestataire={tGlobal(
+                      "le-facility-management-pour-tous",
+                    )}
+                    logoStorageKey={"/img/logo_full.webp"}
+                    darkLogoUrl={"/img/logo_full_dark_mode.webp"}
+                    nomPrestataire={"fm4all"}
+                    locationUrl={null}
+                    anneeCreation={2025}
+                    ca={null}
+                    effectifPrestataire={null}
+                    nbClients={null}
+                    noteGoogle={null}
+                    nbAvis={null}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
             {/* {noteGoogle && nbAvis && (
             <div className="flex items-center gap-1 text-xs">
               <p>{noteGoogle}</p>

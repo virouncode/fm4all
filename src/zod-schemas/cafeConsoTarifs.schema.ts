@@ -14,6 +14,7 @@ export const selectCafeConsoTarifsSchema = createSelectSchema(
   nbClients: z.number().nullable(),
   noteGoogle: z.string().nullable(),
   nbAvis: z.number().nullable(),
+  imageStorageKey: z.string().nullable(),
 });
 
 export type SelectCafeConsoTarifsType = z.infer<

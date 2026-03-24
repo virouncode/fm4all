@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
 import { useTheStore } from "@/stores/devis/theStore";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -196,55 +197,58 @@ const TheMobilePropositionCard = ({
         }`}
       >
         <div className="flex h-1/2 items-center gap-2 border-b border-slate-200 pb-2">
-          <Dialog>
-            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-4">
-                {imgProduitDialog}
-                <p className="text-end text-xs italic">
-                  {t("photo-non-contractuelle")}
-                </p>
-                {infosProduitDialog}
-              </div>
-            </DialogContent>
-          </Dialog>
-          <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomPrestataire}</p>
+          <div onClick={(e) => e.stopPropagation()}>
             <Dialog>
-              <DialogTrigger asChild>
-                {logoStorageKey ? (
-                  <div className="relative h-10">
-                    <Image
-                      src={logoStorageKey}
-                      alt={`logo-de-${nomPrestataire}`}
-                      fill
-                      className="cursor-pointer object-contain object-left"
-                      sizes="(max-width:768px) 100vw"
-                    />
-                  </div>
-                ) : null}
-              </DialogTrigger>
+              <DialogTrigger asChild>{imgProduit}</DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomPrestataire}</DialogTitle>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
                 </DialogHeader>
-                <PrestataireDialog
-                  sloganPrestataire={slogan}
-                  logoStorageKey={logoStorageKey}
-                  nomPrestataire={nomPrestataire}
-                  locationUrl={null}
-                  anneeCreation={anneeCreation}
-                  ca={ca}
-                  effectifPrestataire={effectifPrestataire}
-                  nbClients={nbClients}
-                  noteGoogle={noteGoogle}
-                  nbAvis={nbAvis}
-                />
+                <div className="flex flex-col gap-4">
+                  {imgProduitDialog}
+                  <p className="text-end text-xs italic">
+                    {t("photo-non-contractuelle")}
+                  </p>
+                  {infosProduitDialog}
+                </div>
               </DialogContent>
             </Dialog>
+          </div>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{nomPrestataire}</p>
+            <div onClick={(e) => e.stopPropagation()}>
+              <Dialog>
+                <DialogTrigger asChild>
+                  {logoStorageKey ? (
+                    <div className="relative h-10">
+                      <PresignedLogoImage
+                        storageKey={logoStorageKey}
+                        alt={`logo-de-${nomPrestataire}`}
+                        className="cursor-pointer object-contain object-left"
+                        sizes="(max-width:768px) 100vw"
+                      />
+                    </div>
+                  ) : null}
+                </DialogTrigger>
+                <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+                  <DialogHeader>
+                    <DialogTitle>{nomPrestataire}</DialogTitle>
+                  </DialogHeader>
+                  <PrestataireDialog
+                    sloganPrestataire={slogan}
+                    logoStorageKey={logoStorageKey}
+                    nomPrestataire={nomPrestataire}
+                    locationUrl={null}
+                    anneeCreation={anneeCreation}
+                    ca={ca}
+                    effectifPrestataire={effectifPrestataire}
+                    nbClients={nbClients}
+                    noteGoogle={noteGoogle}
+                    nbAvis={nbAvis}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
             {noteGoogle && nbAvis && (
               <div className="flex items-center gap-1 text-xs">
                 <p>{noteGoogle}</p>

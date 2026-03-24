@@ -26,8 +26,11 @@ import {
   selectVitrerieTarifsSchema,
 } from "@/zod-schemas/nettoyageVitrerie.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import "server-only";
+
+const imageDoc = alias(documents, "image_doc");
 
 const prestataireColumns = {
   nomPrestataire: entreprises.nom,
@@ -93,6 +96,7 @@ export const getNettoyageTarifs = async (surface: string) => {
       .select({
         ...getTableColumns(nettoyageTarifs),
         ...prestataireColumns,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(nettoyageTarifs)
       .innerJoin(entreprises, eq(entreprises.id, nettoyageTarifs.entrepriseId))
@@ -101,6 +105,7 @@ export const getNettoyageTarifs = async (surface: string) => {
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
       .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, nettoyageTarifs.imageId))
       .where(eq(nettoyageTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
 
@@ -150,6 +155,7 @@ export const getRepasseTarifs = async (surface: string) => {
       .select({
         ...getTableColumns(nettoyageRepasseTarifs),
         ...prestataireColumns,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(nettoyageRepasseTarifs)
       .innerJoin(
@@ -161,6 +167,7 @@ export const getRepasseTarifs = async (surface: string) => {
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
       .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, nettoyageRepasseTarifs.imageId))
       .where(eq(nettoyageRepasseTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
@@ -208,6 +215,7 @@ export const getVitrerieTarifs = async () => {
       .select({
         ...getTableColumns(nettoyageVitrerieTarifs),
         ...prestataireColumns,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(nettoyageVitrerieTarifs)
       .innerJoin(
@@ -218,7 +226,8 @@ export const getVitrerieTarifs = async () => {
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
-      .leftJoin(documents, eq(documents.id, entreprises.logoId));
+      .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, nettoyageVitrerieTarifs.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectVitrerieTarifsSchema.parse(result),

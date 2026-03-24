@@ -22,6 +22,7 @@ export const selectVitrerieTarifsSchema = createSelectSchema(
   nbClients: z.number().nullable(),
   noteGoogle: z.string().nullable(),
   nbAvis: z.number().nullable(),
+  imageStorageKey: z.string().nullable(),
 });
 
 export const selectVitrerieTarifsFournisseurSchema = createSelectSchema(

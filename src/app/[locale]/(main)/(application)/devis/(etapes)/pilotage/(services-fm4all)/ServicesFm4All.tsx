@@ -2,7 +2,7 @@
 
 import NextEtapeSauverButton from "@/app/[locale]/(main)/(application)/devis/NextEtapeSauverButton";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import { useManagementStore } from "@/stores/devis/managementStore";
@@ -71,9 +71,7 @@ const ServicesFm4All = ({
             (totalServicesFm4All.totalRemiseCa ?? 0) -
             (totalServicesFm4All.totalRemiseHof ?? 0);
     if (!totalFinalServicesFm4All) {
-      toast({
-        variant: "destructive",
-        title: tFm4all("panier-vide"),
+      toast.error(tFm4all("panier-vide"), {
         description: tFm4all(
           "vous-navez-choisi-aucun-service-veuillez-selectionner-au-moins-un-service",
         ),

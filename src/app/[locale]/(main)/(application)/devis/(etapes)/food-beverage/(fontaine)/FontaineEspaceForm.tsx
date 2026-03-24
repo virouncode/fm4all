@@ -2,7 +2,7 @@
 
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
@@ -398,9 +398,7 @@ const FontaineEspaceForm = ({
     let newNbPersonnes = value ? parseInt(value) : 0;
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE;
-      toast({
-        title: t("limite-atteinte"),
-        variant: "destructive",
+      toast.error(t("limite-atteinte"), {
         description: tFontaines(
           "le-nombre-de-personnes-par-espace-fontaine-a-eau-est-limite-a-110-choisissez-une-offre-puis-ajoutez-un-espace-fontaine-a-eau-si-besoin",
         ),
@@ -414,9 +412,7 @@ const FontaineEspaceForm = ({
     let newNbPersonnes = nbPersonnes + 1;
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE;
-      toast({
-        title: t("limite-atteinte"),
-        variant: "destructive",
+      toast.error(t("limite-atteinte"), {
         description: tFontaines(
           "le-nombre-de-personnes-par-espace-fontaine-a-eau-est-limite-a-110-choisissez-une-offre-puis-ajoutez-un-espace-fontaine-a-eau-si-besoin",
         ),

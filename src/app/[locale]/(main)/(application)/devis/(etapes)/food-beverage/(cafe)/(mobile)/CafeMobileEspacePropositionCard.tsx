@@ -60,6 +60,7 @@ const CafeMobileEspacePropositionCard = ({
     marque,
     modele,
     imageStorageKey,
+    imageConsoStorageKey,
   } = proposition;
   const color = getFm4AllColor(gamme);
 
@@ -107,7 +108,7 @@ const CafeMobileEspacePropositionCard = ({
     <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-200">
       <PresignedTarifImage
         storageKey={imageStorageKey}
-        fallbackSrc="/img/services/cafe.webp"
+        fallbackSrc="/img/services/cafe_machine_fallback.webp"
         alt={`illustration ${marque} ${modele}`}
         sizes="(max-width:768px) 33vw"
       />
@@ -115,13 +116,24 @@ const CafeMobileEspacePropositionCard = ({
   );
 
   const imgProduitDialog = (
-    <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
-      <PresignedTarifImage
-        storageKey={imageStorageKey}
-        fallbackSrc="/img/services/cafe.webp"
-        alt={`illustration ${marque} ${modele}`}
-        sizes="(max-width:768px) 100vw"
-      />
+    <div className="flex items-center gap-2">
+      <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
+        <PresignedTarifImage
+          storageKey={imageStorageKey}
+          fallbackSrc="/img/services/cafe.webp"
+          alt={`illustration ${marque} ${modele}`}
+          sizes="(max-width:768px) 50vw"
+        />
+      </div>
+      <span className="text-2xl font-bold text-slate-400">+</span>
+      <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
+        <PresignedTarifImage
+          storageKey={imageConsoStorageKey}
+          fallbackSrc="/img/services/cafe_conso_fallback.webp"
+          alt="illustration consommables café"
+          sizes="(max-width:768px) 50vw"
+        />
+      </div>
     </div>
   );
 
@@ -223,53 +235,57 @@ const CafeMobileEspacePropositionCard = ({
         }`}
       >
         <div className="flex h-1/2 items-center gap-2 border-b border-slate-200 pb-2">
-          <Dialog>
-            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              {imgProduitDialog}
-              <p className="text-end text-xs italic">
-                {t("photo-non-contractuelle")}
-              </p>
-              {infosProduitDialog}
-            </DialogContent>
-          </Dialog>
-          <div className="flex h-full w-2/3 flex-col gap-1">
-            <p className="text-sm font-bold">{nomPrestataire}</p>
+          <div onClick={(e) => e.stopPropagation()}>
             <Dialog>
-              <DialogTrigger asChild>
-                {logoStorageKey ? (
-                  <div className="relative h-10">
-                    <Image
-                      src={logoStorageKey}
-                      alt={`logo-de-${nomPrestataire}`}
-                      fill={true}
-                      className="cursor-pointer object-contain object-left"
-                      sizes="(max-width:768px) 100vw"
-                    />
-                  </div>
-                ) : null}
-              </DialogTrigger>
+              <DialogTrigger asChild>{imgProduit}</DialogTrigger>
               <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
-                  <DialogTitle>{nomPrestataire}</DialogTitle>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
                 </DialogHeader>
-                <PrestataireDialog
-                  sloganPrestataire={sloganPrestataire}
-                  logoStorageKey={logoStorageKey}
-                  nomPrestataire={nomPrestataire}
-                  locationUrl={null}
-                  anneeCreation={anneeCreation}
-                  ca={ca}
-                  effectifPrestataire={effectifPrestataire}
-                  nbClients={nbClients}
-                  noteGoogle={noteGoogle}
-                  nbAvis={nbAvis}
-                />
+                {imgProduitDialog}
+                <p className="text-end text-xs italic">
+                  {t("photo-non-contractuelle")}
+                </p>
+                {infosProduitDialog}
               </DialogContent>
             </Dialog>
+          </div>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{nomPrestataire}</p>
+            <div onClick={(e) => e.stopPropagation()}>
+              <Dialog>
+                <DialogTrigger asChild>
+                  {logoStorageKey ? (
+                    <div className="relative h-10">
+                      <Image
+                        src={logoStorageKey}
+                        alt={`logo-de-${nomPrestataire}`}
+                        fill={true}
+                        className="cursor-pointer object-contain object-left"
+                        sizes="(max-width:768px) 100vw"
+                      />
+                    </div>
+                  ) : null}
+                </DialogTrigger>
+                <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+                  <DialogHeader>
+                    <DialogTitle>{nomPrestataire}</DialogTitle>
+                  </DialogHeader>
+                  <PrestataireDialog
+                    sloganPrestataire={sloganPrestataire}
+                    logoStorageKey={logoStorageKey}
+                    nomPrestataire={nomPrestataire}
+                    locationUrl={null}
+                    anneeCreation={anneeCreation}
+                    ca={ca}
+                    effectifPrestataire={effectifPrestataire}
+                    nbClients={nbClients}
+                    noteGoogle={noteGoogle}
+                    nbAvis={nbAvis}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
             {noteGoogle && nbAvis && (
               <div className="flex items-center gap-1 text-xs">
                 <p>{noteGoogle}</p>

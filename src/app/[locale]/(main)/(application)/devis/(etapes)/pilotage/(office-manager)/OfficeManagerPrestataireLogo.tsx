@@ -4,7 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Image from "next/image";
+import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
 
 type OfficeManagerPrestataireLogoProps = {
   nomPrestataire: string | null;
@@ -24,10 +24,9 @@ const OfficeManagerPrestataireLogo = ({
           <div className="flex h-1/2 w-full items-center justify-center p-4">
             {logoStorageKey ? (
               <div className="relative h-full w-full">
-                <Image
-                  src={logoStorageKey}
+                <PresignedLogoImage
+                  storageKey={logoStorageKey}
                   alt={`logo-de-${nomPrestataire}`}
-                  fill={true}
                   className="h-full w-full object-contain"
                   sizes="(min-width:768px) 100vw"
                 />

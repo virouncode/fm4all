@@ -1,5 +1,6 @@
 import "server-only";
 import { RATIO } from "@/constants/constants";
+
 import { db } from "@/db";
 import {
   documents,
@@ -19,7 +20,10 @@ import { selectMaintenanceTarifsSchema } from "@/zod-schemas/maintenanceTarifs.s
 import { selectQ18TarifsSchema } from "@/zod-schemas/q18Tarifs.schema";
 import { selectQualiteAirTarifsSchema } from "@/zod-schemas/qualiteAirTarifs.schema";
 import { eq, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
+const imageDoc = alias(documents, "image_doc");
 
 export const getMaintenanceQuantites = async (surface: string) => {
   "use cache";
@@ -61,6 +65,7 @@ export const getMaintenanceTarifs = async (surface: string) => {
         nbClients: entrepriseInfos.nbClients,
         noteGoogle: entrepriseInfos.noteGoogle,
         nbAvis: entrepriseInfos.nbAvis,
+        imageStorageKey: imageDoc.storageKey,
       })
       .from(maintenanceTarifs)
       .innerJoin(
@@ -72,6 +77,7 @@ export const getMaintenanceTarifs = async (surface: string) => {
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
       .leftJoin(documents, eq(documents.id, entreprises.logoId))
+      .leftJoin(imageDoc, eq(imageDoc.id, maintenanceTarifs.imageId))
       .where(eq(maintenanceTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>

@@ -38,6 +38,9 @@ type SnacksFruitsDesktopPropositionsProps = {
     totalSnacks: number;
     totalBoissons: number;
     totalLivraison: number | null;
+    imageStorageKeyFruits: string | null;
+    imageStorageKeySnacks: string | null;
+    imageStorageKeyBoissons: string | null;
   }[][];
   handleClickProposition: (proposition: {
     id: string;
@@ -73,6 +76,9 @@ type SnacksFruitsDesktopPropositionsProps = {
     totalSnacks: number;
     totalBoissons: number;
     totalLivraison: number | null;
+    imageStorageKeyFruits: string | null;
+    imageStorageKeySnacks: string | null;
+    imageStorageKeyBoissons: string | null;
   }) => void;
 };
 

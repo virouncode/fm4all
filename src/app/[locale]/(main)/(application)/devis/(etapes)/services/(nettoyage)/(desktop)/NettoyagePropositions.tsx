@@ -1,4 +1,3 @@
-import { toast } from "@/hooks/use-toast";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { gammes, GammeType } from "@/zod-schemas/gamme.schema";
@@ -13,6 +12,7 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs.schema"
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie.schema";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
+import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import NettoyageMobilePropositions from "../(mobile)/NettoyageMobilePropositions";
 import NettoyageDesktopPropositions from "./NettoyageDesktopPropositions";
@@ -67,6 +67,9 @@ const NettoyagePropositions = ({
       hParPassage,
       tauxHoraire,
       gamme,
+      imageStorageKey,
+      infos,
+      hygienePartenaireEntrepriseId,
     } = item;
     const freqAnnuelle =
       nettoyageQuantites.find((quantite) => quantite.gamme === gamme)
@@ -90,6 +93,9 @@ const NettoyagePropositions = ({
       tauxHoraire,
       gamme,
       totalAnnuel,
+      imageStorageKey,
+      infos,
+      hygienePartenaireEntrepriseId,
     };
   });
 
@@ -113,6 +119,9 @@ const NettoyagePropositions = ({
         tauxHoraire: number;
         gamme: GammeType;
         totalAnnuel: number | null;
+        imageStorageKey: string | null;
+        infos: string | null;
+        hygienePartenaireEntrepriseId: string | null;
       }[]
     >
   >((acc, item) => {
@@ -148,6 +157,9 @@ const NettoyagePropositions = ({
     tauxHoraire: number;
     gamme: GammeType;
     totalAnnuel: number | null;
+    imageStorageKey: string | null;
+    infos: string | null;
+    hygienePartenaireEntrepriseId: string | null;
   }) => {
     //Je décoche la proposition
     if (
@@ -222,12 +234,12 @@ const NettoyagePropositions = ({
     } = proposition;
 
     if (entrepriseId !== nettoyage.infos.entrepriseId) {
-      toast({
-        title: t("fournisseur-selectionne"),
+      toast.info(t("prestataire-selectionne"), {
         description: tNettoyage(
-          "vous-avez-choisi-nomfournisseur-pour-le-nettoyage-ce-prestataire-ou-son-partenaire-assurera-la-prestation-hygiene-sanitaire",
+          "vous-avez-choisi-nomprestataire-pour-le-nettoyage-ce-prestataire-ou-son-partenaire-assurera-la-prestation-hygiene-sanitaire",
           { nomPrestataire },
         ),
+        position: "top-center",
       });
     }
 
@@ -274,11 +286,24 @@ const NettoyagePropositions = ({
     }));
 
     //HYGIENE
-    const hygieneFournisseurId = entrepriseId;
-    const hygieneFournisseurNom = nomPrestataire;
+    const hygieneFournisseurId =
+      proposition.hygienePartenaireEntrepriseId ?? entrepriseId;
     const distribsTarifsFournisseur = hygieneDistribTarifs.filter(
       (tarif) => tarif.entrepriseId === hygieneFournisseurId,
     );
+    const hygienePartenaireTarif = distribsTarifsFournisseur[0];
+    const hygieneFournisseurNom =
+      proposition.hygienePartenaireEntrepriseId && hygienePartenaireTarif
+        ? hygienePartenaireTarif.nomPrestataire
+        : nomPrestataire;
+    const hygieneFournisseurSlogan =
+      proposition.hygienePartenaireEntrepriseId && hygienePartenaireTarif
+        ? hygienePartenaireTarif.slogan
+        : sloganPrestataire;
+    const hygieneFournisseurLogoStorageKey =
+      proposition.hygienePartenaireEntrepriseId && hygienePartenaireTarif
+        ? hygienePartenaireTarif.logoStorageKey
+        : logoStorageKey;
     const consosTarifFournisseur = hygieneConsosTarifs.find(
       (tarif) => tarif.entrepriseId === hygieneFournisseurId,
     );
@@ -371,14 +396,8 @@ const NettoyagePropositions = ({
         ...prev.infos,
         entrepriseId: hygieneFournisseurId,
         nomPrestataire: hygieneFournisseurNom,
-        sloganPrestataire:
-          hygieneFournisseurNom === "EPCH"
-            ? "Le spécialiste de l'hygiène"
-            : sloganPrestataire,
-        logoStorageKey:
-          hygieneFournisseurNom === "EPCH"
-            ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_epch-Iy9QGTogt8KMcKbWGFrKzjQ6jqlEHS.webp"
-            : logoStorageKey,
+        sloganPrestataire: hygieneFournisseurSlogan,
+        logoStorageKey: hygieneFournisseurLogoStorageKey,
       },
       quantites: {
         nbDistribEmp,
@@ -407,7 +426,6 @@ const NettoyagePropositions = ({
         minFacturation,
       },
     }));
-
   };
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 

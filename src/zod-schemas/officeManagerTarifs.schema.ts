@@ -14,6 +14,7 @@ export const selectOfficeManagerTarifsSchema = createSelectSchema(
   nomPrestataire: z.string().nonempty("Nom du prestataire invalide"),
   slogan: z.string().nullable(),
   logoStorageKey: z.string().nullable(),
+  imageStorageKey: z.string().nullable(),
 });
 
 export type SelectOfficeManagerTarifsType =

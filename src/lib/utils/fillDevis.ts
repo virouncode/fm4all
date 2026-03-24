@@ -1,7 +1,7 @@
 import { batiments } from "@/constants/batiments";
 import { TVA } from "@/constants/constants";
 import { occupation } from "@/constants/occupation";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { UpdateProspectType } from "@/zod-schemas/prospect.schema";
 import html2canvas from "html2canvas-pro";
 import { PDFDocument, PDFTextField, RotationTypes } from "pdf-lib";
@@ -201,9 +201,7 @@ export const fillDevis = async (
       }
     } catch (err) {
       if (err instanceof Error)
-        toast({
-          variant: "destructive",
-          title: "Erreur",
+        toast.error("Erreur", {
           description:
             "Impossible d'intégrer la synthèse dans le devis : " + err.message,
         });
@@ -285,9 +283,7 @@ export const fillDevis = async (
       }
     } catch (err) {
       if (err instanceof Error)
-        toast({
-          variant: "destructive",
-          title: "Erreur",
+        toast.error("Erreur", {
           description:
             "Impossible d'intégrer le détail des prestations dans le devis : " +
             err.message,

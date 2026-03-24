@@ -74,15 +74,15 @@ export const getFormattedHygienePropositions = (
         (tarif) => tarif.type === "ph" && tarif.gamme === gamme,
       )?.imageStorageKey ?? null;
 
-    const nomPrestataire = hygieneDistribTarifsFournisseur[0].nomPrestataire;
-    const sloganPrestataire = hygieneDistribTarifsFournisseur[0].slogan;
-    const logoStorageKey = hygieneDistribTarifsFournisseur[0].logoStorageKey;
-    const anneeCreation = hygieneDistribTarifsFournisseur[0].anneeCreation;
-    const ca = hygieneDistribTarifsFournisseur[0].ca;
-    const effectifPrestataire = hygieneDistribTarifsFournisseur[0].effectifPrestataire;
-    const nbClients = hygieneDistribTarifsFournisseur[0].nbClients;
-    const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
-    const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
+    const nomPrestataire = hygieneDistribTarifsFournisseur[0]?.nomPrestataire ?? null;
+    const sloganPrestataire = hygieneDistribTarifsFournisseur[0]?.slogan ?? null;
+    const logoStorageKey = hygieneDistribTarifsFournisseur[0]?.logoStorageKey ?? null;
+    const anneeCreation = hygieneDistribTarifsFournisseur[0]?.anneeCreation ?? null;
+    const ca = hygieneDistribTarifsFournisseur[0]?.ca ?? null;
+    const effectifPrestataire = hygieneDistribTarifsFournisseur[0]?.effectifPrestataire ?? null;
+    const nbClients = hygieneDistribTarifsFournisseur[0]?.nbClients ?? null;
+    const noteGoogle = hygieneDistribTarifsFournisseur[0]?.noteGoogle ?? null;
+    const nbAvis = hygieneDistribTarifsFournisseur[0]?.nbAvis ?? null;
     const minFacturation =
       hygieneMinFacturationFournisseur?.minFacturation ?? null;
 

@@ -9,6 +9,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import PresignedTarifImage from "@/components/devis/PresignedTarifImage";
 import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -24,6 +25,7 @@ type OfficeManagerMobilePropositionCardProps = {
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
+    imageStorageKey: string | null;
   };
   handleClickProposition: (proposition: {
     id: string;
@@ -35,6 +37,7 @@ type OfficeManagerMobilePropositionCardProps = {
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
+    imageStorageKey: string | null;
   }) => void;
   demiJParSemaineConfort: number | null;
   demiJParSemaineExcellence: number | null;
@@ -225,11 +228,10 @@ const OfficeManagerMobilePropositionCard = ({
 
   const imgProduit = (
     <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
-      <Image
-        src={"/img/services/office-managers.webp"}
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc="/img/services/office-managers.webp"
         alt={tOfficeManager("illustration-doffice-managers")}
-        fill
-        className="cursor-pointer object-contain"
         sizes="(max-width:768px) 33vw"
       />
     </div>
@@ -237,11 +239,10 @@ const OfficeManagerMobilePropositionCard = ({
 
   const imgProduitDialog = (
     <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
-      <Image
-        src={"/img/services/office-managers.webp"}
+      <PresignedTarifImage
+        storageKey={proposition.imageStorageKey}
+        fallbackSrc="/img/services/office-managers.webp"
         alt={tOfficeManager("illustration-doffice-managers")}
-        fill
-        className="object-contain object-center"
         sizes="(max-width:768px) 100vw"
       />
     </div>
@@ -257,63 +258,67 @@ const OfficeManagerMobilePropositionCard = ({
       }`}
     >
       <div className="flex h-1/4 items-center gap-2 border-b border-slate-200 pb-2">
-        <Dialog>
-          <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-          <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-            <DialogHeader>
-              <DialogTitle>{dialogTitle}</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-4">
-              {imgProduitDialog}
-              <p className="text-end text-xs italic">
-                {t("photo-non-contractuelle")}
-              </p>
-              {infosProduitDialog}
-            </div>
-          </DialogContent>
-        </Dialog>
-        <div className="flex h-full w-2/3 flex-col gap-1">
-          <p className="text-sm font-bold">fm4all</p>
+        <div onClick={(e) => e.stopPropagation()}>
           <Dialog>
-            <DialogTrigger asChild>
-              <div className="relative h-10">
-                <Image
-                  src={"/img/logo_full.webp"}
-                  alt={`logo-de-fm4all`}
-                  fill
-                  className="cursor-pointer object-contain object-left dark:hidden"
-                  sizes="(max-width:768px) 100vw"
-                />
-                <Image
-                  src={"/img/logo_full_dark_mode.webp"}
-                  alt={`logo-de-fm4all`}
-                  fill
-                  className="hidden cursor-pointer object-contain object-left dark:block"
-                  sizes="(max-width:768px) 100vw"
-                />
-              </div>
-            </DialogTrigger>
+            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
             <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
-                <DialogTitle>fm4all</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <PrestataireDialog
-                sloganPrestataire={tOfficeManager(
-                  "le-facility-management-pour-tous",
-                )}
-                logoStorageKey={"/img/logo_full.webp"}
-                darkLogoUrl={"/img/logo_full_dark_mode.webp"}
-                nomPrestataire={"fm4all"}
-                locationUrl={null}
-                anneeCreation={2025}
-                ca={null}
-                effectifPrestataire={null}
-                nbClients={null}
-                noteGoogle={null}
-                nbAvis={null}
-              />
+              <div className="flex flex-col gap-4">
+                {imgProduitDialog}
+                <p className="text-end text-xs italic">
+                  {t("photo-non-contractuelle")}
+                </p>
+                {infosProduitDialog}
+              </div>
             </DialogContent>
           </Dialog>
+        </div>
+        <div className="flex h-full w-2/3 flex-col gap-1">
+          <p className="text-sm font-bold">fm4all</p>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="relative h-10">
+                  <Image
+                    src={"/img/logo_full.webp"}
+                    alt={`logo-de-fm4all`}
+                    fill
+                    className="cursor-pointer object-contain object-left dark:hidden"
+                    sizes="(max-width:768px) 100vw"
+                  />
+                  <Image
+                    src={"/img/logo_full_dark_mode.webp"}
+                    alt={`logo-de-fm4all`}
+                    fill
+                    className="hidden cursor-pointer object-contain object-left dark:block"
+                    sizes="(max-width:768px) 100vw"
+                  />
+                </div>
+              </DialogTrigger>
+              <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+                <DialogHeader>
+                  <DialogTitle>fm4all</DialogTitle>
+                </DialogHeader>
+                <PrestataireDialog
+                  sloganPrestataire={tOfficeManager(
+                    "le-facility-management-pour-tous",
+                  )}
+                  logoStorageKey={"/img/logo_full.webp"}
+                  darkLogoUrl={"/img/logo_full_dark_mode.webp"}
+                  nomPrestataire={"fm4all"}
+                  locationUrl={null}
+                  anneeCreation={2025}
+                  ca={null}
+                  effectifPrestataire={null}
+                  nbClients={null}
+                  noteGoogle={null}
+                  nbAvis={null}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
           {/* {noteGoogle && nbAvis && (
             <div className="flex items-center gap-1 text-xs">
               <p>{noteGoogle}</p>

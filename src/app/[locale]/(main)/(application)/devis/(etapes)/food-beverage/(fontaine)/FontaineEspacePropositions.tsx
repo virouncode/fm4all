@@ -1,7 +1,7 @@
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
 import { typesPoseArray, TypesPoseType } from "@/constants/typesPose";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
@@ -516,14 +516,9 @@ const FontaineEspacePropositions = ({
 
   const handleAlert = () => {
     if (!espace.infos.poseSelected) {
-      toast({
-        description: t(
-          "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces",
-        ),
-        duration: 3000,
-        variant: "destructive",
-        className: "left-0",
-      });
+      toast.error(t(
+        "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces",
+      ), { duration: 3000 });
       return;
     }
   };

@@ -73,7 +73,18 @@ const SnacksFruitsPropositions = ({
       nbAvis,
       entrepriseId,
       prixKg,
+      imageStorageKey: imageStorageKeyFruits,
     } = item;
+    const imageStorageKeySnacks =
+      snacksTarifsPourNbPersonnes.find(
+        (tarif) =>
+          tarif.gamme === gamme && tarif.entrepriseId === entrepriseId,
+      )?.imageStorageKey ?? null;
+    const imageStorageKeyBoissons =
+      boissonsTarifsPourNbPersonnes.find(
+        (tarif) =>
+          tarif.gamme === gamme && tarif.entrepriseId === entrepriseId,
+      )?.imageStorageKey ?? null;
     //Quantites /  semaine / personne
     const gFruitsParSemaineParPersonne =
       fruitsQuantites.find((quantite) => quantite.gamme === gamme)
@@ -222,6 +233,9 @@ const SnacksFruitsPropositions = ({
       nbAvis,
       isSamePrestataire,
       gamme,
+      imageStorageKeyFruits,
+      imageStorageKeySnacks,
+      imageStorageKeyBoissons,
       //quantites
       fruitsKgParSemaine,
       snacksPortionsParSemaine,

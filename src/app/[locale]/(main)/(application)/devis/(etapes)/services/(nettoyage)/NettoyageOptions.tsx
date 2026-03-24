@@ -229,7 +229,7 @@ const NettoyageOptions = ({
           description={
             nettoyage.infos.entrepriseId && nettoyage.infos.gammeSelected
               ? t(
-                  "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur",
+                  "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomprestataire",
                   {
                     gamme: capitalize(nettoyage.infos.gammeSelected),
                     nomPrestataire: nettoyage.infos.nomPrestataire ?? "",
@@ -246,7 +246,7 @@ const NettoyageOptions = ({
           description={
             nettoyage.infos.entrepriseId && nettoyage.infos.gammeSelected
               ? t(
-                  "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur",
+                  "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomprestataire",
                   {
                     gamme: capitalize(nettoyage.infos.gammeSelected),
                     nomPrestataire: nettoyage.infos.nomPrestataire ?? "",

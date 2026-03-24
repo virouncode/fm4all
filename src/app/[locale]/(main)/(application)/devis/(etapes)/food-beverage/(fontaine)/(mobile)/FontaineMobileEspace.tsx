@@ -1,4 +1,4 @@
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles.schema";
@@ -70,9 +70,7 @@ const FontaineMobileEspace = ({
       fontainesEspacesIds.slice(-1)[0] !== espace.infos.espaceId &&
       fontainesEspacesIds[0] !== espace.infos.espaceId
     ) {
-      toast({
-        description: tCafe("veuillez-dabord-retirer-les-espaces-suivants"),
-        variant: "destructive",
+      toast.error(tCafe("veuillez-dabord-retirer-les-espaces-suivants"), {
         duration: 3000,
       });
     }

@@ -3,13 +3,13 @@ import {
   MAX_NB_EXTINCTEURS,
   MAX_NB_TEL_BAES,
 } from "@/constants/constants";
-import { toast } from "@/hooks/use-toast";
 import { useIncendieStore } from "@/stores/devis/incendieStore";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites.schema";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs.schema";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
+import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import SecuriteIncendieDesktopPropositions from "./(desktop)/SecuriteIncendieDesktopPropositions";
 import SecuriteIncendieMobilePropositions from "./(mobile)/SecuriteIncendieMobilePropositions";
@@ -156,11 +156,12 @@ const SecuriteIncendiePropositions = ({
         fraisDeplacementTrilogie,
       },
     }));
-    toast({
-      description: t(
+    toast.info(
+      t(
         "veillez-a-re-selectionner-vos-options-de-securite-incendie-dans-letape-6-personnaliser",
       ),
-    });
+      { position: "top-center" },
+    );
   };
 
   const handleChangeNbr = (

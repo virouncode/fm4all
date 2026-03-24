@@ -271,25 +271,26 @@ const ServicesFm4AllPropositionCard = ({
             {totalMensuelSansRemiseText}
             {totalMensuelText}
           </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Info
-                size={16}
-                className="cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{dialogTitle}</DialogTitle>
-              </DialogHeader>
-              {imgProduit}
-              <p className="text-end text-xs italic">
-                {t("photo-non-contractuelle")}
-              </p>
-              {infosProduitDialog}
-            </DialogContent>
-          </Dialog>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Info
+                  size={16}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                </DialogHeader>
+                {imgProduit}
+                <p className="text-end text-xs italic">
+                  {t("photo-non-contractuelle")}
+                </p>
+                {infosProduitDialog}
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         {infosProduit}
       </div>
