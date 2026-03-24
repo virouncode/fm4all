@@ -39,17 +39,26 @@ export const roleEntrepriseCodes = roleEntrepriseCT.map(
 ];
 
 export const documentTypeCT = [
+  // Contrats
   { code: "contrat_pdf", name: "Contrat PDF" },
   { code: "avenant_pdf", name: "Avenant PDF" },
+
+  // Devis
   { code: "devis_pdf", name: "Devis PDF" },
   { code: "devis_signe_pdf", name: "Devis signé PDF" },
   { code: "annexe", name: "Annexe" },
+
+  // Référentiels / sites
   { code: "cahier_des_charges", name: "Cahier des charges" },
   { code: "plan_site", name: "Plan de site" },
   { code: "procedure_acces", name: "Procédure d'accès" },
   { code: "consignes_securite", name: "Consignes de sécurité" },
+
+  // Admin fournisseur
   { code: "assurance", name: "Assurance" },
   { code: "kbis", name: "KBIS" },
+
+  // Fallback
   { code: "autre", name: "Autre" },
 ] as const;
 
@@ -61,8 +70,8 @@ export const documentTypeCodes = documentTypeCT.map(
 ];
 
 export const documentVisibiliteCT = [
-  { code: "prive", name: "Privé" },
-  { code: "public", name: "Partagé" },
+  { code: "prive", name: "Privé" }, // visible uniquement par l'entreprise propriétaire
+  { code: "public", name: "Partagé" }, // visible par les entreprises en relation
 ] as const;
 
 export const documentVisibiliteCodes = documentVisibiliteCT.map(
@@ -73,30 +82,41 @@ export const documentVisibiliteCodes = documentVisibiliteCT.map(
 ];
 
 export const documentCategorieCT = [
+  // Contractuel / financier
   { code: "contrat", name: "Contrat" },
   { code: "avenant", name: "Avenant" },
   { code: "devis", name: "Devis" },
+  { code: "devis_temporaire", name: "Devis temporaire" },
   { code: "devis_demande", name: "Demande de devis" },
   { code: "facture", name: "Facture" },
   { code: "bon_commande", name: "Bon de commande" },
-  { code: "rapport_intervention", name: "Rapport d'intervention" },
+
+  // Opérationnel FM
+  { code: "rapport_intervention", name: "Rapport d’intervention" },
   { code: "compte_rendu", name: "Compte rendu" },
   { code: "procedure", name: "Procédure" },
   { code: "plan_acces", name: "Plan / Accès" },
+
+  // Projet / besoin
   { code: "cahier_charges", name: "Cahier des charges" },
   { code: "specification", name: "Spécification" },
+
+  // Identité
   { code: "avatar", name: "Avatar" },
   { code: "photo", name: "Photo" },
   { code: "logo", name: "Logo" },
+
+  // Générique
   { code: "document", name: "Document" },
   { code: "piece_jointe", name: "Pièce jointe" },
+
+  // Ticket
   { code: "ticket_piece_jointe", name: "Pièce jointe (ticket)" },
   {
     code: "ticket_message_piece_jointe",
     name: "Pièce jointe (message ticket)",
   },
   { code: "tache_piece_jointe", name: "Pièce jointe (tâche)" },
-  { code: "devis_temporaire", name: "Devis temporaire" },
 
   // Catalogue machines
   { code: "machine_a_cafe", name: "Photo machine à café (catalogue)" },
