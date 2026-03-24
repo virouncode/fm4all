@@ -12,11 +12,14 @@ import { Spinner } from "@/components/ui/spinner";
 import { MARGE, RATIO } from "@/constants/constants";
 import { departements } from "@/constants/departements";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Link, useRouter } from "@/i18n/navigation";
 import fillDevis from "@/lib/utils/fillDevis";
+import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
 import { getPresignedDevisUploadUrlAction } from "@/server/actions/s3Actions";
+import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useCommentairesStore } from "@/stores/devis/commentairesStore";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
 import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useIncendieStore } from "@/stores/devis/incendieStore";
 import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
@@ -27,7 +30,9 @@ import {
   toStoreProspect,
   useProspectStore,
 } from "@/stores/devis/prospectStore";
+import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
 import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
+import { useTheStore } from "@/stores/devis/theStore";
 import { useTotalStore } from "@/stores/devis/totalStore";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
@@ -75,6 +80,16 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const setSnacksFruits = useSnacksFruitsStore((s) => s.setSnacksFruits);
   const officeManager = useOfficeManagerStore((s) => s.officeManager);
   const setOfficeManager = useOfficeManagerStore((s) => s.setOfficeManager);
+  const cafe = useCafeStore((s) => s.cafe);
+  const setCafe = useCafeStore((s) => s.setCafe);
+  const the = useTheStore((s) => s.the);
+  const setThe = useTheStore((s) => s.setThe);
+  const fontaines = useFontainesStore((s) => s.fontaines);
+  const setFontaines = useFontainesStore((s) => s.setFontaines);
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
+  const setServicesFm4All = useServicesFm4AllStore(
+    (s) => s.setServicesFm4All,
+  );
   const [accepte, setAccepte] = useState(false);
   const router = useRouter();
   useScrollIntoMonDevis();
@@ -121,32 +136,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const { execute: executeFinaliserDevis, isPending: isSavingFinaliserDevis } =
     useAction(finaliserDevisAction, {
       onSuccess: ({ data }) => {
-        if (!data?.success || !data.data) {
-          toast({
-            variant: "destructive",
-            title: t("erreur"),
-            description: t("une-erreur-est-survenue"),
-          });
-          return;
-        }
+        if (!data?.success || !data.data) return;
         setProspect(toStoreProspect(data.data.prospect));
-        setDevisUrl(data.data.devisUrl);
-        setMonDevis({ currentMonDevisId: 2 });
-        toast({
-          variant: "default",
-          title: tSauver("succes"),
-          description: data.message,
-        });
       },
-      onError: ({ error }) => {
-        toast({
-          variant: "destructive",
-          title: tSauver("erreur"),
-          description:
-            typeof error?.serverError === "string"
-              ? error.serverError
-              : tSauver("impossible-de-generer-votre-devis-veuillez-reessayer"),
-        });
+      onError: () => {
+        // Non bloquant — le PDF est déjà affiché depuis le blob URL
       },
     });
 
@@ -169,9 +163,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
 
   const submitForm = async (data: UpdateProspectFormType) => {
     if (!accepte) {
-      toast({
-        variant: "destructive",
-        title: tSauver("erreur"),
+      toast.error(tSauver("erreur"), {
         description: t(
           "en-cochant-cette-case-je-reconnais-avoir-lu-compris-et-accepte-sans-reserve-les",
         ),
@@ -180,9 +172,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     }
 
     if (!prospect.id) {
-      toast({
-        variant: "destructive",
-        title: t("erreur"),
+      toast.error(t("erreur"), {
         description: t(
           "impossible-de-finaliser-votre-devis-aucun-prospect-associe",
         ),
@@ -204,9 +194,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       const cityData = await response.json();
 
       if (cityData.length === 0) {
-        toast({
-          variant: "destructive",
-          title: t("code-postal-invalide"),
+        toast.error(t("code-postal-invalide"), {
           description: t(
             "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer",
           ),
@@ -248,6 +236,10 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         incendie,
         snacksFruits,
         officeManager,
+        cafe,
+        the,
+        fontaines,
+        servicesFm4All,
       });
 
       if (coherenceResult?.data && !coherenceResult.data.coherent) {
@@ -276,9 +268,48 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           const c = corrections.officeManager;
           setOfficeManager((prev) => ({ ...prev, prix: { ...prev.prix, ...c } }));
         }
-        toast({
-          variant: "destructive",
-          title: "Tarifs mis à jour",
+        if (corrections.cafe && corrections.cafe.length > 0) {
+          setCafe((prev) => ({
+            ...prev,
+            espaces: prev.espaces.map((espace) => {
+              const correction = corrections.cafe!.find(
+                (c) => c.espaceId === espace.infos.espaceId,
+              );
+              if (!correction) return espace;
+              return {
+                ...espace,
+                prix: { ...espace.prix, ...correction.prix },
+              };
+            }),
+          }));
+        }
+        if (corrections.the) {
+          const c = corrections.the;
+          setThe((prev) => ({ ...prev, prix: { ...prev.prix, ...c } }));
+        }
+        if (corrections.fontaines && corrections.fontaines.length > 0) {
+          setFontaines((prev) => ({
+            ...prev,
+            espaces: prev.espaces.map((espace) => {
+              const correction = corrections.fontaines!.find(
+                (c) => c.espaceId === espace.infos.espaceId,
+              );
+              if (!correction) return espace;
+              return {
+                ...espace,
+                prix: { ...espace.prix, ...correction.prix },
+              };
+            }),
+          }));
+        }
+        if (corrections.servicesFm4All) {
+          const c = corrections.servicesFm4All;
+          setServicesFm4All((prev) => ({
+            ...prev,
+            prix: { ...prev.prix, ...c },
+          }));
+        }
+        toast.error("Tarifs mis à jour", {
           description:
             "Certains prix ont changé depuis votre dernière visite. Votre devis a été recalculé avec les tarifs à jour. Veuillez vérifier les montants et soumettre à nouveau.",
         });
@@ -308,29 +339,25 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       });
 
       if (!urlTemp) {
-        toast({
-          variant: "destructive",
-          title: t("erreur"),
+        toast.error(t("erreur"), {
           description: t("une-erreur-est-survenue"),
         });
 
         setIsLoading(false);
         return;
       }
-      // 4) obtenir une URL présignée S3 puis uploader le PDF
+
+      // 4) Afficher immédiatement le PDF depuis le blob URL
+      setDevisUrl(urlTemp);
+      setMonDevis({ currentMonDevisId: 2 });
+      toast.success(tSauver("succes"));
+
+      // 5) Obtenir une URL présignée S3 puis uploader le PDF (en arrière-plan)
       const presignResult = await getPresignedDevisUploadUrlAction({
         originalName: nomDevis,
       });
 
-      if (!presignResult?.data) {
-        toast({
-          variant: "destructive",
-          title: t("erreur"),
-          description: t("une-erreur-est-survenue"),
-        });
-        setIsLoading(false);
-        return;
-      }
+      if (!presignResult?.data) return;
 
       const { uploadUrl, key: devisS3Key } = presignResult.data;
 
@@ -343,17 +370,9 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         headers: { "Content-Type": "application/pdf" },
       });
 
-      if (!uploadResponse.ok) {
-        toast({
-          variant: "destructive",
-          title: t("erreur"),
-          description: t("une-erreur-est-survenue"),
-        });
-        setIsLoading(false);
-        return;
-      }
+      if (!uploadResponse.ok) return;
 
-      // 5) appeler la server action avec prospectToUpdate + devisS3Key
+      // 6) Appeler la server action pour persistance DB + email
       executeFinaliserDevis({
         prospect: payload as UpdateProspectType,
         devisS3Key,
@@ -365,11 +384,12 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           ),
           margeCoefficient: MARGE,
         },
+        pdfFilename: nomDevis,
+        pdfSizeBytes: blob.size,
+        texte: formatLocalStorageData(),
       });
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: t("erreur"),
+      toast.error(t("erreur"), {
         description: t("une-erreur-est-survenue"),
       });
       setIsLoading(false);

@@ -3,6 +3,12 @@ import formData from "form-data";
 import Mailgun from "mailgun.js";
 import "server-only";
 
+type AttachmentType = {
+  data: Buffer;
+  filename: string;
+  contentType: string;
+};
+
 type SendEmailDirectParamsType = {
   to: string;
   from?: string;
@@ -12,6 +18,7 @@ type SendEmailDirectParamsType = {
   nomDestinataire?: string;
   prenomDestinataire?: string;
   useTemplate?: boolean;
+  attachment?: AttachmentType;
 };
 
 export async function sendEmailDirect(params: SendEmailDirectParamsType) {
@@ -27,6 +34,7 @@ export async function sendEmailDirect(params: SendEmailDirectParamsType) {
     nomDestinataire,
     prenomDestinataire,
     useTemplate = true,
+    attachment,
   } = params;
 
   const replyTo =
@@ -48,6 +56,17 @@ export async function sendEmailDirect(params: SendEmailDirectParamsType) {
       ...base,
       html: html ? html : undefined,
       text: html ? "" : text,
+      ...(attachment
+        ? {
+            attachment: [
+              {
+                data: attachment.data,
+                filename: attachment.filename,
+                contentType: attachment.contentType,
+              },
+            ],
+          }
+        : {}),
     };
 
     const response = await mg.messages.create("mg.fm4all.com", emailOptions);
@@ -64,6 +83,17 @@ export async function sendEmailDirect(params: SendEmailDirectParamsType) {
       corps_message: text,
       subject: subject,
     }),
+    ...(attachment
+      ? {
+          attachment: [
+            {
+              data: attachment.data,
+              filename: attachment.filename,
+              contentType: attachment.contentType,
+            },
+          ],
+        }
+      : {}),
   };
 
   const response = await mg.messages.create("mg.fm4all.com", emailOptions);

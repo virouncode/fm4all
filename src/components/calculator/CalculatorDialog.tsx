@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Calculator, Check, Copy } from "lucide-react";
 import { useState } from "react";
 
@@ -18,7 +18,6 @@ export function CalculatorDialog() {
   const [operator, setOperator] = useState<string | null>(null);
   const [waitingForSecondOperand, setWaitingForSecondOperand] = useState(false);
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
 
   const clearDisplay = () => {
     setDisplay("0");
@@ -93,15 +92,12 @@ export function CalculatorDialog() {
     try {
       await navigator.clipboard.writeText(display);
       setCopied(true);
-      toast({
-        title: "Copié !",
+      toast.success("Copié !", {
         description: `${display} a été copié dans le presse-papiers.`,
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
+      toast.error("Erreur", {
         description: `Impossible de copier dans le presse-papiers`,
       });
     }

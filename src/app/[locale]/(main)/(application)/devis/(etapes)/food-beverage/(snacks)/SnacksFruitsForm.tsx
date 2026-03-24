@@ -1,7 +1,7 @@
 "use client";
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { calcCafeTotaux } from "@/lib/devis/calc-cafe";
 import { useCafeStore } from "@/stores/devis/cafeStore";
@@ -235,8 +235,7 @@ const SnacksFruitsForm = ({
     let newNbPersonnes = nbPersonnes + 1;
     if (newNbPersonnes > MAX_EFFECTIF) {
       newNbPersonnes = MAX_EFFECTIF;
-      toast({
-        title: t("limite-atteinte"),
+      toast.warning(t("limite-atteinte"), {
         description: t(
           "nous-ne-proposons-pas-de-livraisons-pour-plus-de-300-personnes",
         ),

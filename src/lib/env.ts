@@ -33,6 +33,8 @@ export const env = {
   AWS_REGION: required("AWS_REGION"),
   AWS_S3_BUCKET: required("AWS_S3_BUCKET"),
 
+  FM4ALL_ENTREPRISE_ID: required("FM4ALL_ENTREPRISE_ID"),
+
   // Optionnels serveur
   MAILGUN_BCC_EMAIL: optional("MAILGUN_BCC_EMAIL"),
   MAILGUN_CONTACT_EMAIL: optional("MAILGUN_CONTACT_EMAIL"),

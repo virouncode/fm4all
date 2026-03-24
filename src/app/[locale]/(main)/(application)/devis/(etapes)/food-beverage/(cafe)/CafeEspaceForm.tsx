@@ -7,7 +7,7 @@ import {
   RATIO_SUCRE,
 } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMachines";
 import { useCafeStore } from "@/stores/devis/cafeStore";
@@ -561,8 +561,7 @@ const CafeEspaceForm = ({
     let newNbPersonnes = value ? parseInt(value) : 0;
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
-      toast({
-        title: t("limite-atteinte"),
+      toast.warning(t("limite-atteinte"), {
         description: tCafe(
           "le-nombre-de-personnes-par-espace-cafe-est-limite-a-150-choisissez-une-offre-puis-ajoutez-un-espace-cafe-si-besoin",
         ),
@@ -576,8 +575,7 @@ const CafeEspaceForm = ({
     let newNbPersonnes = nbPersonnes + 1;
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
-      toast({
-        title: t("limite-atteinte"),
+      toast.warning(t("limite-atteinte"), {
         description: tCafe(
           "le-nombre-de-personnes-par-espace-cafe-est-limite-a-150-choisissez-une-offre-puis-ajoutez-un-espace-cafe-si-besoin",
         ),

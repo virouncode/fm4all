@@ -11,6 +11,9 @@ export const finaliserDevisSchema = z.object({
   devisS3Key: z.string().min(1, "La clé S3 du devis est requise"),
   commentaires: z.string().nullable(),
   devisMontants: finaliserDevisMontantsSchema,
+  pdfFilename: z.string().min(1),
+  pdfSizeBytes: z.number().int().positive(),
+  texte: z.string(),
 });
 
 export type FinaliserDevisType = z.infer<typeof finaliserDevisSchema>;

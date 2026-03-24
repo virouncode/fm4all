@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
@@ -80,17 +80,13 @@ const SauvegarderProgression = () => {
     useAction(saveProgressAction, {
       onSuccess: ({ data }) => {
         if (!data || !data.success) {
-          toast({
-            variant: "destructive",
-            title: tSauver("erreur"),
+          toast.error(tSauver("erreur"), {
             description: data?.message,
           });
           return;
         }
 
-        toast({
-          variant: "default",
-          title: tSauver("succes"),
+        toast.success(tSauver("succes"), {
           description: data?.message,
         });
 
@@ -108,9 +104,7 @@ const SauvegarderProgression = () => {
         }, 500);
       },
       onError: () => {
-        toast({
-          variant: "destructive",
-          title: tSauver("erreur"),
+        toast.error(tSauver("erreur"), {
           description: tSauver(
             "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer",
           ),
@@ -120,12 +114,9 @@ const SauvegarderProgression = () => {
 
   const submitForm = async (data: InsertProspectFormType) => {
     if (!accepte) {
-      toast({
-        variant: "destructive",
-        description: tSauver(
-          "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer",
-        ),
-      });
+      toast.error(tSauver(
+        "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer",
+      ));
       return;
     }
     const prospectPayload: InsertProspectType = normalizeForSubmit(data, {

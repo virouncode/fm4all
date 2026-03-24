@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { batiments } from "@/constants/batiments";
 import { occupation } from "@/constants/occupation";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { sendEmailFromClient } from "@/lib/email/sendEmail";
 import { useProspectStore } from "@/stores/devis/prospectStore";
@@ -88,9 +88,7 @@ const CityOut = ({
           `,
         useTemplate: true,
       });
-      toast({
-        variant: "default",
-        title: t("succes"),
+      toast.success(t("succes"), {
         description: t(
           "vos-coordonnees-ont-bien-ete-envoyees-a-notre-equipe-nous-vous-contacterons-dans-les-plus-brefs-delais",
         ),
@@ -102,9 +100,7 @@ const CityOut = ({
       }, 1000);
     } catch (err) {
       if (err instanceof Error) {
-        toast({
-          title: t("erreur"),
-          variant: "destructive",
+        toast.error(t("erreur"), {
           description: t(
             "impossible-denvoyer-vos-coordonnees-a-notre-equipe-veuillez-reessayer",
           ),

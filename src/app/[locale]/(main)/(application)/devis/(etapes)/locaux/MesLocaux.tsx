@@ -16,7 +16,7 @@ import { SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
 import { departements } from "@/constants/departements";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
@@ -49,7 +49,6 @@ const MesLocaux = () => {
   const setProspect = useProspectStore((s) => s.setProspect);
   const [loaderVisible, setLoaderVisible] = useState(false);
   const router = useRouter();
-  const { toast } = useToast();
   const [showModal, setShowModal] = useState(true);
 
   const serviceSearchParams = new URLSearchParams();
@@ -133,9 +132,7 @@ const MesLocaux = () => {
 
       if (cityData.length === 0) {
         setDevisProgress((prev) => ({ ...prev, completedSteps: [] }));
-        toast({
-          variant: "destructive",
-          title: t("code-postal-invalide"),
+        toast.error(t("code-postal-invalide"), {
           description: t(
             "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer",
           ),
@@ -151,9 +148,7 @@ const MesLocaux = () => {
       }));
     } catch (err) {
       console.error(err);
-      toast({
-        variant: "default",
-        title: t("ville-non-verifiee"),
+      toast.warning(t("ville-non-verifiee"), {
         description: t(
           "nous-navons-pas-pu-verifier-la-ville-mais-vous-pouvez-continuer-votre-devis",
         ),

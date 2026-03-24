@@ -1,5 +1,5 @@
 import { MAX_EFFECTIF } from "@/constants/constants";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { useCafeStore } from "@/stores/devis/cafeStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
@@ -81,8 +81,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     let newNbPersonnes = nbPersonnes + 1;
     if (newNbPersonnes > MAX_EFFECTIF) {
       newNbPersonnes = MAX_EFFECTIF;
-      toast({
-        title: t("limite-atteinte"),
+      toast.warning(t("limite-atteinte"), {
         description: tThe(
           "nous-ne-proposons-pas-de-livraisons-de-the-pour-plus-de-300-personnes",
         ),
