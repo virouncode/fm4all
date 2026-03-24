@@ -4,14 +4,8 @@ import { z } from "zod";
 
 export const selectOfficeManagerTarifsSchema = createSelectSchema(
   officeManagerTarifs,
-  {
-    demiTjm: (schema) =>
-      schema.min(1, "Le tarif demi-journalier doit être supérieur à 1"),
-    demiTjmPremium: (schema) =>
-      schema.min(1, "Le tarif demi-journalier premium doit être supérieur à 1"),
-  },
 ).extend({
-  nomPrestataire: z.string().nonempty("Nom du prestataire invalide"),
+  nomPrestataire: z.string().min(1),
   slogan: z.string().nullable(),
   logoStorageKey: z.string().nullable(),
   imageStorageKey: z.string().nullable(),

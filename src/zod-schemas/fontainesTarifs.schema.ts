@@ -5,7 +5,7 @@ import { z } from "zod";
 export const selectFontainesTarifsSchema = createSelectSchema(
   fontainesTarifs,
 ).extend({
-  nomPrestataire: z.string().nonempty("Nom du prestataire obligatoire"),
+  nomPrestataire: z.string().min(1),
   sloganPrestataire: z.string().nullable(),
   logoStorageKey: z.string().nullable(),
   anneeCreation: z.number().nullable(),

@@ -5,15 +5,8 @@ import { z } from "zod";
 
 export const selectVitrerieTarifsSchema = createSelectSchema(
   nettoyageVitrerieTarifs,
-  {
-    cadenceVitres: (schema) =>
-      schema.min(1, "La cadence vitres est obligatoire"),
-    cadenceCloisons: (schema) =>
-      schema.min(1, "La cadence cloisons est obligatoire"),
-    tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
-  },
 ).extend({
-  nomPrestataire: z.string().nonempty("Nom du prestataire invalide"),
+  nomPrestataire: z.string().min(1),
   slogan: z.string().nullable(),
   logoStorageKey: z.string().nullable(),
   anneeCreation: z.number().nullable(),
@@ -27,13 +20,6 @@ export const selectVitrerieTarifsSchema = createSelectSchema(
 
 export const selectVitrerieTarifsFournisseurSchema = createSelectSchema(
   nettoyageVitrerieTarifs,
-  {
-    cadenceVitres: (schema) =>
-      schema.min(1, "La cadence vitres est obligatoire"),
-    cadenceCloisons: (schema) =>
-      schema.min(1, "La cadence cloisons est obligatoire"),
-    tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
-  },
 );
 
 export type SelectVitrerieTarifsType = z.infer<

@@ -2,13 +2,10 @@ import { nettoyageTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const selectNettoyageTarifsSchema = createSelectSchema(nettoyageTarifs, {
-  hParPassage: (schema) =>
-    schema.min(1, "Le nombre d'heures moyen par passage est obligatoire"),
-  tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
-  surface: (schema) => schema.min(1, "La surface est obligatoire"),
-}).extend({
-  nomPrestataire: z.string().nonempty("Nom du prestataire invalide"),
+export const selectNettoyageTarifsSchema = createSelectSchema(
+  nettoyageTarifs,
+).extend({
+  nomPrestataire: z.string().min(1),
   slogan: z.string().nullable(),
   logoStorageKey: z.string().nullable(),
   anneeCreation: z.number().nullable(),
@@ -22,12 +19,6 @@ export const selectNettoyageTarifsSchema = createSelectSchema(nettoyageTarifs, {
 
 export const selectNettoyageTarifsFournisseurSchema = createSelectSchema(
   nettoyageTarifs,
-  {
-    hParPassage: (schema) =>
-      schema.min(1, "Le nombre d'heures moyen par passage est obligatoire"),
-    tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
-    surface: (schema) => schema.min(1, "La surface est obligatoire"),
-  },
 );
 
 export type SelectNettoyageTarifsType =

@@ -4,11 +4,8 @@ import { z } from "zod";
 
 export const selectSucreConsoTarifsSchema = createSelectSchema(
   sucreConsoTarifs,
-  {
-    effectif: (schema) => schema.min(1, "L'effectif est obligatoire"),
-  },
 ).extend({
-  nomPrestataire: z.string().nonempty("Nom du prestataire obligatoire"),
+  nomPrestataire: z.string().min(1),
   slogan: z.string().nullable(),
   logoStorageKey: z.string().nullable(),
 });

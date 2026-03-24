@@ -2,10 +2,10 @@ import { laitConsoTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const selectLaitConsoTarifsSchema = createSelectSchema(laitConsoTarifs, {
-  effectif: (schema) => schema.min(1, "L'effectif est obligatoire"),
-}).extend({
-  nomPrestataire: z.string().nonempty("Nom du prestataire obligatoire"),
+export const selectLaitConsoTarifsSchema = createSelectSchema(
+  laitConsoTarifs,
+).extend({
+  nomPrestataire: z.string().min(1),
   slogan: z.string().nullable(),
   logoStorageKey: z.string().nullable(),
 });
