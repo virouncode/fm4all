@@ -40,12 +40,6 @@ type RhfRadioGroupProps<S extends FieldValues> = {
   "name" | "defaultValue" | "value" | "onChange" | "onBlur" | "ref"
 >;
 
-function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null) {
-  if (!ref) return;
-  if (typeof ref === "function") ref(value);
-  else (ref as React.RefObject<T | null>).current = value;
-}
-
 export function RhfRadioGroup<S extends FieldValues>({
   label,
   name,

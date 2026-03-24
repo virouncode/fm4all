@@ -74,8 +74,7 @@ export const getFontainesTarifs = async () => {
           ? result.paConsoEauChaude / RATIO
           : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -87,8 +86,7 @@ export const getFontaines = async () => {
     const results = await db.select().from(fontaines);
     if (results.length === 0) return [];
     return results.map((result) => selectFontainesModelesSchema.parse(result));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };

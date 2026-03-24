@@ -49,8 +49,7 @@ export const getOfficeManagerQuantites = async (
     return results.map((result) =>
       selectOfficeManagerQuantitesSchema.parse(result),
     );
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -87,8 +86,7 @@ export const getOfficeManagerTarifs = async () => {
       demiTjm: result.demiTjm / RATIO,
       demiTjmPremium: result.demiTjmPremium / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };

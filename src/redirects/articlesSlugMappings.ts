@@ -34,13 +34,13 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
-    ([_, value]) => value === articleSlugEn,
+    ([, value]) => value === articleSlugEn,
   );
   return entry ? entry[0] : articleSlugEn;
 };
 export const getArticlesSubSlugFr = (articleSubSlugEn: string): string => {
   const entry = Object.entries(articlesSubSlugMappingsFrToEn).find(
-    ([_, value]) => value === articleSubSlugEn,
+    ([, value]) => value === articleSubSlugEn,
   );
   return entry ? entry[0] : articleSubSlugEn;
 };

@@ -108,7 +108,6 @@ const HygienePropositions = ({
       prixDistribSavon,
       prixDistribPh,
       prixInstalDistrib,
-      totalAnnuelTrilogie,
       minFacturation,
     } = proposition;
 
@@ -162,9 +161,6 @@ const HygienePropositions = ({
     type: string,
   ) => {
     const value = e.target.value;
-    const paParPersonneEmp = hygiene.prix.paParPersonneEmp;
-    const paParPersonneSavon = hygiene.prix.paParPersonneSavon;
-    const paParPersonnePh = hygiene.prix.paParPersonnePh;
 
     switch (type) {
       case "emp":

@@ -1,3 +1,5 @@
+"use client";
+
 import { TheType } from "@/zod-schemas/the.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";

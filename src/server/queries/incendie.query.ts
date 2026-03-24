@@ -37,8 +37,7 @@ export const getIncendieQuantite = async (surface: string) => {
       .where(eq(incendieQuantites.surface, roundedSurface));
     if (results.length === 0) return null;
     return selectIncendieQuantitesSchema.parse(results[0]);
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return null;
   }
 };
@@ -80,8 +79,7 @@ export const getIncendieTarifs = async (surface: string) => {
       prixParTelBaes: result.prixParTelBaes / RATIO,
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -100,8 +98,7 @@ export const getExutoiresTarifs = async () => {
       prixParExutoire: result.prixParExutoire / RATIO,
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -120,8 +117,7 @@ export const getExutoiresParkingsTarifs = async () => {
       prixParExutoire: result.prixParExutoire / RATIO,
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -139,8 +135,7 @@ export const getAlarmesTarifs = async () => {
       ...result,
       prixParControle: result.prixParControle / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -158,8 +153,7 @@ export const getRiaTarifs = async () => {
       ...result,
       prixParRIA: result.prixParRIA / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -177,8 +171,7 @@ export const getColonnesSechesTarifs = async () => {
       ...result,
       prixParColonne: result.prixParColonne / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -196,8 +189,7 @@ export const getPortesCoupeFeuTarifs = async () => {
       ...result,
       prixParPorte: result.prixParPorte / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };

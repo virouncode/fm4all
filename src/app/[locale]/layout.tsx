@@ -9,6 +9,7 @@ import { setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic, Geist, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import "./globals.css";
 
 export const didact = Didact_Gothic({
@@ -93,9 +94,11 @@ export default async function LocalizedLayout({
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
       </head>
       <body className={`scroll-smooth font-sans tracking-tight antialiased`}>
-        <GoogleTags
-          GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
-        />
+        <Suspense>
+          <GoogleTags
+            GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
+          />
+        </Suspense>
         <ConfirmProvider>
           <NextIntlClientProvider>
             <ThemeProvider

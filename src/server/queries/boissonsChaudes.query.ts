@@ -77,8 +77,7 @@ export const getCafeMachinesTarifs = async () => {
           ? result.fraisInstallation / RATIO
           : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -120,8 +119,7 @@ export const getCafeConsoTarifs = async () => {
       ...result,
       prixUnitaire: result.prixUnitaire ? result.prixUnitaire / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -166,8 +164,7 @@ export const getLaitConsoTarifs = async () => {
           ? result.prixUnitairePoudre / RATIO
           : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -208,8 +205,7 @@ export const getChocolatConsoTarifs = async () => {
           ? result.prixUnitairePoudre / RATIO
           : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -250,8 +246,7 @@ export const getTheConsoTarifs = async () => {
       prixUnitaire:
         result.prixUnitaire !== null ? result.prixUnitaire / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -286,8 +281,7 @@ export const getSucreConsoTarifs = async () => {
       prixUnitaire:
         result.prixUnitaire !== null ? result.prixUnitaire / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -299,8 +293,7 @@ export const getCafeMachines = async () => {
     const results = await db.select().from(cafeMachines);
     if (results.length === 0) return [];
     return results.map((result) => selectCafeMachinesSchema.parse(result));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };

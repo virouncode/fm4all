@@ -20,11 +20,8 @@ const PersonnaliserCommentaires = () => {
       setCommentaires: s.setCommentaires,
     })),
   );
-  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
-    useShallow((s) => ({
-      personnalisation: s.personnalisation,
-      setPersonnalisation: s.setPersonnalisation,
-    })),
+  const setPersonnalisation = usePersonnalisationStore(
+    (s) => s.setPersonnalisation,
   );
   const router = useRouter();
   const handleClickPrevious = () => {

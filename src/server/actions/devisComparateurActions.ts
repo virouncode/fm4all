@@ -21,6 +21,15 @@ import { and, desc, eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
 
+function escapeHtml(value: string | null | undefined): string {
+  return (value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export const saveProgressAction = actionClient
   .metadata({ actionName: "saveProgressAction" })
   .inputSchema(saveProgressSchema, {
@@ -101,27 +110,27 @@ export const saveProgressAction = actionClient
           text: "placeholder",
           html: `<p>Un prospect a sauvegardé sa progression dans le funnel.</p><br/>
               <p>Voici ses coordonnées :</p><br/>
-              <p>Entreprise : ${upsertedProspect.nomEntreprise}</p>
-              <p>Code postal : ${upsertedProspect.codePostal}</p>
-              <p>Ville : ${upsertedProspect.ville}</p>
+              <p>Entreprise : ${escapeHtml(upsertedProspect.nomEntreprise)}</p>
+              <p>Code postal : ${escapeHtml(upsertedProspect.codePostal)}</p>
+              <p>Ville : ${escapeHtml(upsertedProspect.ville)}</p>
               <p>Surface des locaux : ${upsertedProspect.surface}</p>
               <p>Effectif : ${upsertedProspect.effectif}</p>
-              <p>Type de bâtiment : ${
+              <p>Type de bâtiment : ${escapeHtml(
                 batiments.find(({ id }) => id === upsertedProspect.typeBatiment)
-                  ?.description
-              }</p>
-              <p>Type d'occupation : ${
+                  ?.description,
+              )}</p>
+              <p>Type d'occupation : ${escapeHtml(
                 occupation.find(
                   ({ id }) => id === upsertedProspect.typeOccupation,
-                )?.description
-              }</p><br/>
-              <p>Nom du contact : ${upsertedProspect.nomContact}</p>
-              <p>Prénom du contact : ${upsertedProspect.prenomContact}</p>
-              <p>Poste du contact : ${upsertedProspect.posteContact}</p>
-              <p>Email du contact : ${upsertedProspect.emailContact}</p>
-              <p>N°Tél du contact : ${upsertedProspect.phoneContact}</p><br/>
+                )?.description,
+              )}</p><br/>
+              <p>Nom du contact : ${escapeHtml(upsertedProspect.nomContact)}</p>
+              <p>Prénom du contact : ${escapeHtml(upsertedProspect.prenomContact)}</p>
+              <p>Poste du contact : ${escapeHtml(upsertedProspect.posteContact)}</p>
+              <p>Email du contact : ${escapeHtml(upsertedProspect.emailContact)}</p>
+              <p>N°Tél du contact : ${escapeHtml(upsertedProspect.phoneContact)}</p><br/>
               <p>Voici ses informations de chiffrage (avant personnalisation) :</p><br/>
-              <pre>${insertedDevisTemp.texte}</pre>
+              <pre>${escapeHtml(insertedDevisTemp.texte)}</pre>
               `,
           useTemplate: false,
         });
@@ -246,31 +255,31 @@ export const finaliserDevisAction = actionClient
           html: `
 <p>Un client a finalisé son devis.</p><br/>
 <p>Voici ses coordonnées :</p><br/>
-<p>Entreprise : ${updatedProspect.nomEntreprise}</p>
-<p>Siret : ${updatedProspect.siret ?? ""}</p>
-<p>Adresse ligne 1 : ${updatedProspect.adresseLigne1 ?? ""}</p>
-<p>Adresse ligne 2 : ${updatedProspect.adresseLigne2 ?? ""}</p>
-<p>Code postal : ${updatedProspect.codePostal}</p>
-<p>Ville : ${updatedProspect.ville}</p>
+<p>Entreprise : ${escapeHtml(updatedProspect.nomEntreprise)}</p>
+<p>Siret : ${escapeHtml(updatedProspect.siret)}</p>
+<p>Adresse ligne 1 : ${escapeHtml(updatedProspect.adresseLigne1)}</p>
+<p>Adresse ligne 2 : ${escapeHtml(updatedProspect.adresseLigne2)}</p>
+<p>Code postal : ${escapeHtml(updatedProspect.codePostal)}</p>
+<p>Ville : ${escapeHtml(updatedProspect.ville)}</p>
 <p>Surface des locaux : ${updatedProspect.surface}</p>
 <p>Effectif : ${updatedProspect.effectif}</p>
-<p>Type de bâtiment : ${
+<p>Type de bâtiment : ${escapeHtml(
             batiments.find(({ id }) => id === updatedProspect.typeBatiment)
-              ?.description ?? ""
-          }</p>
-<p>Type d'occupation : ${
+              ?.description,
+          )}</p>
+<p>Type d'occupation : ${escapeHtml(
             occupation.find(({ id }) => id === updatedProspect.typeOccupation)
-              ?.description ?? ""
-          }</p>
-<p>Nom du contact : ${updatedProspect.nomContact}</p>
-<p>Prénom du contact : ${updatedProspect.prenomContact}</p>
-<p>Poste du contact : ${updatedProspect.posteContact}</p>
-<p>Email du contact : ${updatedProspect.emailContact}</p>
-<p>N°Tél du contact : ${updatedProspect.phoneContact}</p>
-<p>Nom du signataire : ${updatedProspect.nomSignataire ?? ""}</p>
-<p>Prénom du signataire : ${updatedProspect.prenomSignataire ?? ""}</p>
-<p>Poste du signataire : ${updatedProspect.posteSignataire ?? ""}</p>
-<p>Email du signataire : ${updatedProspect.emailSignataire ?? ""}</p>
+              ?.description,
+          )}</p>
+<p>Nom du contact : ${escapeHtml(updatedProspect.nomContact)}</p>
+<p>Prénom du contact : ${escapeHtml(updatedProspect.prenomContact)}</p>
+<p>Poste du contact : ${escapeHtml(updatedProspect.posteContact)}</p>
+<p>Email du contact : ${escapeHtml(updatedProspect.emailContact)}</p>
+<p>N°Tél du contact : ${escapeHtml(updatedProspect.phoneContact)}</p>
+<p>Nom du signataire : ${escapeHtml(updatedProspect.nomSignataire)}</p>
+<p>Prénom du signataire : ${escapeHtml(updatedProspect.prenomSignataire)}</p>
+<p>Poste du signataire : ${escapeHtml(updatedProspect.posteSignataire)}</p>
+<p>Email du signataire : ${escapeHtml(updatedProspect.emailSignataire)}</p>
 <p>Date de démarrage : ${
             updatedProspect.dateDeDemarrage
               ? format(new Date(updatedProspect.dateDeDemarrage), "dd/MM/yyyy", {
@@ -279,7 +288,7 @@ export const finaliserDevisAction = actionClient
               : ""
           }</p>
 <br/>
-<p>Commentaires du client : ${commentaires ?? ""}</p>
+<p>Commentaires du client : ${escapeHtml(commentaires)}</p>
 `,
           text: "",
           useTemplate: false,

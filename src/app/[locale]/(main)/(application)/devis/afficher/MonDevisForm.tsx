@@ -388,7 +388,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         pdfSizeBytes: blob.size,
         texte: formatLocalStorageData(),
       });
-    } catch (err) {
+    } catch {
       toast.error(t("erreur"), {
         description: t("une-erreur-est-survenue"),
       });

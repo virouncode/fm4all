@@ -69,7 +69,7 @@ export function RhfCheckboxItem<
   ...props
 }: RhfCheckboxItemProps<S, V>) {
   const { control } = useFormContext<S>();
-  const id = `${String(name).replace(/\./g, "_")}__${String(value).replace(/\s+/g, "_")}`;
+  const id = idProp ?? `${String(name).replace(/\./g, "_")}__${String(value).replace(/\s+/g, "_")}`;
   const errorId = `${id}-error`;
   const descriptionId = description ? `${id}-description` : undefined;
 

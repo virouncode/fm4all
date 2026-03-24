@@ -62,8 +62,7 @@ export const getNettoyageQuantites = async (surface: string) => {
       ...result,
       freqAnnuelle: result.freqAnnuelle / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -81,8 +80,7 @@ export const getNettoyageAllQuantites = async () => {
       ...result,
       freqAnnuelle: result.freqAnnuelle / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -117,8 +115,7 @@ export const getNettoyageTarifs = async (surface: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -140,8 +137,7 @@ export const getNettoyageTarifsPrestataire = async (entrepriseId: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -178,8 +174,7 @@ export const getRepasseTarifs = async (surface: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -201,8 +196,7 @@ export const getRepasseTarifsPrestataire = async (entrepriseId: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -238,8 +232,7 @@ export const getVitrerieTarifs = async () => {
       minFacturation: result.minFacturation / RATIO,
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -263,8 +256,7 @@ export const getVitrerieTarifsPrestataire = async (entrepriseId: string) => {
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
     return data[0];
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return null;
   }
 };

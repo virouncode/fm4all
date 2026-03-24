@@ -1,3 +1,5 @@
+"use client";
+
 import { TotalType } from "@/zod-schemas/total.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";

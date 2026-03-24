@@ -57,8 +57,7 @@ export const getHygieneDistribQuantite = async (effectif: string) => {
       nbDistribPoubelle: Math.ceil(results[0].nbDistribPh / 2),
     };
     return selectHygieneDistribQuantitesSchema.parse(formattedResults);
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return null;
   }
 };
@@ -103,8 +102,7 @@ export const getHygieneDistribTarifs = async () => {
       pa24M: result.pa24M ? result.pa24M / RATIO : null,
       pa36M: result.pa36M ? result.pa36M / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -122,8 +120,7 @@ export const getHygieneMinFacturation = async () => {
       ...result,
       minFacturation: result.minFacturation ? result.minFacturation / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -146,8 +143,7 @@ export const getHygieneMinFacturationPrestataire = async (
       ...result,
       minFacturation: result.minFacturation ? result.minFacturation / RATIO : null,
     }))[0];
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return null;
   }
 };
@@ -173,8 +169,7 @@ export const getHygieneDistribTarifsPrestataire = async (
       pa24M: result.pa24M ? result.pa24M / RATIO : null,
       pa36M: result.pa36M ? result.pa36M / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -196,8 +191,7 @@ export const getHygieneInstalDistribTarifs = async (effectif: string) => {
       ...result,
       prixInstallation: result.prixInstallation / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -220,8 +214,7 @@ export const getHygieneInstalDistribTarifsPrestataire = async (
       ...result,
       prixInstallation: result.prixInstallation / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -266,8 +259,7 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
       paParPersonneSavon: result.paParPersonneSavon / RATIO,
       paParPersonneDesinfectant: result.paParPersonneDesinfectant / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -293,8 +285,7 @@ export const getHygieneConsosTarifsPrestataire = async (
       paParPersonneSavon: result.paParPersonneSavon / RATIO,
       paParPersonneDesinfectant: result.paParPersonneDesinfectant / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };

@@ -180,7 +180,6 @@ const MaintenancePropositions = ({
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
-      totalAnnuelService,
       totalAnnuelQ18,
       totalAnnuelLegio,
       totalAnnuelQualiteAir,

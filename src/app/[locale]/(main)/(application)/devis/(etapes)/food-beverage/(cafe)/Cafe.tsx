@@ -4,7 +4,6 @@ import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
 import useScrollIntoCafeEspace from "@/hooks/use-scroll-into-cafe-espace";
 import useScrollIntoFood from "@/hooks/use-scroll-into-food";
 import { useCafeStore } from "@/stores/devis/cafeStore";
-import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
@@ -52,7 +51,6 @@ const Cafe = ({
       setCafe: s.setCafe,
     })),
   );
-  const devisProgress = useDevisProgressStore((s) => s.devisProgress);
   const effectif = prospect.effectif ?? 0;
   useScrollIntoFood();
   useScrollIntoCafeEspace();

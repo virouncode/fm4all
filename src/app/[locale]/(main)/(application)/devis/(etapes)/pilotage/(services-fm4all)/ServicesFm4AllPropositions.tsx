@@ -238,11 +238,6 @@ const ServicesFm4AllPropositions = ({
       tauxAccountManager,
       tauxRemiseCa,
       tauxRemiseHof,
-      prixAssurance,
-      prixPlateforme,
-      prixSupportAdmin,
-      prixSupportOp,
-      prixAccountManager,
       assurance,
       plateforme,
       supportAdmin,
@@ -253,8 +248,6 @@ const ServicesFm4AllPropositions = ({
       minFacturationSupportOp,
       minFacturationAccountManager,
       remiseCaSeuil,
-      remiseCa,
-      remiseHof,
     } = proposition;
     if (servicesFm4All.infos.gammeSelected === gamme) return;
 

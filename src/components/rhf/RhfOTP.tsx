@@ -117,9 +117,6 @@ export function RhfOTP<S extends FieldValues>({
                 role="group"
                 aria-labelledby={labelId}
                 aria-describedby={describedBy}
-                aria-errormessage={hasError ? errorId : undefined}
-                aria-invalid={hasError || undefined}
-                aria-required={requiredMark || undefined}
                 // Valeur contrôlée RHF (assure une string)
                 value={(field.value as string) ?? ""}
                 // Refs : RHF n’a pas besoin de ref ici (pas un input unique), on expose juste la parentRef

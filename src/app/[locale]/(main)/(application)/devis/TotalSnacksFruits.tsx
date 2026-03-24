@@ -24,7 +24,7 @@ const TotalSnacksFruits = () => {
   const totalSnacks = totalSnacksFruits.totalSnacks;
   const totalBoissons = totalSnacksFruits.totalBoissons;
   const totalLivraison = totalSnacksFruits.totalLivraison ?? 0; //car on veut afficher même si 0
-  let total = totalSnacksFruits.total;
+  const total = totalSnacksFruits.total;
   const totalSansRemise = totalSnacksFruits.totalSansRemise;
   const remiseSiCafe =
     totalSansRemise && total && totalSansRemise !== total

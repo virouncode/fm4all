@@ -21,7 +21,6 @@ type PrestataireDialogProps = {
 const PrestataireDialog = ({
   logoStorageKey,
   darkLogoUrl,
-  locationUrl,
   sloganPrestataire,
   presentation,
   nomPrestataire,

@@ -42,8 +42,7 @@ export const getMaintenanceQuantites = async (surface: string) => {
       ...result,
       freqAnnuelle: result.freqAnnuelle / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -88,8 +87,7 @@ export const getMaintenanceTarifs = async (surface: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -111,8 +109,7 @@ export const getQ18Tarifs = async (surface: string) => {
       ...result,
       prixAnnuel: result.prixAnnuel / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -134,8 +131,7 @@ export const getLegioTarifs = async (surface: string) => {
       ...result,
       prixAnnuel: result.prixAnnuel / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -157,8 +153,7 @@ export const getQualiteAirTarifs = async (surface: string) => {
       ...result,
       prixAnnuel: result.prixAnnuel / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };

@@ -1,6 +1,5 @@
 import { toast } from "sonner";
 import { useCafeStore } from "@/stores/devis/cafeStore";
-import { useProspectStore } from "@/stores/devis/prospectStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs.schema";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine.schema";
@@ -38,7 +37,6 @@ const CafeMobileEspace = ({
   sucreConsoTarifs,
 }: CafeMobileEspaceProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
-  const prospect = useProspectStore((s) => s.prospect);
   const { cafe, setCafe } = useCafeStore(
     useShallow((s) => ({
       cafe: s.cafe,

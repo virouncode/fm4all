@@ -122,10 +122,7 @@ const NettoyageOptionsPropositions = ({
     }
   };
 
-  const handleClickSamediProposition = (_proposition: {
-    id: string;
-    prixAnnuel: number;
-  }) => {
+  const handleClickSamediProposition = () => {
     if (nettoyage.infos.samediSelected) {
       setNettoyage((prev) => ({
         ...prev,
@@ -145,10 +142,7 @@ const NettoyageOptionsPropositions = ({
     }
   };
 
-  const handleClickDimancheProposition = (_proposition: {
-    id: string;
-    prixAnnuel: number;
-  }) => {
+  const handleClickDimancheProposition = () => {
     if (nettoyage.infos.dimancheSelected) {
       setNettoyage((prev) => ({
         ...prev,

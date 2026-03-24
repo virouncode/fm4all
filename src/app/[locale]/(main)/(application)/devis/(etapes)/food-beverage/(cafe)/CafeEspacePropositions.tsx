@@ -377,8 +377,6 @@ const CafeEspacePropositions = ({
       prixUnitaireConsoLait,
       prixUnitaireConsoChocolat,
       prixUnitaireConsoSucre,
-      totalAnnuel,
-      totalInstallation,
     } = proposition;
     //Je décoche
     if (
@@ -510,8 +508,6 @@ const CafeEspacePropositions = ({
       prixUnitaireConsoLait,
       prixUnitaireConsoChocolat,
       prixUnitaireConsoSucre,
-      totalAnnuel,
-      totalInstallation,
     } = proposition;
     //======================= JE DECOCHE ======================//
     if (

@@ -101,7 +101,6 @@ const SecuriteIncendiePropositions = ({
       prixParExtincteur,
       prixParBaes,
       prixParTelBaes,
-      totalAnnuelTrilogie,
       fraisDeplacementTrilogie,
     } = proposition;
     if (incendie.infos.entrepriseId === entrepriseId) {

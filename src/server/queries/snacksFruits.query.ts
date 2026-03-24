@@ -34,8 +34,7 @@ export const getFruitsQuantites = async () => {
     const results = await db.select().from(fruitsQuantites);
     if (results.length === 0) return [];
     return results.map((result) => selectFruitsQuantitesSchema.parse(result));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -74,8 +73,7 @@ export const getFruitsTarifs = async () => {
       ...result,
       prixKg: result.prixKg ? result.prixKg / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -87,8 +85,7 @@ export const getSnacksQuantites = async () => {
     const results = await db.select().from(snacksQuantites);
     if (results.length === 0) return [];
     return results.map((result) => selectSnacksQuantitesSchema.parse(result));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -127,8 +124,7 @@ export const getSnacksTarifs = async () => {
       ...result,
       prixUnitaire: result.prixUnitaire ? result.prixUnitaire / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -142,8 +138,7 @@ export const getBoissonsQuantites = async () => {
     return results.map((result) =>
       selectBoissonsQuantitesSchema.parse(result),
     );
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -182,8 +177,7 @@ export const getBoissonsTarifs = async () => {
       ...result,
       prixUnitaire: result.prixUnitaire ? result.prixUnitaire / RATIO : null,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -220,8 +214,7 @@ export const getFoodLivraisonTarifs = async () => {
       seuilFranco: result.seuilFranco ? result.seuilFranco / RATIO : null,
       prixUnitaireSiCafe: result.prixUnitaireSiCafe / RATIO,
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };

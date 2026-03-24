@@ -1,3 +1,5 @@
+"use client";
+
 import { SnacksFruitsType } from "@/zod-schemas/snacksFruits.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";

@@ -30,8 +30,7 @@ export const getServicesFm4AllTaux = async () => {
       remiseCa: result.remiseCa / (RATIO * 100),
       remiseHof: result.remiseHof / (RATIO * 100),
     }));
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };
@@ -45,8 +44,7 @@ export const getServicesFm4AllOffres = async () => {
     return results.map((result) =>
       selectServicesFm4AllOffresSchema.parse(result),
     );
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
+  } catch {
     return [];
   }
 };

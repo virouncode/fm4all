@@ -183,17 +183,8 @@ const SnacksFruitsForm = ({
         ? (fraisLivraisonsFournisseur?.prixUnitaire ?? null)
         : null;
 
-      let fraisLivraisonPanier = isSamePrestataire
-        ? prixUnitaireLivraisonSiCafe
-        : prixUnitaireLivraison;
-
       const seuilFranco = fraisLivraisonsFournisseur?.seuilFranco ?? 0;
 
-      fraisLivraisonPanier = isPanierMin
-        ? prixPanier < seuilFranco
-          ? fraisLivraisonPanier
-          : 0
-        : null;
       setSnacksFruits((prev) => ({
         ...prev,
         quantites: {

@@ -1,3 +1,5 @@
+"use client";
+
 import { ServicesType } from "@/zod-schemas/services.schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";

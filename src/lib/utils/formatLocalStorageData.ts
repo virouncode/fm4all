@@ -45,8 +45,7 @@ export const formatLocalStorageData = (): string => {
       try {
         // Essayer de parser les données en JSON
         formattedData[key] = value ? JSON.parse(value) : null;
-      } catch (err) {
-        console.log(err);
+      } catch {
         formattedData[key] = value;
       }
     }

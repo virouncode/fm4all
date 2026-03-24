@@ -96,7 +96,7 @@ export function CalculatorDialog() {
         description: `${display} a été copié dans le presse-papiers.`,
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast.error("Erreur", {
         description: `Impossible de copier dans le presse-papiers`,
       });

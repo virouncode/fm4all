@@ -182,10 +182,6 @@ const HygieneOptionsPropositions = ({
       prixDistribBalai,
       prixDistribPoubelle,
       paParPersonneDesinfectant,
-      totalDesinfectant,
-      totalParfum,
-      totalBalai,
-      totalPoubelle,
     } = proposition;
     switch (type) {
       case "desinfectant":

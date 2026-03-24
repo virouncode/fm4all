@@ -8,7 +8,12 @@ const finaliserDevisMontantsSchema = z.object({
 });
 export const finaliserDevisSchema = z.object({
   prospect: updateProspectSchema,
-  devisS3Key: z.string().min(1, "La clé S3 du devis est requise"),
+  devisS3Key: z
+    .string()
+    .regex(
+      /^public\/devis_temporaires\/\d{4}\/\d{2}\/[0-9a-f-]{36}_[\w.\-]{1,80}\.pdf$/,
+      "Clé S3 du devis invalide",
+    ),
   commentaires: z.string().nullable(),
   devisMontants: finaliserDevisMontantsSchema,
   pdfFilename: z.string().min(1),

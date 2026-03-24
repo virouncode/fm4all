@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  MAX_NB_PERSONNES_PAR_ESPACE,
-  RATIO_CHOCO,
-  RATIO_LAIT,
-  RATIO_SUCRE,
-} from "@/constants/constants";
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { toast } from "sonner";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
@@ -66,7 +61,6 @@ const CafeEspaceForm = ({
       ? MAX_NB_PERSONNES_PAR_ESPACE
       : effectif);
 
-  const nbTassesParAn = nbPersonnes * 400;
   // const nbPersonnesTotal = cafe.espaces.reduce(
   //   (acc, curr) =>
   //     acc +

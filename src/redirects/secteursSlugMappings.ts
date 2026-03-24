@@ -16,7 +16,7 @@ export const secteursSlugMappingsFrToEn: Record<string, string> = {
 // Fonction pour obtenir le slug français à partir du slug anglais
 export const getSecteurSlugFr = (secteurSlugEn: string): string => {
   const entry = Object.entries(secteursSlugMappingsFrToEn).find(
-    ([_, value]) => value === secteurSlugEn,
+    ([, value]) => value === secteurSlugEn,
   );
   return entry ? entry[0] : secteurSlugEn;
 };

@@ -3,13 +3,13 @@
 import { env } from "@/lib/env";
 import { actionClient } from "@/lib/action/safe-actions";
 import {
-  makeTempKey,
   s3,
   S3_BUCKET,
 } from "@/server/s3/s3";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { flattenValidationErrors } from "next-safe-action";
+import path from "node:path";
 import { z } from "zod";
 
 const uploadExpiresIn = env.S3_PRESIGN_UPLOAD_EXPIRES_SECONDS;
@@ -29,12 +29,15 @@ export const getPresignedDevisUploadUrlAction = actionClient
     },
   )
   .action(async ({ parsedInput }) => {
-    const key = makeTempKey({
-      proprietaireEntrepriseId: "public",
-      categorie: "devis_temporaire",
-      contentType: "application/pdf",
-      originalName: parsedInput.originalName,
-    });
+    const safeBase = path
+      .parse(parsedInput.originalName)
+      .name.replace(/[^\w.\-]+/g, "_")
+      .slice(0, 80);
+    const uuid = crypto.randomUUID();
+    const now = new Date();
+    const yyyy = String(now.getUTCFullYear());
+    const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const key = `public/devis_temporaires/${yyyy}/${mm}/${uuid}_${safeBase}.pdf`;
 
     const cmd = new PutObjectCommand({
       Bucket: S3_BUCKET,
