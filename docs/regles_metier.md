@@ -419,7 +419,68 @@ Tous services ──→ FM4All         totalBase = Σ services × MARGE (base de
 
 ---
 
-## 15. Limites connues
+## 15. Émission du devis (`finaliserDevisAction`)
 
-- **Réconciliation des prix** : prévue à l'émission du devis (non encore implémentée). Les prix en localStorage peuvent diverger si le catalogue prestataire change entre deux sessions.
+### 15.1 Flux côté client (`MonDevisForm.tsx`)
+
+1. Vérification de cohérence des prix (voir §16)
+2. Génération du PDF via `fillDevis()` → `urlTemp` (blob URL)
+3. Affichage **immédiat** du PDF depuis le blob URL (sans attendre S3)
+4. Upload du PDF sur S3 via URL présignée
+5. Appel de `finaliserDevisAction` en arrière-plan avec `devisS3Key`, `pdfFilename`, `pdfSizeBytes`, `texte`
+
+### 15.2 Flux côté serveur (`finaliserDevisAction`)
+
+1. Mise à jour du prospect en DB
+2. Récupération du `devisTemporaire` le plus récent pour ce prospect (par `prospectId` + `createdAt DESC`)
+3. Téléchargement du PDF depuis S3 (Buffer pour la pièce jointe email)
+4. Dans une transaction :
+   - INSERT dans `documents` (`proprietaireEntrepriseId = FM4ALL_ENTREPRISE_ID`, `categorie = "devis_temporaire"`, `storageProvider = "s3"`)
+   - UPDATE `devisTemporaires.documentId` + `texte` (snapshot localStorage à la date d'émission)
+   - INSERT dans `documentsLinks` (`devisTemporaireId`)
+5. Envoi d'un email à `MAILGUN_CONTACT_EMAIL` avec le PDF en pièce jointe (+ BCC via `MAILGUN_BCC_EMAIL`)
+
+Les étapes 3–5 sont non bloquantes : en cas d'échec, le prospect est mis à jour et le PDF reste accessible sur S3.
+
+---
+
+## 16. Anti-falsification des prix à l'émission
+
+### 16.1 Principe
+
+`verifierCoherenceDevisAction` est appelée **avant** la génération du PDF. Elle relit les tarifs directement depuis la DB et les compare aux prix stockés dans le localStorage (stores Zustand). Si une divergence est détectée, les corrections sont appliquées dans les stores et le formulaire redemande une soumission.
+
+### 16.2 Services vérifiés
+
+| Service          | Clé de lookup                                                                                     | Champs vérifiés                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Nettoyage        | `entrepriseId + surface + gamme`                                                                  | `tauxHoraire`, `hParPassage`, + options repasse/vitrerie                  |
+| Maintenance      | `entrepriseId + surface + gamme`                                                                  | `tauxHoraire`, `hParPassage`                                              |
+| Hygiène          | `entrepriseId + effectif + dureeLocation`                                                         | Tous les prix trilogie, désinfectant, parfum, balai, poubelle, instal     |
+| Incendie         | `entrepriseId`                                                                                    | Tous les prix par élément                                                 |
+| Snacks & Fruits  | `entrepriseId + effectif`                                                                         | `prixKgFruits`, `prixUnitaireSnacks`, `prixUnitaireBoissons`, livraisons  |
+| Office Manager   | `entrepriseId + gamme`                                                                            | `demiTjm`, `demiTjmPremium`                                               |
+| Café (par espace)| `entrepriseId + roundNbPersonnesCafeMachines(nbPersonnes)` + `roundNbPersonnesCafeConso`          | `prixLoc`, `prixMaintenance`, `prixInstal`, toutes les consos             |
+| Thé              | `cafe.infos.entrepriseId + roundNbPersonnesCafeConso(nbPersonnes / 0.15)`                         | `prixUnitaire`                                                            |
+| Fontaines (espace)| `entrepriseId + roundNbPersonnesFontaine(nbPersonnes) + typeFontaine + dureeLocation`            | `prixLocation`, `prixMaintenance`, `prixInstallation`, consos             |
+| ServicesFm4All   | `gamme`                                                                                           | Tous les taux et minimums                                                 |
+
+### 16.3 Règles d'arrondi pour les lookups
+
+```
+roundNbPersonnesCafeConso(n)    → Math.floor(n / 5) × 5   (arrondi vers le bas par palier de 5)
+roundNbPersonnesCafeMachines(n) → Math.ceil(n / 5) × 5    (arrondi vers le haut par palier de 5)
+roundNbPersonnesFontaine(n)     → Math.ceil(n / 5) × 5    (arrondi vers le haut par palier de 5)
+```
+
+### 16.4 Corrections par espace (café / fontaines)
+
+Les corrections sont retournées sous forme de tableau `[{ espaceId, prix: Partial<...> }]` et appliquées espace par espace dans le store.
+
+---
+
+## 17. Limites et invariants
+
 - **MARGE invariante** : la constante `MARGE = 1.11111111` ne doit jamais être modifiée sans recalibrer tous les taux FM4All et les minFacturations qui sont calibrés sur cette base.
+- **Diviseurs DB** : prix standards `/ RATIO`, taux servicesFm4All `/ (RATIO × 100)`, minimums servicesFm4All `/ RATIO`.
+- **Logos prestataires** : stockés en S3, jamais en URL statique. Les composants `PresignedLogoImage` et `PresignedTarifImage` génèrent une URL présignée au montage via `getPresignedReadUrl()`.
