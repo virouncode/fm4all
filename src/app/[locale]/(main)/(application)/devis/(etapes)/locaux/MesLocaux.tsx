@@ -214,10 +214,14 @@ const MesLocaux = () => {
   };
 
   const handleClickReprendre = () => {
+    const maxCompletedStep = Math.max(...devisProgress.completedSteps);
+    const targetStep = maxCompletedStep + 1;
     const route =
-      devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
+      devisRoutes.find(({ id }) => id === targetStep) ??
+      devisRoutes.find(({ id }) => id === maxCompletedStep) ??
       devisRoutes[0];
 
+    setDevisProgress((prev) => ({ ...prev, currentStep: route.id }));
     router.push({
       pathname: `/devis${route.pathname}`,
       query: route.searchParams

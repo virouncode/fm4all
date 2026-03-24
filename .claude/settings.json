@@ -276,7 +276,11 @@
       "Bash(for file:*)",
       "Bash(do if:*)",
       "Bash(grep -n \"margeCoefficient\\\\|totalMensuelHt\\\\|totalInstallationHt\" /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/afficher/MonDevisForm.tsx)",
-      "Bash(xargs -I{} bash -c \"head -1 \"\"{}\"\" | grep -L \"\"use client\"\" && echo \"\"{} MISSING use client\"\"\")"
+      "Bash(xargs -I{} bash -c \"head -1 \"\"{}\"\" | grep -L \"\"use client\"\" && echo \"\"{} MISSING use client\"\"\")",
+      "Bash(ls /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/\\\\\\(etapes\\\\\\)/services/)",
+      "Bash(grep -n \"overflow\\\\|min-h\" /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/\\\\\\(etapes\\\\\\)/food-beverage/FoodBeverage.tsx)",
+      "WebFetch(domain:jpedroribeiro.com)",
+      "WebFetch(domain:github.com)"
     ],
     "additionalDirectories": [
       "/Users/virounkattygnarath/.claude/projects/-Users-virounkattygnarath-Desktop-fm4all/memory",
