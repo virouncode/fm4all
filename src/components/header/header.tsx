@@ -343,7 +343,7 @@ const Header = () => {
       icon: Network,
     },
     {
-      title: locale === "fr" ? "Devenir prestataire" : "Become a provider",
+      title: locale === "fr" ? "Devenir prestataire" : "Become a service provider",
       href: {
         pathname: "/prestataire",
       },

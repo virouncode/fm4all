@@ -116,7 +116,7 @@ const page = async ({
           </ul>
         </div>
         <div className="flex flex-col gap-6">
-          <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">{t("rapiditie")}</p>
+          <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">{t("rapidite")}</p>
           <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "votre-temps-est-precieux-et-nous-nous-engageons-a-agir-avec-efficacite",
