@@ -17,8 +17,8 @@ import { ConsentState, ConsentUpdateParams } from "../analytics/GoogleTags";
 const CONSENT_KEY = "cookie_consent";
 const CONSENT_DATE_KEY = "cookie_consent_date";
 
-// À ajuster selon ta politique (souvent 6 mois / 12 mois en prod)
-const CONSENT_EXPIRATION_MS = 1000 * 60 * 60 * 24; // 24h
+const CONSENT_ACCEPTED_EXPIRATION_MS = 1000 * 60 * 60 * 24 * 180; // 6 mois
+const CONSENT_REFUSED_EXPIRATION_MS = 1000 * 60 * 60 * 24 * 30; // 1 mois
 
 type StoredConsentType = boolean | null;
 type StoredConsentDateType = number | null;
@@ -55,7 +55,11 @@ export default function CookieBanner() {
       return;
     }
 
-    const expired = Date.now() - storedDate > CONSENT_EXPIRATION_MS;
+    const expirationMs =
+      storedConsent === true
+        ? CONSENT_ACCEPTED_EXPIRATION_MS
+        : CONSENT_REFUSED_EXPIRATION_MS;
+    const expired = Date.now() - storedDate > expirationMs;
 
     if (expired) {
       safeRemove(CONSENT_KEY);
@@ -85,6 +89,11 @@ export default function CookieBanner() {
 
     setLocalStorage(CONSENT_KEY, consent);
     setLocalStorage(CONSENT_DATE_KEY, Date.now());
+
+    // Notifier ConsentBasedGoogleTags dans le même onglet
+    window.dispatchEvent(
+      new CustomEvent("cookieConsentChanged", { detail: { consent } }),
+    );
   }, [consent]);
 
   const handleAccept = () => setConsent(true);

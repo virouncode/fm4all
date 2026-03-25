@@ -1,4 +1,4 @@
-import GoogleTags from "@/components/analytics/GoogleTags";
+import ConsentBasedGoogleTags from "@/components/analytics/ConsentBasedGoogleTags";
 import { Toaster } from "@/components/ui/sonner";
 import { ConfirmProvider } from "@/context/ConfirmContextProvider";
 import { LocaleType, routing } from "@/i18n/routing";
@@ -95,7 +95,7 @@ export default async function LocalizedLayout({
       </head>
       <body className={`scroll-smooth font-sans tracking-tight antialiased`}>
         <Suspense>
-          <GoogleTags
+          <ConsentBasedGoogleTags
             GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
           />
         </Suspense>
