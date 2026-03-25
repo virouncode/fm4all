@@ -13,7 +13,7 @@ const ConceptCard = ({ icon: Icon, title, description }: ConceptCardProps) => {
     <Card className="w-full p-4 lg:w-1/3">
       <CardHeader>
         <CardTitle className="flex flex-col items-center justify-center gap-4">
-          <Icon size={40} />
+          <Icon size={40} className="text-primary" />
           <p className="text-center text-2xl">{title}</p>
         </CardTitle>
       </CardHeader>

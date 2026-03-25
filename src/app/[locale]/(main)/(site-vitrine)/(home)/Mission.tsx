@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 const Mission = () => {
   const t = useTranslations("HomePage.mission");
   return (
-    <section id="mission">
+    <section id="mission" className="bg-muted">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pt-8 pb-20">
         <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("notre-mission")}

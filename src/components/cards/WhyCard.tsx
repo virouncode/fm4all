@@ -13,7 +13,7 @@ const WhyCard = ({ title, content, icon: Icon }: WhyCardProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <p>{title}</p>
-          <Icon size={20} />
+          <Icon size={20} className="text-primary" />
         </CardTitle>
       </CardHeader>
       <CardContent>
