@@ -57,7 +57,7 @@ const TltrCard = ({
               title={devisButtonTitle}
               text={devisButtonTitle}
               size="lg"
-              className="bg-destructive ring-destructive hover:bg-destructive/90 w-full border-none text-white shadow-lg md:w-auto"
+              className="bg-white hover:bg-white/90 text-primary w-full border-none shadow-lg md:w-auto"
             />
           </div>
         </div>

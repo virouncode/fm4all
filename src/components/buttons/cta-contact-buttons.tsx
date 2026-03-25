@@ -32,7 +32,7 @@ const CTAContactButtons = () => {
     <div className="flex w-full flex-col items-center justify-center gap-4">
       <Button
         size="lg"
-        className="ring-primary flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
+        className="flex w-full items-center justify-center text-base transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
         onClick={() =>
           gtag_report_conversion_contact(
             "2epzCPent5cbEP6OqaZB",
@@ -48,7 +48,7 @@ const CTAContactButtons = () => {
       </Button>
       <Button
         size="lg"
-        className="ring-primary flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
+        className="flex w-full items-center justify-center text-base transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
         onClick={() =>
           gtag_report_conversion_contact(
             "zv70CMzfu5cbEP6OqaZB",
@@ -62,7 +62,7 @@ const CTAContactButtons = () => {
 
       <Button
         size="lg"
-        className="ring-primary flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
+        className="flex w-full items-center justify-center text-base transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
         onClick={() =>
           gtag_report_conversion_contact(
             "6oRqCKTAu5cbEP6OqaZB",

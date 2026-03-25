@@ -22,7 +22,7 @@ const Slogan = () => {
           className="hidden object-contain object-center dark:block"
         />
       </div>
-      <h2 className="text-destructive text-center text-5xl font-bold tracking-tighter">
+      <h2 className="text-primary dark:text-white text-center text-5xl font-bold tracking-tighter">
         {t("le-facility-management-pour-tous")}
       </h2>
     </section>

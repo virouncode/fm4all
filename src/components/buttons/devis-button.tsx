@@ -26,7 +26,7 @@ const DevisButton = ({
       <Button
         size={size}
         title={title}
-        className={`ring-primary text-base shadow-md ring-2 ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
+        className={`text-base shadow-md transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
         data-testid="devis-button"
         onClick={() => {
           setIsMobileNavOpen?.(false);

@@ -65,7 +65,7 @@ const page = async ({
         <h1 className="text-4xl">{t("rejoignez-nous")}</h1>
         <Button
           size="lg"
-          className="ring-primary flex items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%]"
+          className="flex items-center justify-center text-base transition-all hover:scale-[101%]"
           asChild
         >
           <a

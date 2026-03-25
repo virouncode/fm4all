@@ -64,7 +64,7 @@ const Presentation = () => {
                 title={t("obtenez-votre-devis-en-quelques-clics")}
                 text={t("obtenez-votre-devis-en-quelques-clics")}
                 size="lg"
-                className="bg-destructive ring-destructive hover:bg-destructive/90 mx-auto mt-10 w-full self-start border-none text-white shadow-lg md:w-auto"
+                className="bg-white hover:bg-white/90 text-primary mx-auto mt-10 w-full self-start border-none shadow-lg md:w-auto"
               />
             </div>
           </div>
