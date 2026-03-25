@@ -35,6 +35,30 @@ const page = async ({
   const t = await getTranslations("CookiesPage");
 
   const cookiesRows = [
+    // Gestion du consentement
+    {
+      nom: "cookie_consent",
+      fournisseur: t("fm4all"),
+      finalite: t("memorise-le-choix-de-consentement-aux-cookies"),
+      duree: t("6-mois-si-accepte-1-mois-si-refuse"),
+      type: t("gestion-du-consentement"),
+    },
+    {
+      nom: "cookie_consent_date",
+      fournisseur: t("fm4all"),
+      finalite: t("memorise-la-date-du-choix-de-consentement"),
+      duree: t("6-mois-si-accepte-1-mois-si-refuse"),
+      type: t("gestion-du-consentement"),
+    },
+    // Personnalisation
+    {
+      nom: "NEXT_LOCALE",
+      fournisseur: t("librairie-next-intl"),
+      finalite: t("memorise-la-langue-preferee-de-lutilisateur"),
+      duree: t("indeterminee"),
+      type: t("personnalisation-de-lexperience-utilisateur"),
+    },
+    // Analytique (après consentement)
     {
       nom: "_ga",
       fournisseur: t("google-analytics"),
@@ -51,39 +75,34 @@ const page = async ({
       duree: t("2-ans"),
       type: t("suivi-analytique"),
     },
+    // Publicitaire (après consentement)
     {
-      nom: "__Secure-better-auth.session_data",
-      fournisseur: t("librairie-better-auth"),
+      nom: "_gcl_au",
+      fournisseur: t("google-ads"),
       finalite: t(
-        "gestion-securisee-de-la-session-utilisateur-apres-authentification",
+        "mesure-les-conversions-publicitaires-apres-clic-sur-une-publicite-google-ads",
       ),
-      duree: t("session"),
-      type: t("cookie-strictement-necessaire"),
+      duree: t("3-mois"),
+      type: t("suivi-publicitaire"),
     },
+    // YouTube – vidéo de présentation (youtube-nocookie.com), posés à la lecture
     {
-      nom: "__Secure-better-auth.session_token",
-      fournisseur: t("librairie-better-auth"),
-      finalite: t(
-        "assure-lidentification-securisee-de-lutilisateur-pendant-la-session",
-      ),
-      duree: t("session"),
-      type: t("cookie-strictement-necessaire"),
-    },
-    {
-      nom: "NEXT LOCALE",
-      fournisseur: t("librairie-next-intl"),
-      finalite: t("memorise-la-langue-preferee-de-lutilisateur"),
-      duree: t("indeterminee"),
-      type: t("personnalisation-de-lexperience-utilisateur"),
-    },
-    {
-      nom: "ADS_VISITOR_ID",
+      nom: "VISITOR_INFO1_LIVE",
       fournisseur: t("youtube-google"),
       finalite: t(
-        "identifie-un-utilisateur-unique-pour-le-suivi-des-publicites-et-du-remarketing",
+        "identifie-le-navigateur-pour-les-preferences-video-youtube",
       ),
-      duree: t("13-mois"),
-      type: t("suivi-publicitaire-et-analytique"),
+      duree: t("6-mois"),
+      type: t("fonctionnalite-video"),
+    },
+    {
+      nom: "YSC",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "enregistre-les-vues-de-video-youtube-incorporee-pour-eviter-les-comptages-frauduleux",
+      ),
+      duree: t("session"),
+      type: t("fonctionnalite-video"),
     },
     {
       nom: "AEC",
