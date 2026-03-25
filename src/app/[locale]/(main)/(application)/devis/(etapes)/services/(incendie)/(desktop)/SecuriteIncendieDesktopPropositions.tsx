@@ -1,7 +1,7 @@
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites.schema";
 import { useTranslations } from "next-intl";
-import SecuriteIncendiePrestataireLogo from "../SecuriteIncendiePrestataireLogo";
 import SecuriteIncendieInputs from "../SecuriteIncendieInputs";
+import SecuriteIncendiePrestataireLogo from "../SecuriteIncendiePrestataireLogo";
 import SecuriteIncendiePropostionCard from "../SecuriteIncendiePropostionCard";
 
 type SecuriteIncendieDesktopPropositionsProps = {
@@ -72,7 +72,7 @@ const SecuriteIncendieDesktopPropositions = ({
       {propositions.length > 0 &&
         propositions.map((proposition) => (
           <div className="flex flex-1 border-b" key={proposition.id}>
-            <div className="flex w-1/4 flex-col items-center justify-between gap-10 p-4">
+            <div className="flex h-full w-1/4 flex-col items-center justify-between gap-4 p-4">
               <SecuriteIncendiePrestataireLogo {...proposition} />
               <SecuriteIncendieInputs
                 nbExtincteurs={nbExtincteurs}

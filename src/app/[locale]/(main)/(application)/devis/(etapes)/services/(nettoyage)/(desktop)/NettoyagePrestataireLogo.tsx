@@ -51,9 +51,8 @@ const NettoyagePrestataireLogo = ({
             nomPrestataire
           )}
           <SquareArrowOutUpRight
-            className="absolute top-2 right-2 cursor-pointer hover:opacity-70"
+            className="absolute top-2 right-2 cursor-pointer text-foreground hover:opacity-70"
             size={16}
-            color="#000000"
           />
         </div>
       </DialogTrigger>

@@ -39,7 +39,7 @@ const FontaineEspacePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex min-h-36 flex-1 items-center justify-center gap-4 border-r bg-slate-100 p-4 text-center text-base`}
+        className={`flex min-h-36 flex-1 items-center justify-center gap-4 border-r bg-muted p-4 text-center text-base`}
       >
         {t("non-propose-pour-ces-criteres")}
       </div>
@@ -205,7 +205,7 @@ const FontaineEspacePropositionCard = ({
         : "/img/services/fontaine_comptoir.webp";
 
   const imgProduit = (
-    <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
+    <div className="relative mx-auto h-64 w-full rounded-lg border border-border bg-muted">
       <PresignedTarifImage
         storageKey={proposition.imageStorageKey}
         fallbackSrc={fontaineFallback}
@@ -215,7 +215,7 @@ const FontaineEspacePropositionCard = ({
   );
   return (
     <div
-      className={`flex flex-1 cursor-pointer items-center justify-center gap-4 border-r bg-slate-100 p-4 text-2xl ${
+      className={`flex flex-1 cursor-pointer items-center justify-center gap-4 border-r bg-muted p-4 text-2xl ${
         fontaines.infos.entrepriseId === proposition.entrepriseId &&
         espace.infos.poseSelected === proposition.typePose
           ? "ring-destructive ring-4 ring-inset"

@@ -24,7 +24,7 @@ const PropositionsTitle = ({
 }: PropositionsTitleProps) => {
   return (
     <div className="flex flex-col items-center justify-between gap-4 lg:flex-row lg:gap-0">
-      <div className="border-primary text-primary flex w-full items-center justify-center gap-4 rounded-xl border-2 p-4 lg:w-auto lg:justify-start">
+      <div className="border-primary text-primary dark:border-foreground dark:text-foreground flex w-full items-center justify-center gap-4 rounded-xl border-2 p-4 lg:w-auto lg:justify-start">
         <div className="flex items-center gap-1">
           <Icon />
           {Icon2 && <Icon2 />}

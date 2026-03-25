@@ -26,7 +26,7 @@ const PresignedLogoImage = ({
 
   useEffect(() => {
     if (!storageKey || isDirectUrl(storageKey)) return;
-    getPresignedDevisImageReadUrlAction({ key: storageKey }).then((result) => {
+    getPresignedDevisImageReadUrlAction({ key: storageKey, expiresIn: 3600 }).then((result) => {
       if (result?.data?.url) {
         setImageUrl(result.data.url);
       }

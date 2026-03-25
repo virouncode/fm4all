@@ -202,7 +202,7 @@ const DevisBreadcrumb = () => {
         </Breadcrumb>
       </div>
       {/* MOBILE BREADCRUMB */}
-      <div className="sticky top-[65px] z-20 -mt-4 flex items-center justify-between border-b border-slate-200 bg-white py-4 lg:hidden">
+      <div className="sticky top-16 z-20 -mt-4 flex items-center justify-between border-b border-border bg-background py-4 lg:hidden">
         <div>
           {previousRoute ? (
             <Link

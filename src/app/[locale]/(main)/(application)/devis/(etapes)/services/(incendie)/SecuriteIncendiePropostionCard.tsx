@@ -69,7 +69,7 @@ const SecuriteIncendiePropostionCard = ({
 
   if (!totalAnnuelTrilogie)
     return (
-      <div className="flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-slate-100 p-4 text-xl">
+      <div className="flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-muted p-4 text-xl">
         {t("non-propose")}
       </div>
     );
@@ -151,7 +151,7 @@ const SecuriteIncendiePropostionCard = ({
 
   return (
     <div
-      className={`flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-slate-100 p-4 text-xl ${
+      className={`flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-muted p-4 text-xl ${
         incendie.infos.entrepriseId === proposition.entrepriseId
           ? "ring-destructive ring-4 ring-inset"
           : ""

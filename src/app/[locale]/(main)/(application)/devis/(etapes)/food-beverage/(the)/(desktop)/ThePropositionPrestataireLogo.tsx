@@ -49,9 +49,8 @@ const ThePropositionPrestataireLogo = ({
             nomPrestataire
           )}
           <SquareArrowOutUpRight
-            className="absolute top-0 right-0 hover:opacity-70"
+            className="absolute top-0 right-0 text-foreground hover:opacity-70"
             size={16}
-            color="#000000"
           />
         </div>
       </DialogTrigger>

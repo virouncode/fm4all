@@ -53,12 +53,12 @@ const PropositionsTitleMobile = ({
   return (
     <>
       <div
-        className="sticky top-[7.6rem] z-[15] cursor-pointer bg-white py-2"
+        className="sticky top-[7.6rem] z-[15] cursor-pointer bg-background py-2"
         onClick={handleClickTitle}
         ref={containerRef}
       >
         <div
-          className="border-primary text-primary flex w-full items-center justify-between rounded-xl border-2 p-4 font-bold"
+          className="border-primary text-primary dark:border-foreground dark:text-foreground flex w-full items-center justify-between rounded-xl border-2 p-4 font-bold"
           ref={titleRef}
         >
           <div className="flex flex-1 items-center gap-4">
@@ -71,8 +71,7 @@ const PropositionsTitleMobile = ({
           </div>
           <Triangle
             size={14}
-            className="-rotate-180 transition"
-            fill="#164f64"
+            className="-rotate-180 transition fill-primary dark:fill-foreground"
             ref={triangleRef}
           />
         </div>

@@ -51,9 +51,8 @@ const MaintenancePrestataireLogo = ({
             nomPrestataire
           )}
           <SquareArrowOutUpRight
-            className="absolute top-2 right-2 hover:opacity-70"
+            className="absolute top-2 right-2 text-foreground hover:opacity-70"
             size={16}
-            color="#000000"
           />
         </div>
       </DialogTrigger>

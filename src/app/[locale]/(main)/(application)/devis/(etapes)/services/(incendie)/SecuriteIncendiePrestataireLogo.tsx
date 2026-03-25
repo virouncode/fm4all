@@ -1,4 +1,5 @@
 import PrestataireDialog from "@/app/[locale]/(main)/(application)/devis/PrestataireDialog";
+import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +7,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import PresignedLogoImage from "@/components/devis/PresignedLogoImage";
 import { SquareArrowOutUpRight } from "lucide-react";
 
 type SecuriteIncendiePrestataireLogoProps = {
@@ -35,7 +35,7 @@ const SecuriteIncendiePrestataireLogo = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="relative flex h-1/4 w-full cursor-pointer items-center justify-center p-2">
+        <div className="relative mb-4 flex h-14 w-full cursor-pointer items-center justify-center p-2">
           {logoStorageKey ? (
             <div className="relative h-full w-full">
               <PresignedLogoImage
@@ -49,9 +49,8 @@ const SecuriteIncendiePrestataireLogo = ({
             nomPrestataire
           )}
           <SquareArrowOutUpRight
-            className="absolute top-0 right-0 hover:opacity-70"
+            className="absolute top-0 right-0 text-foreground hover:opacity-70"
             size={16}
-            color="#000000"
           />
         </div>
       </DialogTrigger>

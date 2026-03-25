@@ -59,6 +59,7 @@ export const getPresignedDevisImageReadUrlAction = actionClient
   .inputSchema(
     z.object({
       key: z.string().min(1, "La clé S3 est requise"),
+      expiresIn: z.number().int().positive().max(86400).optional(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
@@ -66,7 +67,7 @@ export const getPresignedDevisImageReadUrlAction = actionClient
     },
   )
   .action(async ({ parsedInput }) => {
-    const { key } = parsedInput;
+    const { key, expiresIn } = parsedInput;
     if (
       key.includes("..") ||
       key.includes("\\") ||
@@ -82,6 +83,8 @@ export const getPresignedDevisImageReadUrlAction = actionClient
       Key: key,
     });
 
-    const url = await getSignedUrl(s3, cmd, { expiresIn: readExpiresIn });
+    const url = await getSignedUrl(s3, cmd, {
+      expiresIn: expiresIn ?? readExpiresIn,
+    });
     return { url };
   });
