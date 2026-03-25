@@ -1,6 +1,12 @@
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { z } from "zod";
 
+function parsePhone(val: string) {
+  return val.startsWith("+")
+    ? parsePhoneNumberFromString(val)
+    : parsePhoneNumberFromString(val, "FR");
+}
+
 //======================= PHONE NUMBER SCHEMAS =======================//
 export const phoneNumberSchemaEmpty = (message: string) =>
   z
@@ -9,15 +15,12 @@ export const phoneNumberSchemaEmpty = (message: string) =>
     .refine(
       (val) => {
         if (val === "") return true;
-        const phone = parsePhoneNumberFromString(val, "FR");
-        return phone?.isValid() ?? false;
+        return parsePhone(val)?.isValid() ?? false;
       },
-      {
-        message,
-      },
+      { message },
     )
     .transform((val) =>
-      val === "" ? "" : parsePhoneNumberFromString(val, "FR")!.format("E.164"),
+      val === "" ? "" : parsePhone(val)!.format("E.164"),
     );
 
 export const phoneNumberSchema = (message: string) =>
@@ -25,12 +28,7 @@ export const phoneNumberSchema = (message: string) =>
     .string()
     .trim()
     .refine(
-      (val) => {
-        const phone = parsePhoneNumberFromString(val, "FR");
-        return phone?.isValid() ?? false;
-      },
-      {
-        message,
-      },
+      (val) => parsePhone(val)?.isValid() ?? false,
+      { message },
     )
-    .transform((val) => parsePhoneNumberFromString(val, "FR")!.format("E.164"));
+    .transform((val) => parsePhone(val)!.format("E.164"));
