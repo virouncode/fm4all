@@ -78,17 +78,6 @@ export default async function LocalizedLayout({
           href="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com"
           crossOrigin=""
         />
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-          crossOrigin=""
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin=""
-        />
-
         {/* DNS prefetch pour les analytics */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
