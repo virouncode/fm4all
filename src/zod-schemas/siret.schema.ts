@@ -1,4 +1,4 @@
-import { formatSIRET, isValidSIRET } from "@/lib/utils/isValidSIRET";
+import { isValidSIRET } from "@/lib/utils/isValidSIRET";
 import { z } from "zod";
 
 export const siretSchemaEmpty = (message: string) =>
@@ -8,8 +8,7 @@ export const siretSchemaEmpty = (message: string) =>
     .refine((val) => val === "" || isValidSIRET(val), { message })
     .transform((val) => {
       if (val === "") return ""; // important !
-      const digitsOnly = val.replace(/\s/g, "");
-      return formatSIRET(digitsOnly);
+      return val.replace(/\s/g, "");
     });
 
 export const siretSchema = (message: string) =>
@@ -17,7 +16,4 @@ export const siretSchema = (message: string) =>
     .string()
     .trim()
     .refine((val) => isValidSIRET(val), { message })
-    .transform((val) => {
-      const digitsOnly = val.replace(/\s/g, "");
-      return formatSIRET(digitsOnly);
-    });
+    .transform((val) => val.replace(/\s/g, ""));

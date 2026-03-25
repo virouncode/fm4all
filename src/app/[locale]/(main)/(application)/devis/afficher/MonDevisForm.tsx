@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSIRET } from "@/lib/utils/isValidSIRET";
 import { finaliserDevisAction } from "@/server/actions/devisComparateurActions";
 import { verifierCoherenceDevisAction } from "@/server/actions/verifierCoherenceDevisAction";
 import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
@@ -103,7 +104,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
 
   const defaultValues: UpdateProspectFormType = {
     nomEntreprise: prospect.nomEntreprise ?? "",
-    siret: prospect.siret ?? "",
+    siret: prospect.siret ? formatSIRET(prospect.siret) : "",
     prenomContact: prospect.prenomContact ?? "",
     nomContact: prospect.nomContact ?? "",
     posteContact: prospect.posteContact ?? "",
