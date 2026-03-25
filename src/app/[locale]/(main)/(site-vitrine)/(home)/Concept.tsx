@@ -44,7 +44,7 @@ const Concept = () => {
   ];
   return (
     <section id="presentation">
-      <div className="bg-gradient-to-r from-[#f0c674]/100 to-[#f0c674]/70">
+      <div className="bg-primary/20 dark:bg-primary/30">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-8">
           <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
             {t("notre-concept")}
