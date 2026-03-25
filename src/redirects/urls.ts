@@ -53,6 +53,12 @@ export const legacyRedirects: Record<string, string> = {
     "/en/services/office-fruit-basket-delivery",
   "/fr/articles/histoire-externalisation-fm":
     "/fr/articles/pilotage-facility-management/histoire-de-l-externalisation-du-facility-management",
+  "/fr/articles/facility-management/externalisation-du-fm":
+    "/fr/articles/pilotage-facility-management/histoire-de-l-externalisation-du-facility-management",
+  "/fr/articles/pilotage-facility-management/facilities-management-outsourcing":
+    "/fr/articles/pilotage-facility-management",
+  "/en/terms-and-conditions-of-use": "/en/terms-of-use",
+  "/services/accueil": "/fr/services",
 };
 export const goneUrls: string[] = [
   "https://e99e300d.fm4all.com/",
