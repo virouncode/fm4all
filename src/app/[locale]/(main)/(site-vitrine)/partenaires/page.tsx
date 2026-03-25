@@ -68,13 +68,19 @@ const page = async ({
       <div className="mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-4xl">{t("nos-prestataires-partenaires")}</h1>
         <Button
-          title={locale === "fr" ? "Devenir prestataire" : "Become a service provider"}
-          className="items-center justify-center min-[600px]:flex"
+          title={
+            locale === "fr"
+              ? "Devenir prestataire"
+              : "Become a service provider"
+          }
+          className="items-center justify-center text-base min-[600px]:flex"
           size="lg"
           asChild
         >
           <Link href="/prestataire">
-            {locale === "fr" ? "Devenir prestataire" : "Become a service provider"}
+            {locale === "fr"
+              ? "Devenir prestataire"
+              : "Become a service provider"}
           </Link>
         </Button>
       </div>

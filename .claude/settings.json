@@ -280,7 +280,8 @@
       "Bash(ls /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/\\\\\\(etapes\\\\\\)/services/)",
       "Bash(grep -n \"overflow\\\\|min-h\" /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis/\\\\\\(etapes\\\\\\)/food-beverage/FoodBeverage.tsx)",
       "WebFetch(domain:jpedroribeiro.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(gh api:*)"
     ],
     "additionalDirectories": [
       "/Users/virounkattygnarath/.claude/projects/-Users-virounkattygnarath-Desktop-fm4all/memory",
