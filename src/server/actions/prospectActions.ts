@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { prospects } from "@/db/schema";
 import { actionClient } from "@/lib/action/safe-actions";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { insertProspectSchema } from "@/zod-schemas/prospect.schema";
 import { and, eq } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
@@ -17,20 +18,23 @@ export const insertProspectAction = actionClient
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(async ({ parsedInput }) => {
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["emailSignataire", "siret"] as const,
+    });
     //Existing prospect
     const [existingProspect] = await db
       .select({ id: prospects.id })
       .from(prospects)
       .where(
         and(
-          eq(prospects.emailContact, parsedInput.emailContact),
-          eq(prospects.nomContact, parsedInput.nomContact),
+          eq(prospects.emailContact, normalized.emailContact),
+          eq(prospects.nomContact, normalized.nomContact),
         ),
       );
     if (existingProspect) {
       const [updatedProspect] = await db
         .update(prospects)
-        .set(parsedInput)
+        .set(normalized)
         .where(eq(prospects.id, existingProspect.id))
         .returning();
       if (!updatedProspect) {
@@ -44,7 +48,7 @@ export const insertProspectAction = actionClient
     }
     const [insertedProspect] = await db
       .insert(prospects)
-      .values(parsedInput)
+      .values(normalized)
       .returning();
     if (!insertedProspect) {
       throw new Error("Erreur lors de la création du prospect");

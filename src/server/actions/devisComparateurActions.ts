@@ -7,6 +7,7 @@ import { devisTemporaires, documents, documentsLinks, prospects } from "@/db/sch
 import { actionClient } from "@/lib/action/safe-actions";
 import { env } from "@/lib/env";
 import { sendEmailDirect } from "@/server/email/mailgunDirect";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   s3,
   S3_BUCKET,
@@ -39,6 +40,9 @@ export const saveProgressAction = actionClient
   .action(async ({ parsedInput }) => {
     const locale = await getLocale();
     const { prospect, texte } = parsedInput;
+    const normalizedProspect = normalizeForSubmit(prospect, {
+      optionalStrings: ["emailSignataire", "siret"] as const,
+    });
 
     const result = await db.transaction(async (tx) => {
       // 1) Upsert prospect
@@ -47,8 +51,8 @@ export const saveProgressAction = actionClient
         .from(prospects)
         .where(
           and(
-            eq(prospects.emailContact, prospect.emailContact),
-            eq(prospects.nomContact, prospect.nomContact),
+            eq(prospects.emailContact, normalizedProspect.emailContact),
+            eq(prospects.nomContact, normalizedProspect.nomContact),
           ),
         );
 
@@ -57,7 +61,7 @@ export const saveProgressAction = actionClient
       if (existingProspect) {
         const [updated] = await tx
           .update(prospects)
-          .set(prospect)
+          .set(normalizedProspect)
           .where(eq(prospects.id, existingProspect.id))
           .returning();
 
@@ -69,7 +73,7 @@ export const saveProgressAction = actionClient
       } else {
         const [inserted] = await tx
           .insert(prospects)
-          .values(prospect)
+          .values(normalizedProspect)
           .returning();
 
         if (!inserted) {
@@ -171,7 +175,10 @@ export const finaliserDevisAction = actionClient
     }
 
     // 1) Update prospect
-    const { id: prospectId, ...prospectData } = prospect;
+    const { id: prospectId, ...prospectDataRaw } = prospect;
+    const prospectData = normalizeForSubmit(prospectDataRaw, {
+      optionalStrings: ["emailSignataire", "siret"] as const,
+    });
     const [updatedProspect] = await db
       .update(prospects)
       .set(prospectData)
