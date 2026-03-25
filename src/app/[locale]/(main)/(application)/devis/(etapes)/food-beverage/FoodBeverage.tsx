@@ -98,7 +98,7 @@ const FoodBeverage = async () => {
   }
 
   return (
-    <section className="flex-1 lg:overflow-hidden">
+    <section className="relative flex-1 lg:overflow-hidden">
       <Cafe
         cafeMachines={cafeMachines}
         cafeMachinesTarifs={cafeMachinesTarifs}

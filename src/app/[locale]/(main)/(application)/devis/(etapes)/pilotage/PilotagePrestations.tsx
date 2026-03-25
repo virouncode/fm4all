@@ -44,7 +44,7 @@ const PilotagePrestations = async ({
     !servicesFm4AllOffres.length
   ) {
     return (
-      <section className="flex h-dvh items-center justify-center text-lg">
+      <section className="relative flex h-dvh items-center justify-center text-lg">
         <p>
           {t("nous-n-avons-pas-trouve-de-tarifs-pour-ces-informations")}{" "}
           <Link href="/devis/locaux" className="underline">

@@ -43,6 +43,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { TIMEZONE } from "@/constants/time";
 import { DateTime } from "luxon";
 import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
@@ -94,6 +95,12 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const router = useRouter();
   useScrollIntoMonDevis();
 
+  const today = DateTime.now().setZone(TIMEZONE);
+  const minDateDemarrage =
+    today.plus({ weeks: 1 }).startOf("week").toISODate() ?? "";
+  const maxDateDemarrage = today.plus({ years: 2 }).toISODate() ?? "";
+  const defaultDateDemarrage = minDateDemarrage;
+
   const defaultValues: UpdateProspectFormType = {
     nomEntreprise: prospect.nomEntreprise ?? "",
     siret: prospect.siret ?? "",
@@ -110,7 +117,10 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     adresseLigne2: prospect.adresseLigne2 ?? "",
     codePostal: prospect.codePostal ?? "",
     ville: prospect.ville ?? "",
-    dateDeDemarrage: prospect.dateDeDemarrage ?? "",
+    dateDeDemarrage:
+      prospect.dateDeDemarrage && prospect.dateDeDemarrage >= minDateDemarrage
+        ? prospect.dateDeDemarrage
+        : defaultDateDemarrage,
     commentaires: prospect.commentaires ?? "",
   };
 
@@ -506,6 +516,8 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   onChange={handleChangeDate}
                   requiredMark
                   className="w-full"
+                  min={minDateDemarrage}
+                  max={maxDateDemarrage}
                 />
               </div>
               <div className="flex w-full flex-col lg:w-1/4">

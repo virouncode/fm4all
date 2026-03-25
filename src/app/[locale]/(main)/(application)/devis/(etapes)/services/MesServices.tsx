@@ -125,7 +125,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
   }
 
   return (
-    <section className="flex-1 lg:overflow-hidden">
+    <section className="relative flex-1 lg:overflow-hidden">
       <MesServicesPresentation />
       <Nettoyage
         nettoyageQuantites={nettoyageQuantites}

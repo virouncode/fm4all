@@ -1,14 +1,13 @@
 "use client";
-import { saveProgressAction } from "@/server/actions/devisComparateurActions";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
+import { saveProgressAction } from "@/server/actions/devisComparateurActions";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import {
   toStoreProspect,
@@ -25,6 +24,7 @@ import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
 import { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 
 const SauvegarderProgression = () => {
@@ -114,9 +114,11 @@ const SauvegarderProgression = () => {
 
   const submitForm = async (data: InsertProspectFormType) => {
     if (!accepte) {
-      toast.error(tSauver(
-        "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer",
-      ));
+      toast.error(
+        tSauver(
+          "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer",
+        ),
+      );
       return;
     }
     const prospectPayload: InsertProspectType = normalizeForSubmit(data, {
@@ -135,7 +137,7 @@ const SauvegarderProgression = () => {
   };
 
   return (
-    <section className="flex-1 overflow-scroll">
+    <section className="relative flex-1 overflow-scroll">
       <div className="mx-auto flex h-full w-full flex-col gap-4 py-2">
         <p className="mx-auto w-full md:w-2/3">
           {tSauver(

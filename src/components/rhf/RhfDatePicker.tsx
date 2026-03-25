@@ -234,6 +234,8 @@ export function RhfDatePicker<S extends FieldValues>(
                     selected={selectedDate}
                     defaultMonth={defaultMonth}
                     captionLayout="dropdown"
+                    startMonth={fromDate}
+                    endMonth={toDate}
                     timeZone={zone}
                     locale={fr}
                     disabled={hiddenMatchers}

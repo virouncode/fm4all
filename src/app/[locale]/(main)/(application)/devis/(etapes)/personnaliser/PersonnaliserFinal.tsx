@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "@/i18n/navigation";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
 import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
 import PreviousServiceButton from "../../PreviousServiceButton";
@@ -17,8 +19,10 @@ const PersonnaliserFinal = () => {
     })),
   );
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAfficherDevis = () => {
+    setIsLoading(true);
     setDevisProgress({
       currentStep: 7,
       completedSteps: [1, 2, 3, 4, 5, 6],
@@ -71,8 +75,10 @@ const PersonnaliserFinal = () => {
           onClick={handleAfficherDevis}
           size="lg"
           className="text-base"
+          disabled={isLoading}
           data-testid="valider-personnalisation"
         >
+          {isLoading && <Spinner />}
           {tPersonnaliser("valider")}
         </Button>
       </div>
