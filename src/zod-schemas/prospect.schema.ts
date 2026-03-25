@@ -135,7 +135,7 @@ export const createUpdateProspectFormSchema = (
     nomEntreprise: z
       .string()
       .min(1, messages.nomEntreprise)
-      .transform((v) => capitalizeWords(v)),
+      .transform((v) => upper(v)),
     prenomContact: z
       .string()
       .min(1, messages.prenomContact)
@@ -269,8 +269,8 @@ export type ProspectsQueryFiltersType = z.infer<
   typeof prospectsQueryFiltersSchema
 >;
 
-export const prospectsQueryFrontendSchema = prospectsQueryFiltersSchema.merge(
-  createSortSchema(SORTABLE_PROSPECTS_COLUMNS, "createdAt"), // orderBy, orderDir
+export const prospectsQueryFrontendSchema = prospectsQueryFiltersSchema.extend(
+  createSortSchema(SORTABLE_PROSPECTS_COLUMNS, "createdAt").shape, // orderBy, orderDir
 );
 
 export type ProspectsQueryFrontendType = z.infer<
