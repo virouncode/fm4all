@@ -50,7 +50,6 @@ const VideoPresentation = () => {
                 media="(min-width: 640px)"
                 srcSet={thumbnailDesktopUrl}
               />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={thumbnailMobileUrl}
                 alt={
