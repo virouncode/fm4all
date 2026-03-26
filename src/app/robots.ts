@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const disallowUrls = ["/fr/mon-devis/*", "/en/my-quote/*", "/_next/*"];
+const disallowUrls = ["/fr/mon-devis/*", "/en/my-quote/*"];
 
 export default function robots(): MetadataRoute.Robots {
   return {
