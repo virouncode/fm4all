@@ -46,8 +46,8 @@ const useIntersection = <TElement extends HTMLElement | null>({
 
         try {
           await onLoadMore();
-        } catch (error) {
-          console.error("Error loading more data:", error);
+        } catch {
+          // Erreur silencieuse — le callback onLoadMore gère ses propres erreurs
         }
       }, options);
 

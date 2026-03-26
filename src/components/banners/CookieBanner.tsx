@@ -149,6 +149,7 @@ export default function CookieBanner() {
                 href="/cookies"
                 className="cursor-pointer underline hover:opacity-80"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 {t("politique-relative-aux-cookies")}
               </Link>

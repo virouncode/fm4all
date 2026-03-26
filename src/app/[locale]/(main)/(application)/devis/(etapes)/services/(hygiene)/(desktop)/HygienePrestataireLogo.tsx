@@ -62,7 +62,6 @@ const HygienePrestataireLogo = ({
           sloganPrestataire={sloganPrestataire}
           logoStorageKey={logoStorageKey}
           nomPrestataire={nomPrestataire}
-          locationUrl={null}
           anneeCreation={anneeCreation}
           ca={ca}
           effectifPrestataire={effectifPrestataire}

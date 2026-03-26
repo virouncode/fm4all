@@ -21,7 +21,6 @@ export const routing = defineRouting({
       fr: "/services/[slug]/villes",
       en: "/services/[slug]/cities",
     },
-
     "/services/[slug]/[subSlug]": {
       fr: "/services/[slug]/[subSlug]",
       en: "/services/[slug]/[subSlug]",
@@ -110,7 +109,6 @@ export const routing = defineRouting({
       fr: "/mon-devis/afficher-mon-devis",
       en: "/my-quote/view-my-quote",
     },
-
     "/blog": {
       fr: "/articles",
       en: "/posts",

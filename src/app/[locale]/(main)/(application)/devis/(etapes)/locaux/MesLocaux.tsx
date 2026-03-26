@@ -146,8 +146,7 @@ const MesLocaux = () => {
         ...prev,
         ...payload,
       }));
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.warning(t("ville-non-verifiee"), {
         description: t(
           "nous-navons-pas-pu-verifier-la-ville-mais-vous-pouvez-continuer-votre-devis",

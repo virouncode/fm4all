@@ -308,7 +308,6 @@ const OfficeManagerMobilePropositionCard = ({
                   logoStorageKey={"/img/logo_full.webp"}
                   darkLogoUrl={"/img/logo_full_dark_mode.webp"}
                   nomPrestataire={"fm4all"}
-                  locationUrl={null}
                   anneeCreation={2025}
                   ca={null}
                   effectifPrestataire={null}

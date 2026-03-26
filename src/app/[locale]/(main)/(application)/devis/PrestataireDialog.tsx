@@ -8,7 +8,6 @@ type PrestataireDialogProps = {
   darkLogoUrl?: string | null;
   sloganPrestataire: string | null;
   presentation?: string | null;
-  locationUrl: string | null;
   nomPrestataire: string | null;
   anneeCreation: number | null;
   ca: string | null;
@@ -32,36 +31,6 @@ const PrestataireDialog = ({
   nbAvis,
 }: PrestataireDialogProps) => {
   const t = useTranslations("DevisPage");
-  // const [score, setScore] = useState(0);
-  // const [nbOfReviews, setNbOfReviews] = useState(0);
-  // const [loading, setLoading] = useState(false);
-
-  // useEffect(() => {
-  //   const fetchReviews = async () => {
-  //     try {
-  //       if (!locationUrl) return;
-  //       setLoading(true);
-  //       const response = await fetch("/api/google-reviews", {
-  //         method: "POST",
-  //         body: JSON.stringify({
-  //           locationUrl,
-  //         }),
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-  //       const data = (await response.json()).data;
-  //       if (data) {
-  //         setScore(data[0].totalScore);
-  //         setNbOfReviews(data.length);
-  //       }
-  //       setLoading(false);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-  //   fetchReviews();
-  // }, [locationUrl]);
   return (
     <div className="flex flex-col gap-2 text-sm">
       <p className="italic">{sloganPrestataire}</p>

@@ -563,11 +563,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 {t(
                   "en-cochant-cette-case-je-reconnais-avoir-lu-compris-et-accepte-sans-reserve-les",
                 )}{" "}
-                <Link href="/cgu" className="underline" target="_blank">
+                <Link href="/cgu" className="underline" target="_blank" rel="noopener noreferrer">
                   {t("conditions-generales-dutilisation-cgu")}
                 </Link>{" "}
                 {t("et-les")}{" "}
-                <Link href="/cgv" className="underline" target="_blank">
+                <Link href="/cgv" className="underline" target="_blank" rel="noopener noreferrer">
                   {t("conditions-generales-de-vente")}
                 </Link>{" "}
                 {t("de-fm4all-applicables-a-tout-contrat-ulterieur")}

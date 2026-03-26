@@ -173,7 +173,6 @@ const NettoyageMobileOptionsDimancheCard = ({
                       sloganPrestataire={dimancheProposition.slogan}
                       logoStorageKey={dimancheProposition.logoStorageKey}
                       nomPrestataire={dimancheProposition.nomPrestataire}
-                      locationUrl={null}
                       anneeCreation={dimancheProposition.anneeCreation}
                       ca={dimancheProposition.ca}
                       effectifPrestataire={dimancheProposition.effectifPrestataire}

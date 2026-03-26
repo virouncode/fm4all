@@ -197,7 +197,6 @@ const NettoyageMobileOptionsRepasseCard = ({
                       sloganPrestataire={repasseProposition.slogan}
                       logoStorageKey={repasseProposition.logoStorageKey}
                       nomPrestataire={repasseProposition.nomPrestataire}
-                      locationUrl={null}
                       anneeCreation={repasseProposition.anneeCreation}
                       ca={repasseProposition.ca}
                       effectifPrestataire={repasseProposition.effectifPrestataire}

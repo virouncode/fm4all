@@ -242,6 +242,7 @@ const SauvegarderProgression = () => {
                   href="/confidentialite"
                   className="underline"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   {tSauver("politique-de-confidentialite")}
                 </Link>

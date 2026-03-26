@@ -264,7 +264,6 @@ const NettoyageMobileOptionsVitrerieCard = ({
                       sloganPrestataire={vitrerieProposition.slogan}
                       logoStorageKey={vitrerieProposition.logoStorageKey}
                       nomPrestataire={vitrerieProposition.nomPrestataire}
-                      locationUrl={null}
                       anneeCreation={vitrerieProposition.anneeCreation}
                       ca={vitrerieProposition.ca}
                       effectifPrestataire={vitrerieProposition.effectifPrestataire}

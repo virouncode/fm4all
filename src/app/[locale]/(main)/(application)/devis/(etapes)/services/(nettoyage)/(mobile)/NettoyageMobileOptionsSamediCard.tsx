@@ -172,7 +172,6 @@ const NettoyageMobileOptionsSamediCard = ({
                       sloganPrestataire={samediProposition.slogan}
                       logoStorageKey={samediProposition.logoStorageKey}
                       nomPrestataire={samediProposition.nomPrestataire}
-                      locationUrl={null}
                       anneeCreation={samediProposition.anneeCreation}
                       ca={samediProposition.ca}
                       effectifPrestataire={samediProposition.effectifPrestataire}

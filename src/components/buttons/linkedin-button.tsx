@@ -19,7 +19,7 @@ const LinkedinButton = ({
       title={t("notre-profil-linkedin")}
       aria-label={t("notre-profil-linkedin")}
       target="_blank"
-      rel="noopener"
+      rel="noopener noreferrer"
     >
       <Button
         title={t("notre-profil-linkedin")}

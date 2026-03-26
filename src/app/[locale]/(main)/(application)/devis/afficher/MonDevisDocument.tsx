@@ -4,7 +4,6 @@ import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { DateTime } from "luxon";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 
 type MonDevisDocumentProps = {
   devisUrl: string;
@@ -52,9 +51,14 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
           </a>
           <p>
             {t("si-le-document-ne-saffiche-pas-correctement")}{" "}
-            <Link href={devisUrl} target="_blank" className="underline">
+            <a
+              href={devisUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
               {t("cliquez-ici")}
-            </Link>
+            </a>
           </p>
         </div>
         <div className="mt-6 mb-6 flex w-full justify-center">

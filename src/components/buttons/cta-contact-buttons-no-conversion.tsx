@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, Video } from "lucide-react";
 import { useLocale } from "next-intl";
-import Link from "next/link";
 
 type CTAContactButtonsNoConversionProps = {
   withVisio?: boolean;
@@ -28,7 +27,7 @@ const CTAContactButtonsNoConversion = ({
           className="flex w-full items-center justify-center text-base transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
           asChild
         >
-          <Link
+          <a
             href="https://calendly.com/romuald-fm4all/rdv-fm4all"
             target="_blank"
             rel="noopener noreferrer"
@@ -43,7 +42,7 @@ const CTAContactButtonsNoConversion = ({
             {locale === "fr"
               ? "Je prends un rendez-vous en visio"
               : "Schedule a video call"}
-          </Link>
+          </a>
         </Button>
       )}
       {withPhone && (
@@ -52,14 +51,14 @@ const CTAContactButtonsNoConversion = ({
           className="flex w-full items-center justify-center text-base transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
           asChild
         >
-          <Link
+          <a
             href="tel:+33669311046"
             className="flex items-center justify-center gap-2"
             title={locale === "fr" ? "Appeler par téléphone" : "Call by phone"}
           >
             <Phone />
             +33 6 69 31 10 46
-          </Link>
+          </a>
         </Button>
       )}
 
@@ -68,14 +67,14 @@ const CTAContactButtonsNoConversion = ({
         className="flex w-full items-center justify-center text-base transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
         asChild
       >
-        <Link
+        <a
           href={`mailto:${email}`}
           className="flex items-center justify-center gap-2"
           title={locale === "fr" ? "Contacter par email" : "Contact by email"}
         >
           <Mail />
           {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}
-        </Link>
+        </a>
       </Button>
     </div>
   );
