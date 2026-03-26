@@ -19,7 +19,8 @@ const VideoPresentation = () => {
   const video = locale === "fr" ? VIDEO_FR : VIDEO_EN;
 
   const iframeSrc = `https://www.youtube-nocookie.com/embed/${video.id}?si=${video.si}&autoplay=1&modestbranding=1&rel=0&origin=https://www.fm4all.com`;
-  const thumbnailUrl = `https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`;
+  const thumbnailMobileUrl = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+  const thumbnailDesktopUrl = `https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`;
 
   return (
     <section className="flex items-center justify-center py-12">
@@ -44,16 +45,22 @@ const VideoPresentation = () => {
                 : "Play presentation video"
             }
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={thumbnailUrl}
-              alt={
-                locale === "fr"
-                  ? "Miniature vidéo de présentation fm4all"
-                  : "fm4all presentation video thumbnail"
-              }
-              className="h-full w-full object-cover"
-            />
+            <picture>
+              <source
+                media="(min-width: 640px)"
+                srcSet={thumbnailDesktopUrl}
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={thumbnailMobileUrl}
+                alt={
+                  locale === "fr"
+                    ? "Miniature vidéo de présentation fm4all"
+                    : "fm4all presentation video thumbnail"
+                }
+                className="h-full w-full object-cover"
+              />
+            </picture>
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/30">
               <div className="rounded-full bg-red-600 p-4 transition-transform group-hover:scale-110">
                 <Play fill="white" className="ml-1 h-8 w-8 text-white" />
