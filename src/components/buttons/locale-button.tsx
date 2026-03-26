@@ -125,7 +125,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
-          className={`flex h-9 w-16 cursor-pointer items-center justify-center gap-1 rounded-md border text-sm hover:opacity-75 ${className}`}
+          className={`flex h-9 w-16 items-center justify-center gap-1 rounded-md border text-sm hover:opacity-75 ${className}`}
           aria-label={locale === "fr" ? "Changer de langue" : "Change language"}
           variant="outline"
           title={locale === "fr" ? "Changer de langue" : "Change language"}
