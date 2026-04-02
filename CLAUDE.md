@@ -2487,7 +2487,7 @@ if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
 - ✅ Formulaire "Remplir depuis un prospect" (ProspectPickerDialog)
 - ✅ Page de détail avec édition inline (infos, contact, rôles, logo)
 - ✅ Upload logo via avatar cliquable + promotion S3 (temp → documents/)
-- ✅ Guards serveur sur retrait de rôles/services (vérifie clientServices et clientServiceExecutions avant toute suppression)
+- ✅ Guards serveur sur retrait de rôles/services (vérifie clientServices avant toute suppression)
 - ✅ Fix React Hook Form v7 : remplacer `form.watch()` par `useWatch` hook (évite "Maximum update depth exceeded")
 
 **Pattern : URLs présignées S3 dans les listes/grids** :
@@ -2597,7 +2597,7 @@ Ne PAS essayer `const table = condition ? tableA : tableB` — le typage Drizzle
 - ✅ `app/sites-clients` — nouvelle page plateforme : tous les clients + droits complets super_admin
 - ✅ `SitesTree` — nouvelle prop `canManageOverride?: boolean` pour contourner les check de rôle
 - ✅ `sitesActions.ts` — helper `canManageSiteAsProxy()` dans insert/update/archive
-- ✅ `clientServiceExecutions.query.ts` — `ClientAvecDetails` enrichi avec `adminEmail`
+- ✅ `entreprises.query.ts` — `ClientAvecDetails` enrichi avec `adminEmail`
 - ✅ Sidebar plateforme — "Sites clients" ajouté dans section "Réseau"
 - ✅ `routing.ts` — route `/app/sites-clients` enregistrée
 - ✅ Suppression de `restoreSiteAction` (code mort)
@@ -2685,7 +2685,7 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 - ✅ **Bug `inviterClientAdminAction`** : réécriture — flow invitation (token → `entrepriseInvitations` → email → `/auth/inscription-admin?token=`) au lieu de création directe de compte
 - ✅ **Bug `canManageChecklists`** : `statut: "actif"` manquant sur les deux checks d'adhésion
 - ✅ **`app/layout.tsx`** : deux TODO placeholder remplacés par de vrais redirects (`/auth/login`, `/auth/unauthorized`)
-- ✅ **Centralisation `hasAccessToEntreprise`** : exportée depuis `userAdhesions.query.ts`, copies locales supprimées dans `clientServiceExecutionsActions.ts` et `tacheListesTemplatesActions.ts`
+- ✅ **Centralisation `hasAccessToEntreprise`** : exportée depuis `userAdhesions.query.ts`, copies locales supprimées dans les fichiers d'actions
 - ✅ **`getEffectivePlateformeRole()`** créée dans `src/server/utils/permissions.utils.ts` — rend le bypass plateforme posture-aware (lit le cookie `fm4all:postureActive`)
 - ✅ **11 fichiers d'actions** migrés : `getUserPlateformeAdhesion` → `getEffectivePlateformeRole`
 
@@ -2696,7 +2696,6 @@ uniqueIndex("user_prestataire_adhesions_user_udx").on(table.userId),
 **Fichiers modifiés** :
 
 - `src/server/queries/userAdhesions.query.ts`
-- `src/server/actions/clientServiceExecutionsActions.ts`
 - `src/server/actions/tacheListesTemplatesActions.ts`
 - `src/app/[locale]/.../app/layout.tsx`
 - `src/app/[locale]/.../app/mes-clients/MesClientsClient.tsx`
@@ -2922,7 +2921,7 @@ const hasActiveExecution = executions.some(
 
 **Queries/types corrigés pour propager emoji** :
 
-- `ExecutionChecklistItem` (type) + query dans `clientServiceExecutions.query.ts` — `emoji` ajouté au SELECT et au push
+- `ChecklistItem` (type) + query dans `clientServiceOccurrences.query.ts` — `emoji` ajouté au SELECT et au push
 - `getOccurrenceTachesAction` — fallback template : `emoji` ajouté au SELECT + map
 - `getTacheItemsByTemplateAction` — `emoji` ajouté au SELECT + map
 - `OccurrenceDetailDialog.tsx` — type local `TacheItemType` + `mapTaches()` mis à jour

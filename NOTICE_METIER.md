@@ -338,11 +338,11 @@ Une **prestation** représente la mise en place opérationnelle d'un service FM 
 - Le **type de service** (nettoyage, maintenance, café, etc.)
 - Le **site** concerné
 - La **fréquence** des interventions
-- Le ou les **prestataires** qui réalisent le service, avec leurs tarifs
+- Le **prestataire** qui réalise le service, avec ses tarifs
 
 Une prestation encadre toute la vie opérationnelle d'un service : de la planification des passages à la réalisation des tâches sur le terrain.
 
-> **Éléments immuables** une fois la prestation créée : l'entreprise cliente, le site, le type de service. Le mode commercial (voir ci-dessous) devient immuable dès qu'une exécution est ajoutée.
+> **Éléments immuables** une fois la prestation créée : l'entreprise cliente, le site, le type de service. Le mode commercial (voir ci-dessous) devient immuable dès que la prestation est activée.
 
 ### 5.2 Mode commercial
 
@@ -353,7 +353,7 @@ Le mode commercial définit le **circuit contractuel et de facturation**.
 | **Direct** | Le client gère sa relation directement avec son prestataire. FM4ALL est un outil de suivi opérationnel. | Client → Prestataire |
 | **Intermédiaire FM4ALL** | FM4ALL porte le contrat, facture le client, reverse aux prestataires après avoir appliqué sa marge. | Client → FM4ALL → Prestataire(s) |
 
-> ⚠️ **Règle critique** : Le mode commercial **ne peut plus être modifié** dès lors qu'au moins une exécution (prestataire + tarifs) a été enregistrée sur la prestation. Ce choix est définitif.
+> ⚠️ **Règle critique** : Le mode commercial **ne peut plus être modifié** une fois la prestation activée (hors brouillon). Ce choix est définitif.
 
 > Le mode **Intermédiaire FM4ALL** ne peut être géré que par les équipes FM4ALL.
 
@@ -386,26 +386,24 @@ Pour les fréquences récurrentes, il est possible de préciser :
 | Statut | Signification | Génération des passages |
 |--------|--------------|------------------------|
 | **Brouillon** | Prestation configurée mais pas encore opérationnelle | Aucun passage généré |
-| **Actif** | Prestation en cours d'exécution | Passages générés automatiquement (si mode planifié) |
+| **Actif** | Prestation opérationnelle | Passages générés automatiquement (si mode planifié) |
 | **En pause** | Prestation temporairement suspendue | Aucun nouveau passage généré pendant la pause |
 | **Terminé** | Prestation définitivement clôturée | Archivée, aucune modification possible |
 
-### 5.6 Les exécutions (prestataires et tarifs)
+### 5.6 Prestataire et tarifs
 
-Une **exécution** représente le lien entre une prestation et un prestataire, accompagné des **conditions tarifaires** applicables.
+Chaque prestation est liée à **un seul prestataire** (champ `prestataireEntrepriseId` sur `clientServices`). Les conditions tarifaires sont portées par la table `clientServiceTarifs` (historique avec `dateApplication`).
 
-Une même prestation peut avoir **plusieurs exécutions** (plusieurs prestataires se succèdent ou coexistent), mais une seule peut être **active** à un instant donné.
+#### Lignes tarifaires
 
-#### Lignes tarifaires d'une exécution
-
-Chaque exécution peut avoir jusqu'à **4 lignes tarifaires**, en combinant librement les types suivants :
+Chaque prestation peut avoir jusqu'à **4 lignes tarifaires**, en combinant librement les types suivants :
 
 | Type de tarif | Description | Contrainte |
 |---------------|-------------|------------|
-| **Abonnement** | Montant fixe facturé à chaque période (semaine / mois / an). Indépendant du nombre de passages réalisés. | **Maximum 1** par exécution |
+| **Abonnement** | Montant fixe facturé à chaque période (semaine / mois / an). Indépendant du nombre de passages réalisés. | **Maximum 1** par prestation |
 | **Par intervention** | Montant facturé à chaque passage réalisé. Si un abonnement avec quota d'interventions incluses existe, ce tarif s'applique uniquement au-delà du quota. | Illimité |
 | **Frais par intervention** | Frais fixes additionnels à chaque passage (ex : frais de déplacement, frais de livraison). | Illimité |
-| **Installation** | Frais de mise en place facturés une seule fois, lors du premier passage. Ne se répète pas. | **Maximum 1** par exécution |
+| **Installation** | Frais de mise en place facturés une seule fois, lors du premier passage. Ne se répète pas. | **Maximum 1** par prestation |
 
 **Périodes de facturation pour l'abonnement** : Semaine / Mois / Année
 
@@ -422,7 +420,7 @@ On renseigne uniquement le **montant HT** appliqué au client.
 
 #### Ajout d'un nouveau prestataire
 
-Si le prestataire n'est pas encore référencé dans le système, il peut être créé directement depuis le formulaire d'ajout d'exécution :
+Si le prestataire n'est pas encore référencé dans le système, il peut être créé directement depuis le formulaire d'ajout de prestataire :
 
 1. Saisir le **numéro SIRET** (14 chiffres)
 2. Le système **vérifie automatiquement** la validité du SIRET (algorithme de Luhn)
@@ -499,11 +497,9 @@ La durée entre le démarrage et la clôture d'une tâche est **enregistrée aut
 
 ### 5.9 Assignation des intervenants
 
-L'assignation définit **qui réalise les passages**. Elle fonctionne en cascade sur trois niveaux :
+L'assignation définit **qui réalise les passages**. Elle fonctionne en cascade sur deux niveaux :
 
 ```
-Exécution (défaut global)
-    ↓ hérite sauf si écrasé
 Passage (défaut pour ce passage)
     ↓ hérite sauf si écrasé
 Tâche (assignation spécifique à une tâche)
@@ -511,11 +507,8 @@ Tâche (assignation spécifique à une tâche)
 
 | Niveau | Description |
 |--------|-------------|
-| **Exécution** | Intervenants par défaut pour tous les futurs passages de cette exécution |
-| **Passage** | Intervenants spécifiques à ce passage précis (remplace l'assignation de l'exécution pour ce passage) |
+| **Passage** | Intervenants assignés à ce passage précis |
 | **Tâche** | Intervenant spécifique pour cette tâche précise (remplace l'assignation du passage) |
-
-> ⚠️ **Règle de non-rétroactivité** : modifier les intervenants assignés à une exécution **ne modifie pas** les passages déjà créés ou déjà assignés individuellement. Seuls les futurs passages non encore assignés sont impactés.
 
 ### 5.10 Modèles de checklists (templates)
 
@@ -554,7 +547,7 @@ Les tâches affichées lors de chaque passage sont issues d'un **modèle de chec
 |--------|:-:|:-:|
 | Créer une prestation | ✅ | ✅ |
 | Modifier fréquence, planning | ✅ | ✅ |
-| Ajouter un prestataire / exécution | ✅ | ✅ |
+| Assigner un prestataire / tarifs | ✅ | ✅ |
 | Activer / Mettre en pause | ✅ | ✅ |
 | Clore définitivement | ✅ | ✅ |
 | Gérer en mode Intermédiaire FM4ALL | ❌ | ✅ uniquement |
@@ -581,7 +574,7 @@ Une **entreprise** est l'entité centrale du modèle : elle regroupe des utilisa
 
 **Garde-fous sur le retrait de rôle** :
 - Le rôle **Client** ne peut pas être retiré si l'entreprise possède des **prestations actives** (`clientServices`)
-- Le rôle **Prestataire** (ou un service associé) ne peut pas être retiré si l'entreprise est **référencée comme exécutante** dans des prestations (`clientServiceExecutions`)
+- Le rôle **Prestataire** (ou un service associé) ne peut pas être retiré si l'entreprise est **référencée comme prestataire** dans des prestations actives (`clientServices.prestataireEntrepriseId`)
 
 ### 6.3 Informations d'une entreprise
 
@@ -732,7 +725,7 @@ Les utilisateurs en posture **Prestataire** (admin ou manager) disposent d'une p
 
 #### Sélection du client
 
-Un sélecteur en haut de page permet de choisir le client parmi les entreprises liées au prestataire (via une relation explicite ou une exécution de prestation active). Le choix est persisté dans l'URL (`?clientId=xxx`).
+Un sélecteur en haut de page permet de choisir le client parmi les entreprises liées au prestataire (via une relation explicite `clientPrestataireRelations` ou une prestation active). Le choix est persisté dans l'URL (`?clientId=xxx`).
 
 #### Règle de gestion déléguée (proxy)
 

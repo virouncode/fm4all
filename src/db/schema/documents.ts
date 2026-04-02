@@ -88,7 +88,6 @@ export const documentsLinks = pgTable(
     // Tables gérées par l'outil FM (suite)
     occurrenceId: uuid("occurrence_id"),
     clientServiceId: uuid("client_service_id"),
-    clientServiceExecutionId: uuid("client_service_execution_id"),
     occurrenceTacheId: uuid("occurrence_tache_id"),
 
     visibilite: documentVisibiliteEnum("visibilite")
