@@ -7,7 +7,7 @@ import { batiments } from "@/constants/batiments";
 import { occupation } from "@/constants/occupation";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
-import { sendEmailFromClient } from "@/lib/email/sendEmail";
+import { sendCityOutEmailAction } from "@/server/actions/cityOutActions";
 import { useProspectStore } from "@/stores/devis/prospectStore";
 import { CityOutType, createCityOutSchema } from "@/zod-schemas/cityout.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,27 +67,27 @@ const CityOut = ({
   const submitForm = async (data: CityOutType) => {
     setLoading(true);
     try {
-      await sendEmailFromClient({
-        to: "contact@fm4all.com",
-        from: "contact@fm4all.com",
-        subject: "Nouveau prospect : région en cours de développement",
-        text: `<p>Un nouveau prospect a laissé ses coordonnées sur la page de chiffrage automatique. La matrice de chiffrage est en cours de développement pour sa région.</p><br/>
-          <p>Voici ses coordonnées :</p><br/>
-          <p>Entreprise : ${data.nomEntreprise}</p>
-          <p>Code postal : ${codePostal ?? ""}</p>
-          <p>Ville : ${ville ?? ""}</p>
-          <p>Surface des locaux : ${surface ?? ""}</p>
-          <p>Effectif : ${effectif ?? ""}</p>
-          <p>Type de bâtiment : ${typeBatiment ? batiments.find(({ id }) => id === typeBatiment)?.description : ""}</p>
-          <p>Type d'occupation : ${typeOccupation ? occupation.find(({ id }) => id === typeOccupation)?.description : ""}</p>
-          <p>Nom du contact : ${data.nomContact}</p>
-          <p>Prénom du contact : ${data.prenomContact}</p>
-          <p>Poste du contact : ${data.posteContact}</p>
-          <p>Email du contact : ${data.emailContact}</p>
-          <p>N°Tél du contact : ${data.phoneContact}</p>
-          `,
-        useTemplate: true,
+      const result = await sendCityOutEmailAction({
+        ...data,
+        codePostal: codePostal ?? "",
+        ville: ville ?? "",
+        surface: surface ?? "",
+        effectif: effectif ?? "",
+        typeBatimentLabel: typeBatiment
+          ? batiments.find(({ id }) => id === typeBatiment)?.description ?? ""
+          : "",
+        typeOccupationLabel: typeOccupation
+          ? occupation.find(({ id }) => id === typeOccupation)?.description ?? ""
+          : "",
       });
+      if (result?.serverError) {
+        toast.error(t("erreur"), {
+          description: t(
+            "impossible-denvoyer-vos-coordonnees-a-notre-equipe-veuillez-reessayer",
+          ),
+        });
+        return;
+      }
       toast.success(t("succes"), {
         description: t(
           "vos-coordonnees-ont-bien-ete-envoyees-a-notre-equipe-nous-vous-contacterons-dans-les-plus-brefs-delais",
