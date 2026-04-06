@@ -160,7 +160,10 @@ type SingleSlugRouteKey =
   | "servicePresentation"
   | "secteurPresentation";
 type DoubleSlugRouteKey = "blogArticle" | "serviceVille";
-type NoSlugRouteKey = Exclude<RouteKey, SingleSlugRouteKey | DoubleSlugRouteKey>;
+type NoSlugRouteKey = Exclude<
+  RouteKey,
+  SingleSlugRouteKey | DoubleSlugRouteKey
+>;
 
 type SingleSlugParams = { fr: string; en: string };
 type DoubleSlugParams = {
@@ -168,14 +171,14 @@ type DoubleSlugParams = {
   en: { slug: string; subSlug: string };
 };
 
-export function generateAlternates(
+export function generatePageMetadata(
   routeKey: NoSlugRouteKey,
   locale: LocaleType,
   title: string,
   description: string,
   imageUrl?: string,
 ): Metadata;
-export function generateAlternates(
+export function generatePageMetadata(
   routeKey: SingleSlugRouteKey,
   locale: LocaleType,
   title: string,
@@ -183,7 +186,7 @@ export function generateAlternates(
   imageUrl: string | undefined,
   slugs: SingleSlugParams,
 ): Metadata;
-export function generateAlternates(
+export function generatePageMetadata(
   routeKey: DoubleSlugRouteKey,
   locale: LocaleType,
   title: string,
@@ -191,7 +194,7 @@ export function generateAlternates(
   imageUrl: string | undefined,
   slugs: DoubleSlugParams,
 ): Metadata;
-export function generateAlternates(
+export function generatePageMetadata(
   routeKey: RouteKey,
   locale: LocaleType,
   title: string,
@@ -281,6 +284,9 @@ export function generateAlternates(
           alt: title,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
     },
   };
 }

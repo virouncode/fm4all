@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { capitalize } from "@/lib/utils/capitalize";
 import {
   getServicesSlugEn,
@@ -104,7 +104,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { slug, subSlug, locale } = await params;
   const service = await getServiceVille(slug, subSlug, locale as LocaleType);
-  return generateAlternates(
+  return generatePageMetadata(
     "serviceVille",
     locale,
     service?.baliseTitle ?? "",

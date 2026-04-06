@@ -11,7 +11,7 @@ import Slogan from "@/app/[locale]/(main)/(site-vitrine)/(home)/Slogan";
 import VideoPresentation from "@/app/[locale]/(main)/(site-vitrine)/(home)/VideoPresentation";
 import Why from "@/app/[locale]/(main)/(site-vitrine)/(home)/Why";
 import { LocaleType } from "@/i18n/routing";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
@@ -38,7 +38,7 @@ export const generateMetadata = async ({
       ? "fm4all gère vos services généraux à Paris et en IDF : propreté, maintenance, etc. Obtenez dès maintenant un devis gratuit pour vos locaux."
       : "Facility Management services in Paris: fm4all provides cleaning, maintenance, fire safety, and more. Get your free quote online and simplify operations.";
 
-  return generateAlternates("home", locale, title, description);
+  return generatePageMetadata("home", locale, title, description);
 };
 
 export default async function page({

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import {
   getSecteurSlugEn,
   getSecteurSlugFr,
@@ -98,7 +98,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { slug, locale } = await params;
   const secteur = await getSecteur(slug);
-  return generateAlternates(
+  return generatePageMetadata(
     "secteurPresentation",
     locale,
     secteur?.baliseTitle ?? "",

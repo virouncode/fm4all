@@ -256,7 +256,7 @@ src/
 │
 ├── lib/
 │   └── metadata/
-│       └── metadata-helpers.ts             # generateAlternates(), getLocaleFromPathname()
+│       └── metadata-helpers.ts             # generatePageMetadata(), getLocaleFromPathname()
 │
 └── components/
     ├── blocs/                              # Composants PortableText (Bloc, TltrCard)
@@ -272,7 +272,7 @@ src/
 | Page dynamique Sanity (service) | `/services/[slug]/page.tsx`                       |
 | Page dynamique Sanity (article) | `/blog/[slug]/[subSlug]/page.tsx`                 |
 | Page liste avec données Sanity  | `/services/page.tsx`                              |
-| Metadata + hreflang             | `generateAlternates()` dans `metadata-helpers.ts` |
+| Metadata + hreflang             | `generatePageMetadata()` dans `metadata-helpers.ts` |
 | Redirections SEO slug           | `redirects/handleRedirects.ts`                    |
 
 ### Modules de référence — Devis (si back-office extrait)
@@ -1903,7 +1903,7 @@ export const generateStaticParams = async () => {
 
 **Règle** : Toute page `[slug]/page.tsx` qui lit Sanity DOIT avoir `generateStaticParams`. Sans ça, la page est rendue à la demande (lent) et n'est pas préchargée au build.
 
-### 3. Metadata SEO — Utiliser generateAlternates()
+### 3. Metadata SEO — Utiliser generatePageMetadata()
 
 ```typescript
 export const generateMetadata = async ({
@@ -1914,7 +1914,7 @@ export const generateMetadata = async ({
   const { slug, locale } = await params;
   const service = await getService(slug);
 
-  return generateAlternates(
+  return generatePageMetadata(
     "servicePresentation", // Clé dans routing.ts pathnames
     locale,
     service?.baliseTitle ?? "",
@@ -3049,7 +3049,7 @@ Pour toute question ou clarification, référez-vous d'abord aux implémentation
 - `/blog/[slug]/[subSlug]/page.tsx` — Article Sanity avec hreflang bilingue
 - `/services/page.tsx` — Page liste avec données Sanity + liens service×ville
 - `src/sanity/queries.ts` — Toutes les GROQ queries (source de vérité Sanity)
-- `src/lib/metadata/metadata-helpers.ts` — generateAlternates(), helpers SEO
+- `src/lib/metadata/metadata-helpers.ts` — generatePageMetadata(), helpers SEO
 - `src/redirects/` — Gestion des redirections SEO et slugs FR↔EN
 - `src/middleware.ts` — Flux complet des redirections + next-intl
 - Ce document CLAUDE.md — Patterns et bonnes pratiques

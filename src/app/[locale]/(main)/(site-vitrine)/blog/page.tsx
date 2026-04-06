@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { getAllCategories } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
@@ -23,7 +23,7 @@ export const generateMetadata = async ({
   params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return generateAlternates(
+  return generatePageMetadata(
     "blog",
     locale,
     locale === "fr" ? "Articles" : "Posts",

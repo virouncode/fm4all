@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -20,7 +20,7 @@ export const generateMetadata = async ({
   params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return generateAlternates(
+  return generatePageMetadata(
     "servicesDevis",
     locale,
     locale === "fr" ? "Mes services" : "My services",

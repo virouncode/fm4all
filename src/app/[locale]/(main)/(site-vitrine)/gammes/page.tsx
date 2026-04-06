@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
@@ -21,7 +21,7 @@ export const generateMetadata = async ({
   params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return generateAlternates(
+  return generatePageMetadata(
     "gammes",
     locale,
     locale === "fr"

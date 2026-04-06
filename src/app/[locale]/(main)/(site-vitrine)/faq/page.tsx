@@ -1,6 +1,6 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import { LocaleType } from "@/i18n/routing";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -11,7 +11,7 @@ export const generateMetadata = async ({
   params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return generateAlternates(
+  return generatePageMetadata(
     "faq",
     locale,
     locale === "fr"

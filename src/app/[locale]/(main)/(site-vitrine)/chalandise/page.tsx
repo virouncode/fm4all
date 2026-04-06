@@ -1,4 +1,4 @@
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
@@ -11,7 +11,7 @@ export const generateMetadata = async ({
   params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return generateAlternates(
+  return generatePageMetadata(
     "chalandise",
     locale,
     locale === "fr" ? "Zone non couverte" : "Area not covered",

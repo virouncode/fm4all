@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import {
   getArticlesSlugEn,
   getArticlesSlugFr,
@@ -33,7 +33,7 @@ export const generateMetadata = async ({
   const { slug, locale } = await params;
   const categorie = await getCategorie(slug);
 
-  return generateAlternates(
+  return generatePageMetadata(
     "blogCategorie",
     locale,
     categorie?.baliseTitle ?? "",
