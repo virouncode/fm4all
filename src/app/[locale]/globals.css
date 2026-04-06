@@ -146,7 +146,6 @@
     --fm4all-essential: hsl(171 27% 51%);
     --fm4all-comfort: hsl(200 75% 25%);
     --fm4all-excellence: hsl(238 38% 16%);
-
   }
 
   .dark {
@@ -185,7 +184,6 @@
     --fm4all-essential: hsl(171 27% 51%);
     --fm4all-comfort: hsl(200 75% 25%);
     --fm4all-excellence: hsl(238 38% 16%);
-
   }
 
   body > div:last-child > span + img {
@@ -212,10 +210,6 @@
   }
 }
 
-@theme {
-  --font-sans: system-ui, var(--font-geist), sans-serif;
-}
-
 @utility list-check {
   @apply relative list-none items-start pl-6 before:absolute before:left-0 before:content-['✓'];
 }
@@ -231,4 +225,3 @@
 @utility list-smile {
   @apply relative list-none items-start pl-6 before:absolute before:left-0 before:content-['😊'];
 }
-

@@ -49,12 +49,11 @@ const generateStaticUrls = () => {
   for (const locale of routing.locales) {
     // Parcourir toutes les routes définies dans routing.pathnames
     for (const [path, localized] of Object.entries(routing.pathnames)) {
-      // Ignorer les routes dynamiques avec paramètres et les routes protégées
+      // Ignorer les routes dynamiques avec paramètres et les routes non pertinentes pour le SEO
       if (
         (path.includes("[") && path.includes("]")) ||
         path.includes("/devis") ||
-        path.includes("/chalandise") ||
-        path.includes("/tag")
+        path.includes("/chalandise")
       )
         continue;
 
