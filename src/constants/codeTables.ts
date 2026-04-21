@@ -117,6 +117,7 @@ export const documentCategorieCT = [
     name: "Pièce jointe (message ticket)",
   },
   { code: "tache_piece_jointe", name: "Pièce jointe (tâche)" },
+  { code: "intervention_piece_jointe", name: "Pièce jointe (intervention)" },
 
   // Catalogue machines
   { code: "machine_a_cafe", name: "Photo machine à café (catalogue)" },
