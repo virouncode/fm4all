@@ -2,6 +2,7 @@ import {
   AnyPgColumn,
   boolean,
   index,
+  jsonb,
   pgTable,
   text,
   uuid,
@@ -26,6 +27,10 @@ export const user = pgTable(
     avatarId: uuid("avatar_id").references((): AnyPgColumn => documents.id, {
       onDelete: "set null",
     }),
+    onboardingCompleted: jsonb("onboarding_completed")
+      .$type<Record<string, boolean>>()
+      .default({})
+      .notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdById: uuid("created_by_id").references((): AnyPgColumn => user.id, {
