@@ -19,7 +19,7 @@ export const sendCityOutEmailAction = actionClient
   .metadata({ actionName: "sendCityOutEmailAction" })
   .inputSchema(sendCityOutEmailSchema)
   .action(async ({ parsedInput }) => {
-    const contactEmail = env.BREVO_CONTACT_EMAIL;
+    const contactEmail = env.CONTACT_EMAIL;
 
     if (contactEmail) {
       await sendEmailDirect({

@@ -1386,7 +1386,7 @@ const base = {
 
 - `BREVO_API_KEY` - Clé API Brevo (requis)
 - `BREVO_TEMPLATE_GENERAL_ID` - ID du template transactionnel "general" (optionnel, requis si `useTemplate: true`)
-- `BREVO_CONTACT_EMAIL` - Destinataire interne FM4ALL pour les notifications ops (optionnel)
+- `CONTACT_EMAIL` - Destinataire interne FM4ALL pour les notifications ops (optionnel)
 - `BREVO_BCC_EMAIL` - Email BCC optionnel pour debug/copie
 
 **Fichier**: `src/server/email/brevoDirect.ts` — utilise le SDK `@getbrevo/brevo`.

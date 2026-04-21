@@ -37,7 +37,7 @@ export const env = {
   // Optionnels serveur
   BREVO_TEMPLATE_GENERAL_ID: optional("BREVO_TEMPLATE_GENERAL_ID"),
   BREVO_BCC_EMAIL: optional("BREVO_BCC_EMAIL"),
-  BREVO_CONTACT_EMAIL: optional("BREVO_CONTACT_EMAIL"),
+  CONTACT_EMAIL: optional("CONTACT_EMAIL"),
   S3_PRESIGN_READ_EXPIRES_SECONDS: Number(
     optionalWithDefault("S3_PRESIGN_READ_EXPIRES_SECONDS", "60"),
   ),

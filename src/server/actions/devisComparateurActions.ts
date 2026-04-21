@@ -106,7 +106,7 @@ export const saveProgressAction = actionClient
     const { prospect: upsertedProspect, devisTemporaire: insertedDevisTemp } =
       result;
 
-    const contactEmail = env.BREVO_CONTACT_EMAIL;
+    const contactEmail = env.CONTACT_EMAIL;
 
     if (contactEmail) {
       try {
@@ -256,7 +256,7 @@ export const finaliserDevisAction = actionClient
     }
 
     // 5) Email admin avec le PDF en pièce jointe
-    const contactEmail = env.BREVO_CONTACT_EMAIL;
+    const contactEmail = env.CONTACT_EMAIL;
 
     if (contactEmail) {
       try {
