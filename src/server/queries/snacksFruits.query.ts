@@ -6,6 +6,7 @@ import {
   boissonsTarifs,
   documents,
   entrepriseInfos,
+  entrepriseRoles,
   entreprises,
   foodLivraisonTarifs,
   fruitsQuantites,
@@ -21,7 +22,7 @@ import { selectFruitsQuantitesSchema } from "@/zod-schemas/fruitsQuantites.schem
 import { selectFruitsTarifsSchema } from "@/zod-schemas/fruitsTarifs.schema";
 import { selectSnacksQuantitesSchema } from "@/zod-schemas/snacksQuantites.schema";
 import { selectSnacksTarifsSchema } from "@/zod-schemas/snacksTarifs.schema";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
@@ -59,6 +60,14 @@ export const getFruitsTarifs = async () => {
       })
       .from(fruitsTarifs)
       .innerJoin(entreprises, eq(entreprises.id, fruitsTarifs.entrepriseId))
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -110,6 +119,14 @@ export const getSnacksTarifs = async () => {
       })
       .from(snacksTarifs)
       .innerJoin(entreprises, eq(entreprises.id, snacksTarifs.entrepriseId))
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -163,6 +180,14 @@ export const getBoissonsTarifs = async () => {
       })
       .from(boissonsTarifs)
       .innerJoin(entreprises, eq(entreprises.id, boissonsTarifs.entrepriseId))
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -197,6 +222,14 @@ export const getFoodLivraisonTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, foodLivraisonTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,

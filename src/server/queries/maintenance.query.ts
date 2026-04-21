@@ -5,6 +5,7 @@ import { db } from "@/db";
 import {
   documents,
   entrepriseInfos,
+  entrepriseRoles,
   entreprises,
   legioTarifs,
   maintenanceQuantites,
@@ -19,7 +20,7 @@ import { selectMaintenanceQuantitesSchema } from "@/zod-schemas/maintenanceQuant
 import { selectMaintenanceTarifsSchema } from "@/zod-schemas/maintenanceTarifs.schema";
 import { selectQ18TarifsSchema } from "@/zod-schemas/q18Tarifs.schema";
 import { selectQualiteAirTarifsSchema } from "@/zod-schemas/qualiteAirTarifs.schema";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
@@ -71,6 +72,14 @@ export const getMaintenanceTarifs = async (surface: string) => {
         entreprises,
         eq(entreprises.id, maintenanceTarifs.entrepriseId),
       )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -98,8 +107,16 @@ export const getQ18Tarifs = async (surface: string) => {
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
-      .select()
+      .select({ ...getTableColumns(q18Tarifs) })
       .from(q18Tarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, q18Tarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .where(eq(q18Tarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
@@ -120,8 +137,16 @@ export const getLegioTarifs = async (surface: string) => {
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
-      .select()
+      .select({ ...getTableColumns(legioTarifs) })
       .from(legioTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, legioTarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .where(eq(legioTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
@@ -142,8 +167,16 @@ export const getQualiteAirTarifs = async (surface: string) => {
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
-      .select()
+      .select({ ...getTableColumns(qualiteAirTarifs) })
       .from(qualiteAirTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, qualiteAirTarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .where(eq(qualiteAirTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>

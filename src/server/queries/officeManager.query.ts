@@ -4,6 +4,7 @@ import { db } from "@/db";
 import {
   documents,
   entrepriseInfos,
+  entrepriseRoles,
   entreprises,
   officeManagerQuantites,
   officeManagerTarifs,
@@ -13,7 +14,7 @@ import { roundEffectifOfficeManager } from "@/lib/utils/roundEffectifOfficeManag
 import { roundSurface } from "@/lib/utils/roundSurface";
 import { selectOfficeManagerQuantitesSchema } from "@/zod-schemas/officeManagerQuantites.schema";
 import { selectOfficeManagerTarifsSchema } from "@/zod-schemas/officeManagerTarifs.schema";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
@@ -70,6 +71,14 @@ export const getOfficeManagerTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, officeManagerTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,

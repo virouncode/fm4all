@@ -4,6 +4,7 @@ import { db } from "@/db";
 import {
   documents,
   entrepriseInfos,
+  entrepriseRoles,
   entreprises,
   fontaines,
   fontainesTarifs,
@@ -11,7 +12,7 @@ import {
 import { getGlobalTag } from "@/lib/data-cache";
 import { selectFontainesModelesSchema } from "@/zod-schemas/fontainesModeles.schema";
 import { selectFontainesTarifsSchema } from "@/zod-schemas/fontainesTarifs.schema";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
@@ -39,6 +40,14 @@ export const getFontainesTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, fontainesTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,

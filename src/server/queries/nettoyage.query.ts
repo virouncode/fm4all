@@ -3,6 +3,7 @@ import { db } from "@/db";
 import {
   documents,
   entrepriseInfos,
+  entrepriseRoles,
   entreprises,
   nettoyageQuantites,
   nettoyageRepasseTarifs,
@@ -25,7 +26,7 @@ import {
   selectVitrerieTarifsFournisseurSchema,
   selectVitrerieTarifsSchema,
 } from "@/zod-schemas/nettoyageVitrerie.schema";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import "server-only";
@@ -98,6 +99,14 @@ export const getNettoyageTarifs = async (surface: string) => {
       })
       .from(nettoyageTarifs)
       .innerJoin(entreprises, eq(entreprises.id, nettoyageTarifs.entrepriseId))
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -158,6 +167,14 @@ export const getRepasseTarifs = async (surface: string) => {
         entreprises,
         eq(entreprises.id, nettoyageRepasseTarifs.entrepriseId),
       )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -215,6 +232,14 @@ export const getVitrerieTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, nettoyageVitrerieTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,

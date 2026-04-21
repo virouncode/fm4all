@@ -6,6 +6,7 @@ import {
   colonnesSechesTarifs,
   documents,
   entrepriseInfos,
+  entrepriseRoles,
   entreprises,
   exutoiresParkingTarifs,
   exutoiresTarifs,
@@ -23,7 +24,7 @@ import { selectIncendieQuantitesSchema } from "@/zod-schemas/incendieQuantites.s
 import { selectIncendieTarifsSchema } from "@/zod-schemas/incendieTarifs.schema";
 import { selectPortesCoupeFeuTarifsSchema } from "@/zod-schemas/portesCoupeFeuTarifs.schema";
 import { selectRiaTarifsSchema } from "@/zod-schemas/riaTarifs.schema";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getIncendieQuantite = async (surface: string) => {
@@ -62,6 +63,14 @@ export const getIncendieTarifs = async (surface: string) => {
       })
       .from(incendieTarifs)
       .innerJoin(entreprises, eq(entreprises.id, incendieTarifs.entrepriseId))
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -88,7 +97,17 @@ export const getExutoiresTarifs = async () => {
   "use cache";
   cacheTag(getGlobalTag("exutoiresTarifs"));
   try {
-    const results = await db.select().from(exutoiresTarifs);
+    const results = await db
+      .select({ ...getTableColumns(exutoiresTarifs) })
+      .from(exutoiresTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, exutoiresTarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectExutoiresTarifsSchema.parse(result),
@@ -107,7 +126,17 @@ export const getExutoiresParkingsTarifs = async () => {
   "use cache";
   cacheTag(getGlobalTag("exutoiresParkingTarifs"));
   try {
-    const results = await db.select().from(exutoiresParkingTarifs);
+    const results = await db
+      .select({ ...getTableColumns(exutoiresParkingTarifs) })
+      .from(exutoiresParkingTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, exutoiresParkingTarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectExutoiresTarifsSchema.parse(result),
@@ -126,7 +155,17 @@ export const getAlarmesTarifs = async () => {
   "use cache";
   cacheTag(getGlobalTag("alarmesTarifs"));
   try {
-    const results = await db.select().from(alarmesTarifs);
+    const results = await db
+      .select({ ...getTableColumns(alarmesTarifs) })
+      .from(alarmesTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, alarmesTarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectAlarmesTarifsSchema.parse(result),
@@ -144,7 +183,17 @@ export const getRiaTarifs = async () => {
   "use cache";
   cacheTag(getGlobalTag("riaTarifs"));
   try {
-    const results = await db.select().from(riaTarifs);
+    const results = await db
+      .select({ ...getTableColumns(riaTarifs) })
+      .from(riaTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, riaTarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectRiaTarifsSchema.parse(result),
@@ -162,7 +211,17 @@ export const getColonnesSechesTarifs = async () => {
   "use cache";
   cacheTag(getGlobalTag("colonnesSechesTarifs"));
   try {
-    const results = await db.select().from(colonnesSechesTarifs);
+    const results = await db
+      .select({ ...getTableColumns(colonnesSechesTarifs) })
+      .from(colonnesSechesTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, colonnesSechesTarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectColonnesSechesTarifsSchema.parse(result),
@@ -180,7 +239,17 @@ export const getPortesCoupeFeuTarifs = async () => {
   "use cache";
   cacheTag(getGlobalTag("portesCoupeFeuTarifs"));
   try {
-    const results = await db.select().from(portesCoupeFeuTarifs);
+    const results = await db
+      .select({ ...getTableColumns(portesCoupeFeuTarifs) })
+      .from(portesCoupeFeuTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, portesCoupeFeuTarifs.entrepriseId),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectPortesCoupeFeuTarifsSchema.parse(result),

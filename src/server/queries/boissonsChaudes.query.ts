@@ -8,6 +8,7 @@ import {
   chocolatConsoTarifs,
   documents,
   entrepriseInfos,
+  entrepriseRoles,
   entreprises,
   laitConsoTarifs,
   sucreConsoTarifs,
@@ -21,7 +22,7 @@ import { selectLaitConsoTarifsSchema } from "@/zod-schemas/laitConsoTarifs.schem
 import { selectSucreConsoTarifsSchema } from "@/zod-schemas/sucreConsoTarifs.schema";
 import { selectTheConsoTarifsSchema } from "@/zod-schemas/theConsoTarifs.schema";
 import { getGlobalTag } from "@/lib/data-cache";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
@@ -49,6 +50,14 @@ export const getCafeMachinesTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, cafeMachinesTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,
@@ -105,6 +114,14 @@ export const getCafeConsoTarifs = async () => {
         entreprises,
         eq(entreprises.id, cafeConsoTarifs.entrepriseId),
       )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -139,6 +156,14 @@ export const getLaitConsoTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, laitConsoTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,
@@ -184,6 +209,14 @@ export const getChocolatConsoTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, chocolatConsoTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,
@@ -232,6 +265,14 @@ export const getTheConsoTarifs = async () => {
         entreprises,
         eq(entreprises.id, theConsoTarifs.entrepriseId),
       )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .leftJoin(
         entrepriseInfos,
         eq(entrepriseInfos.entrepriseId, entreprises.id),
@@ -266,6 +307,14 @@ export const getSucreConsoTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, sucreConsoTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,

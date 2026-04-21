@@ -4,6 +4,7 @@ import { db } from "@/db";
 import {
   documents,
   entrepriseInfos,
+  entrepriseRoles,
   entreprises,
   hygieneConsoTarifs,
   hygieneDistribQuantites,
@@ -31,7 +32,7 @@ import {
   selectHygieneInstalDistribTarifsSchema,
 } from "@/zod-schemas/hygieneInstalDistribTarifs.schema";
 import { selectHygieneMinFacturationSchema } from "@/zod-schemas/hygieneMinFacturation.schema";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
@@ -84,6 +85,14 @@ export const getHygieneDistribTarifs = async () => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, hygieneDistribTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,
@@ -180,8 +189,19 @@ export const getHygieneInstalDistribTarifs = async (effectif: string) => {
   const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
     const results = await db
-      .select()
+      .select({ ...getTableColumns(hygieneInstalDistribTarifs) })
       .from(hygieneInstalDistribTarifs)
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(
+            entrepriseRoles.entrepriseId,
+            hygieneInstalDistribTarifs.entrepriseId,
+          ),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
+      )
       .where(eq(hygieneInstalDistribTarifs.effectif, roundedEffectif));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
@@ -241,6 +261,14 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
       .innerJoin(
         entreprises,
         eq(entreprises.id, hygieneConsoTarifs.entrepriseId),
+      )
+      .innerJoin(
+        entrepriseRoles,
+        and(
+          eq(entrepriseRoles.entrepriseId, entreprises.id),
+          eq(entrepriseRoles.role, "prestataire"),
+          eq(entrepriseRoles.estSurComparateur, true),
+        ),
       )
       .leftJoin(
         entrepriseInfos,
