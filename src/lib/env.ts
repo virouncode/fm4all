@@ -29,15 +29,15 @@ function optionalWithDefault(key: string, defaultValue: string): string {
 export const env = {
   APP_URL: required("APP_URL"),
   DATABASE_URL: required("DATABASE_URL"),
-  MAILGUN_API_KEY: required("MAILGUN_API_KEY"),
   AWS_REGION: required("AWS_REGION"),
   AWS_S3_BUCKET: required("AWS_S3_BUCKET"),
-
+  BREVO_API_KEY: required("BREVO_API_KEY"),
   FM4ALL_ENTREPRISE_ID: required("FM4ALL_ENTREPRISE_ID"),
 
   // Optionnels serveur
-  MAILGUN_BCC_EMAIL: optional("MAILGUN_BCC_EMAIL"),
-  MAILGUN_CONTACT_EMAIL: optional("MAILGUN_CONTACT_EMAIL"),
+  BREVO_TEMPLATE_GENERAL_ID: optional("BREVO_TEMPLATE_GENERAL_ID"),
+  BREVO_BCC_EMAIL: optional("BREVO_BCC_EMAIL"),
+  BREVO_CONTACT_EMAIL: optional("BREVO_CONTACT_EMAIL"),
   S3_PRESIGN_READ_EXPIRES_SECONDS: Number(
     optionalWithDefault("S3_PRESIGN_READ_EXPIRES_SECONDS", "60"),
   ),

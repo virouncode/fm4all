@@ -438,7 +438,7 @@ Tous services ──→ FM4All         totalBase = Σ services × MARGE (base de
    - INSERT dans `documents` (`proprietaireEntrepriseId = FM4ALL_ENTREPRISE_ID`, `categorie = "devis_temporaire"`, `storageProvider = "s3"`)
    - UPDATE `devisTemporaires.documentId` + `texte` (snapshot localStorage à la date d'émission)
    - INSERT dans `documentsLinks` (`devisTemporaireId`)
-5. Envoi d'un email à `MAILGUN_CONTACT_EMAIL` avec le PDF en pièce jointe (+ BCC via `MAILGUN_BCC_EMAIL`)
+5. Envoi d'un email à `BREVO_CONTACT_EMAIL` avec le PDF en pièce jointe (+ BCC via `BREVO_BCC_EMAIL`)
 
 Les étapes 3–5 sont non bloquantes : en cas d'échec, le prospect est mis à jour et le PDF reste accessible sur S3.
 

@@ -1,7 +1,8 @@
 "use server";
 
 import { actionClient } from "@/lib/action/safe-actions";
-import { sendEmailDirect } from "@/server/email/mailgunDirect";
+import { env } from "@/lib/env";
+import { sendEmailDirect } from "@/server/email/brevoDirect";
 import { cityOutSchema } from "@/zod-schemas/cityout.schema";
 import { z } from "zod";
 
@@ -16,13 +17,16 @@ const sendCityOutEmailSchema = cityOutSchema.extend({
 
 export const sendCityOutEmailAction = actionClient
   .metadata({ actionName: "sendCityOutEmailAction" })
-  .schema(sendCityOutEmailSchema)
+  .inputSchema(sendCityOutEmailSchema)
   .action(async ({ parsedInput }) => {
-    await sendEmailDirect({
-      to: "contact@fm4all.com",
-      from: "contact@fm4all.com",
-      subject: "Nouveau prospect : région en cours de développement",
-      text: `<p>Un nouveau prospect a laissé ses coordonnées sur la page de chiffrage automatique. La matrice de chiffrage est en cours de développement pour sa région.</p><br/>
+    const contactEmail = env.BREVO_CONTACT_EMAIL;
+
+    if (contactEmail) {
+      await sendEmailDirect({
+        to: contactEmail,
+        from: "noreply@mail.fm4all.com",
+        subject: "Nouveau prospect : région en cours de développement",
+        text: `<p>Un nouveau prospect a laissé ses coordonnées sur la page de chiffrage automatique. La matrice de chiffrage est en cours de développement pour sa région.</p><br/>
           <p>Voici ses coordonnées :</p><br/>
           <p>Entreprise : ${parsedInput.nomEntreprise}</p>
           <p>Code postal : ${parsedInput.codePostal ?? ""}</p>
@@ -37,8 +41,11 @@ export const sendCityOutEmailAction = actionClient
           <p>Email du contact : ${parsedInput.emailContact}</p>
           <p>N°Tél du contact : ${parsedInput.phoneContact}</p>
           `,
-      useTemplate: true,
-    });
+        nomDestinataire: "FM4ALL",
+        prenomDestinataire: "Équipe",
+        useTemplate: true,
+      });
+    }
 
     return { success: true };
   });

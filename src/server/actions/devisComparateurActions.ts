@@ -3,15 +3,17 @@
 import { batiments } from "@/constants/batiments";
 import { occupation } from "@/constants/occupation";
 import { db } from "@/db";
-import { devisTemporaires, documents, documentsLinks, prospects } from "@/db/schema";
+import {
+  devisTemporaires,
+  documents,
+  documentsLinks,
+  prospects,
+} from "@/db/schema";
 import { actionClient } from "@/lib/action/safe-actions";
 import { env } from "@/lib/env";
-import { sendEmailDirect } from "@/server/email/mailgunDirect";
+import { sendEmailDirect } from "@/server/email/brevoDirect";
+import { s3, S3_BUCKET } from "@/server/s3/s3";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
-import {
-  s3,
-  S3_BUCKET,
-} from "@/server/s3/s3";
 import { saveProgressSchema } from "@/zod-schemas/devisComparateur.schema";
 import { finaliserDevisSchema } from "@/zod-schemas/finaliserDevis.schema";
 import { SelectProspectType } from "@/zod-schemas/prospect.schema";
@@ -104,15 +106,15 @@ export const saveProgressAction = actionClient
     const { prospect: upsertedProspect, devisTemporaire: insertedDevisTemp } =
       result;
 
-    const contactEmail = env.MAILGUN_CONTACT_EMAIL;
+    const contactEmail = env.BREVO_CONTACT_EMAIL;
 
     if (contactEmail) {
       try {
         await sendEmailDirect({
           to: contactEmail,
+          from: "noreply@mail.fm4all.com",
           subject: "Un prospect a sauvegardé sa progression",
-          text: "placeholder",
-          html: `<p>Un prospect a sauvegardé sa progression dans le funnel.</p><br/>
+          text: `<p>Un prospect a sauvegardé sa progression dans le funnel.</p><br/>
               <p>Voici ses coordonnées :</p><br/>
               <p>Entreprise : ${escapeHtml(upsertedProspect.nomEntreprise)}</p>
               <p>Code postal : ${escapeHtml(upsertedProspect.codePostal)}</p>
@@ -136,7 +138,9 @@ export const saveProgressAction = actionClient
               <p>Voici ses informations de chiffrage (avant personnalisation) :</p><br/>
               <pre>${escapeHtml(insertedDevisTemp.texte)}</pre>
               `,
-          useTemplate: false,
+          nomDestinataire: "FM4ALL",
+          prenomDestinataire: "Équipe",
+          useTemplate: true,
         });
       } catch (err) {
         void err;
@@ -252,14 +256,15 @@ export const finaliserDevisAction = actionClient
     }
 
     // 5) Email admin avec le PDF en pièce jointe
-    const contactEmail = env.MAILGUN_CONTACT_EMAIL;
+    const contactEmail = env.BREVO_CONTACT_EMAIL;
 
     if (contactEmail) {
       try {
         await sendEmailDirect({
           to: contactEmail,
+          from: "noreply@mail.fm4all.com",
           subject: "Un client a finalisé son devis",
-          html: `
+          text: `
 <p>Un client a finalisé son devis.</p><br/>
 <p>Voici ses coordonnées :</p><br/>
 <p>Entreprise : ${escapeHtml(updatedProspect.nomEntreprise)}</p>
@@ -289,16 +294,21 @@ export const finaliserDevisAction = actionClient
 <p>Email du signataire : ${escapeHtml(updatedProspect.emailSignataire)}</p>
 <p>Date de démarrage : ${
             updatedProspect.dateDeDemarrage
-              ? format(new Date(updatedProspect.dateDeDemarrage), "dd/MM/yyyy", {
-                  locale: fr,
-                })
+              ? format(
+                  new Date(updatedProspect.dateDeDemarrage),
+                  "dd/MM/yyyy",
+                  {
+                    locale: fr,
+                  },
+                )
               : ""
           }</p>
 <br/>
 <p>Commentaires du client : ${escapeHtml(commentaires)}</p>
 `,
-          text: "",
-          useTemplate: false,
+          nomDestinataire: "FM4ALL",
+          prenomDestinataire: "Équipe",
+          useTemplate: true,
           ...(pdfBuffer
             ? {
                 attachment: {

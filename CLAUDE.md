@@ -1365,29 +1365,31 @@ function ResetPasswordForm() {
 ```typescript
 // ❌ FAUX
 const base = {
-  from: `fm4all <noreply@mg.fm4all.com>`,
-  to: [to],
-  bcc: ["viroun@fm4all.com"], // ❌ Hardcodé!
+  sender: { email: "noreply@mail.fm4all.com", name: "fm4all" },
+  to: [{ email: to }],
+  bcc: [{ email: "viroun@fm4all.com" }], // ❌ Hardcodé!
   subject,
 };
 
 // ✅ CORRECT
-const bccEmail = process.env.MAILGUN_BCC_EMAIL;
+const bccEmail = env.BREVO_BCC_EMAIL;
 
 const base = {
-  from: `fm4all: Le Facility Management pour tous <noreply@mg.fm4all.com>`,
-  to: [to],
-  ...(bccEmail ? { bcc: [bccEmail] } : {}), // ✅ Optionnel depuis env
+  sender: { email: from, name: "fm4all" },
+  to: [{ email: to }],
+  ...(bccEmail ? { bcc: [{ email: bccEmail }] } : {}), // ✅ Optionnel depuis env
   subject,
 };
 ```
 
 **Variables d'environnement**:
 
-- `MAILGUN_API_KEY` - Clé API Mailgun (requis)
-- `MAILGUN_BCC_EMAIL` - Email BCC optionnel pour debug/copie
+- `BREVO_API_KEY` - Clé API Brevo (requis)
+- `BREVO_TEMPLATE_GENERAL_ID` - ID du template transactionnel "general" (optionnel, requis si `useTemplate: true`)
+- `BREVO_CONTACT_EMAIL` - Destinataire interne FM4ALL pour les notifications ops (optionnel)
+- `BREVO_BCC_EMAIL` - Email BCC optionnel pour debug/copie
 
-**Fichier**: `src/server/email/mailgunDirect.ts`
+**Fichier**: `src/server/email/brevoDirect.ts` — utilise le SDK `@getbrevo/brevo`.
 
 ### 8. Toasts avec Sonner
 
@@ -1707,7 +1709,7 @@ const onSubmit = async (data) => {
 const bccEmail = "viroun@fm4all.com";
 
 // ✅ CORRECT
-const bccEmail = process.env.MAILGUN_BCC_EMAIL;
+const bccEmail = env.BREVO_BCC_EMAIL;
 ```
 
 ### ❌ Aligner validation et messages d'erreur
@@ -2442,7 +2444,7 @@ if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
 **Bugs Corrigés**:
 
 - 🔴 3 bypass de permissions critiques (usersActions.ts)
-- 🔴 Email BCC hardcodé (mailgunDirect.ts)
+- 🔴 Email BCC hardcodé dans le client email (historique — désormais dans `brevoDirect.ts`)
 - 🟠 Validation password faible (resetPassword.ts)
 - 🟠 2 console.log en production
 - 🟠 Redirect vers route inexistante (EmailOkCard.tsx)

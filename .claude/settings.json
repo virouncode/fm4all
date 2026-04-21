@@ -325,7 +325,8 @@
       "Bash(do wc:*)",
       "Read(//Users/virounkattygnarath/Desktop/fm4all/**)",
       "Bash(head -10 /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(site-vitrine\\\\\\)/chalandise/CityOut.tsx)",
-      "Bash(find /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis -name \"*.tsx\" -type f -exec grep -l \"form\\\\.watch\\\\|useWatch\" {})"
+      "Bash(find /Users/virounkattygnarath/Desktop/fm4all/src/app/[locale]/\\\\\\(main\\\\\\)/\\\\\\(application\\\\\\)/devis -name \"*.tsx\" -type f -exec grep -l \"form\\\\.watch\\\\|useWatch\" {})",
+      "WebFetch(domain:developers.brevo.com)"
     ],
     "additionalDirectories": [
       "/Users/virounkattygnarath/.claude/projects/-Users-virounkattygnarath-Desktop-fm4all/memory",
