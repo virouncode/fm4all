@@ -12,6 +12,11 @@ import {
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
+import {
+  extractFaqItemsFromPortableText,
+  FaqJsonLd,
+  portableTextBlocksToPlainText,
+} from "@/lib/seo/faq-jsonld";
 import { capitalize } from "@/lib/utils/capitalize";
 import {
   getServicesSlugEn,
@@ -160,6 +165,14 @@ export default async function page({
     notFound();
   }
 
+  const faqJsonLdItems =
+    service.faq && Array.isArray(service.faq) && service.faq.length > 0
+      ? extractFaqItemsFromPortableText(service.faq).map((item) => ({
+          question: item.question,
+          answer: portableTextBlocksToPlainText(item.answerBlocks),
+        }))
+      : [];
+
   const serviceImageUrl = service.imagePrincipale
     ? urlFor(service.imagePrincipale)
     : null; //TODO placeholder image
@@ -307,6 +320,7 @@ export default async function page({
 
   return (
     <main className="mx-auto mb-24 max-w-7xl px-6 py-4 hyphens-auto md:px-20">
+      <FaqJsonLd items={faqJsonLdItems} />
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>

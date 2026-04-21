@@ -12,10 +12,11 @@ import VideoPresentation from "@/app/[locale]/(main)/(site-vitrine)/(home)/Video
 import Why from "@/app/[locale]/(main)/(site-vitrine)/(home)/Why";
 import { LocaleType } from "@/i18n/routing";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
+import { FaqJsonLd } from "@/lib/seo/faq-jsonld";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
-import FAQ from "./FAQ";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import FAQ, { getHomeFaqPlainItems } from "./FAQ";
 
 export const generateStaticParams = () => {
   return generateLocaleParams();
@@ -48,8 +49,11 @@ export default async function page({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const tFaq = await getTranslations({ locale, namespace: "HomePage.faq" });
+  const faqJsonLdItems = getHomeFaqPlainItems(tFaq);
   return (
     <>
+      <FaqJsonLd items={faqJsonLdItems} />
       <main className="mb-24 flex flex-col">
         <Hero />
         <Slogan />

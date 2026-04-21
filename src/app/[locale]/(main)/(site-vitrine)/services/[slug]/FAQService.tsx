@@ -1,6 +1,7 @@
 import { Accordion } from "@/components/ui/accordion";
+import { extractFaqItemsFromPortableText } from "@/lib/seo/faq-jsonld";
 import { useLocale } from "next-intl";
-import { PortableText, PortableTextBlock } from "next-sanity";
+import { PortableText } from "next-sanity";
 import FAQItem from "../../(home)/FAQItem";
 import { Service, ServiceVille } from "../../../../../../../sanity.types";
 
@@ -10,54 +11,11 @@ type FAQServiceProps = {
 
 const FAQService = ({ service }: FAQServiceProps) => {
   const locale = useLocale();
-  // Vérifier si le service a un champ FAQ et s'il contient des données
   if (!service.faq || !Array.isArray(service.faq) || service.faq.length === 0) {
     return null;
   }
 
-  // Analyser le contenu de service.faq pour extraire les questions et réponses
-  // Nous supposons que les questions sont des titres H3 et les réponses sont les paragraphes qui suivent
-  const faqItems: {
-    id: number;
-    question: string;
-    answer: PortableTextBlock[];
-  }[] = [];
-  let currentQuestion = "";
-  let currentAnswerBlocks: PortableTextBlock[] = [];
-  let id = 0;
-
-  service.faq.forEach((block) => {
-    // Si c'est un titre H3, c'est une question
-    if (block.style === "h3") {
-      // Si nous avons déjà une question et une réponse, ajoutons-les à notre tableau
-      if (currentQuestion && currentAnswerBlocks.length > 0) {
-        faqItems.push({
-          id: id++,
-          question: currentQuestion,
-          answer: currentAnswerBlocks,
-        });
-        currentAnswerBlocks = [];
-      }
-      // Définir la nouvelle question
-      currentQuestion =
-        block.children?.map((child) => child.text).join("") || "";
-    }
-    // Sinon, c'est une partie de la réponse
-    else if (currentQuestion) {
-      currentAnswerBlocks.push(block as PortableTextBlock);
-    }
-  });
-
-  // Ajouter le dernier élément s'il existe
-  if (currentQuestion && currentAnswerBlocks.length > 0) {
-    faqItems.push({
-      id: id,
-      question: currentQuestion,
-      answer: currentAnswerBlocks,
-    });
-  }
-
-  // Si nous n'avons pas pu extraire de questions/réponses, ne rien afficher
+  const faqItems = extractFaqItemsFromPortableText(service.faq);
   if (faqItems.length === 0) {
     return null;
   }
@@ -72,14 +30,14 @@ const FAQService = ({ service }: FAQServiceProps) => {
       </h2>
 
       <Accordion type="single" collapsible className="w-full px-6 lg:w-1/2">
-        {faqItems.map((faq) => (
+        {faqItems.map((faq, index) => (
           <FAQItem
-            key={faq.id}
-            value={`item-${faq.id}`}
+            key={index}
+            value={`item-${index}`}
             question={faq.question}
           >
             <div className="prose-base prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl prose-h3:ml-10 prose-h3:text-xl prose-h3:font-bold prose-h3:italic prose-h4:mx-auto prose-h4:my-8 prose-h4:text-center prose-p:mx-auto prose-p:max-w-prose prose-p:hyphens-auto prose-p:text-pretty prose-p:text-base prose-a:underline prose-ul:mx-auto prose-ul:max-w-prose prose-ul:text-base prose-li:m-0 prose-li:list-disc flex-1">
-              <PortableText value={faq.answer} />
+              <PortableText value={faq.answerBlocks} />
             </div>
           </FAQItem>
         ))}

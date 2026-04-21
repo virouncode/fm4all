@@ -3,6 +3,77 @@ import { useTranslations } from "next-intl";
 import { ReactNode } from "react";
 import FAQItem from "./FAQItem";
 
+export function getHomeFaqPlainItems(
+  t: (key: string) => string,
+): Array<{ question: string; answer: string }> {
+  return [
+    {
+      question: t("quest-ce-que-le-facility-management-en-entreprise"),
+      answer: [
+        `${t("le")} ${t("facility-management")}${t("qui-se-traduit-par")} ${t("gestion-des-services-generaux")} ${t("en-francais-fait-reference-a-la-gestion-de-lensemble-des-activites-necessaires-pour-assurer-le-bon-fonctionnement-dune-societe")}`,
+        `${t("cela-englobe-la")} ${t("proprete")} ${t("nettoyage-et-hygiene-sanitaire-la")} ${t("gestion-des-batiments")}${t("la")} ${t("surete")} ${t("surveillance-securite-incendie-le")} ${t("bien-etre-au-travail")} ${t("location-de-machines-a-cafe-et-fontaines-a-eau-livraison-de-fruits-et-collations-ainsi-que-le")}${t("confort-des-occupants")} ${t("reception-courrier-espaces-verts")}`,
+        `${t("le-but-est-d")}${t("optimiser-les-couts")} ${t("associes-a-letablissement-dun")} ${t("environnement-de-travail-efficace-et-sain")}.`,
+      ].join(" "),
+    },
+    {
+      question: t(
+        "quels-services-inclut-notre-solution-de-facility-management-pour-les-entreprises",
+      ),
+      answer: [
+        t(
+          "notre-solution-de-facility-management-est-complete-et-modulable-selon-les-besoins-de-chaque-entreprise-elle-comprend",
+        ),
+        `• ${t("une-offre-complete")} ${t("multiservices-a-la-carte")} ${t("proprete-securite-maintenance-boissons-et-collations-office-manager-externalise-via-un")} ${t("comparateur-en-ligne")} ${t("des-offres-de-nos-differents-fournisseurs-partenaires")}`,
+        `• ${t("le")} ${t("pilotage-et-la-gestion")} ${t("des-services-devis-cahier-des-charges-contrats-factures-planification")}`,
+        `• ${t("un")} ${t("back-office")} ${t("pour-les-clients-et-les-fournisseurs-mise-a-jour-des-tarifs-pages-produits-signature-des-contrats-plannings-dintervention")}`,
+        `• ${t("un")} ${t("accompagnement")} ${t("support-reclamations-controles-qualite")}`,
+      ].join(" "),
+    },
+    {
+      question: t(
+        "quels-sont-les-avantages-a-externaliser-le-facility-management",
+      ),
+      answer: [
+        `${t("l")}${t("externalisation-des-services-generaux")} ${t("presente-de-nombreux-avantages-pour-les-entreprises")}`,
+        `• ${t("gain-de-temps")} ${t("vous-deleguez-la-gestion-de-vos-services-et-vous-vous-concentrez-sur-votre-coeur-de-metier")}`,
+        `• ${t("optimisation-des-couts")} ${t("en-passant-par-notre-plateforme-de-facility-management-vous-profitez-de-tarifs-competitifs")}`,
+        `• ${t("flexibilite")} ${t("nous-pouvons-adapter-rapidement-vos-contrats-a-levolution-de-vos-besoins")}`,
+        `• ${t("qualite")} ${t("nos-prestataires-sont-selectionnes-selon-des-criteres-stricts-de-conformite-et-de-qualite")}`,
+        `${t("cette-approche-est-pour-vous-lassurance-dune")} ${t("tranquilite-desprit")} ${t("et-dun")} ${t("environnement-de-travail-sain-et-performant")}.`,
+      ].join(" "),
+    },
+    {
+      question: t("a-qui-sadressent-nos-prestations-de-facility-management"),
+      answer: [
+        t(
+          "nos-prestations-de-facility-management-sadressent-a-une-large-variete-dacteurs-professionnels",
+        ),
+        `• ${t("tpe-pme")} ${t("qui-souhaitent-optimiser-leurs-couts-et-ameliorer-leur-environnement-de-travail")}`,
+        `• ${t("start-ups/scale-ups")} ${t("qui-ont-besoin-de-flexibilite-et-dagilite-dans-la-gestion-de-leurs-services")}`,
+        `• ${t("cabinets-medicaux")} ${t("qui-necessitent-des-services-adaptes-a-leurs-normes-dhygiene")}`,
+        `• ${t("locaux-commerciaux")} ${t("qui-veulent-offrir-une-experience-client-de-qualite")}`,
+        `• ${t("entrepots-logistiques")} ${t("qui-ont-besoin-de-maintenance-et-de-securite")}`,
+        `• ${t("proprietaires-ou-gestionnaires-d")}${t("immeubles-tertiaires")} ${t("qui-cherchent-a-professionnaliser-la-gestion-de-leurs-espaces")}`,
+        t(
+          "quel-que-soit-votre-secteur-notre-offre-sadapte-a-vos-enjeux-specifiques",
+        ),
+      ].join(" "),
+    },
+    {
+      question: t("comment-choisir-son-prestataire-de-facility-management"),
+      answer: [
+        `${t("pour-choisir-convenablement-votre")} ${t("societe-de-facility-management")}${t("vous-devez-tenir-compte-des-criteres-suivants")}`,
+        `• ${t("lexperience-et-les-references")}${t("dans-votre-secteur-dactivite")}`,
+        `• ${t("la-capacite-a-offrir-une")} ${t("proposition-sur-mesure-et-evolutive")}`,
+        `• ${t("la-transparence-et-les")} ${t("engagements-contractuels")}`,
+        `• ${t("le-respect-des-normes-et-des")} ${t("bonnes-pratiques")}`,
+        `• ${t("une-approche")} ${t("durable-et-innovante")}`,
+        `${t("un-bon-partenaire-conjuguera")} ${t("performance-operationnelle-qualite-de-service")} ${t("et-prise-en-compte-de-vos-objectifs-strategiques")}`,
+      ].join(" "),
+    },
+  ];
+}
+
 const FAQ = () => {
   const t = useTranslations("HomePage.faq");
   const faqs: { id: number; question: string; answer: ReactNode }[] = [
