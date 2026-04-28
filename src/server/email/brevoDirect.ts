@@ -11,7 +11,7 @@ type AttachmentType = {
 
 type SendEmailDirectParamsType = {
   to: string;
-  from: string;
+  from?: string;
   subject: string;
   text: string;
   html?: string;
@@ -22,6 +22,7 @@ type SendEmailDirectParamsType = {
 };
 
 const SENDER_NAME = "fm4all";
+const DEFAULT_SENDER_EMAIL = "noreply@mail.fm4all.com";
 
 export async function sendEmailDirect(params: SendEmailDirectParamsType) {
   const apiKey = env.BREVO_API_KEY;
@@ -33,7 +34,7 @@ export async function sendEmailDirect(params: SendEmailDirectParamsType) {
 
   const {
     to,
-    from,
+    from = DEFAULT_SENDER_EMAIL,
     subject,
     text,
     html,

@@ -24,7 +24,6 @@ export const sendCityOutEmailAction = actionClient
     if (contactEmail) {
       await sendEmailDirect({
         to: contactEmail,
-        from: "noreply@mail.fm4all.com",
         subject: "Nouveau prospect : région en cours de développement",
         text: `<p>Un nouveau prospect a laissé ses coordonnées sur la page de chiffrage automatique. La matrice de chiffrage est en cours de développement pour sa région.</p><br/>
           <p>Voici ses coordonnées :</p><br/>

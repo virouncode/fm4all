@@ -112,7 +112,6 @@ export const saveProgressAction = actionClient
       try {
         await sendEmailDirect({
           to: contactEmail,
-          from: "noreply@mail.fm4all.com",
           subject: "Un prospect a sauvegardé sa progression",
           text: `<p>Un prospect a sauvegardé sa progression dans le funnel.</p><br/>
               <p>Voici ses coordonnées :</p><br/>
@@ -262,7 +261,6 @@ export const finaliserDevisAction = actionClient
       try {
         await sendEmailDirect({
           to: contactEmail,
-          from: "noreply@mail.fm4all.com",
           subject: "Un client a finalisé son devis",
           text: `
 <p>Un client a finalisé son devis.</p><br/>
