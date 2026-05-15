@@ -119,6 +119,45 @@ Avant d'écrire **la moindre ligne de code**, pour toute nouvelle feature ou sou
 
 ---
 
+## ⚠️ RÈGLE ABSOLUE — Zustand & SSR (singleton serveur)
+
+**Tout `create(...)` au niveau d'un module est un singleton partagé entre toutes les requêtes concurrentes du même process Node.** En Next.js App Router, les Client Components sont aussi rendus côté serveur (SSR pass pour produire le HTML), donc le code du store **s'exécute sur le serveur** malgré `"use client"`.
+
+### Les deux instances du store
+
+Le fichier `create(...)` est chargé **deux fois**, dans deux runtimes JS séparés :
+
+| Runtime | Instance | Partage |
+| ------- | -------- | ------- |
+| Process Node.js (SSR) | `STORE_SERVEUR` | **Partagé entre TOUS les utilisateurs** qui frappent ce process |
+| Browser (par onglet) | `STORE_CLIENT` | Isolé par utilisateur/onglet |
+
+**`"use client"` ne protège pas du SSR pass** — ça marque la frontière du bundle client, mais le code tourne quand même sur le serveur lors du rendu HTML initial.
+
+### Règles inviolables
+
+1. **Jamais** appeler `set()` / `setState()` / `useStore.setState(...)` **pendant le render** d'un composant. Toute mutation pendant le render écrit dans `STORE_SERVEUR` et fuit entre utilisateurs en prod.
+2. **Jamais** lire `useStore.getState()` dans un Server Component. Si tu as besoin de valeurs côté serveur, c'est une requête DB, pas un store.
+3. **Jamais** calculer l'état initial d'un store à partir d'un autre store si la valeur peut différer par utilisateur (cf. piège `theStore.ts` : `buildInitialThe()` fige `effectif=0` au boot du process).
+4. **Mutations uniquement dans les event handlers** (`onClick`, `onChange`, `onSubmit`, etc.) ou dans `useEffect` — jamais dans le corps du composant.
+5. **Stores liés à un utilisateur authentifié** (user, posture, entreprise, sélections privées) → **pattern Provider obligatoire** (un store par render-tree via `useRef` dans un Context Provider). Voir https://zustand.docs.pmnd.rs/guides/nextjs.
+
+### Pourquoi c'est un piège silencieux
+
+- En dev local, un seul utilisateur frappe le serveur → aucune concurrence → bug invisible.
+- Aucun test, aucun linter, aucun TypeScript error ne le détecte.
+- `persist` middleware réhydrate côté client en moins de 100ms → le leak ressemble à un "flash" et n'est jamais signalé.
+- Le bug n'apparaît qu'en **prod sous charge concurrente** et ne se manifeste que si une mutation a lieu pendant un render SSR.
+
+### Checklist à exécuter pour chaque store nouveau ou modifié
+
+- [ ] Aucun `set(...)` n'est appelé en dehors d'un event handler ou d'un `useEffect`.
+- [ ] L'état initial ne dépend pas d'un autre store dont la valeur pourrait différer par utilisateur.
+- [ ] Si le store contient des données utilisateur authentifié → pattern Provider, pas `create(...)` au niveau module.
+- [ ] Aucun appel à `useStore.getState()` dans un fichier sans `"use client"`.
+
+---
+
 ## Vue d'Ensemble du Projet
 
 ### Contexte Métier

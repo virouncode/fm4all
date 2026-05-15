@@ -13,7 +13,7 @@ import { useShallow } from "zustand/shallow";
 import CafeEspaceForm from "../CafeEspaceForm";
 import CafeEspacePropositions from "../CafeEspacePropositions";
 import PreviousEspaceButton from "../PreviousEspaceButton";
-import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
+import { useReinitialisationCafeThe } from "../reinitialisationCafeThe";
 import RetirerEspaceButton from "../RetirerEspaceButton";
 
 type CafeEspaceProps = {
@@ -44,6 +44,7 @@ const CafeEspace = ({
       setCafe: s.setCafe,
     })),
   );
+  const reinitialisationCafeThe = useReinitialisationCafeThe();
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
 
   const handleClickPreviousEspace = () => {

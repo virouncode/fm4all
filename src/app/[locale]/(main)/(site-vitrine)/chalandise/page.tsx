@@ -1,5 +1,6 @@
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
+import { ProspectStoreProvider } from "@/stores/devis/prospectStore";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import CityOut from "./CityOut";
@@ -46,15 +47,17 @@ const page = async ({
 
   return (
     <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col gap-4 px-6 pt-4 pb-10 md:px-20">
-      <CityOut
-        destination={destination}
-        codePostal={codePostal}
-        ville={ville}
-        surface={surface}
-        effectif={effectif}
-        typeBatiment={typeBatiment}
-        typeOccupation={typeOccupation}
-      />
+      <ProspectStoreProvider>
+        <CityOut
+          destination={destination}
+          codePostal={codePostal}
+          ville={ville}
+          surface={surface}
+          effectif={effectif}
+          typeBatiment={typeBatiment}
+          typeOccupation={typeOccupation}
+        />
+      </ProspectStoreProvider>
     </main>
   );
 };

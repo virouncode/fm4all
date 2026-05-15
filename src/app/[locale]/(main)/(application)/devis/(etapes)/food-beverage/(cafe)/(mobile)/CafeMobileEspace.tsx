@@ -12,7 +12,7 @@ import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 import CafeEspaceForm from "../CafeEspaceForm";
 import CafeEspacePropositions from "../CafeEspacePropositions";
-import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
+import { useReinitialisationCafeThe } from "../reinitialisationCafeThe";
 import RetirerEspaceButton from "../RetirerEspaceButton";
 
 type CafeMobileEspaceProps = {
@@ -43,6 +43,7 @@ const CafeMobileEspace = ({
       setCafe: s.setCafe,
     })),
   );
+  const reinitialisationCafeThe = useReinitialisationCafeThe();
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
 
   const handleClickRemove = () => {

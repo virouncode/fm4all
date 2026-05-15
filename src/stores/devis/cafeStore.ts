@@ -1,22 +1,18 @@
 "use client";
 
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
+import { createStoreContext } from "@/stores/lib/createStoreContext";
 import { CafeType } from "@/zod-schemas/cafe.schema";
-import { create } from "zustand";
+import { create, type StoreApi } from "zustand";
 import { persist } from "zustand/middleware";
-import { useProspectStore } from "./prospectStore";
-
-// Récupération des données du prospect pour l'initialisation
 
 type CafeStore = {
   cafe: CafeType;
   setCafe: (value: CafeType | ((prev: CafeType) => CafeType)) => void;
-  reset: () => void;
+  reset: (effectif?: number) => void;
 };
 
-const buildInitialCafe = (): CafeType => {
-  const { effectif = 0 } = useProspectStore.getState().prospect;
-
+const buildCafe = (effectif: number): CafeType => {
   const nbPersonnes =
     effectif > MAX_NB_PERSONNES_PAR_ESPACE
       ? MAX_NB_PERSONNES_PAR_ESPACE
@@ -64,21 +60,23 @@ const buildInitialCafe = (): CafeType => {
   };
 };
 
-export const useCafeStore = create<CafeStore>()(
-  persist(
-    (set) => ({
-      cafe: buildInitialCafe(),
+const createCafeStore = (): StoreApi<CafeStore> =>
+  create<CafeStore>()(
+    persist(
+      (set) => ({
+        cafe: buildCafe(0),
+        setCafe: (value) =>
+          set((state) => ({
+            cafe: typeof value === "function" ? value(state.cafe) : value,
+          })),
+        reset: (effectif = 0) => set(() => ({ cafe: buildCafe(effectif) })),
+      }),
+      { name: "cafe" },
+    ),
+  );
 
-      setCafe: (value) =>
-        set((state) => ({
-          cafe: typeof value === "function" ? value(state.cafe) : value,
-        })),
+const ctx = createStoreContext<CafeStore>(createCafeStore, "Cafe");
 
-      reset: () =>
-        set(() => ({
-          cafe: buildInitialCafe(), // ← relit le prospect et recalcule nbPersonnes
-        })),
-    }),
-    { name: "cafe" },
-  ),
-);
+export const CafeStoreProvider = ctx.Provider;
+export const useCafeStore = ctx.useTypedStore;
+export const useCafeStoreApi = ctx.useStoreApi;

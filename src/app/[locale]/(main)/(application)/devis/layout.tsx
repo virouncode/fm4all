@@ -1,6 +1,7 @@
 import Header from "@/components/header/header";
 import { LocaleType } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { DevisStoresProvider } from "@/stores/devis/DevisStoresProvider";
 
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
@@ -21,9 +22,9 @@ export default async function DevisLayout({
   setRequestLocale(locale);
 
   return (
-    <>
+    <DevisStoresProvider>
       <Header />
       {children}
-    </>
+    </DevisStoresProvider>
   );
 }

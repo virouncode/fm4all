@@ -12,7 +12,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import "./globals.css";
 
-export const geist = Geist({
+const geist = Geist({
   subsets: ["latin"],
   display: "swap",
 });

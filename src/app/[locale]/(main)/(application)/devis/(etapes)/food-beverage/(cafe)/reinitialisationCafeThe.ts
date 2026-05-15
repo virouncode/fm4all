@@ -1,21 +1,27 @@
-import { useCafeStore } from "@/stores/devis/cafeStore";
-import { useTheStore } from "@/stores/devis/theStore";
+"use client";
 
-export const reinitialisationCafeThe = () => {
-  const resetThe = useTheStore.getState().reset;
-  const setCafe = useCafeStore.getState().setCafe;
-  setCafe({
-    infos: {
-      entrepriseId: null,
-      nomPrestataire: null,
-      sloganPrestataire: null,
-      logoStorageKey: null,
-      currentEspaceId: 1,
-      dureeLocation: "pa12M",
-      commentaires: null,
-    },
-    nbEspaces: null,
-    espaces: [],
-  });
-  resetThe();
+import { useCafeStoreApi } from "@/stores/devis/cafeStore";
+import { useTheStoreApi } from "@/stores/devis/theStore";
+import { useCallback } from "react";
+
+export const useReinitialisationCafeThe = () => {
+  const cafe = useCafeStoreApi();
+  const the = useTheStoreApi();
+
+  return useCallback(() => {
+    cafe.getState().setCafe({
+      infos: {
+        entrepriseId: null,
+        nomPrestataire: null,
+        sloganPrestataire: null,
+        logoStorageKey: null,
+        currentEspaceId: 1,
+        dureeLocation: "pa12M",
+        commentaires: null,
+      },
+      nbEspaces: null,
+      espaces: [],
+    });
+    the.getState().reset();
+  }, [cafe, the]);
 };

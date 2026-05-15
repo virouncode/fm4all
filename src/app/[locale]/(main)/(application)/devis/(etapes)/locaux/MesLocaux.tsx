@@ -19,7 +19,10 @@ import { departements } from "@/constants/departements";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
-import { useProspectStore } from "@/stores/devis/prospectStore";
+import {
+  useProspectStore,
+  useProspectStoreApi,
+} from "@/stores/devis/prospectStore";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createMesLocauxFormSchema,
@@ -30,8 +33,8 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useShallow } from "zustand/shallow";
-import { fullReinitialisationDevis } from "./fullReinitialisationDevis";
-import { initialisationDevis } from "./initialisationDevis";
+import { useFullReinitialisationDevis } from "./fullReinitialisationDevis";
+import { useInitialisationDevis } from "./initialisationDevis";
 import ServicesLoader from "./ServicesLoader";
 
 const MesLocaux = () => {
@@ -47,6 +50,9 @@ const MesLocaux = () => {
   );
   const prospect = useProspectStore((s) => s.prospect);
   const setProspect = useProspectStore((s) => s.setProspect);
+  const prospectApi = useProspectStoreApi();
+  const fullReinitialisationDevis = useFullReinitialisationDevis();
+  const initialisationDevis = useInitialisationDevis();
   const [loaderVisible, setLoaderVisible] = useState(false);
   const router = useRouter();
   const [showModal, setShowModal] = useState(true);
@@ -199,7 +205,7 @@ const MesLocaux = () => {
 
   const handleClickNouveau = () => {
     fullReinitialisationDevis();
-    const freshProspect = useProspectStore.getState().prospect;
+    const freshProspect = prospectApi.getState().prospect;
     form.reset({
       surface:
         freshProspect.surface != null ? freshProspect.surface.toString() : "",

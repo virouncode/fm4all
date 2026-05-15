@@ -1,24 +1,20 @@
 "use client";
 
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
+import { createStoreContext } from "@/stores/lib/createStoreContext";
 import { FontainesType } from "@/zod-schemas/fontaines.schema";
-import { create } from "zustand";
+import { create, type StoreApi } from "zustand";
 import { persist } from "zustand/middleware";
-import { useProspectStore } from "./prospectStore";
-
-// Récupération des données du prospect pour l'initialisation
 
 type FontainesStore = {
   fontaines: FontainesType;
   setFontaines: (
     value: FontainesType | ((prev: FontainesType) => FontainesType),
   ) => void;
-  reset: () => void;
+  reset: (effectif?: number) => void;
 };
 
-const buildInitialFontaines = (): FontainesType => {
-  const { effectif = 0 } = useProspectStore.getState().prospect;
-
+const buildFontaines = (effectif: number): FontainesType => {
   const nbPersonnes =
     effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
       ? MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
@@ -61,22 +57,25 @@ const buildInitialFontaines = (): FontainesType => {
   };
 };
 
-export const useFontainesStore = create<FontainesStore>()(
-  persist(
-    (set) => ({
-      fontaines: buildInitialFontaines(),
+const createFontainesStore = (): StoreApi<FontainesStore> =>
+  create<FontainesStore>()(
+    persist(
+      (set) => ({
+        fontaines: buildFontaines(0),
+        setFontaines: (value) =>
+          set((state) => ({
+            fontaines:
+              typeof value === "function" ? value(state.fontaines) : value,
+          })),
+        reset: (effectif = 0) =>
+          set(() => ({ fontaines: buildFontaines(effectif) })),
+      }),
+      { name: "fontaines" },
+    ),
+  );
 
-      setFontaines: (value) =>
-        set((state) => ({
-          fontaines:
-            typeof value === "function" ? value(state.fontaines) : value,
-        })),
+const ctx = createStoreContext<FontainesStore>(createFontainesStore, "Fontaines");
 
-      reset: () =>
-        set(() => ({
-          fontaines: buildInitialFontaines(), // ← relit le prospect et recalcule nbPersonnes
-        })),
-    }),
-    { name: "fontaines" },
-  ),
-);
+export const FontainesStoreProvider = ctx.Provider;
+export const useFontainesStore = ctx.useTypedStore;
+export const useFontainesStoreApi = ctx.useStoreApi;

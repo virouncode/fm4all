@@ -1,67 +1,67 @@
 "use client";
 
+import { createStoreContext } from "@/stores/lib/createStoreContext";
 import { SnacksFruitsType } from "@/zod-schemas/snacksFruits.schema";
-import { create } from "zustand";
+import { create, type StoreApi } from "zustand";
 import { persist } from "zustand/middleware";
-import { useProspectStore } from "./prospectStore";
 
 type SnacksFruitsStore = {
   snacksFruits: SnacksFruitsType;
   setSnacksFruits: (
     value: SnacksFruitsType | ((prev: SnacksFruitsType) => SnacksFruitsType),
   ) => void;
-  reset: () => void;
+  reset: (effectif?: number) => void;
 };
 
-const buildInitialSnacksFruits = (): SnacksFruitsType => {
-  const { effectif = 0 } = useProspectStore.getState().prospect;
+const buildSnacksFruits = (effectif: number): SnacksFruitsType => ({
+  infos: {
+    entrepriseId: null,
+    nomPrestataire: null,
+    sloganPrestataire: null,
+    isSamePrestataire: false,
+    gammeSelected: null,
+    choix: ["fruits"],
+    commentaires: null,
+  },
+  quantites: {
+    nbPersonnes: effectif,
+    fruitsKgParSemaine: 0,
+    snacksPortionsParSemaine: 0,
+    boissonsConsosParSemaine: 0,
+  },
+  prix: {
+    prixKgFruits: null,
+    prixUnitaireSnacks: null,
+    prixUnitaireBoissons: null,
+    prixUnitaireLivraisonSiCafe: null,
+    prixUnitaireLivraison: null,
+    seuilFranco: null,
+    panierMin: null,
+  },
+});
 
-  return {
-    infos: {
-      entrepriseId: null,
-      nomPrestataire: null,
-      sloganPrestataire: null,
-      isSamePrestataire: false,
-      gammeSelected: null,
-      choix: ["fruits"],
-      commentaires: null,
-    },
-    quantites: {
-      nbPersonnes: effectif,
-      fruitsKgParSemaine: 0,
-      snacksPortionsParSemaine: 0,
-      boissonsConsosParSemaine: 0,
-    },
-    prix: {
-      prixKgFruits: null,
-      prixUnitaireSnacks: null,
-      prixUnitaireBoissons: null,
-      prixUnitaireLivraisonSiCafe: null,
-      prixUnitaireLivraison: null,
-      seuilFranco: null,
-      panierMin: null,
-    },
-  };
-};
+const createSnacksFruitsStore = (): StoreApi<SnacksFruitsStore> =>
+  create<SnacksFruitsStore>()(
+    persist(
+      (set) => ({
+        snacksFruits: buildSnacksFruits(0),
+        setSnacksFruits: (value) =>
+          set((state) => ({
+            snacksFruits:
+              typeof value === "function" ? value(state.snacksFruits) : value,
+          })),
+        reset: (effectif = 0) =>
+          set(() => ({ snacksFruits: buildSnacksFruits(effectif) })),
+      }),
+      { name: "snacksFruits" },
+    ),
+  );
 
-export const useSnacksFruitsStore = create<SnacksFruitsStore>()(
-  persist(
-    (set) => ({
-      snacksFruits: buildInitialSnacksFruits(),
-
-      setSnacksFruits: (value) =>
-        set((state) => ({
-          snacksFruits:
-            typeof value === "function" ? value(state.snacksFruits) : value,
-        })),
-
-      reset: () =>
-        set(() => ({
-          snacksFruits: buildInitialSnacksFruits(), // ← relit le prospect et recalcule nbPersonnes
-        })),
-    }),
-    {
-      name: "snacksFruits",
-    },
-  ),
+const ctx = createStoreContext<SnacksFruitsStore>(
+  createSnacksFruitsStore,
+  "SnacksFruits",
 );
+
+export const SnacksFruitsStoreProvider = ctx.Provider;
+export const useSnacksFruitsStore = ctx.useTypedStore;
+export const useSnacksFruitsStoreApi = ctx.useStoreApi;

@@ -1,73 +1,70 @@
 "use client";
 
+import { createStoreContext } from "@/stores/lib/createStoreContext";
 import { NettoyageType } from "@/zod-schemas/nettoyage.schema";
-import { create } from "zustand";
+import { create, type StoreApi } from "zustand";
 import { persist } from "zustand/middleware";
-import { useProspectStore } from "./prospectStore";
-
-// Récupération de la surface du prospect pour l'initialisation
 
 type NettoyageStore = {
   nettoyage: NettoyageType;
   setNettoyage: (
     value: NettoyageType | ((prev: NettoyageType) => NettoyageType),
   ) => void;
-  reset: () => void;
+  reset: (surface?: number) => void;
 };
 
-const buildInitialNettoyage = (): NettoyageType => {
-  const { surface = 0 } = useProspectStore.getState().prospect;
+const buildNettoyage = (surface: number): NettoyageType => ({
+  infos: {
+    entrepriseId: null,
+    nomPrestataire: null,
+    sloganPrestataire: null,
+    logoStorageKey: null,
+    gammeSelected: null,
+    repasseSelected: false,
+    samediSelected: false,
+    dimancheSelected: false,
+    vitrerieSelected: false,
+    plainPied: true,
+    commentaires: null,
+  },
+  quantites: {
+    freqAnnuelle: null,
+    hParPassage: null,
+    hParPassageRepasse: null,
+    surfaceCloisons: surface * 0.15,
+    surfaceVitres: surface * 0.15,
+    cadenceCloisons: null,
+    cadenceVitres: null,
+    nbPassagesVitrerie: 2,
+  },
+  prix: {
+    tauxHoraire: null,
+    tauxHoraireRepasse: null,
+    tauxHoraireVitrerie: null,
+    minFacturationVitrerie: null,
+    fraisDeplacementVitrerie: null,
+  },
+});
 
-  return {
-    infos: {
-      entrepriseId: null,
-      nomPrestataire: null,
-      sloganPrestataire: null,
-      logoStorageKey: null,
-      gammeSelected: null,
-      repasseSelected: false,
-      samediSelected: false,
-      dimancheSelected: false,
-      vitrerieSelected: false,
-      plainPied: true,
-      commentaires: null,
-    },
-    quantites: {
-      freqAnnuelle: null,
-      hParPassage: null,
-      hParPassageRepasse: null,
-      surfaceCloisons: surface * 0.15,
-      surfaceVitres: surface * 0.15,
-      cadenceCloisons: null,
-      cadenceVitres: null,
-      nbPassagesVitrerie: 2,
-    },
-    prix: {
-      tauxHoraire: null,
-      tauxHoraireRepasse: null,
-      tauxHoraireVitrerie: null,
-      minFacturationVitrerie: null,
-      fraisDeplacementVitrerie: null,
-    },
-  };
-};
+const createNettoyageStore = (): StoreApi<NettoyageStore> =>
+  create<NettoyageStore>()(
+    persist(
+      (set) => ({
+        nettoyage: buildNettoyage(0),
+        setNettoyage: (value) =>
+          set((state) => ({
+            nettoyage:
+              typeof value === "function" ? value(state.nettoyage) : value,
+          })),
+        reset: (surface = 0) =>
+          set(() => ({ nettoyage: buildNettoyage(surface) })),
+      }),
+      { name: "nettoyage" },
+    ),
+  );
 
-export const useNettoyageStore = create<NettoyageStore>()(
-  persist(
-    (set) => ({
-      nettoyage: buildInitialNettoyage(),
+const ctx = createStoreContext<NettoyageStore>(createNettoyageStore, "Nettoyage");
 
-      setNettoyage: (value) =>
-        set((state) => ({
-          nettoyage:
-            typeof value === "function" ? value(state.nettoyage) : value,
-        })),
-
-      reset: () =>
-        set(() => ({
-          nettoyage: buildInitialNettoyage(), // ← relit le prospect et recalcule les surfaces
-        })),
-    }),
-    { name: "nettoyage" },
-  ),
-);
+export const NettoyageStoreProvider = ctx.Provider;
+export const useNettoyageStore = ctx.useTypedStore;
+export const useNettoyageStoreApi = ctx.useStoreApi;

@@ -1,50 +1,46 @@
 "use client";
 
+import { createStoreContext } from "@/stores/lib/createStoreContext";
 import { TheType } from "@/zod-schemas/the.schema";
-import { create } from "zustand";
+import { create, type StoreApi } from "zustand";
 import { persist } from "zustand/middleware";
-import { useProspectStore } from "./prospectStore";
 
 type TheStore = {
   the: TheType;
   setThe: (value: TheType | ((prev: TheType) => TheType)) => void;
-  reset: () => void;
+  reset: (effectif?: number) => void;
 };
 
-const buildInitialThe = (): TheType => {
-  const { effectif = 0 } = useProspectStore.getState().prospect;
+const buildThe = (effectif: number): TheType => ({
+  infos: {
+    gammeSelected: null,
+    commentaires: null,
+  },
+  quantites: {
+    nbPersonnes: Math.round(effectif * 0.15),
+  },
+  prix: {
+    prixUnitaire: null,
+  },
+});
 
-  return {
-    infos: {
-      gammeSelected: null,
-      commentaires: null,
-    },
-    quantites: {
-      nbPersonnes: Math.round(effectif * 0.15),
-    },
-    prix: {
-      prixUnitaire: null,
-    },
-  };
-};
+const createTheStore = (): StoreApi<TheStore> =>
+  create<TheStore>()(
+    persist(
+      (set) => ({
+        the: buildThe(0),
+        setThe: (value) =>
+          set((state) => ({
+            the: typeof value === "function" ? value(state.the) : value,
+          })),
+        reset: (effectif = 0) => set(() => ({ the: buildThe(effectif) })),
+      }),
+      { name: "the" },
+    ),
+  );
 
-export const useTheStore = create<TheStore>()(
-  persist(
-    (set) => ({
-      the: buildInitialThe(),
+const ctx = createStoreContext<TheStore>(createTheStore, "The");
 
-      setThe: (value) =>
-        set((state) => ({
-          the: typeof value === "function" ? value(state.the) : value,
-        })),
-
-      reset: () =>
-        set(() => ({
-          the: buildInitialThe(), // ← relit le prospect et recalcule nbPersonnes
-        })),
-    }),
-    {
-      name: "the",
-    },
-  ),
-);
+export const TheStoreProvider = ctx.Provider;
+export const useTheStore = ctx.useTypedStore;
+export const useTheStoreApi = ctx.useStoreApi;
