@@ -53,12 +53,12 @@ const CTAContactButtonsNoConversion = ({
           asChild
         >
           <a
-            href="tel:+33669311046"
+            href="tel:+33970700001"
             className="flex items-center justify-center gap-2"
             title={locale === "fr" ? "Appeler par téléphone" : "Call by phone"}
           >
             <Phone />
-            +33 6 69 31 10 46
+            {locale === "fr" ? "09 70 70 00 01" : "+33 9 70 70 00 01"}
           </a>
         </Button>
       )}

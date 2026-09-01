@@ -53,12 +53,12 @@ const CTAContactButtons = () => {
         onClick={() =>
           gtag_report_conversion_contact(
             "zv70CMzfu5cbEP6OqaZB",
-            "tel:+33669311046",
+            "tel:+33970700001",
           )
         }
       >
         <Phone />
-        +33 6 69 31 10 46
+        {locale === "fr" ? "09 70 70 00 01" : "+33 9 70 70 00 01"}
       </Button>
 
       <Button
