@@ -1,4 +1,5 @@
 import CTAContactButtonsNoConversion from "@/components/buttons/cta-contact-buttons-no-conversion";
+import MailtoButton from "@/components/buttons/mailto-button";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,12 +8,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
 import { Link as I18nLink } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
-import { HomeIcon, Mail } from "lucide-react";
+import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -63,20 +63,10 @@ const page = async ({
       </Breadcrumb>
       <div className="mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-4xl">{t("rejoignez-nous")}</h1>
-        <Button
-          size="lg"
-          className="flex items-center justify-center text-base transition-all hover:scale-[101%]"
-          asChild
-        >
-          <a
-            href="mailto:emploi@fm4all.com"
-            className="flex items-center justify-center gap-2"
-            title={locale === "fr" ? "Contacter par email" : "Contact by email"}
-          >
-            <Mail />
-            {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}
-          </a>
-        </Button>
+        <MailtoButton
+          email="emploi@fm4all.com"
+          className="w-auto sm:w-auto lg:w-auto"
+        />
       </div>
 
       <article className="flex flex-col gap-10">

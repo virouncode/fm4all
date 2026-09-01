@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { openMailtoWithFallback } from "@/lib/utils/openMailto";
 import { Mail, Phone, Video } from "lucide-react";
 import { useLocale } from "next-intl";
 
@@ -63,12 +64,12 @@ const CTAContactButtons = () => {
       <Button
         size="lg"
         className="flex w-full items-center justify-center text-base transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
-        onClick={() =>
-          gtag_report_conversion_contact(
-            "6oRqCKTAu5cbEP6OqaZB",
-            "mailto:contact@fm4all.com",
-          )
-        }
+        onClick={() => {
+          // Conversion seule : l'ouverture du mailto est gérée par
+          // openMailtoWithFallback (qui copie l'adresse si aucun client email)
+          gtag_report_conversion_contact("6oRqCKTAu5cbEP6OqaZB");
+          openMailtoWithFallback("contact@fm4all.com", locale);
+        }}
       >
         <Mail />
         {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}

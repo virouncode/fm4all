@@ -1,7 +1,8 @@
 "use client";
 
+import MailtoButton from "@/components/buttons/mailto-button";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, Video } from "lucide-react";
+import { Phone, Video } from "lucide-react";
 import { useLocale } from "next-intl";
 
 type CTAContactButtonsNoConversionProps = {
@@ -62,20 +63,7 @@ const CTAContactButtonsNoConversion = ({
         </Button>
       )}
 
-      <Button
-        size="lg"
-        className="flex w-full items-center justify-center text-base transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
-        asChild
-      >
-        <a
-          href={`mailto:${email}`}
-          className="flex items-center justify-center gap-2"
-          title={locale === "fr" ? "Contacter par email" : "Contact by email"}
-        >
-          <Mail />
-          {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}
-        </a>
-      </Button>
+      <MailtoButton email={email} />
     </div>
   );
 };
