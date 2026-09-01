@@ -68,13 +68,13 @@ export const openMailtoWithFallback = (email: string, locale: string) => {
     if (copied) {
       toast.success(
         locale === "fr"
-          ? "Adresse email copiée dans le presse-papier"
-          : "Email address copied to clipboard",
+          ? `Adresse copiée : ${email}`
+          : `Address copied: ${email}`,
         {
           description:
             locale === "fr"
-              ? `Aucun client email détecté. Écrivez-nous à ${email}`
-              : `No email client detected. Write to us at ${email}`,
+              ? "Collez-la dans votre messagerie pour nous écrire."
+              : "Paste it into your email app to write to us.",
         },
       );
     } else {

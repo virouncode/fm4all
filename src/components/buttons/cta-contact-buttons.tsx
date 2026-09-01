@@ -10,20 +10,32 @@ export const gtag_report_conversion_contact = (
   url?: string,
   newTab: boolean = false,
 ) => {
-  if (typeof window.gtag !== "undefined") {
-    window.gtag("event", "conversion", {
+  const gtag = window.gtag;
+
+  if (gtag) {
+    gtag("event", "conversion", {
       send_to: `AW-17528670078/${sendTo}`,
     });
-    if (url) {
-      setTimeout(() => {
-        if (newTab) {
-          window.open(url, "_blank");
-          return;
-        }
-        window.location.href = url;
-      }, 300);
+  }
+
+  if (url) {
+    const navigate = () => {
+      if (newTab) {
+        window.open(url, "_blank");
+        return;
+      }
+      window.location.href = url;
+    };
+    // La navigation ne doit jamais dépendre de gtag : si le script est bloqué
+    // (bloqueur de pub), le bouton doit quand même fonctionner. On ne temporise
+    // que lorsque gtag est présent, le temps que la conversion soit envoyée.
+    if (gtag) {
+      setTimeout(navigate, 300);
+    } else {
+      navigate();
     }
   }
+
   return false;
 };
 
