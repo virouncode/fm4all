@@ -29,7 +29,10 @@ export async function getProspectsPaginated({
     ? or(
         ilike(prospects.nomEntreprise, `%${search}%`),
         ilike(prospects.emailContact, `%${search}%`),
-        ilike(sql`CONCAT(${prospects.prenomContact}, ' ', ${prospects.nomContact})`, `%${search}%`),
+        ilike(
+          sql`CONCAT(${prospects.prenomContact}, ' ', ${prospects.nomContact})`,
+          `%${search}%`,
+        ),
         ilike(prospects.ville, `%${search}%`),
       )
     : undefined;
@@ -72,7 +75,10 @@ export async function countProspects({
     ? or(
         ilike(prospects.nomEntreprise, `%${search}%`),
         ilike(prospects.emailContact, `%${search}%`),
-        ilike(sql`CONCAT(${prospects.prenomContact}, ' ', ${prospects.nomContact})`, `%${search}%`),
+        ilike(
+          sql`CONCAT(${prospects.prenomContact}, ' ', ${prospects.nomContact})`,
+          `%${search}%`,
+        ),
         ilike(prospects.ville, `%${search}%`),
       )
     : undefined;

@@ -30,7 +30,8 @@ export const getServicesFm4AllTaux = async () => {
       remiseCa: result.remiseCa / (RATIO * 100),
       remiseHof: result.remiseHof / (RATIO * 100),
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getServicesFm4AllTaux a échoué", error);
     return [];
   }
 };
@@ -44,7 +45,8 @@ export const getServicesFm4AllOffres = async () => {
     return results.map((result) =>
       selectServicesFm4AllOffresSchema.parse(result),
     );
-  } catch {
+  } catch (error) {
+    console.error("[queries] getServicesFm4AllOffres a échoué", error);
     return [];
   }
 };

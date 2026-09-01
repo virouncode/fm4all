@@ -38,7 +38,8 @@ export const getIncendieQuantite = async (surface: string) => {
       .where(eq(incendieQuantites.surface, roundedSurface));
     if (results.length === 0) return null;
     return selectIncendieQuantitesSchema.parse(results[0]);
-  } catch {
+  } catch (error) {
+    console.error("[queries] getIncendieQuantite a échoué", error);
     return null;
   }
 };
@@ -88,7 +89,8 @@ export const getIncendieTarifs = async (surface: string) => {
       prixParTelBaes: result.prixParTelBaes / RATIO,
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getIncendieTarifs a échoué", error);
     return [];
   }
 };
@@ -117,7 +119,8 @@ export const getExutoiresTarifs = async () => {
       prixParExutoire: result.prixParExutoire / RATIO,
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getExutoiresTarifs a échoué", error);
     return [];
   }
 };
@@ -146,7 +149,8 @@ export const getExutoiresParkingsTarifs = async () => {
       prixParExutoire: result.prixParExutoire / RATIO,
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getExutoiresParkingsTarifs a échoué", error);
     return [];
   }
 };
@@ -174,7 +178,8 @@ export const getAlarmesTarifs = async () => {
       ...result,
       prixParControle: result.prixParControle / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getAlarmesTarifs a échoué", error);
     return [];
   }
 };
@@ -202,7 +207,8 @@ export const getRiaTarifs = async () => {
       ...result,
       prixParRIA: result.prixParRIA / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getRiaTarifs a échoué", error);
     return [];
   }
 };
@@ -230,7 +236,8 @@ export const getColonnesSechesTarifs = async () => {
       ...result,
       prixParColonne: result.prixParColonne / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getColonnesSechesTarifs a échoué", error);
     return [];
   }
 };
@@ -258,7 +265,8 @@ export const getPortesCoupeFeuTarifs = async () => {
       ...result,
       prixParPorte: result.prixParPorte / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getPortesCoupeFeuTarifs a échoué", error);
     return [];
   }
 };

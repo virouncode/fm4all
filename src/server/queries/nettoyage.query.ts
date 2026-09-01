@@ -63,7 +63,8 @@ export const getNettoyageQuantites = async (surface: string) => {
       ...result,
       freqAnnuelle: result.freqAnnuelle / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getNettoyageQuantites a échoué", error);
     return [];
   }
 };
@@ -81,7 +82,8 @@ export const getNettoyageAllQuantites = async () => {
       ...result,
       freqAnnuelle: result.freqAnnuelle / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getNettoyageAllQuantites a échoué", error);
     return [];
   }
 };
@@ -124,7 +126,8 @@ export const getNettoyageTarifs = async (surface: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getNettoyageTarifs a échoué", error);
     return [];
   }
 };
@@ -146,7 +149,8 @@ export const getNettoyageTarifsPrestataire = async (entrepriseId: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getNettoyageTarifsPrestataire a échoué", error);
     return [];
   }
 };
@@ -191,7 +195,8 @@ export const getRepasseTarifs = async (surface: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getRepasseTarifs a échoué", error);
     return [];
   }
 };
@@ -213,7 +218,8 @@ export const getRepasseTarifsPrestataire = async (entrepriseId: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getRepasseTarifsPrestataire a échoué", error);
     return [];
   }
 };
@@ -257,7 +263,8 @@ export const getVitrerieTarifs = async () => {
       minFacturation: result.minFacturation / RATIO,
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getVitrerieTarifs a échoué", error);
     return [];
   }
 };
@@ -281,7 +288,8 @@ export const getVitrerieTarifsPrestataire = async (entrepriseId: string) => {
       fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
     return data[0];
-  } catch {
+  } catch (error) {
+    console.error("[queries] getVitrerieTarifsPrestataire a échoué", error);
     return null;
   }
 };

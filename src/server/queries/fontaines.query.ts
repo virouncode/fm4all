@@ -37,10 +37,7 @@ export const getFontainesTarifs = async () => {
         imageStorageKey: imageDoc.storageKey,
       })
       .from(fontainesTarifs)
-      .innerJoin(
-        entreprises,
-        eq(entreprises.id, fontainesTarifs.entrepriseId),
-      )
+      .innerJoin(entreprises, eq(entreprises.id, fontainesTarifs.entrepriseId))
       .innerJoin(
         entrepriseRoles,
         and(
@@ -83,7 +80,8 @@ export const getFontainesTarifs = async () => {
           ? result.paConsoEauChaude / RATIO
           : null,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getFontainesTarifs a échoué", error);
     return [];
   }
 };
@@ -95,7 +93,8 @@ export const getFontaines = async () => {
     const results = await db.select().from(fontaines);
     if (results.length === 0) return [];
     return results.map((result) => selectFontainesModelesSchema.parse(result));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getFontaines a échoué", error);
     return [];
   }
 };

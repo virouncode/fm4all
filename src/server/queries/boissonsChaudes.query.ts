@@ -64,7 +64,10 @@ export const getCafeMachinesTarifs = async () => {
         eq(entrepriseInfos.entrepriseId, entreprises.id),
       )
       .leftJoin(documents, eq(documents.id, entreprises.logoId))
-      .leftJoin(cafeMachines, eq(cafeMachines.id, cafeMachinesTarifs.cafeMachineId))
+      .leftJoin(
+        cafeMachines,
+        eq(cafeMachines.id, cafeMachinesTarifs.cafeMachineId),
+      )
       .leftJoin(imageDoc, eq(imageDoc.id, cafeMachines.imageId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
@@ -86,7 +89,8 @@ export const getCafeMachinesTarifs = async () => {
           ? result.fraisInstallation / RATIO
           : null,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getCafeMachinesTarifs a échoué", error);
     return [];
   }
 };
@@ -110,10 +114,7 @@ export const getCafeConsoTarifs = async () => {
         imageStorageKey: imageDoc.storageKey,
       })
       .from(cafeConsoTarifs)
-      .innerJoin(
-        entreprises,
-        eq(entreprises.id, cafeConsoTarifs.entrepriseId),
-      )
+      .innerJoin(entreprises, eq(entreprises.id, cafeConsoTarifs.entrepriseId))
       .innerJoin(
         entrepriseRoles,
         and(
@@ -136,7 +137,8 @@ export const getCafeConsoTarifs = async () => {
       ...result,
       prixUnitaire: result.prixUnitaire ? result.prixUnitaire / RATIO : null,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getCafeConsoTarifs a échoué", error);
     return [];
   }
 };
@@ -153,10 +155,7 @@ export const getLaitConsoTarifs = async () => {
         logoStorageKey: documents.storageKey,
       })
       .from(laitConsoTarifs)
-      .innerJoin(
-        entreprises,
-        eq(entreprises.id, laitConsoTarifs.entrepriseId),
-      )
+      .innerJoin(entreprises, eq(entreprises.id, laitConsoTarifs.entrepriseId))
       .innerJoin(
         entrepriseRoles,
         and(
@@ -189,7 +188,8 @@ export const getLaitConsoTarifs = async () => {
           ? result.prixUnitairePoudre / RATIO
           : null,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getLaitConsoTarifs a échoué", error);
     return [];
   }
 };
@@ -238,7 +238,8 @@ export const getChocolatConsoTarifs = async () => {
           ? result.prixUnitairePoudre / RATIO
           : null,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getChocolatConsoTarifs a échoué", error);
     return [];
   }
 };
@@ -261,10 +262,7 @@ export const getTheConsoTarifs = async () => {
         nbAvis: entrepriseInfos.nbAvis,
       })
       .from(theConsoTarifs)
-      .innerJoin(
-        entreprises,
-        eq(entreprises.id, theConsoTarifs.entrepriseId),
-      )
+      .innerJoin(entreprises, eq(entreprises.id, theConsoTarifs.entrepriseId))
       .innerJoin(
         entrepriseRoles,
         and(
@@ -287,7 +285,8 @@ export const getTheConsoTarifs = async () => {
       prixUnitaire:
         result.prixUnitaire !== null ? result.prixUnitaire / RATIO : null,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getTheConsoTarifs a échoué", error);
     return [];
   }
 };
@@ -304,10 +303,7 @@ export const getSucreConsoTarifs = async () => {
         logoStorageKey: documents.storageKey,
       })
       .from(sucreConsoTarifs)
-      .innerJoin(
-        entreprises,
-        eq(entreprises.id, sucreConsoTarifs.entrepriseId),
-      )
+      .innerJoin(entreprises, eq(entreprises.id, sucreConsoTarifs.entrepriseId))
       .innerJoin(
         entrepriseRoles,
         and(
@@ -330,7 +326,8 @@ export const getSucreConsoTarifs = async () => {
       prixUnitaire:
         result.prixUnitaire !== null ? result.prixUnitaire / RATIO : null,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getSucreConsoTarifs a échoué", error);
     return [];
   }
 };
@@ -342,7 +339,8 @@ export const getCafeMachines = async () => {
     const results = await db.select().from(cafeMachines);
     if (results.length === 0) return [];
     return results.map((result) => selectCafeMachinesSchema.parse(result));
-  } catch {
+  } catch (error) {
+    console.error("[queries] getCafeMachines a échoué", error);
     return [];
   }
 };
