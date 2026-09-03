@@ -11,7 +11,15 @@
 
 set -euo pipefail
 
-PG_BIN="/opt/homebrew/opt/libpq/bin"
+# libpq n'est pas dans le PATH par defaut avec Homebrew.
+if command -v pg_dump >/dev/null 2>&1; then
+  PG_BIN="$(dirname "$(command -v pg_dump)")"
+elif [ -x /opt/homebrew/opt/libpq/bin/pg_dump ]; then
+  PG_BIN="/opt/homebrew/opt/libpq/bin"
+else
+  echo "pg_dump introuvable. Installer libpq : brew install libpq" >&2
+  exit 1
+fi
 OUT_DIR="backups"
 KEEP=10  # nombre de sauvegardes conservees par branche
 

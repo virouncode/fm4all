@@ -3,5 +3,6 @@
   "i18n-ally.keystyle": "nested",
   "i18n-ally.sourceLanguage": "fr",
   "i18n-ally.enabledParsers": ["js", "ts"],
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "js/ts.tsdk.path": "node_modules/typescript/lib"
 }
