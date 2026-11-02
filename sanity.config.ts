@@ -22,7 +22,17 @@ import { serviceVilleType } from "./src/sanity/schemaTypes/serviceVilleType";
 
 import { tagType } from "./src/sanity/schemaTypes/tagType";
 
-const TRANSLATABLE_TYPES = ["article", "service", "serviceVille", "secteur"];
+// Tout type qui a une URL par langue doit être ici : c'est le jumelage
+// (translation.metadata) que le site interroge pour traduire une URL,
+// les hreflang et le bouton de langue. Un type absent retombe sur une
+// table manuelle (redirects/*SlugMappings.ts), qui vieillit.
+const TRANSLATABLE_TYPES = [
+  "article",
+  "articleCategory",
+  "service",
+  "serviceVille",
+  "secteur",
+];
 
 // Create configuration object
 const config = {
