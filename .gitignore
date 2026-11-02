@@ -46,3 +46,6 @@ next-env.d.ts
 # Sauvegardes locales de la base (jamais versionnees)
 backups/
 *.dump
+
+# cache vitest 5
+.vitest
