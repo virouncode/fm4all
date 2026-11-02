@@ -2,7 +2,13 @@
 export const articlesSlugMappingsFrToEn: Record<string, string> = {
   "pilotage-facility-management": "facilities-management-outsourcing",
   nettoyage: "cleaning-services",
-  // Ajoutez tous vos autres services ici
+  "securite-incendie": "fire-safety",
+  // ⚠️ Table écrite à la main : toute catégorie ou tout article publié dans
+  // Sanity sans ligne ici garde son slug d'origine au changement de langue, et
+  // la page sert alors le contenu de l'autre langue (bug du 2026-11-02 sur
+  // « Fire Safety »). Sanity connaît déjà les jumelles (translation.metadata) :
+  // la vraie correction est de les lui demander, voir le commit qui a ajouté
+  // cette note.
 };
 // Mappings des slugs de services du français vers l'anglais
 export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
@@ -31,6 +37,7 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
     "technical-maintenance-log-france",
   "attestation-assurance-rc-entreprise":
     "rc-insurance-certificate-business-france",
+  "securite-incendie-erp-conformite-ia": "fire-safety-erp-compliance-ai",
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
