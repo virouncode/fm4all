@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LocaleType } from "@/i18n/routing";
 import { getArticle } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
@@ -14,11 +15,12 @@ import { ArticleCategory } from "../../../../../../sanity.types";
 
 const HofManager = async () => {
   const t = await getTranslations("HomePage.hofManager");
-  const locale = await getLocale();
+  const locale = (await getLocale()) as LocaleType;
   const article = await getArticle(
     locale === "fr"
       ? "hof-managers-un-nouveau-concept"
       : "hof-managers-a-new-concept",
+    locale,
   );
   if (!article) return null;
   const categorie = article.categorie as ArticleCategory;

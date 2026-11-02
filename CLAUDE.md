@@ -1944,6 +1944,19 @@ export const generateStaticParams = async () => {
 
 **Règle** : Toute page `[slug]/page.tsx` qui lit Sanity DOIT avoir `generateStaticParams`. Sans ça, la page est rendue à la demande (lent) et n'est pas préchargée au build.
 
+### 2bis. Traductions d'URL — demander les jumelles à Sanity, pas à une table
+
+Les tables `redirects/*SlugMappings.ts` sont écrites à la main : un document publié dans Sanity sans ligne dans la table gardait son slug au changement de langue, et la page servait le contenu de l'autre langue sous la mauvaise locale (bug « Fire Safety », 2026-11-02). Sanity connaît déjà les jumelles via `translation.metadata` (plugin `document-internationalization`).
+
+**Articles et catégories (fait)** :
+
+- la requête filtre `language == $locale` et projette `"jumelles"` ; `getArticle(subSlug, locale)` / `getCategorie(slug, locale)` ;
+- `articleSlugsParLocale` / `categorieSlugsParLocale` (`lib/i18n/articleAlternates.ts`) : Sanity d'abord, la table en repli ;
+- la page passe le résultat à `generatePageMetadata` (hreflang) **et** le publie avec `<AlternateSlugs value={…} />` (`context/AlternateSlugsContext.tsx`) : le bouton de langue le lit en priorité, la table ne sert plus qu'aux pages qui ne publient rien ;
+- un slug de l'autre langue sous une locale → `findArticleJumelle` / `findCategorieJumelle` → `permanentRedirect` vers la jumelle, jamais le contenu de l'autre langue.
+
+**Reste à faire** : services, secteurs (jumelés dans Sanity, même pattern) ; `serviceVille` (16 pages, jamais jumelées dans le Studio : la table reste nécessaire tant qu'elles ne le sont pas) ; `sitemap.ts` et `handleRedirects.ts` lisent encore la table. Les catégories ne sont pas dans `TRANSLATABLE_TYPES` : leur jumelle se déduit d'un article jumelé — les ajouter au plugin et les jumeler dans le Studio simplifierait la requête.
+
 ### 3. Metadata SEO — Utiliser generatePageMetadata()
 
 ```typescript

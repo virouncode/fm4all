@@ -1,6 +1,7 @@
 import CookieBanner from "@/components/banners/CookieBanner";
 import Footer from "@/components/footer/footer";
 import Header from "@/components/header/header";
+import { AlternateSlugsProvider } from "@/context/AlternateSlugsContext";
 import { routing } from "@/i18n/routing";
 
 import { LocaleType } from "@/i18n/routing";
@@ -49,11 +50,11 @@ export default async function SiteLayout({
   setRequestLocale(locale);
 
   return (
-    <>
+    <AlternateSlugsProvider>
       <Header />
       {children}
       <Footer />
       <CookieBanner />
-    </>
+    </AlternateSlugsProvider>
   );
 }

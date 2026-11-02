@@ -6,16 +6,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Link } from "@/i18n/navigation";
+import { AlternateSlugs } from "@/context/AlternateSlugsContext";
+import { Link, permanentRedirect } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
+import { categorieSlugsParLocale } from "@/lib/i18n/articleAlternates";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
-import {
-  getArticlesSlugEn,
-  getArticlesSlugFr,
-} from "@/redirects/articlesSlugMappings";
 import { urlFor } from "@/sanity/lib/image";
 import {
   fetchArticleCategories,
+  findCategorieJumelle,
   getArticlesOfCategorie,
   getCategorie,
 } from "@/sanity/queries";
@@ -31,7 +30,7 @@ export const generateMetadata = async ({
   params: Promise<{ slug: string; locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { slug, locale } = await params;
-  const categorie = await getCategorie(slug);
+  const categorie = await getCategorie(slug, locale);
 
   return generatePageMetadata(
     "blogCategorie",
@@ -41,10 +40,7 @@ export const generateMetadata = async ({
     categorie?.imagePrincipale
       ? urlFor(categorie.imagePrincipale).url()
       : undefined,
-    {
-      fr: locale === "fr" ? slug : getArticlesSlugFr(slug),
-      en: locale === "en" ? slug : getArticlesSlugEn(slug),
-    },
+    categorieSlugsParLocale(locale, slug, categorie?.jumelle),
   );
 };
 
@@ -68,17 +64,32 @@ const page = async ({
   setRequestLocale(locale);
   const t = await getTranslations("BlogPage");
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
-  const categorie = await getCategorie(slug);
+  const categorie = await getCategorie(slug, locale);
   if (!categorie) {
+    // Slug de l'autre langue sous cette locale : vers la catégorie jumelle.
+    const jumelle = await findCategorieJumelle(slug, locale);
+    if (jumelle) {
+      permanentRedirect({
+        href: { pathname: "/blog/[slug]", params: { slug: jumelle } },
+        locale,
+      });
+    }
     notFound();
   }
   const articles = await getArticlesOfCategorie(
     locale as LocaleType,
     categorie.slug?.current ?? "",
   );
+  const alternates = categorieSlugsParLocale(locale, slug, categorie.jumelle);
 
   return (
     <main className="mx-auto mb-24 max-w-7xl px-6 py-4 hyphens-auto md:px-20">
+      <AlternateSlugs
+        value={{
+          fr: { slug: alternates.fr },
+          en: { slug: alternates.en },
+        }}
+      />
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>

@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAlternateSlugs } from "@/context/AlternateSlugsContext";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { LocaleType, routing } from "@/i18n/routing";
 import {
@@ -38,6 +39,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
   const pathname = usePathname();
   const params = useParams();
   const searchParams = useSearchParams();
+  const alternates = useAlternateSlugs();
 
   const handleChangeLang = (newLocale: LocaleType) => {
     if (newLocale === locale) return;
@@ -45,6 +47,19 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
     searchParams.forEach((value, key) => {
       query[key] = value;
     });
+    // La page a publié ses slugs dans l'autre langue (depuis Sanity) : on les
+    // prend tels quels. Les tables manuelles ci-dessous ne servent plus que
+    // de repli aux pages qui ne publient rien (villes, services, secteurs).
+    const connus = alternates?.[newLocale];
+    if (connus) {
+      router.replace(
+        { pathname, params: connus, query } as Parameters<
+          typeof router.replace
+        >[0],
+        { locale: newLocale },
+      );
+      return;
+    }
     if (pathname === "/services/[slug]") {
       if (typeof params.slug === "string") {
         const newSlug =

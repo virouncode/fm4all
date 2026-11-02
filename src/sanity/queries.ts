@@ -318,20 +318,57 @@ export const getLastArticles = async (
   });
 };
 
-export const CATEGORIE_QUERY = `*[_type == "articleCategory" && slug.current == $slug][0]{
+// Les catégories ne sont pas dans le plugin d'internationalisation : leur
+// jumelle se déduit de la catégorie d'un article jumelé (translation.metadata).
+const CATEGORIE_JUMELLE_PROJECTION = `*[_type == "translation.metadata" && references(*[_type == "article" && references(^.^._id)]._id)][0]
+    .translations[_key == $autreLocale][0].value->categorie->{ "locale": language, "slug": slug.current }`;
+
+export const CATEGORIE_QUERY = `*[_type == "articleCategory" && slug.current == $slug && language == $locale][0]{
   _id,
   titre,
   baliseTitle,
   baliseDescription,
   imagePrincipale,
-  slug}`;
+  slug,
+  "jumelle": ${CATEGORIE_JUMELLE_PROJECTION}
+}`;
 
+export type CategorieJumelleType = {
+  locale: string | null;
+  slug: string | null;
+};
+
+/** La catégorie dans SA langue : un slug anglais sous /fr ne rend plus rien. */
 export const getCategorie = async (
   slug: string,
-): Promise<ArticleCategory | null> => {
-  return await client.fetch<ArticleCategory | null>(CATEGORIE_QUERY, {
+  locale: LocaleType,
+): Promise<(ArticleCategory & { jumelle: CategorieJumelleType | null }) | null> => {
+  return await client.fetch<
+    (ArticleCategory & { jumelle: CategorieJumelleType | null }) | null
+  >(CATEGORIE_QUERY, {
     slug,
+    locale,
+    autreLocale: locale === "fr" ? "en" : "fr",
   });
+};
+
+/**
+ * Pour un slug de catégorie écrit dans N'IMPORTE quelle langue, le slug de la
+ * catégorie jumelle dans `locale` — de quoi rediriger un lien ancien ou mal
+ * traduit au lieu de servir l'autre langue.
+ */
+export const findCategorieJumelle = async (
+  slug: string,
+  locale: LocaleType,
+): Promise<string | null> => {
+  const result = await client.fetch<{ cible: string | null } | null>(
+    `*[_type == "articleCategory" && slug.current == $slug && language != $locale][0]{
+      "cible": *[_type == "translation.metadata" && references(*[_type == "article" && references(^.^._id)]._id)][0]
+        .translations[_key == $locale][0].value->categorie->slug.current
+    }`,
+    { slug, locale },
+  );
+  return result?.cible ?? null;
 };
 
 export const ALL_CATEGORIES_QUERY = `*[_type == "articleCategory" && language == $language]`;
@@ -361,7 +398,20 @@ export const getArticlesOfCategorie = async (
   });
 };
 
-export const ARTICLE_QUERY = `*[_type == "article" && subSlug.current == $subSlug][0]{
+// Les jumelles d'un article (plugin document-internationalization) : ce que le
+// bouton de langue et les hreflang consomment, à la place de la table manuelle.
+const ARTICLE_JUMELLES_PROJECTION = `*[_type == "translation.metadata" && references(^._id)][0]
+    .translations[]{ "locale": _key, "subSlug": value->subSlug.current, "slug": value->categorie->slug.current }`;
+
+export type ArticleJumelleType = {
+  locale: string | null;
+  slug: string | null;
+  subSlug: string | null;
+};
+
+// `language == $locale` : un slug anglais demandé sous /fr ne rend plus le
+// document anglais habillé en français (bug « Fire Safety », 2026-11-02).
+export const ARTICLE_QUERY = `*[_type == "article" && subSlug.current == $subSlug && language == $locale][0]{
   ...,
   categorie->{
     _id,
@@ -384,12 +434,38 @@ export const ARTICLE_QUERY = `*[_type == "article" && subSlug.current == $subSlu
     nom,
     slug
     },
+  "jumelles": ${ARTICLE_JUMELLES_PROJECTION}
 }`;
+
+/**
+ * Pour un sous-slug écrit dans N'IMPORTE quelle langue, les slugs de l'article
+ * jumeau dans `locale` — de quoi rediriger un lien ancien ou mal traduit.
+ */
+export const findArticleJumelle = async (
+  subSlug: string,
+  locale: LocaleType,
+): Promise<{ slug: string; subSlug: string } | null> => {
+  const result = await client.fetch<{
+    cible: { slug: string | null; subSlug: string | null } | null;
+  } | null>(
+    `*[_type == "article" && subSlug.current == $subSlug && language != $locale][0]{
+      "cible": *[_type == "translation.metadata" && references(^._id)][0]
+        .translations[_key == $locale][0]{ "subSlug": value->subSlug.current, "slug": value->categorie->slug.current }
+    }`,
+    { subSlug, locale },
+  );
+  const cible = result?.cible;
+  return cible?.slug && cible?.subSlug
+    ? { slug: cible.slug, subSlug: cible.subSlug }
+    : null;
+};
 
 export const getArticle = async (
   subSlug: string,
+  locale: LocaleType,
 ): Promise<
   | (Article & {
+      jumelles: ArticleJumelleType[] | null;
       categorie: ArticleCategory;
       auteur: {
         _id: string;
@@ -415,6 +491,7 @@ export const getArticle = async (
 > => {
   return await client.fetch<
     | (Article & {
+        jumelles: ArticleJumelleType[] | null;
         categorie: ArticleCategory;
         auteur: {
           _id: string;
@@ -439,6 +516,7 @@ export const getArticle = async (
     | null
   >(ARTICLE_QUERY, {
     subSlug,
+    locale,
   });
 };
 

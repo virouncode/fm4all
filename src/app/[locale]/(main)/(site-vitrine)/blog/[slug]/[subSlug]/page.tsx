@@ -10,18 +10,18 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Link } from "@/i18n/navigation";
+import { AlternateSlugs } from "@/context/AlternateSlugsContext";
+import { Link, permanentRedirect } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
+import { articleSlugsParLocale } from "@/lib/i18n/articleAlternates";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { capitalize } from "@/lib/utils/capitalize";
-import {
-  getArticlesSlugEn,
-  getArticlesSlugFr,
-  getArticlesSubSlugEn,
-  getArticlesSubSlugFr,
-} from "@/redirects/articlesSlugMappings";
 import { urlFor } from "@/sanity/lib/image";
-import { fetchArticleSlugs, getArticle } from "@/sanity/queries";
+import {
+  fetchArticleSlugs,
+  findArticleJumelle,
+  getArticle,
+} from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PortableTextBlock, PortableTextComponentProps } from "next-sanity";
@@ -109,7 +109,7 @@ export const generateMetadata = async ({
   params: Promise<{ slug: string; subSlug: string; locale: LocaleType }>;
 }) => {
   const { slug, subSlug, locale } = await params;
-  const article = await getArticle(subSlug);
+  const article = await getArticle(subSlug, locale);
 
   return generatePageMetadata(
     "blogArticle",
@@ -119,16 +119,8 @@ export const generateMetadata = async ({
     article?.imagePrincipale
       ? urlFor(article.imagePrincipale).url()
       : undefined,
-    {
-      fr: {
-        slug: locale === "fr" ? slug : getArticlesSlugFr(slug),
-        subSlug: locale === "fr" ? subSlug : getArticlesSubSlugFr(subSlug),
-      },
-      en: {
-        slug: locale === "en" ? slug : getArticlesSlugEn(slug),
-        subSlug: locale === "en" ? subSlug : getArticlesSubSlugEn(subSlug),
-      },
-    },
+    // hreflang depuis les jumelles Sanity ; la table manuelle en repli.
+    articleSlugsParLocale(locale, slug, subSlug, article?.jumelles),
   );
 };
 
@@ -152,19 +144,34 @@ export const generateStaticParams = async () => {
 const page = async ({
   params,
 }: {
-  params: Promise<{ subSlug: string; locale: LocaleType }>;
+  params: Promise<{ slug: string; subSlug: string; locale: LocaleType }>;
 }) => {
-  const { subSlug, locale } = await params;
+  const { slug, subSlug, locale } = await params;
   setRequestLocale(locale);
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const tBlog = await getTranslations({
     locale,
     namespace: "BlogPage",
   });
-  const article = await getArticle(subSlug);
+  const article = await getArticle(subSlug, locale);
   if (!article) {
+    // Slug de l'autre langue sous cette locale (lien ancien, table manuelle
+    // en retard) : on envoie vers la jumelle au lieu de servir l'autre langue.
+    const jumelle = await findArticleJumelle(subSlug, locale);
+    if (jumelle) {
+      permanentRedirect({
+        href: { pathname: "/blog/[slug]/[subSlug]", params: jumelle },
+        locale,
+      });
+    }
     notFound();
   }
+  const alternates = articleSlugsParLocale(
+    locale,
+    slug,
+    subSlug,
+    article.jumelles,
+  );
   const auteur = article.auteur as {
     _id: string;
     prenom: string;
@@ -217,6 +224,7 @@ const page = async ({
 
   return (
     <main className="mx-auto mb-24 max-w-7xl px-6 py-4 hyphens-auto md:px-20">
+      <AlternateSlugs value={alternates} />
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
