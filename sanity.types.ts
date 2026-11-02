@@ -24,6 +24,12 @@ export type Tag = {
   language?: "en" | "fr";
 };
 
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
 export type SanityAssistInstructionTask = {
   _type: "sanity.assist.instructionTask";
   path?: string;
@@ -165,13 +171,15 @@ export type TranslationMetadata = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  translations?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayReferenceValue
-  >;
+  translations?: InternationalizedArrayReference;
   schemaTypes?: Array<string>;
 };
+
+export type InternationalizedArrayReference = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayReferenceValue
+>;
 
 export type InternationalizedArrayReferenceValue = {
   _type: "internationalizedArrayReferenceValue";
@@ -181,6 +189,12 @@ export type InternationalizedArrayReferenceValue = {
         _type: "reference";
         _weak?: boolean;
         [internalGroqTypeReferenceTo]?: "article";
+      }
+    | {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "articleCategory";
       }
     | {
         _ref: string;
@@ -223,13 +237,7 @@ export type Secteur = {
       _key: string;
     }>;
     style?:
-      | "normal"
-      | "h2"
-      | "h3"
-      | "h4"
-      | "essentiel"
-      | "confort"
-      | "excellence";
+      "normal" | "h2" | "h3" | "h4" | "essentiel" | "confort" | "excellence";
     listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
@@ -810,6 +818,22 @@ export type Secteur = {
   language?: "en" | "fr";
 };
 
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type ServiceVille = {
   _id: string;
   _type: "serviceVille";
@@ -838,13 +862,7 @@ export type ServiceVille = {
       _key: string;
     }>;
     style?:
-      | "normal"
-      | "h2"
-      | "h3"
-      | "h4"
-      | "essentiel"
-      | "confort"
-      | "excellence";
+      "normal" | "h2" | "h3" | "h4" | "essentiel" | "confort" | "excellence";
     listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
@@ -1416,13 +1434,7 @@ export type ServiceVille = {
       _key: string;
     }>;
     style?:
-      | "normal"
-      | "h2"
-      | "h3"
-      | "h4"
-      | "essentiel"
-      | "confort"
-      | "excellence";
+      "normal" | "h2" | "h3" | "h4" | "essentiel" | "confort" | "excellence";
     listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
@@ -1458,13 +1470,7 @@ export type Service = {
       _key: string;
     }>;
     style?:
-      | "normal"
-      | "h2"
-      | "h3"
-      | "h4"
-      | "essentiel"
-      | "confort"
-      | "excellence";
+      "normal" | "h2" | "h3" | "h4" | "essentiel" | "confort" | "excellence";
     listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
@@ -2050,13 +2056,7 @@ export type Service = {
       _key: string;
     }>;
     style?:
-      | "normal"
-      | "h2"
-      | "h3"
-      | "h4"
-      | "essentiel"
-      | "confort"
-      | "excellence";
+      "normal" | "h2" | "h3" | "h4" | "essentiel" | "confort" | "excellence";
     listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
@@ -2097,13 +2097,7 @@ export type Article = {
       _key: string;
     }>;
     style?:
-      | "normal"
-      | "h2"
-      | "h3"
-      | "h4"
-      | "essentiel"
-      | "confort"
-      | "excellence";
+      "normal" | "h2" | "h3" | "h4" | "essentiel" | "confort" | "excellence";
     listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
@@ -2758,12 +2752,6 @@ export type ArticleCategory = {
   language?: "en" | "fr";
 };
 
-export type InternationalizedArrayReference = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayReferenceValue
->;
-
 export type SanityImagePaletteSwatch = {
   _type: "sanity.imagePaletteSwatch";
   background?: string;
@@ -2790,20 +2778,15 @@ export type SanityImageDimensions = {
   aspectRatio?: number;
 };
 
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
+export type SanityImageMetadata = {
+  _type: "sanity.imageMetadata";
+  location?: Geopoint;
+  dimensions?: SanityImageDimensions;
+  palette?: SanityImagePalette;
+  lqip?: string;
+  blurHash?: string;
+  hasAlpha?: boolean;
+  isOpaque?: boolean;
 };
 
 export type SanityFileAsset = {
@@ -2826,6 +2809,13 @@ export type SanityFileAsset = {
   path?: string;
   url?: string;
   source?: SanityAssetSourceData;
+};
+
+export type SanityAssetSourceData = {
+  _type: "sanity.assetSourceData";
+  name?: string;
+  id?: string;
+  url?: string;
 };
 
 export type SanityImageAsset = {
@@ -2851,17 +2841,6 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData;
 };
 
-export type SanityImageMetadata = {
-  _type: "sanity.imageMetadata";
-  location?: Geopoint;
-  dimensions?: SanityImageDimensions;
-  palette?: SanityImagePalette;
-  lqip?: string;
-  blurHash?: string;
-  hasAlpha?: boolean;
-  isOpaque?: boolean;
-};
-
 export type Geopoint = {
   _type: "geopoint";
   lat?: number;
@@ -2869,21 +2848,9 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
-export type SanityAssetSourceData = {
-  _type: "sanity.assetSourceData";
-  name?: string;
-  id?: string;
-  url?: string;
-};
-
 export type AllSanitySchemaTypes =
   | Tag
+  | Slug
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -2897,23 +2864,22 @@ export type AllSanitySchemaTypes =
   | SanityAssistInstruction
   | SanityAssistSchemaTypeField
   | TranslationMetadata
+  | InternationalizedArrayReference
   | InternationalizedArrayReferenceValue
   | Secteur
+  | SanityImageCrop
+  | SanityImageHotspot
   | ServiceVille
   | Service
   | Article
   | Auteur
   | ArticleCategory
-  | InternationalizedArrayReference
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
-  | SanityImageHotspot
-  | SanityImageCrop
-  | SanityFileAsset
-  | SanityImageAsset
   | SanityImageMetadata
-  | Geopoint
-  | Slug
-  | SanityAssetSourceData;
+  | SanityFileAsset
+  | SanityAssetSourceData
+  | SanityImageAsset
+  | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;

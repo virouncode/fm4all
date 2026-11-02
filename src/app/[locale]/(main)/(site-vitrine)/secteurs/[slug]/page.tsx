@@ -21,12 +21,13 @@ import { fetchSecteursSlugs, getSecteur } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PortableTextBlock, PortableTextComponentProps } from "next-sanity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 // Custom components for PortableText
-type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
+// Les styles de bloc ne lisent que `children` : typer sur le bloc complet
+// liait ce composant au type généré par Sanity, qui a changé avec next-sanity 11.
+type BlockComponentProps = { children?: React.ReactNode };
 type SanityImageValue = {
   asset?: {
     _ref: string;
