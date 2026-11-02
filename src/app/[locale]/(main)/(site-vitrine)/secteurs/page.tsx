@@ -13,14 +13,14 @@ import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import SecteursCards from "./SecteursCards";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   return generatePageMetadata(
     "secteurs",
     locale,
@@ -41,9 +41,9 @@ export const generateStaticParams = () => {
 const page = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }) => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   setRequestLocale(locale);
   const t = await getTranslations("SecteursPage");
 

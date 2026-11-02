@@ -4,7 +4,7 @@ import Header from "@/components/header/header";
 import { AlternateSlugsProvider } from "@/context/AlternateSlugsContext";
 import { routing } from "@/i18n/routing";
 
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 import { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
@@ -13,9 +13,9 @@ import { notFound } from "next/navigation";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   const titleTemplate = "%s | fm4all";
   const title =
     locale === "fr"
@@ -40,9 +40,9 @@ export default async function SiteLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }>) {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

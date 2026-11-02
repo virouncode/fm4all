@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { AlternateSlugs } from "@/context/AlternateSlugsContext";
 import { Link, permanentRedirect } from "@/i18n/navigation";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams, LocaleType } from "@/i18n/routing";
 import { categorieSlugsParLocale } from "@/lib/i18n/articleAlternates";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { urlFor } from "@/sanity/lib/image";
@@ -27,9 +27,9 @@ import ArticlesCards from "./ArticlesCards";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: LocaleType }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> => {
-  const { slug, locale } = await params;
+  const { slug, locale } = await localeParams(params);
   const categorie = await getCategorie(slug, locale);
 
   return generatePageMetadata(
@@ -58,9 +58,9 @@ export const generateStaticParams = async () => {
 const page = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: LocaleType }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) => {
-  const { slug, locale } = await params;
+  const { slug, locale } = await localeParams(params);
   setRequestLocale(locale);
   const t = await getTranslations("BlogPage");
   const tGlobal = await getTranslations({ locale, namespace: "Global" });

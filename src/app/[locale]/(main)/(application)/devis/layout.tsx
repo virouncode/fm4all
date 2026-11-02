@@ -1,5 +1,5 @@
 import Header from "@/components/header/header";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { DevisStoresProvider } from "@/stores/devis/DevisStoresProvider";
 
@@ -12,9 +12,9 @@ export default async function DevisLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }>) {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

@@ -4,14 +4,14 @@ import { ProspectStoreProvider } from "@/stores/devis/prospectStore";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import CityOut from "./CityOut";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   return generatePageMetadata(
     "chalandise",
     locale,
@@ -31,9 +31,9 @@ const page = async ({
   params,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }) => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   setRequestLocale(locale);
   const {
     destination,

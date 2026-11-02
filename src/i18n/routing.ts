@@ -129,4 +129,18 @@ export const routing = defineRouting({
 });
 
 export type LocaleType = (typeof routing.locales)[number];
+
+/**
+ * Lit les `params` d'une page ou d'un layout en rétrécissant `locale` à
+ * `LocaleType`. Depuis Next 15.5, le build valide la signature des pages :
+ * `params` doit être typé `Promise<{ locale: string }>`, le type littéral
+ * n'y est plus accepté. Le rétrécissement est sûr : `[locale]/layout.tsx`
+ * répond `notFound()` à toute locale inconnue avant de rendre une page.
+ */
+export async function localeParams<T extends { locale: string }>(
+  params: Promise<T>,
+): Promise<Omit<T, "locale"> & { locale: LocaleType }> {
+  const resolved = await params;
+  return { ...resolved, locale: resolved.locale as LocaleType };
+}
 export type PathnamesType = keyof typeof routing.pathnames;

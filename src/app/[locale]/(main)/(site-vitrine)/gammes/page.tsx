@@ -7,7 +7,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { HomeIcon } from "lucide-react";
@@ -18,9 +18,9 @@ import Image from "next/image";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   return generatePageMetadata(
     "gammes",
     locale,
@@ -40,9 +40,9 @@ export const generateStaticParams = () => {
 const page = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }) => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   setRequestLocale(locale);
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("GammesPage");

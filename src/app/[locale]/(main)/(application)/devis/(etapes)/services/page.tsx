@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -17,9 +17,9 @@ export const generateStaticParams = () => {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   return generatePageMetadata(
     "servicesDevis",
     locale,
@@ -34,10 +34,10 @@ const page = async ({
   params,
   searchParams,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   setRequestLocale(locale);
   const t = await getTranslations("DevisPage");
   const tServices = await getTranslations("DevisPage.services");

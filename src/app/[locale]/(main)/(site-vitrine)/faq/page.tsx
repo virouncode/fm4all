@@ -1,5 +1,5 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { FaqJsonLd } from "@/lib/seo/faq-jsonld";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
@@ -9,9 +9,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   return generatePageMetadata(
     "faq",
     locale,
@@ -86,9 +86,9 @@ const FAQ_PAIRS: Array<{ questionKey: string; answerKey: string }> = [
 const page = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }) => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   setRequestLocale(locale);
   const t = await getTranslations("FAQPage");
 

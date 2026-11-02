@@ -10,7 +10,7 @@ import Services from "@/app/[locale]/(main)/(site-vitrine)/(home)/Services";
 import Slogan from "@/app/[locale]/(main)/(site-vitrine)/(home)/Slogan";
 import VideoPresentation from "@/app/[locale]/(main)/(site-vitrine)/(home)/VideoPresentation";
 import Why from "@/app/[locale]/(main)/(site-vitrine)/(home)/Why";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { FaqJsonLd } from "@/lib/seo/faq-jsonld";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
@@ -25,9 +25,9 @@ export const generateStaticParams = () => {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   const title =
     locale === "fr"
       ? "Entreprise de Facility Management Paris IDF | Devis"
@@ -45,9 +45,9 @@ export const generateMetadata = async ({
 export default async function page({
   params,
 }: {
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
   setRequestLocale(locale);
   const tFaq = await getTranslations({ locale, namespace: "HomePage.faq" });
   const faqJsonLdItems = getHomeFaqPlainItems(tFaq);

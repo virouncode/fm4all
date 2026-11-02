@@ -1,7 +1,7 @@
 import ConsentBasedGoogleTags from "@/components/analytics/ConsentBasedGoogleTags";
 import { Toaster } from "@/components/ui/sonner";
 import { ConfirmProvider } from "@/context/ConfirmContextProvider";
-import { LocaleType, routing } from "@/i18n/routing";
+import { localeParams, routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -22,9 +22,9 @@ export default async function LocalizedLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ locale: LocaleType }>;
+  params: Promise<{ locale: string }>;
 }>) {
-  const { locale } = await params;
+  const { locale } = await localeParams(params);
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

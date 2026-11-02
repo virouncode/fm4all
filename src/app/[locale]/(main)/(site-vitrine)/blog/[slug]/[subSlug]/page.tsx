@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { AlternateSlugs } from "@/context/AlternateSlugsContext";
 import { Link, permanentRedirect } from "@/i18n/navigation";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 import { articleSlugsParLocale } from "@/lib/i18n/articleAlternates";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import { capitalize } from "@/lib/utils/capitalize";
@@ -106,9 +106,9 @@ export type PtComponentsType = typeof ptComponents;
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string; subSlug: string; locale: LocaleType }>;
+  params: Promise<{ slug: string; subSlug: string; locale: string }>;
 }) => {
-  const { slug, subSlug, locale } = await params;
+  const { slug, subSlug, locale } = await localeParams(params);
   const article = await getArticle(subSlug, locale);
 
   return generatePageMetadata(
@@ -144,9 +144,9 @@ export const generateStaticParams = async () => {
 const page = async ({
   params,
 }: {
-  params: Promise<{ slug: string; subSlug: string; locale: LocaleType }>;
+  params: Promise<{ slug: string; subSlug: string; locale: string }>;
 }) => {
-  const { slug, subSlug, locale } = await params;
+  const { slug, subSlug, locale } = await localeParams(params);
   setRequestLocale(locale);
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const tBlog = await getTranslations({

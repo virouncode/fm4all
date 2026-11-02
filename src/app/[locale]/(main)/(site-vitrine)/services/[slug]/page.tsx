@@ -10,7 +10,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
-import { LocaleType } from "@/i18n/routing";
+import { localeParams } from "@/i18n/routing";
 import { generatePageMetadata } from "@/lib/metadata/metadata-helpers";
 import {
   extractFaqItemsFromPortableText,
@@ -112,9 +112,9 @@ export const generateStaticParams = async () => {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: LocaleType }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> => {
-  const { slug, locale } = await params;
+  const { slug, locale } = await localeParams(params);
   const service = await getService(slug);
   return generatePageMetadata(
     "servicePresentation",
@@ -134,9 +134,9 @@ export const generateMetadata = async ({
 export default async function page({
   params,
 }: {
-  params: Promise<{ slug: string; locale: LocaleType }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug, locale } = await params;
+  const { slug, locale } = await localeParams(params);
   setRequestLocale(locale);
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const t = await getTranslations({ locale, namespace: "ServicesPage" });
