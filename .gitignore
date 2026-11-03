@@ -49,3 +49,6 @@ backups/
 
 # cache vitest 5
 .vitest
+
+# Sanity (généré par sanity dev)
+.sanity/
