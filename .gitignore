@@ -52,3 +52,6 @@ backups/
 
 # Sanity (généré par sanity dev)
 .sanity/
+
+# Build du Studio Sanity (sanity build)
+dist/
